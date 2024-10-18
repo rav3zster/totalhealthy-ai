@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
+  static const Color mauve = Color(0xFFD0B4F9);
+  static const Color smokyBlack = Color(0xFF0C0C0C);
+  static const Color neplesYellow = Color(0xFFF5D657);
+  static const Color mandarin = Color(0xFFF57552);
+  static const Color chineseGreen = Color(0xFFCDE26D);
+
   static const Color pageBackground = Color(0xFFFFFFFF);
   static const Color violet = Color(0xFF8A2BE2);
   static const Color heading = Color(0xFF9A74D9);
   static const Color drawerBackground = Color(0xFFFEE6F2);
   // 9A74D9
   static const Color white = Colors.white;
-  static const Color buttonColor = Color(0xffa989de);
-  static const Color backgroundColor = Color(0xffbda4e8);
+
   static const Color black = Colors.black;
-  static const Color primaryColor = Color(0xFF001e00);
+
   static const Color red = Colors.red;
   static const Color grey = Colors.grey;
   static const Color lightGrey = Color(0xFFEFEFEF); // Add the new color
@@ -24,10 +29,6 @@ class AppColors {
 
   static const Color backgroundGreen = Color(0xEBEAFFE9);
   static const Color primarygreen = Color(0xEBCCFAC8); // Add the new color
-
-  static const Color customNavyBlue = Color(0xFF000089);
-
-  static const Color navyBlue = Color(0xFF000089);
 }
 
 class AppColorSchemes {
