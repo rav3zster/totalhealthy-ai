@@ -45,7 +45,7 @@ class ThemeController extends GetxController {
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(
-              AppColors.customGreen2,
+              AppColors.chineseGreen,
             ),
             foregroundColor: WidgetStatePropertyAll(Colors.white),
             textStyle: WidgetStatePropertyAll(
