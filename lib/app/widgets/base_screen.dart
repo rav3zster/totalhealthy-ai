@@ -18,7 +18,7 @@ class BaseScreen extends StatefulWidget {
     this.isBottomNavbar = false,
     this.backgroundheight = 80,
     this.floatingActionButton,
-    this.backgroundColor = AppColors.pageBackground,
+    this.backgroundColor = AppColors.black,
   }) : super(key: key);
   final Widget child;
   double backgroundheight;
@@ -83,12 +83,14 @@ class _BaseScreenState extends State<BaseScreen> {
                   Container(
                     constraints:
                         BoxConstraints(maxHeight: widget.backgroundheight),
-                    decoration: const BoxDecoration(color: Colors.blue
-                        // gradient: LinearGradient(
-                        //     begin: Alignment.topLeft,
-                        //     end: Alignment.bottomRight,
-                        //     colors: [Colors.grey, Colors.blue]),
-                        ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.black,
+                          ]),
+                    ),
                     padding: const EdgeInsets.only(
                       top: 20,
                       left: 20,
