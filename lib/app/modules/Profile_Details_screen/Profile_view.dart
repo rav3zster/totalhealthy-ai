@@ -21,12 +21,16 @@ class _Profile_detailsState extends State<Profile_details> {
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color.fromARGB(255, 34, 37, 26),
+             Color(0xFF272e23),
+              Color.fromARGB(255, 12,12,12),
+
               Color.fromARGB(255, 12, 12, 12),
-              Color.fromARGB(255, 31, 33, 20),
+              Color(0xFF272e23),
             ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topRight,
+
+
+            end: Alignment.bottomLeft,
           ),
         ),
         child: SingleChildScrollView(
@@ -84,7 +88,8 @@ class _Profile_detailsState extends State<Profile_details> {
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
                           color: isMaleSelected
-                              ? const Color.fromARGB(255, 206, 225, 107) // Yellow when selected
+                              ? const Color.fromARGB(255,205, 226, 109)
+                          // Yellow when selected
                               : Colors.transparent, // Transparent when not selected
                           width: 3,
                         ),
