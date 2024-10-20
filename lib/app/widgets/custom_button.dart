@@ -13,14 +13,14 @@ class CustomButton extends StatelessWidget {
   final bool isFullWidth;
 
   const CustomButton({
-    Key? key,
+    super.key,
     required this.child,
     required this.onPressed,
     required this.size,
     required this.type,
     this.icon,
     this.isFullWidth = false, // Default to sizing according to the content
-  }) : super(key: key);
+  });
 
   // Define button sizes
   double _getButtonHeight() {

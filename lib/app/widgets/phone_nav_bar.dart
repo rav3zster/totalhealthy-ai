@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../core/base/constants/appcolor.dart';
 import '../routes/app_pages.dart';
 // ignore_for_file: prefer_const_constructors
 
@@ -64,7 +63,7 @@ class _MobileNavBarState extends State<MobileNavBar> {
           height: 50,
           selectedIndex: OntapStore.index,
           onDestinationSelected: (value) => ontapFunction(value),
-          destinations: [
+          destinations: const [
             NavigationDestination(
                 icon: Icon(
                   Icons.shopping_cart_outlined,
@@ -117,9 +116,9 @@ class _MobileNavBarState extends State<MobileNavBar> {
 }
 
 class ButtomNav extends StatefulWidget {
-  ButtomNav({
-    Key? key,
-  }) : super(key: key);
+  const ButtomNav({
+    super.key,
+  });
   @override
   State<ButtomNav> createState() => _ButtomNavState();
 }
@@ -149,7 +148,7 @@ class _ButtomNavState extends State<ButtomNav> {
       ),
       child: BottomNavigationBar(
         iconSize: 20,
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',

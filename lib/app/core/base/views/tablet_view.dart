@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BaseTabletView extends StatelessWidget {
-  const BaseTabletView({Key? key, required this.vBuilderTablet})
-      : super(key: key);
+  const BaseTabletView({super.key, required this.vBuilderTablet});
   final Widget vBuilderTablet;
 
   @override
