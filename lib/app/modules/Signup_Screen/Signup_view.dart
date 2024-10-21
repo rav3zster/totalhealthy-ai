@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:totalhealthy/app/modules/Registration_Screen/Registration_view.dart';
 
-class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+class SignupView extends StatefulWidget {
+  const SignupView({super.key});
 
   @override
-  LoginViewState createState() => LoginViewState();
+  SignupViewState createState() => SignupViewState();
 }
 
-class LoginViewState extends State<LoginView> {
+class SignupViewState extends State<SignupView> {
   bool isMaleSelected = false; // Track Male selection
   bool isFemaleSelected = false; // Track Female selection
 
@@ -253,7 +253,7 @@ class LoginViewState extends State<LoginView> {
                 child: TextField(
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.lock_outline_rounded,
-                        color: Colors.white54),suffixIcon: Icon(Icons.remove_red_eye_outlined,color: Colors.white30,),
+                        color: Colors.white54),suffixIcon: Icon(Icons.remove_red_eye_outlined,color: Colors.white54,),
                     hintText: "enter your password",
                     hintStyle: const TextStyle(color: Colors.white30),
                     fillColor: const Color.fromARGB(255, 36, 36, 36),
@@ -323,7 +323,7 @@ class LoginViewState extends State<LoginView> {
                         )),
                   ],
                 ),
-              ),
+              ),SizedBox(height: 15,),
               Row(
                 children: [
                   Container(
