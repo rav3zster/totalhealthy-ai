@@ -1,18 +1,9 @@
 import 'package:get/get.dart';
-<<<<<<< HEAD
 import 'package:totalhealthy/app/modules/login/bindings/login_binding.dart';
 import 'package:totalhealthy/app/modules/registration/bindings/registration_binding.dart';
 import 'package:totalhealthy/app/modules/registration/views/registration_view.dart';
-=======
-import 'package:totalhealthy/app/modules/Onboarding_Screen/Onboarding_view.dart';
-//import 'package:totalhealthy/app/modules/Login_Screen/Login_controller.dart';
-//import 'package:totalhealthy/app/modules/Login_Screen/Login_view.dart';
-import 'package:totalhealthy/app/modules/Registration_Screen/Registration_view.dart';
-import 'package:totalhealthy/app/modules/Signup_Screen/Signup_view.dart';
-import 'package:totalhealthy/app/modules/home/widgets/home_screen.dart';
-//import 'package:totalhealthy/app/modules/login_screen/login_controller.dart';
->>>>>>> f7b99eece11a3049787b33107225f1ea3317ef42
 
+import '../modules/Onboarding_Screen/Onboarding_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/views/login_view.dart';
@@ -26,16 +17,12 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.WelcomeScreen;
+  static const INITIAL = Routes.HOME;
 
   static final routes = [
     GetPage(
       name: _Paths.HOME,
-<<<<<<< HEAD
       page: () => HomeView(),
-=======
-      page: () => OnboardingView(),
->>>>>>> f7b99eece11a3049787b33107225f1ea3317ef42
       binding: HomeBinding(),
     ),
     GetPage(
