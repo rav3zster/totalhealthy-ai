@@ -22,10 +22,10 @@ class AppColors {
   static const Color customOrange = Color(0xFFFF9A2F); // Add the new color
   static const Color customGreen = Color(0xFF046A38);
   static const Color customGreen2 = Color(0xf00a8901);
-  static const Color pinklight = Color(0xFFFC0A3F3);
-  static const Color pinkText = Color(0xFFFA889DC);
+  static const Color pinklight = Color(0xfffc0a3f3);
+  static const Color pinkText = Color(0xfffa889dc);
 
-  static const Color pinkdark = Color(0xFFFA989DC);
+  static const Color pinkdark = Color(0xfffa989dc);
 
   static const Color backgroundGreen = Color(0xEBEAFFE9);
   static const Color primarygreen = Color(0xEBCCFAC8); // Add the new color
@@ -50,11 +50,9 @@ class AppColorSchemes {
     errorContainer: Color(0xFFFFDAD6),
     onError: Color(0xFFFFFFFF),
     onErrorContainer: Color(0xFF410002),
-    background: Colors.white,
-    onBackground: Color(0xFF002107),
     surface: Color(0xFFF6FFF1),
     onSurface: AppColors.backgroundGreen,
-    surfaceVariant: Color.fromARGB(255, 255, 255, 255),
+    surfaceContainerHighest: Color.fromARGB(255, 255, 255, 255),
     onSurfaceVariant: Color(0xFF43483F),
     outline: Color(0xFF73796E),
     onInverseSurface: Color(0xFFC6FFC6),
@@ -84,11 +82,9 @@ class AppColorSchemes {
     errorContainer: Color(0xFF93000A),
     onError: Color(0xFF690005),
     onErrorContainer: Color(0xFFFFDAD6),
-    background: Color.fromARGB(255, 32, 31, 31),
-    onBackground: Color(0xFFA4F5A9),
     surface: Color(0xFF272e23),
     onSurface: Color(0xFF272e23),
-    surfaceVariant: Color(0xFF43483F),
+    surfaceContainerHighest: Color(0xFF43483F),
     onSurfaceVariant: Color(0xFFC3C8BC),
     outline: Color(0xFF8D9387),
     onInverseSurface: Color(0xFF002107),
@@ -122,9 +118,9 @@ extension CustomColorScheme on BuildContext {
   Color get errorContainer => Theme.of(this).colorScheme.errorContainer;
   Color get onError => Theme.of(this).colorScheme.onError;
   Color get onErrorContainer => Theme.of(this).colorScheme.onErrorContainer;
-  Color get background => Theme.of(this).colorScheme.background;
-  Color get onBackground => Theme.of(this).colorScheme.onBackground;
-  Color get surfaceVariant => Theme.of(this).colorScheme.surfaceVariant;
+  Color get background => Theme.of(this).colorScheme.surface;
+  Color get onBackground => Theme.of(this).colorScheme.onSurface;
+  Color get surfaceVariant => Theme.of(this).colorScheme.surfaceContainerHighest;
   Color get onSurfaceVariant => Theme.of(this).colorScheme.onSurfaceVariant;
   Color get outline => Theme.of(this).colorScheme.outline;
   Color get onInverseSurface => Theme.of(this).colorScheme.onInverseSurface;

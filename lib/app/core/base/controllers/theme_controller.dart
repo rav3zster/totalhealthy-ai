@@ -10,7 +10,7 @@ class ThemeController extends GetxController {
 
   static ThemeData lightTheme = ThemeData(
     primarySwatch: Colors.blue,
-    datePickerTheme: DatePickerThemeData(
+    datePickerTheme: const DatePickerThemeData(
       todayForegroundColor: WidgetStatePropertyAll(Colors.black),
       weekdayStyle: TextStyle(color: Colors.black),
       yearForegroundColor:
@@ -18,7 +18,7 @@ class ThemeController extends GetxController {
       dayForegroundColor: WidgetStatePropertyAll(Colors.black),
       headerForegroundColor: Colors.black,
     ),
-    listTileTheme: ListTileThemeData(
+    listTileTheme: const ListTileThemeData(
         titleTextStyle:
             TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
     // cardTheme: CardTheme(color: AppColors.primarygreen),
@@ -42,7 +42,7 @@ class ThemeController extends GetxController {
       labelSmall: TextStyle(color: Colors.black), // Equivalent to overline
     ),
 
-    elevatedButtonTheme: ElevatedButtonThemeData(
+    elevatedButtonTheme: const ElevatedButtonThemeData(
         style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(
               AppColors.chineseGreen,
@@ -109,7 +109,6 @@ class ThemeController extends GetxController {
       ),
     ),
     colorScheme: AppColorSchemes.darkColorScheme,
-    useMaterial3: true,
     appBarTheme: const AppBarTheme(
       color: AppColors.lightGrey,
       iconTheme: IconThemeData(color: AppColors.white),

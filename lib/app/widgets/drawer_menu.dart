@@ -2,10 +2,8 @@ import '/app/core/base/constants/appcolor.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 import '../core/utitlity/responsive_settings.dart';
-import '../routes/app_pages.dart';
 import 'phone_nav_bar.dart';
 
 class DrawerMenu extends StatefulWidget {
@@ -28,16 +26,16 @@ class _DrawerMenuState extends State<DrawerMenu> {
               child: Column(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     width: double.infinity,
-                    decoration: BoxDecoration(),
+                    decoration: const BoxDecoration(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: double.infinity,
                           child: Row(
                             // crossAxisAlignment: WrapCrossAlignment.start,
@@ -71,7 +69,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             ],
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
                         ListView(
@@ -85,11 +83,11 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                   OntapStore.index = 0;
                                 });
                               },
-                              title: Text(
+                              title: const Text(
                                 "Home",
                                 style: TextStyle(color: Colors.black),
                               ),
-                              leading: Icon(Icons.person),
+                              leading: const Icon(Icons.person),
                             ),
                             // ListTile(
                             //   onTap: () {
@@ -107,11 +105,11 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             // ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
-                        Divider(),
-                        SizedBox(
+                        const Divider(),
+                        const SizedBox(
                           height: 20,
                         ),
                         IconButton(
@@ -129,14 +127,14 @@ class _DrawerMenuState extends State<DrawerMenu> {
               ),
             ),
           )
-        : SizedBox();
+        : const SizedBox();
   }
 }
 
 class AvatarWithLetter extends StatelessWidget {
   final String username;
 
-  AvatarWithLetter({required this.username});
+  const AvatarWithLetter({super.key, required this.username});
 
   // Generate a color based on the ASCII value of the first letter
   Color _getColorForLetter(String letter) {
@@ -159,7 +157,7 @@ class AvatarWithLetter extends StatelessWidget {
       backgroundColor: _getColorForLetter(firstLetter),
       child: Text(
         firstLetter,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 24, // Adjust font size here
           color: Colors.white, // Text color
         ),

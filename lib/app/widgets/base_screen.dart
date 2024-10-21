@@ -2,14 +2,13 @@ import '../core/base/constants/appcolor.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 
 import 'drawer_menu.dart';
 import 'phone_nav_bar.dart';
 
 class BaseScreen extends StatefulWidget {
   BaseScreen({
-    Key? key,
+    super.key,
     required this.child,
     this.isDrawer = true,
     this.isfloaingbutton = true,
@@ -19,7 +18,7 @@ class BaseScreen extends StatefulWidget {
     this.backgroundheight = 80,
     this.floatingActionButton,
     this.backgroundColor = AppColors.black,
-  }) : super(key: key);
+  });
   final Widget child;
   double backgroundheight;
 
@@ -72,11 +71,11 @@ class _BaseScreenState extends State<BaseScreen> {
       child: Scaffold(
         key: _scaffoldKey,
         bottomNavigationBar:
-            widget.isBottomNavbar == true ? MobileNavBar() : null,
+            widget.isBottomNavbar == true ? const MobileNavBar() : null,
         backgroundColor: widget.backgroundColor,
         floatingActionButton:
             widget.isfloaingbutton ? widget.floatingActionButton : null,
-        drawer: widget.isDrawer ? DrawerMenu() : null,
+        drawer: widget.isDrawer ? const DrawerMenu() : null,
         body: widget.istheme
             ? Stack(
                 children: [
@@ -132,7 +131,7 @@ class _BaseScreenState extends State<BaseScreen> {
                                 fontSize: 22,
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 20,
                             ),
                             // Image.asset('assets/Ellipse 2149.png',

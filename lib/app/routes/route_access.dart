@@ -19,7 +19,7 @@ class AppRouteAccess {
 
       if (isAuthChange == true) {}
 
-      return RouteSettings(name: Routes.HOME);
+      return const RouteSettings(name: Routes.HOME);
     }
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BaseMobileView extends StatelessWidget {
-  BaseMobileView({Key? key, required this.vBuilderMobile}) : super(key: key);
+  const BaseMobileView({super.key, required this.vBuilderMobile});
   final Widget vBuilderMobile;
 
   @override
