@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:totalhealthy/app/modules/Registration_Screen/Registration_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -21,15 +21,12 @@ class LoginViewState extends State<LoginView> {
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-             Color(0xFF272e23),
-              Color.fromARGB(255, 12,12,12),
-
+              Color(0xFF272e23),
+              Color.fromARGB(255, 12, 12, 12),
               Color.fromARGB(255, 12, 12, 12),
               Color(0xFF272e23),
             ],
             begin: Alignment.topRight,
-
-
             end: Alignment.bottomLeft,
           ),
         ),
@@ -38,7 +35,7 @@ class LoginViewState extends State<LoginView> {
           child: Column(
             children: [
               Container(
-                margin: const EdgeInsets.only(top: 60, left: 95),
+                margin: const EdgeInsets.only(top: 70, left: 95),
                 child: const Row(
                   children: [
                     Text(
@@ -46,7 +43,7 @@ class LoginViewState extends State<LoginView> {
                       style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white70),
+                          color: Colors.white),
                     ),
                     SizedBox(width: 5),
                     Text(
@@ -54,22 +51,24 @@ class LoginViewState extends State<LoginView> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w500,
-                        color: Color.fromARGB(255, 246, 212, 85),
+                        color: Color.fromARGB(255, 205, 226, 109),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               const Text(
                 "Kindly Share The Required Information To",
-                style: TextStyle(color: Colors.white54,fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    color: Colors.white54, fontWeight: FontWeight.w500),
               ),
               const Text(
                 "Proceed Further.",
-                style: TextStyle(color: Colors.white54,fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    color: Colors.white54, fontWeight: FontWeight.w500),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 60),
               // Gender Selection Boxes
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -79,7 +78,8 @@ class LoginViewState extends State<LoginView> {
                     onTap: () {
                       setState(() {
                         isMaleSelected = true;
-                        isFemaleSelected = false; // Deselect female when male is selected
+                        isFemaleSelected =
+                            false; // Deselect female when male is selected
                       });
                     },
                     child: Container(
@@ -88,9 +88,10 @@ class LoginViewState extends State<LoginView> {
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
                           color: isMaleSelected
-                              ? const Color.fromARGB(255,205, 226, 109)
-                          // Yellow when selected
-                              : Colors.transparent, // Transparent when not selected
+                              ? const Color.fromARGB(255, 146, 159, 83)
+                              // Yellow when selected
+                              : Colors
+                                  .transparent, // Transparent when not selected
                           width: 3,
                         ),
                       ),
@@ -99,16 +100,17 @@ class LoginViewState extends State<LoginView> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                       //   Image.asset(
-                         //   'assets/male.png', // Add your male image path here
-                         //   height: 40,
-                         //   color: const Color.fromARGB(255, 160, 141, 60), // Adjust color if needed
-                       //   ),
+                          //   Image.asset(
+                          //   'assets/male.png', // Add your male image path here
+                          //   height: 40,
+                          //   color: const Color.fromARGB(255, 160, 141, 60), // Adjust color if needed
+                          //   ),
                           const SizedBox(height: 70),
                           const Text(
                             "Male",
                             style: TextStyle(
-                             color: Colors.white30,fontWeight: FontWeight.w500,
+                              color: Colors.white30,
+                              fontWeight: FontWeight.w500,
                               fontSize: 18,
                             ),
                           ),
@@ -121,7 +123,8 @@ class LoginViewState extends State<LoginView> {
                     onTap: () {
                       setState(() {
                         isFemaleSelected = true;
-                        isMaleSelected = false; // Deselect male when female is selected
+                        isMaleSelected =
+                            false; // Deselect male when female is selected
                       });
                     },
                     child: Container(
@@ -130,8 +133,10 @@ class LoginViewState extends State<LoginView> {
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
                           color: isFemaleSelected
-                              ? const Color.fromARGB(255, 246, 212, 85) // Yellow when selected
-                              : Colors.transparent, // Transparent when not selected
+                              ? const Color.fromARGB(
+                                  255, 205, 226, 109) // Yellow when selected
+                              : Colors
+                                  .transparent, // Transparent when not selected
                           width: 3,
                         ),
                       ),
@@ -140,16 +145,17 @@ class LoginViewState extends State<LoginView> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                        //  Image.network(
-                         //   'assets/female.png', // Add your female image path here
-                        //    height: 60,
-                        //    color: const Color.fromARGB(255, 160, 141, 60), // Adjust color if needed
-                       //   ),
+                          //  Image.network(
+                          //   'assets/female.png', // Add your female image path here
+                          //    height: 60,
+                          //    color: const Color.fromARGB(255, 160, 141, 60), // Adjust color if needed
+                          //   ),
                           const SizedBox(height: 70),
                           const Text(
                             "Female",
                             style: TextStyle(
-                              color: Colors.white30,fontWeight: FontWeight.w500,
+                              color: Colors.white30,
+                              fontWeight: FontWeight.w500,
                               fontSize: 18,
                             ),
                           ),
@@ -165,14 +171,17 @@ class LoginViewState extends State<LoginView> {
                 margin: const EdgeInsets.only(right: 350),
                 child: const Text(
                   "Full Name",
-                  style: TextStyle( color:Colors.white70,fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                      color: Colors.white70, fontWeight: FontWeight.w500),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               SizedBox(
                 width: 420,
                 child: TextField(
-                  decoration: InputDecoration(prefixIcon: Icon(Icons.person_2_outlined,color: Colors.white54),
+                  decoration: InputDecoration(
+                    prefixIcon:
+                        Icon(Icons.person_2_outlined, color: Colors.white54),
                     hintText: "enter your full name",
                     hintStyle: const TextStyle(color: Colors.white30),
                     fillColor: const Color.fromARGB(255, 36, 36, 36),
@@ -192,22 +201,23 @@ class LoginViewState extends State<LoginView> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               // Email
               Container(
-                margin: const EdgeInsets.only(right: 380),
+                margin: const EdgeInsets.only(right: 322),
                 child: const Text(
-                  "Email",
-                  style: TextStyle( color:Colors.white70,fontWeight: FontWeight.w500),
+                  "Email Address",
+                  style: TextStyle(
+                      color: Colors.white70, fontWeight: FontWeight.w500),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               SizedBox(
                 width: 420,
                 child: TextField(
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.mail_outline_rounded, color: Colors.white54
-                    ),
+                    prefixIcon: const Icon(Icons.mail_outline_rounded,
+                        color: Colors.white54),
                     hintText: "enter your email address",
                     hintStyle: const TextStyle(color: Colors.white30),
                     fillColor: const Color.fromARGB(255, 36, 36, 36),
@@ -227,22 +237,23 @@ class LoginViewState extends State<LoginView> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               // Date of Birth
               Container(
                 margin: const EdgeInsets.only(right: 350),
                 child: const Text(
                   "Password",
-                  style: TextStyle( color:Colors.white70,fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                      color: Colors.white70, fontWeight: FontWeight.w500),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               SizedBox(
                 width: 420,
                 child: TextField(
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.lock_outline_rounded, color: Colors.white54
-                    ),
+                    prefixIcon: const Icon(Icons.lock_outline_rounded,
+                        color: Colors.white54),suffixIcon: Icon(Icons.remove_red_eye_outlined,color: Colors.white30,),
                     hintText: "enter your password",
                     hintStyle: const TextStyle(color: Colors.white30),
                     fillColor: const Color.fromARGB(255, 36, 36, 36),
@@ -270,26 +281,46 @@ class LoginViewState extends State<LoginView> {
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 204, 224, 109),
+                    backgroundColor: const Color.fromARGB(255, 205, 226, 109),
                   ),
                   child: const Text(
                     "Sign Up",
-                    style: TextStyle(color: Colors.black54,fontSize: 18),
+                    style: TextStyle(color: Colors.black54, fontSize: 18),
                   ),
                 ),
               ),
               Container(
                 child: Row(
-                  children: [Container(
-                    margin: const EdgeInsets.only(left: 150,top: 20),
-                    child: Text("----------",style: TextStyle(color: Colors.white30,fontSize: 18,fontWeight: FontWeight.w500),),
-                  ),Container(
-                    margin: const EdgeInsets.only(left: 5,top: 20),
-                    child: Text("Or",style: TextStyle(color: Colors.white30,fontSize: 12,fontWeight: FontWeight.w500),),
-                  ),
-        Container(
-          margin: const EdgeInsets.only(left: 5,top: 20),
-          child: Text("----------",style: TextStyle(color: Colors.white30,fontSize: 18,fontWeight: FontWeight.w500),)),
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(left: 150, top: 20),
+                      child: Text(
+                        "----------",
+                        style: TextStyle(
+                            color: Colors.white30,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(left: 5, top: 20),
+                      child: Text(
+                        "Or",
+                        style: TextStyle(
+                            color: Colors.white30,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    Container(
+                        margin: const EdgeInsets.only(left: 5, top: 20),
+                        child: Text(
+                          "----------",
+                          style: TextStyle(
+                              color: Colors.white30,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500),
+                        )),
                   ],
                 ),
               ),
@@ -297,13 +328,37 @@ class LoginViewState extends State<LoginView> {
                 children: [
                   Container(
                     margin: EdgeInsets.only(left: 115),
-                    child: Text("Already have an account?", style: TextStyle(color: Colors.white54,fontWeight: FontWeight.w500),),
-                  ),SizedBox(width: 3,),
+                    child: Text(
+                      "Already have an account?",
+                      style: TextStyle(
+                          color: Colors.white54, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 3,
+                  ),
                   Container(
                     margin: EdgeInsets.only(right: 0),
-                    child: Text("Sign in", style: TextStyle(color: Color.fromARGB(255, 205,226,109),fontWeight: FontWeight.w500),),),
+                    child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => RegistrationView(),
+                              ));
+                        },
+                        child: Text(
+                          "Sign in",
+                          style: TextStyle(
+                              color: Color.fromARGB(255, 205, 226, 109),
+                              fontWeight: FontWeight.w500),
+                        )),
+                  ),
                 ],
-              ),SizedBox(height: 10,)
+              ),
+              SizedBox(
+                height: 10,
+              )
             ],
           ),
         ),
