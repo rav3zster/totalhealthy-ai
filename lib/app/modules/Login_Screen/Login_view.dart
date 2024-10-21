@@ -45,13 +45,13 @@ class LoginViewState extends State<LoginView> {
                           fontWeight: FontWeight.w500,
                           color: Colors.white),
                     ),
-                    SizedBox(width: 5),
+                    SizedBox(width: 6),
                     Text(
                       "Details",
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w500,
-                        color: Color.fromARGB(255, 205, 226, 109),
+                        color: Colors.amberAccent,
                       ),
                     ),
                   ],
@@ -133,8 +133,8 @@ class LoginViewState extends State<LoginView> {
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
                           color: isFemaleSelected
-                              ? const Color.fromARGB(
-                                  255, 205, 226, 109) // Yellow when selected
+                              ?  Colors
+                              .amberAccent // Yellow when selected
                               : Colors
                                   .transparent, // Transparent when not selected
                           width: 3,
@@ -191,7 +191,7 @@ class LoginViewState extends State<LoginView> {
                       borderSide: BorderSide.none,
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(0),
+                      borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide.none,
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -227,7 +227,7 @@ class LoginViewState extends State<LoginView> {
                       borderSide: BorderSide.none,
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(0),
+                      borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide.none,
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -263,7 +263,7 @@ class LoginViewState extends State<LoginView> {
                       borderSide: BorderSide.none,
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(0),
+                      borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide.none,
                     ),
                     focusedBorder: OutlineInputBorder(

@@ -46,13 +46,14 @@ class _RegistrationViewState extends State<RegistrationView> {
                           fontWeight: FontWeight.w500,
                           color: Colors.white),
                     ),
-                    SizedBox(width: 5),
+                    SizedBox(width: 6),
                     Text(
                       "Account",
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w500,
-                        color: Color.fromARGB(255, 205, 226, 109),
+                        color:  Colors
+                            .amberAccent
                       ),
                     ),
                   ],
@@ -123,8 +124,8 @@ class _RegistrationViewState extends State<RegistrationView> {
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
                           color: isFemaleSelected
-                              ? const Color.fromARGB(
-                                  255, 205, 226, 109) // Yellow when selected
+                              ?  Colors
+                              .amberAccent // Yellow when selected
                               : Colors
                                   .transparent, // Transparent when not selected
                           width: 3,
