@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:totalhealthy/app/modules/Login_Screen/Login_view.dart';
+import 'package:totalhealthy/app/modules/Signup_Screen/Signup_view.dart';
 
 class RegistrationView extends StatefulWidget {
   const RegistrationView({super.key});
@@ -233,7 +233,7 @@ class _RegistrationViewState extends State<RegistrationView> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => LoginView(),
+                                builder: (context) => SignupView(),
                               ));
                         },
                         child: Text(

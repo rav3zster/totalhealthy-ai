@@ -1,7 +1,8 @@
 import 'package:get/get.dart';
-import 'package:totalhealthy/app/modules/Login_Screen/Login_controller.dart';
-import 'package:totalhealthy/app/modules/Login_Screen/Login_view.dart';
+//import 'package:totalhealthy/app/modules/Login_Screen/Login_controller.dart';
+//import 'package:totalhealthy/app/modules/Login_Screen/Login_view.dart';
 import 'package:totalhealthy/app/modules/Registration_Screen/Registration_view.dart';
+import 'package:totalhealthy/app/modules/Signup_Screen/Signup_view.dart';
 import 'package:totalhealthy/app/modules/home/widgets/home_screen.dart';
 import 'package:totalhealthy/app/modules/login_screen/login_controller.dart';
 
@@ -18,7 +19,7 @@ class AppPages {
   static final routes = [
     GetPage(
       name: _Paths.HOME,
-      page: () => RegistrationView(),
+      page: () => SignupView(),
       binding: HomeBinding(),
     ),
   ];
