@@ -223,7 +223,7 @@ class _OnboardingViewState extends State<OnboardingView> {
     return Column(
       children: [
         Container(
-          margin: EdgeInsets.only(top: 120),
+          margin: EdgeInsets.only(top: 40),
           height: 400,
           width: 450,
           child: Image.asset(imagePath, fit: BoxFit.fitWidth),

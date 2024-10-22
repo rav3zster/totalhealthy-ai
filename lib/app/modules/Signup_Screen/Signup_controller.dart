@@ -1,23 +1,34 @@
 import 'package:get/get.dart';
 
 class SignupController extends GetxController {
+  // Gender selection state
+  var isMaleSelected = false.obs;
+  var isFemaleSelected = false.obs;
 
+  // Form fields
+  var fullName = ''.obs;
+  var email = ''.obs;
+  var password = ''.obs;
 
-  final count = 0.obs;
-  @override
-  void onInit() {
-    super.onInit();
+  // Toggle gender selection
+  void selectMale() {
+    isMaleSelected.value = true;
+    isFemaleSelected.value = false;
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  void selectFemale() {
+    isMaleSelected.value = false;
+    isFemaleSelected.value = true;
   }
 
-  @override
-  void onClose() {
-    super.onClose();
+  // Validate and process the signup form
+  void submitSignupForm() {
+    if (fullName.value.isNotEmpty && email.value.isNotEmpty && password.value.isNotEmpty) {
+      // Process the signup logic here
+      print("Sign up successful");
+    } else {
+      // Handle form validation failure
+      print("Please fill all the fields");
+    }
   }
-
-  void increment() => count.value++;
 }
