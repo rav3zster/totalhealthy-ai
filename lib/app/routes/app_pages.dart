@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/modules/Create_Screen/Create_view.dart';
 import 'package:totalhealthy/app/modules/Onboarding_Screen/Onboarding_view.dart';
 //import 'package:totalhealthy/app/modules/Login_Screen/Login_controller.dart';
 //import 'package:totalhealthy/app/modules/Login_Screen/Login_view.dart';
@@ -20,7 +21,7 @@ class AppPages {
   static final routes = [
     GetPage(
       name: _Paths.HOME,
-      page: () => OnboardingView(),
+      page: () => CreateView(),
       binding: HomeBinding(),
     ),
   ];
