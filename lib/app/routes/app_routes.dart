@@ -14,6 +14,8 @@ abstract class Routes {
   static const MEAL_HISTORY = _Paths.MEAL_HISTORY;
   static const MEALS_DETAILS = _Paths.MEALS_DETAILS;
   static const MEAL_TIMING = _Paths.MEAL_TIMING;
+  static const UserDiet = _Paths.UserDiet;
+  static const TrainerDashboard = _Paths.TrainerDashboard;
 }
 
 abstract class _Paths {
@@ -29,4 +31,6 @@ abstract class _Paths {
   static const MEAL_HISTORY = '/meal-history';
   static const MEALS_DETAILS = '/meals-details';
   static const MEAL_TIMING = '/meal-timing';
+  static const UserDiet = '/userdiet';
+  static const TrainerDashboard = '/trainerdashboard';
 }

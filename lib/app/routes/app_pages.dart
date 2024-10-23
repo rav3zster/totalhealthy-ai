@@ -22,6 +22,10 @@ import '../modules/swipe_screen/bindings/swipe_screen_bindings.dart';
 import '../modules/swipe_screen/views/swipe_screen_views.dart';
 import '../modules/welcom_screen/bindings/welcome-screen-bindings.dart';
 import '../modules/welcom_screen/views/welcome-screen-views.dart';
+import '../modules/trainer_dashboard/bindings/trainer_dashboard_bindings.dart';
+import '../modules/trainer_dashboard/views/trainer_dashboard_views.dart';
+import '../modules/user_diet_screen/bindings/user_diet_screen_bindings.dart';
+import '../modules/user_diet_screen/views/user_diet_screen_view.dart';
 
 part 'app_routes.dart';
 
@@ -85,6 +89,16 @@ class AppPages {
       name: _Paths.MEAL_TIMING,
       page: () => MealTimingView(),
       binding: MealTimingBinding(),
+    ),
+    GetPage(
+      name: _Paths.TrainerDashboard,
+      page: () => TrainerDashboardView(),
+      binding: TrainerDashboardBindings(),
+    ),
+    GetPage(
+      name: _Paths.UserDiet,
+      page: () => UserDietScreen(),
+      binding: UserDietScreenBindings(),
     ),
   ];
 }
