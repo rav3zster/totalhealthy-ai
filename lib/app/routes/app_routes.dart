@@ -8,6 +8,12 @@ abstract class Routes {
   static const WelcomeScreen = _Paths.WelcomeScreen;
   static const Registration = _Paths.Registration;
   static const Login = _Paths.Login;
+  static const NUTRITION_GOAL = _Paths.NUTRITION_GOAL;
+  static const NOTIFICATION = _Paths.NOTIFICATION;
+  static const GENERATE_AI = _Paths.GENERATE_AI;
+  static const MEAL_HISTORY = _Paths.MEAL_HISTORY;
+  static const MEALS_DETAILS = _Paths.MEALS_DETAILS;
+  static const MEAL_TIMING = _Paths.MEAL_TIMING;
 }
 
 abstract class _Paths {
@@ -17,4 +23,10 @@ abstract class _Paths {
   static const WelcomeScreen = '/welcomescreen';
   static const Registration = '/registration';
   static const Login = '/login';
+  static const NUTRITION_GOAL = '/nutrition-goal';
+  static const NOTIFICATION = '/notification';
+  static const GENERATE_AI = '/generate-ai';
+  static const MEAL_HISTORY = '/meal-history';
+  static const MEALS_DETAILS = '/meals-details';
+  static const MEAL_TIMING = '/meal-timing';
 }

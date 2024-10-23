@@ -6,7 +6,7 @@ class AppColors {
   static const Color neplesYellow = Color(0xFFF5D657);
   static const Color mandarin = Color(0xFFF57552);
   static const Color chineseGreen = Color(0xFFCDE26D);
-
+  static const Color cardbackground = Color(0xFF242522);
   static const Color pageBackground = Color(0xFFFFFFFF);
   static const Color violet = Color(0xFF8A2BE2);
   static const Color heading = Color(0xFF9A74D9);
@@ -120,7 +120,8 @@ extension CustomColorScheme on BuildContext {
   Color get onErrorContainer => Theme.of(this).colorScheme.onErrorContainer;
   Color get background => Theme.of(this).colorScheme.surface;
   Color get onBackground => Theme.of(this).colorScheme.onSurface;
-  Color get surfaceVariant => Theme.of(this).colorScheme.surfaceContainerHighest;
+  Color get surfaceVariant =>
+      Theme.of(this).colorScheme.surfaceContainerHighest;
   Color get onSurfaceVariant => Theme.of(this).colorScheme.onSurfaceVariant;
   Color get outline => Theme.of(this).colorScheme.outline;
   Color get onInverseSurface => Theme.of(this).colorScheme.onInverseSurface;

@@ -1,23 +1,23 @@
 import 'package:get/get.dart';
-<<<<<<< HEAD
-import 'package:totalhealthy/app/modules/login/bindings/login_binding.dart';
-import 'package:totalhealthy/app/modules/registration/bindings/registration_binding.dart';
-import 'package:totalhealthy/app/modules/registration/views/registration_view.dart';
-=======
-import 'package:totalhealthy/app/modules/Create_Screen/Create_view.dart';
-import 'package:totalhealthy/app/modules/Onboarding_Screen/Onboarding_view.dart';
-//import 'package:totalhealthy/app/modules/Login_Screen/Login_controller.dart';
-//import 'package:totalhealthy/app/modules/Login_Screen/Login_view.dart';
-import 'package:totalhealthy/app/modules/Registration_Screen/Registration_view.dart';
-import 'package:totalhealthy/app/modules/Signup_Screen/Signup_view.dart';
-import 'package:totalhealthy/app/modules/home/widgets/home_screen.dart';
-//import 'package:totalhealthy/app/modules/login_screen/login_controller.dart';
->>>>>>> 4a283684da58155a80dc6a1f20ce59857f949406
 
 import '../modules/Onboarding_Screen/Onboarding_view.dart';
+import '../modules/generate_ai/bindings/generate_ai_binding.dart';
+import '../modules/generate_ai/views/generate_ai_view.dart';
 import '../modules/home/bindings/home_binding.dart';
-import '../modules/home/views/home_view.dart';
+import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
+import '../modules/meal_history/bindings/meal_history_binding.dart';
+import '../modules/meal_history/views/meal_history_view.dart';
+import '../modules/meal_timing/bindings/meal_timing_binding.dart';
+import '../modules/meal_timing/views/meal_timing_view.dart';
+import '../modules/meals_details/bindings/meals_details_binding.dart';
+import '../modules/meals_details/views/meals_details_view.dart';
+import '../modules/notification/bindings/notification_binding.dart';
+import '../modules/notification/views/notification_view.dart';
+import '../modules/nutrition_goal/bindings/nutrition_goal_binding.dart';
+import '../modules/nutrition_goal/views/nutrition_goal_view.dart';
+import '../modules/registration/bindings/registration_binding.dart';
+import '../modules/registration/views/registration_view.dart';
 import '../modules/swipe_screen/bindings/swipe_screen_bindings.dart';
 import '../modules/swipe_screen/views/swipe_screen_views.dart';
 import '../modules/welcom_screen/bindings/welcome-screen-bindings.dart';
@@ -28,16 +28,12 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.HOME;
+  static const INITIAL = Routes.MEALS_DETAILS;
 
   static final routes = [
     GetPage(
       name: _Paths.HOME,
-<<<<<<< HEAD
-      page: () => HomeView(),
-=======
-      page: () => CreateView(),
->>>>>>> 4a283684da58155a80dc6a1f20ce59857f949406
+      page: () => OnboardingView(),
       binding: HomeBinding(),
     ),
     GetPage(
@@ -59,6 +55,36 @@ class AppPages {
       name: _Paths.Login,
       page: () => LoginView(),
       binding: LoginBinding(),
+    ),
+    GetPage(
+      name: _Paths.NUTRITION_GOAL,
+      page: () => NutritionGoalView(),
+      binding: NutritionGoalBinding(),
+    ),
+    GetPage(
+      name: _Paths.NOTIFICATION,
+      page: () => NotificationView(),
+      binding: NotificationBinding(),
+    ),
+    GetPage(
+      name: _Paths.GENERATE_AI,
+      page: () => GenerateAiView(),
+      binding: GenerateAiBinding(),
+    ),
+    GetPage(
+      name: _Paths.MEAL_HISTORY,
+      page: () => MealHistoryView(),
+      binding: MealHistoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.MEALS_DETAILS,
+      page: () => MealsDetailsView(),
+      binding: MealsDetailsBinding(),
+    ),
+    GetPage(
+      name: _Paths.MEAL_TIMING,
+      page: () => MealTimingView(),
+      binding: MealTimingBinding(),
     ),
   ];
 }

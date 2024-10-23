@@ -17,7 +17,7 @@ class BaseScreen extends StatefulWidget {
     this.isBottomNavbar = false,
     this.backgroundheight = 80,
     this.floatingActionButton,
-    this.backgroundColor = AppColors.black,
+    this.backgroundColor = AppColors.white,
   });
   final Widget child;
   double backgroundheight;
