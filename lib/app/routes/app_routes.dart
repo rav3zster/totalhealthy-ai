@@ -6,6 +6,8 @@ abstract class Routes {
   static const HOME = _Paths.HOME;
   static const SwipeScreen = _Paths.SwipeScreen;
   static const WelcomeScreen = _Paths.WelcomeScreen;
+  static const EmptyScreen = _Paths.EmptyScreen;
+  static const ClientDashboard = _Paths.ClientDashboard;
 }
 
 abstract class _Paths {
@@ -13,4 +15,6 @@ abstract class _Paths {
   static const HOME = '/home';
   static const SwipeScreen = '/swipescreen';
   static const WelcomeScreen = '/welcomescreen';
+  static const EmptyScreen = '/emptyscreen';
+  static const ClientDashboard = '/clientdashboard';
 }
