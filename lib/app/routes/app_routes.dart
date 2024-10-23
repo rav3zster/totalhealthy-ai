@@ -6,6 +6,7 @@ abstract class Routes {
   static const HOME = _Paths.HOME;
   static const SwipeScreen = _Paths.SwipeScreen;
   static const WelcomeScreen = _Paths.WelcomeScreen;
+<<<<<<< HEAD
   static const Registration = _Paths.Registration;
   static const Login = _Paths.Login;
   static const NUTRITION_GOAL = _Paths.NUTRITION_GOAL;
@@ -16,6 +17,10 @@ abstract class Routes {
   static const MEAL_TIMING = _Paths.MEAL_TIMING;
   static const UserDiet = _Paths.UserDiet;
   static const TrainerDashboard = _Paths.TrainerDashboard;
+=======
+  static const EmptyScreen = _Paths.EmptyScreen;
+  static const ClientDashboard = _Paths.ClientDashboard;
+>>>>>>> fda6541a551cef98ce00f1758a1d5e4e941bf264
 }
 
 abstract class _Paths {
@@ -23,6 +28,7 @@ abstract class _Paths {
   static const HOME = '/home';
   static const SwipeScreen = '/swipescreen';
   static const WelcomeScreen = '/welcomescreen';
+<<<<<<< HEAD
   static const Registration = '/registration';
   static const Login = '/login';
   static const NUTRITION_GOAL = '/nutrition-goal';
@@ -33,4 +39,8 @@ abstract class _Paths {
   static const MEAL_TIMING = '/meal-timing';
   static const UserDiet = '/userdiet';
   static const TrainerDashboard = '/trainerdashboard';
+=======
+  static const EmptyScreen = '/emptyscreen';
+  static const ClientDashboard = '/clientdashboard';
+>>>>>>> fda6541a551cef98ce00f1758a1d5e4e941bf264
 }

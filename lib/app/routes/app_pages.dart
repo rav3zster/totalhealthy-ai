@@ -3,6 +3,12 @@ import 'package:get/get.dart';
 import '../modules/Onboarding_Screen/Onboarding_view.dart';
 import '../modules/generate_ai/bindings/generate_ai_binding.dart';
 import '../modules/generate_ai/views/generate_ai_view.dart';
+import 'package:totalhealthy/app/modules/client_dashboard/bindings/client_dashboard_bindings.dart';
+import 'package:totalhealthy/app/modules/client_dashboard/views/client_dashboard_views.dart';
+import 'package:totalhealthy/app/modules/swipe_screen/bindings/swipe_screen_bindings.dart';
+import 'package:totalhealthy/app/modules/swipe_screen/views/swipe_screen_views.dart';
+import '../modules/empty_data_screen/bindings/empty_data_screen_bindings.dart';
+import '../modules/empty_data_screen/views/empty_data_screen_views.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
@@ -18,8 +24,7 @@ import '../modules/nutrition_goal/bindings/nutrition_goal_binding.dart';
 import '../modules/nutrition_goal/views/nutrition_goal_view.dart';
 import '../modules/registration/bindings/registration_binding.dart';
 import '../modules/registration/views/registration_view.dart';
-import '../modules/swipe_screen/bindings/swipe_screen_bindings.dart';
-import '../modules/swipe_screen/views/swipe_screen_views.dart';
+
 import '../modules/welcom_screen/bindings/welcome-screen-bindings.dart';
 import '../modules/welcom_screen/views/welcome-screen-views.dart';
 import '../modules/trainer_dashboard/bindings/trainer_dashboard_bindings.dart';
@@ -99,6 +104,16 @@ class AppPages {
       name: _Paths.UserDiet,
       page: () => UserDietScreen(),
       binding: UserDietScreenBindings(),
+    ),
+    GetPage(
+      name: _Paths.EmptyScreen,
+      page: () => EmptyScreenView(),
+      binding: EmptyScreenBindings(),
+    ),
+    GetPage(
+      name: _Paths.ClientDashboard,
+      page: () => ClientDashboardScreen(),
+      binding: ClientDashboardBindings(),
     ),
   ];
 }
