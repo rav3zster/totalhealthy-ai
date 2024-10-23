@@ -1,15 +1,9 @@
 import 'package:get/get.dart';
-import 'package:totalhealthy/app/modules/Registration_Screen/Registration_controller.dart';
+import 'registration_controller.dart';
 
-
-
-
-class SwipeScreenBindings extends Bindings {
+class RegistrationBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<RegistrationController>(
-          () => RegistrationController()
-      ,
-    );
+    Get.lazyPut<RegistrationController>(() => RegistrationController());
   }
 }

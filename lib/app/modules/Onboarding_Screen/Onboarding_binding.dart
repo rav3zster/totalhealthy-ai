@@ -1,16 +1,9 @@
 import 'package:get/get.dart';
-import 'package:totalhealthy/app/modules/Onboarding_Screen/Onboarding_controller.dart';
-import 'package:totalhealthy/app/modules/Registration_Screen/Registration_controller.dart';
+import 'onboarding_controller.dart';
 
-
-
-
-class SwipeScreenBindings extends Bindings {
+class OnboardingBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<OnboardingController>(
-          () => OnboardingController()
-      ,
-    );
+    Get.lazyPut<OnboardingController>(() => OnboardingController());
   }
 }

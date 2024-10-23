@@ -1,23 +1,20 @@
 import 'package:get/get.dart';
 
 class RegistrationController extends GetxController {
-  //TODO: Implement HomeController
+  var isMaleSelected = false.obs;
+  var isFemaleSelected = false.obs;
 
-  final count = 0.obs;
-  @override
-  void onInit() {
-    super.onInit();
+  void selectMale() {
+    isMaleSelected.value = true;
+    isFemaleSelected.value = false;
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  void selectFemale() {
+    isFemaleSelected.value = true;
+    isMaleSelected.value = false;
   }
 
-  @override
-  void onClose() {
-    super.onClose();
+  void goToSignup() {
+    Get.toNamed('/signup'); // Adjust the route as per your project
   }
-
-  void increment() => count.value++;
 }

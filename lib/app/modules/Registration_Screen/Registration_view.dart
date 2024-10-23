@@ -36,7 +36,7 @@ class _RegistrationViewState extends State<RegistrationView> {
           child: Column(
             children: [
               Container(
-                margin: const EdgeInsets.only(top: 110, left: 95),
+                margin: const EdgeInsets.only(top: 80, left: 75),
                 child: const Row(
                   children: [
                     Text(
@@ -86,8 +86,8 @@ class _RegistrationViewState extends State<RegistrationView> {
                           width: 3,
                         ),
                       ),
-                      width: 200,
-                      height: 220,
+                      width: 175,
+                      height: 195,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -131,8 +131,8 @@ class _RegistrationViewState extends State<RegistrationView> {
                           width: 3,
                         ),
                       ),
-                      width: 200,
-                      height: 220,
+                      width: 175,
+                      height: 195,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -156,11 +156,11 @@ class _RegistrationViewState extends State<RegistrationView> {
                   ),
                 ],
               ),
-              const SizedBox(height: 360),
+              const SizedBox(height: 300),
               // Continue Button
               SizedBox(
                 width: 400,
-                height: 60,
+                height: 50,
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
@@ -179,7 +179,7 @@ class _RegistrationViewState extends State<RegistrationView> {
                 child: Row(
                   children: [
                     Container(
-                      margin: const EdgeInsets.only(left: 150, top: 20),
+                      margin: const EdgeInsets.only(left: 130, top: 20),
                       child: Text(
                         "----------",
                         style: TextStyle(
@@ -216,7 +216,7 @@ class _RegistrationViewState extends State<RegistrationView> {
               Row(
                 children: [
                   Container(
-                    margin: EdgeInsets.only(left: 115),
+                    margin: EdgeInsets.only(left: 90),
                     child: Text(
                       "Don't have an account yet?",
                       style: TextStyle(
@@ -246,7 +246,7 @@ class _RegistrationViewState extends State<RegistrationView> {
                 ],
               ),
               SizedBox(
-                height: 10,
+                height: 20,
               )
             ],
           ),
