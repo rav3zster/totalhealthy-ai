@@ -28,7 +28,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.MEALS_DETAILS;
+  static const INITIAL = Routes.GENERATE_AI;
 
   static final routes = [
     GetPage(
