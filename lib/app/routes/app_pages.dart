@@ -28,7 +28,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.GENERATE_AI;
+  static const INITIAL = Routes.NUTRITION_GOAL;
 
   static final routes = [
     GetPage(
