@@ -1,16 +1,8 @@
 import 'package:get/get.dart';
-import 'package:totalhealthy/app/modules/create_meal/bindings/create_meal_binding.dart';
-import 'package:totalhealthy/app/modules/create_meal/views/create_meal_view.dart';
 
 import '../modules/Onboarding_Screen/Onboarding_view.dart';
 import '../modules/generate_ai/bindings/generate_ai_binding.dart';
 import '../modules/generate_ai/views/generate_ai_view.dart';
-import 'package:totalhealthy/app/modules/client_dashboard/bindings/client_dashboard_bindings.dart';
-import 'package:totalhealthy/app/modules/client_dashboard/views/client_dashboard_views.dart';
-import 'package:totalhealthy/app/modules/swipe_screen/bindings/swipe_screen_bindings.dart';
-import 'package:totalhealthy/app/modules/swipe_screen/views/swipe_screen_views.dart';
-import '../modules/empty_data_screen/bindings/empty_data_screen_bindings.dart';
-import '../modules/empty_data_screen/views/empty_data_screen_views.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
@@ -40,6 +32,7 @@ class AppPages {
   AppPages._();
 
   static const INITIAL = Routes.CreateMeal;
+
 
   static final routes = [
     GetPage(
