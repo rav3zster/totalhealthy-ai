@@ -17,9 +17,7 @@ class AppRouteAccess {
     } else {
       print("ss ${Get.find<AuthController>().isAuthenticated.value}");
 
-      if (isAuthChange == true) {}
-
-      return const RouteSettings(name: Routes.HOME);
+      return const RouteSettings(name: Routes.Login);
     }
   }
 }

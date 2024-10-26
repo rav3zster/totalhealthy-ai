@@ -22,7 +22,7 @@ class CheckPinMiddleware extends GetMiddleware {
   @override
   RouteSettings? redirect(String? route) {
     if (Get.find<AuthController>().isAuthenticated.value == false) {
-      return const RouteSettings(name: Routes.HOME);
+      return const RouteSettings(name: Routes.Login);
     }
     return null;
   }

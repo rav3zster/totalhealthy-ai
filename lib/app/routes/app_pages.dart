@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../core/middlewares/global_middleware.dart';
 import '../modules/Onboarding_Screen/Onboarding_view.dart';
 import '../modules/generate_ai/bindings/generate_ai_binding.dart';
 import '../modules/generate_ai/views/generate_ai_view.dart';
@@ -37,7 +38,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.MEALS_DETAILS;
+  static const INITIAL = Routes.HOME;
 
   static final routes = [
     GetPage(
@@ -66,54 +67,54 @@ class AppPages {
       binding: LoginBinding(),
     ),
     GetPage(
-      name: _Paths.NUTRITION_GOAL,
-      page: () => NutritionGoalView(),
-      binding: NutritionGoalBinding(),
-    ),
+        name: _Paths.NUTRITION_GOAL,
+        page: () => NutritionGoalView(),
+        binding: NutritionGoalBinding(),
+        middlewares: [AuthCheckMiddleware()]),
     GetPage(
-      name: _Paths.NOTIFICATION,
-      page: () => NotificationView(),
-      binding: NotificationBinding(),
-    ),
+        name: _Paths.NOTIFICATION,
+        page: () => NotificationView(),
+        binding: NotificationBinding(),
+        middlewares: [AuthCheckMiddleware()]),
     GetPage(
-      name: _Paths.GENERATE_AI,
-      page: () => GenerateAiView(),
-      binding: GenerateAiBinding(),
-    ),
+        name: _Paths.GENERATE_AI,
+        page: () => GenerateAiView(),
+        binding: GenerateAiBinding(),
+        middlewares: [AuthCheckMiddleware()]),
     GetPage(
-      name: _Paths.MEAL_HISTORY,
-      page: () => MealHistoryView(),
-      binding: MealHistoryBinding(),
-    ),
+        name: _Paths.MEAL_HISTORY,
+        page: () => MealHistoryView(),
+        binding: MealHistoryBinding(),
+        middlewares: [AuthCheckMiddleware()]),
     GetPage(
-      name: _Paths.MEALS_DETAILS,
-      page: () => MealsDetailsView(),
-      binding: MealsDetailsBinding(),
-    ),
+        name: _Paths.MEALS_DETAILS,
+        page: () => MealsDetailsView(),
+        binding: MealsDetailsBinding(),
+        middlewares: [AuthCheckMiddleware()]),
     GetPage(
-      name: _Paths.MEAL_TIMING,
-      page: () => MealTimingView(),
-      binding: MealTimingBinding(),
-    ),
+        name: _Paths.MEAL_TIMING,
+        page: () => MealTimingView(),
+        binding: MealTimingBinding(),
+        middlewares: [AuthCheckMiddleware()]),
     GetPage(
-      name: _Paths.TrainerDashboard,
-      page: () => TrainerDashboardView(),
-      binding: TrainerDashboardBindings(),
-    ),
+        name: _Paths.TrainerDashboard,
+        page: () => TrainerDashboardView(),
+        binding: TrainerDashboardBindings(),
+        middlewares: [AuthCheckMiddleware()]),
     GetPage(
-      name: _Paths.UserDiet,
-      page: () => UserDietScreen(),
-      binding: UserDietScreenBindings(),
-    ),
+        name: _Paths.UserDiet,
+        page: () => UserDietScreen(),
+        binding: UserDietScreenBindings(),
+        middlewares: [AuthCheckMiddleware()]),
     GetPage(
-      name: _Paths.EmptyScreen,
-      page: () => EmptyScreenView(),
-      binding: EmptyScreenBindings(),
-    ),
+        name: _Paths.EmptyScreen,
+        page: () => EmptyScreenView(),
+        binding: EmptyScreenBindings(),
+        middlewares: [AuthCheckMiddleware()]),
     GetPage(
-      name: _Paths.ClientDashboard,
-      page: () => ClientDashboardScreen(),
-      binding: ClientDashboardBindings(),
-    ),
+        name: _Paths.ClientDashboard,
+        page: () => ClientDashboardScreen(),
+        binding: ClientDashboardBindings(),
+        middlewares: [AuthCheckMiddleware()]),
   ];
 }
