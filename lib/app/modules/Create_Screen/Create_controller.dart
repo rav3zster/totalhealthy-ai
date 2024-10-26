@@ -22,7 +22,7 @@ class CreateController extends GetxController {
   var value4 = 500.obs;
 
   // Reactive boolean values for pressed states
-  var isDecrementPressed1 = false.obs;
+  var isDecrementPressed1 =  false.obs;
   var isIncrementPressed1 = false.obs;
   var isDecrementPressed2 = false.obs;
   var isIncrementPressed2 = false.obs;
