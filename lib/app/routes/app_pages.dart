@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/modules/signup/bindings/signup_binding.dart';
 
 import '../core/middlewares/global_middleware.dart';
 import '../modules/Onboarding_Screen/Onboarding_view.dart';
@@ -25,6 +26,7 @@ import '../modules/nutrition_goal/bindings/nutrition_goal_binding.dart';
 import '../modules/nutrition_goal/views/nutrition_goal_view.dart';
 import '../modules/registration/bindings/registration_binding.dart';
 import '../modules/registration/views/registration_view.dart';
+import '../modules/signup/views/signup_view.dart';
 import '../modules/swipe_screen/bindings/swipe_screen_bindings.dart';
 import '../modules/swipe_screen/views/swipe_screen_views.dart';
 import '../modules/welcom_screen/bindings/welcome-screen-bindings.dart';
@@ -117,5 +119,10 @@ class AppPages {
         page: () => ClientDashboardScreen(),
         binding: ClientDashboardBindings(),
         middlewares: [AuthCheckMiddleware()]),
+    GetPage(
+      name: _Paths.SIGNUP,
+      binding: SignupBinding(),
+      page: () => SignupView(),
+    )
   ];
 }

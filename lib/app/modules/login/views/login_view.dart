@@ -5,6 +5,7 @@ import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/controllers/auth_controller.dart';
+import '../../../routes/app_pages.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -263,7 +264,9 @@ class _LoginViewState extends State<LoginView> {
                         style: TextStyle(color: Color(0XFFB0AFAF)),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.toNamed(Routes.SIGNUP);
+                        },
                         child: Text(
                           'Sign up',
                           style: TextStyle(color: Colors.lightGreenAccent),

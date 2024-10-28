@@ -8,19 +8,23 @@ import 'app/routes/app_pages.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await initializeControllers();
   runApp(const MyApp());
 }
 
-Future<void> initializeControllers() async {
+initializeControllers() {
   Get.putAsync<ThemeController>(() async => ThemeController());
   Get.putAsync<AuthController>(() async => AuthController());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -28,6 +32,9 @@ class MyApp extends StatelessWidget {
         getPages: AppPages.routes,
         initialRoute: AppPages.INITIAL,
         title: 'Total Healthy',
+        onReady: () {
+          Get.find<AuthController>().tokenVaildate();
+        },
         scrollBehavior: MyCustomScrollBehavior(),
         debugShowCheckedModeBanner: false,
         theme: Get.find<ThemeController>().themeData);

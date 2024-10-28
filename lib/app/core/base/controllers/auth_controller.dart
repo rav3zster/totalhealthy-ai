@@ -6,12 +6,6 @@ import '../../../routes/route_access.dart';
 
 class AuthController extends GetxController {
   Future<AuthController> init() async => this;
-  @override
-  void onInit() {
-    super.onInit();
-    refreshAuth();
-    tokenVaildate();
-  }
 
   final _authToken = "".obs;
   RxBool isLogOut = false.obs;
@@ -66,10 +60,10 @@ class AuthController extends GetxController {
     var authTokenr = box.read("authToken");
     var refreshTokend = box.read("refreshToken");
     print("ddf $authToken");
-    if (box.hasData("authToken") && authTokenr == authToken) {
+    if (box.hasData("authToken")) {
       isAuthenticated.value = true;
 
-      // Get.toNamed(Routes.NUTRITION_GOAL);
+      Get.toNamed(Routes.NUTRITION_GOAL);
 
       print("ddff $authTokenr");
     } else {

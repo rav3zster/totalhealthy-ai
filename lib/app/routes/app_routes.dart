@@ -19,6 +19,7 @@ abstract class Routes {
   static const EmptyScreen = _Paths.EmptyScreen;
   static const ClientDashboard = _Paths.ClientDashboard;
   static const CreateMeal = _Paths.CreateMeal;
+  static const SIGNUP = _Paths.SIGNUP;
 }
 
 abstract class _Paths {
@@ -38,5 +39,6 @@ abstract class _Paths {
   static const TrainerDashboard = '/trainerdashboard';
   static const EmptyScreen = '/emptyscreen';
   static const ClientDashboard = '/clientdashboard';
-  static const CreateMeal ='/createmeal';
+  static const CreateMeal = '/createmeal';
+  static const SIGNUP = '/signup';
 }
