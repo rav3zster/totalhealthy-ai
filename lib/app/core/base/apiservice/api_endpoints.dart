@@ -3,7 +3,7 @@
 class APIEndpoints {
   static const baseURL = _development;
   static const _development =
-      "https://uxtaxcxe54qbnsse3mffqq2i6i0vbnqd.lambda-url.us-east-1.on.aws/";
+      "https://2tice5smragy4oxgo3qvcy52q40qzwed.lambda-url.us-east-1.on.aws/";
   static const auth = _Auth();
 
   static const group = _Group();
@@ -75,7 +75,7 @@ class _Auth {
   const _Auth();
   String get signup =>
       "https://uxtaxcxe54qbnsse3mffqq2i6i0vbnqd.lambda-url.us-east-1.on.aws/registration";
-  String get login => "${APIEndpoints.baseURL}token";
+  String get login => "${APIEndpoints.baseURL}login";
 }
 
 class _Group {

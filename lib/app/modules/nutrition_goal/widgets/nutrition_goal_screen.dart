@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:get/get_common/get_reset.dart';
 import 'package:get/get_core/src/get_main.dart';
 
+import '../../../routes/app_pages.dart';
+
 class NutritionGoalsScreen extends StatefulWidget {
   @override
   _NutritionGoalsScreenState createState() => _NutritionGoalsScreenState();
@@ -131,7 +133,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                           duration: Duration(milliseconds: 500),
                           curve: Curves.easeIn);
                     } else {
-                      // Final action on last page
+                      Get.toNamed(Routes.CreateMeal);
                     }
                   },
                   child: Text("Continue",

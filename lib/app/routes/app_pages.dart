@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/modules/create_meal/bindings/create_meal_binding.dart';
+import 'package:totalhealthy/app/modules/create_meal/views/create_meal_view.dart';
 import 'package:totalhealthy/app/modules/forget_passowrd_screen/bindings/forget_passowrd_screen_bindings.dart';
 import 'package:totalhealthy/app/modules/forget_passowrd_screen/views/forget_password_screen_views.dart';
 import 'package:totalhealthy/app/modules/signup/bindings/signup_binding.dart';
@@ -41,7 +43,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.Login;
+  static const INITIAL = Routes.CreateMeal;
 
   static final routes = [
     GetPage(
@@ -129,5 +131,10 @@ class AppPages {
       binding: ForgetPasswordScreenBindings(),
       page: () => ForgetPasswordScreenViews(),
     ),
+    GetPage(
+        name: _Paths.CreateMeal,
+        binding: CreateMealBinding(),
+        page: () => CreateMealView(),
+        middlewares: [AuthCheckMiddleware()]),
   ];
 }

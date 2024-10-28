@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../controllers/create_meal_controller.dart';
 
-class CreateMealView extends StatelessWidget {
+class CreateMealView extends StatefulWidget {
+
+  @override
+  State<CreateMealView> createState() => _CreateMealViewState();
+}
+
+class _CreateMealViewState extends State<CreateMealView> {
+
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<CreateMealController>();

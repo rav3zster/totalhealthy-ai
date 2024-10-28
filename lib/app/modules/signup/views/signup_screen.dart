@@ -19,8 +19,7 @@ class SignupScreen extends StatefulWidget {
 class SignupScreenState extends State<SignupScreen> {
   bool isMaleSelected = false; // Track Male selection
   bool isFemaleSelected = false; // Track Female selection
-  var email = TextEditingController();
-  var pass = TextEditingController();
+
 
   GlobalKey<FormState> key = GlobalKey<FormState>();
 
@@ -164,8 +163,8 @@ class SignupScreenState extends State<SignupScreen> {
                               width: 3,
                             ),
                           ),
-                          width: 175,
-                          height: 195,
+                          width: 110,
+                          height: 110,
                           child: const Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -201,8 +200,8 @@ class SignupScreenState extends State<SignupScreen> {
                               width: 3,
                             ),
                           ),
-                          width: 175,
-                          height: 195,
+                          width: 110,
+                          height: 110,
                           child: const Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -221,7 +220,7 @@ class SignupScreenState extends State<SignupScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
                   Container(
                     margin: const EdgeInsets.only(right: 320),
                     child: const Text(
@@ -254,6 +253,9 @@ class SignupScreenState extends State<SignupScreen> {
                           borderRadius: BorderRadius.circular(0),
                           borderSide: BorderSide.none,
                         ),
+                      ),
+                      style: TextStyle(
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -291,6 +293,9 @@ class SignupScreenState extends State<SignupScreen> {
                           borderSide: BorderSide.none,
                         ),
                       ),
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 25),
@@ -308,32 +313,68 @@ class SignupScreenState extends State<SignupScreen> {
                     child: TextFormField(
                       controller: passwordController,
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock_outline_rounded,
-                            color: Colors.white54),
-                        suffixIcon: const Icon(
-                          Icons.remove_red_eye_outlined,
-                          color: Colors.white54,
-                        ),
-                        hintText: "enter your password",
-                        hintStyle: const TextStyle(color: Colors.white30),
-                        fillColor: const Color.fromARGB(255, 36, 36, 36),
                         filled: true,
+                        fillColor: Color(0XFF242522),
+                        hintText: 'Enter Your Password',
+                        prefixIcon:
+                        Icon(Icons.lock_outline, color: Colors.white54),
+                        suffixIcon: Icon(Icons.visibility_outlined,
+                            color: Colors.white54),
+                        hintStyle: TextStyle(color: Colors.white54),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(0),
-                          borderSide: BorderSide.none,
-                        ),
-                        enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide.none,
                         ),
+                        // Custom Border Properties
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(0),
-                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.transparent),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.transparent),
                         ),
                       ),
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
-                  const SizedBox(height: 60),
+                  SizedBox(height: 20,),
+                  Container(
+                    margin: const EdgeInsets.only(right: 290),
+                    child: const Text(
+                      "Phone Number",
+                      style: TextStyle(
+                          color: Colors.white70, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: 390,
+                    child: TextFormField(
+                      controller: phoneNumberController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Color(0XFF242522),
+                        hintText: 'Enter Your Number',
+                        hintStyle: TextStyle(color: Colors.white54),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        // Custom Border Properties
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.transparent),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.transparent),
+                        ),
+                      ),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   // Login Button
                   SizedBox(
                     width: 390,
