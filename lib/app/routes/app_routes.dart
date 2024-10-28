@@ -14,6 +14,8 @@ abstract class Routes {
   static const MEAL_HISTORY = _Paths.MEAL_HISTORY;
   static const MEALS_DETAILS = _Paths.MEALS_DETAILS;
   static const MEAL_TIMING = _Paths.MEAL_TIMING;
+  static const LoginView= _Paths.MEAL_TIMING;
+  static const FORGETPASSWORD= _Paths.FORGETPASSWORD;
   static const UserDiet = _Paths.UserDiet;
   static const TrainerDashboard = _Paths.TrainerDashboard;
   static const EmptyScreen = _Paths.EmptyScreen;
@@ -41,4 +43,5 @@ abstract class _Paths {
   static const ClientDashboard = '/clientdashboard';
   static const CreateMeal = '/createmeal';
   static const SIGNUP = '/signup';
+  static const FORGETPASSWORD = '/forgot-password';
 }
