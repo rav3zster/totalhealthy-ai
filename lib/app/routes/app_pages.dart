@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
-
+import 'package:totalhealthy/app/modules/forget_passowrd_screen/bindings/forget_passowrd_screen_bindings.dart';
+import 'package:totalhealthy/app/modules/forget_passowrd_screen/views/forget_password_screen_views.dart';
 import '../modules/Onboarding_Screen/Onboarding_view.dart';
 import '../modules/generate_ai/bindings/generate_ai_binding.dart';
 import '../modules/generate_ai/views/generate_ai_view.dart';
@@ -28,7 +29,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.NUTRITION_GOAL;
+  static const INITIAL = Routes.Login;
 
   static final routes = [
     GetPage(
@@ -85,6 +86,11 @@ class AppPages {
       name: _Paths.MEAL_TIMING,
       page: () => MealTimingView(),
       binding: MealTimingBinding(),
+    ),
+    GetPage(
+      name: _Paths.FORGETPASSWORD,
+      page: () => ForgetPasswordScreenViews(),
+      binding: ForgetPasswordScreenBindings(),
     ),
   ];
 }

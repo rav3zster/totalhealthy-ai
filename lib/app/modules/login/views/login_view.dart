@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_common/get_reset.dart';
+import 'package:get/get_core/src/get_main.dart';
+
+import '../../../routes/app_pages.dart';
 
 class LoginView extends StatelessWidget {
   @override
@@ -116,7 +121,9 @@ class LoginView extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.toNamed(Routes.FORGETPASSWORD);
+                    },
                     child: Text(
                       'Forgot Password?',
                       style: TextStyle(
