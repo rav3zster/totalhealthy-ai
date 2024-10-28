@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:totalhealthy/app/widgets/custom_button.dart';
+
+import '../../../core/base/apiservice/api_endpoints.dart';
+import '../../../core/base/apiservice/api_status.dart';
+import '../../../core/base/apiservice/base_methods.dart';
+import '../../../core/base/controllers/auth_controller.dart';
 
 class RegistrationView extends StatelessWidget {
   @override
@@ -17,7 +25,8 @@ class RegistrationView extends StatelessWidget {
           children: [
             // App Bar
             PreferredSize(
-              preferredSize: Size.fromHeight(100), // Set desired height here
+              preferredSize: Size.fromHeight(100),
+              // Set desired height here
               child: AppBar(
                 backgroundColor: Color(0XFF000000).withOpacity(0.1),
                 // Semi-transparent app bar color
@@ -71,22 +80,23 @@ class RegistrationView extends StatelessWidget {
                     // Menu Options
                     _buildMenuOption('Manage Account',
                         imageUrl:
-                        'https://s3-alpha-sig.figma.com/img/27a7/8251/47767f09ea813a7e6432862d64d01a48?Expires=1730073600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YqFbiCvKf4s6ARTE-clMv9lwEppng5dkxjmM0Am42bBMB7P2mscenLw6DXQgMOO91XAchMTZsreBR2lzcUjaQFyKdTZjd8gNszCwjs4XWfztNIjTBZWVfZONO~umyqxZmie9ylhIZ9~DCA8DVaGTwP0LxP-2mRIII5zd~3HTK0UVZafzhwzKusLr~8JnCDR~7mZCY6baoPNpcXRqxpoXYxOZ2hRsfncqTwE1tsVOMRXHmCUQ9Npfh3Wlz50l0iYX29gpXzsrj-YgIeCYv6wNsG2Tb03mZZvZfQcZqDobSPuwtjNtIGzWtVoOE8GKCY73J~Vt9YxHlMBigeu~vu3~KA__'),
+                            'https://s3-alpha-sig.figma.com/img/27a7/8251/47767f09ea813a7e6432862d64d01a48?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=M2nLA7tK~xdu7S3RgmrvuVZXlMpmqREShWyHsyFWAHC1~4AaXA19GV6XVCZVL9NhDtJKL3qTguhPk00wxZtWdUglgmGIsrH44hsDvjHY-qRKA7THVK4q~-tI7DBoEDknmfbTAzTMTehblbawSxOlAXf2pf1UpEI-aW8Nk7afN3NFsYCbBTNzrGRUWvyTsbbY31lMovlmVqtEWkPf6sogKAZTz0vYYA7uE4sUaVyaquIIlpiXcx2CMVTHRpe1q7DNuDjXHGcltNpuzOdeUwp2qxQB1919j6FZtNty00rehZng9ZeoQyJTgSI2WUGy~OfKksc9Gtezjb0lhDWjQulMdA__'),
+
                     _buildMenuOption('Goal Setting',
                         imageUrl:
-                        'https://s3-alpha-sig.figma.com/img/91a7/6aaa/2a085f2c303b8d2d6a6b5605f976d2a4?Expires=1730073600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=ROLKzWryFk2jOhUv72p4CY9DnAJs1AjyQlFkF9gSOIcMsQIZRb4N1HMobV0jaForZXA3VG81l5dQhySV6KCt5xbkiDdVeX7dHLEv~s-S3ILAGv-EJ~xZMd-03ZW~BD-bAjF6-GpTtEKnPzMTLJ1MyCXdKm110cAM8Jv0on00m-sntu0X1H5b-zrCW0mtfkPSBwtweaS30fSXM7yIp~GKnM1ZJI1cFvj-jniRPiLqsjODUVGUvSPlOOMgv2A13~Oz2jsezkXJ3i0y0i1PGHrl7fcTQ5fCz-v9scTO546eOwqVG0Lpp8hz4UKUXDm75RHi7lIyMJF~NhCXR9DbdtJ6rw__'),
+                            'https://s3-alpha-sig.figma.com/img/91a7/6aaa/2a085f2c303b8d2d6a6b5605f976d2a4?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=Tq-Ij3veOUuGnSm1Q0LEarXmsw67U8Ger53XzsQ287jLo~js6gRTGgIxFW~aLh4Oyb4oOGAzrEWtYsi59wV-CyBJ0QoDaYBZRA1IC-mwPm7rAVYAdMXHg0QiDx26P-B5mRVUTUzdqu0ir54j93tTQ2u4WFfyMsFWhv8IZIoUTrvNdKDjaMXoD3DY3BNiwtbQrjwDG8msCcFnGBrjGfIvQiEzd57DRAhyu8sKguOG6RxmsDefxdQHO7VL4YZN7IuxZ3-7XRiSm-eduyWyOCWwAmxj4-lHf6hWnJD3Fsnfk5srcmNL~msK4B3G7TYGM-1Yio2xkQJljIO6S4afe9DPUQ__'),
                     _buildMenuOption('Active Recipe',
                         imageUrl:
-                        'https://s3-alpha-sig.figma.com/img/94d5/cdc2/20998cd9dc945c2a72ab5a3d8591c030?Expires=1730073600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=P1S1iorlmno-r6NoYNqEweO9WuvfzJ2MbHmQkqjLPvqkO-R7gUej8QQQVe4KmV2WQVTVnOeqtlGJJBEtablan7xZAozEowZ8OMBP~ju8CVu4KFc8wZZBWjd~VUB5V91BvCkpuia7QohRHY80tuLgbN3oOT4iv6UrP8x5tyF7Euns5GBqxX5nL83~5ZqlwJp3zmcrKUvLmChWNeHHo3THqfxg8PZGxZgJ5Jjn14vyNxJvKVu2x7Dh23-2~HgjFJEwXiXw0eFi24XdP~Lnzw2Z1ajq69bRnOgJRb62jvfFEzeQiTTNS275dIeXQ5jswTYGJBPcoMSv~40DV3PRoavz2A__'),
+                            'https://s3-alpha-sig.figma.com/img/94d5/cdc2/20998cd9dc945c2a72ab5a3d8591c030?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=gAa1TojpjY4Fuvq8YUcm6nFTp5xathZHSYxcAoTAMgX~RCN4Eb6Wz8XC8ynbazIqXSNQUFbRih0WNOMEZtnq9g-ReOevXSWz4RiDT8LI~E0MmELRCJ3OdLcInhcIwt6ouoiciLF2J1wq08L8FnhFh3gwXOhzqK75p1WejXk5PZwBf~DBHDnrbsETaatKgqX6iAxG3ymvykM42GJNf~NlokkywkISEoaG7iKs5HyyYtIs1pRq3uv7DrVx5Pm8FPoxG555RszhUytIHh8K39XxsggXnV3H4FngdaYq9~lUBlektacrQH1FywudPArUwqMQufyNaioKqiOpH-b6eMC5xw__'),
                     _buildMenuOption('Linked Accounts',
                         imageUrl:
-                        'https://s3-alpha-sig.figma.com/img/f74c/564c/d2f38b04e5aef386ee70fad5e4309e8d?Expires=1730073600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=T5gCq-hrxLxFUSdKlyaJ8FWJH95TMgHtcli1Jy0hoght6t~efDNUKeqHLYC1Ij5Tc1DvHFVM4PuqD6jXJJoejNiK-aYeTCiLWlJ4aA1NgKLGBEL15GHGek-92jKyxQC4QqXopJP3DhYyhoJFDrsQam36wiyjNAkVmVwCohjGs4JgmfJF66LFUNX9nP07vwLWWZtZ1Gam6dny~sCS6npwSUXLV1X4HvtQ8sUZ2x54ME2jWcYl0O2JdcLSRy42o~7E~Su~i~QQ~zaxHjSIl26ckrCbAKfy-jRRE~Hpjn7p2Z~ZptICnQUBKPPJ923sM4VG7cal7EAVme5SxFwJVeyghg__'),
+                            'https://s3-alpha-sig.figma.com/img/f74c/564c/d2f38b04e5aef386ee70fad5e4309e8d?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=D1jDxUhUFxYgqFM8-FHTN9pYaQKC2M~zf8RdwHldbaT5W9EK5YhBns8Mj6FkxocXx84CBuw~gIpLjhqa~L-G4RWbecgjxbixY9v286ULG96wiOFYfMO~I72bTDRpd0bAZWlXr0KT6kJlmRz~y9UEXWyXoCw7EDkv2fXWlDOSTJswi7xeB8manrsRD6Ab2p2rRFY6mWDzhPdKgT64PeW3BZKAbZnSMznaNuAFvXzyOLCc5ekkhewW4KJvBgsCy5ziE9v7HUVykTuOkXxfNN2BkW4uV0jH2nlROeboX9Jf958nbCWyPkkJd9AQvjyzy2LUlS-FN2f-cf~1X6QZdEH29w__'),
                     _buildMenuOption('Help & Support',
                         imageUrl:
-                        'https://s3-alpha-sig.figma.com/img/faec/13ab/b0b0470db066027c23b1363cf8c279f4?Expires=1730073600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=moLPbKvrFcgcxAmTSxh~gBKG9YUbV~~r4AeUre4QG~mtl5qhMWFdHDXaBme-JrFYOtvqd7gCrCe9vOnWizRw9s1lACfm9SElGxwYUm37QZbY~Jz5Q3x0L4MZPC1RY6BGuIOWR72t6Qk3kkFZ1DyijD1jxxmH-JmIZAejTCNuiSuPInUnc3uDuA2zEjwyA4dr0OasyGcFJ3YRp1Fc4vF5gHie-u1eDS940nuwP4WE8J6~W7XtWaa8tKDi0RvQ0l7QZRY6sbvGQehY9x5KKS~BgjyOe72JTwqGns2sPU4BmXbPA-Ye9813DTmlg-EMu7imQKLeoVnybqjDZrv35gK7ng__'),
+                            'https://s3-alpha-sig.figma.com/img/faec/13ab/b0b0470db066027c23b1363cf8c279f4?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=IuCggQ8OsK1C6amobo6Za5eOO4kT42QF2LqDSwbg-Tx0kiGLmIRWng3yswy8f7ZVtGw20p-6yPvKbLwZlMYiHn~seITkHQOQk1xbie49wNnaK1NvwLwfzE3Ym-922aJGC3qYSMLn1XlcGG6zjXkvDGntUvEDaCsurux878V7mfTWzLJbbEX4p65cX8QOrVJ9Eg7EstFC51oxJy5RF327Gf-D19P-ArZ9UVlZ4VYyxdoNZw5e8dUIvGypl7FzbPCw6rjJTAPbgXKoZxLjLoAFWxtzSvskfq3zHkffJ1V55XAxeysekU6Anuuz7oZvQzOG1lbiq5eatJCTgIYruHDdvg__'),
                     _buildMenuOption('Settings',
                         imageUrl:
-                        'https://s3-alpha-sig.figma.com/img/79c8/eb16/d4ba0866f19f186f0f65be7d8fe01431?Expires=1730073600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=fPqoBu298hRs8uaPiCecURtPOO2dxZFWnDSKuzoTD9REFu1gdcF6y0kHka1XNgs7DKLKjUjhON9-xnyS2UbKrSUSGGng-I0hbKrWF5AxQiyM1kIpRPoovBE0esCN0gH8d520c021qnZ7S33HUCOsObcp-0AgF~90imDEYpzd9qXhSIizMA8JBgmfrg2JezNrxbsaQgJthelCtj5fl0VcPILTz4ryK~oGpa15MPB2bDSqXNUi9zJaJYr2jnHuz1CR0fqTIKZNvvTmOg8HW4qDtnovgLRfGfRPpSyeW3lW1X9tbhNbqYawzoQwz6YWPI6~M3vq1YGhE6bkKXKYz3usnA__'),
+                            'https://s3-alpha-sig.figma.com/img/79c8/eb16/d4ba0866f19f186f0f65be7d8fe01431?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=bTptPAQ29iInyyJvhfA-t8MW~6yeqDd03T7gVM0azodC6BB8lwqpqvM61BgG40obFhdbHRBNwmpYOwTx0fPvcHH2PDsmsSuBF1QSvjh2HiznymGcnqhhKZYxh0X78VHMNoQUjPKVDWGaMtLPmZZaozKDaNw0SGAdhqTHgRuaxUiNb1Vg4BPHhje1N8HK19MJX99OXgLFwO3b6z3-gT-v1sXiOiq1reAdxn778RWYzTryJz-pnYIoMyJIOhNk1-DJB74GN2o4M2fsa4BYCpjnuzYQVw4H5lGj8fHzy0tphC75dK6rIPZDBPF734RsxP-t1iaIUjShkU-dwFr~IrrXHw__'),
                   ],
                 ),
               ),
@@ -128,6 +138,19 @@ class RegistrationView extends StatelessWidget {
             //     ),
             //   ],
             // ),
+            CustomButton(
+                child: Text("Create group"),
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return CreateGroup();
+                      });
+                },
+                size: ButtonSize.medium,
+                type: ButtonType.elevated
+
+            )
           ],
         ),
       ),
@@ -176,7 +199,7 @@ class RegistrationView extends StatelessWidget {
             child: ListTile(
               leading: imageUrl != null
                   ? Image.network(imageUrl,
-                  width: 30, height: 26) // Adjust size if needed
+                      width: 30, height: 26) // Adjust size if needed
                   : null,
               title: Text(
                 title,
@@ -185,13 +208,168 @@ class RegistrationView extends StatelessWidget {
                   fontSize: 18, // Increase the font size here
                 ),
               ),
-              trailing: Image.network(
-                'https://s3-alpha-sig.figma.com/img/360b/a86c/047c7aca834d409183f630868f9de686?Expires=1730073600&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=nFk8STNiBbelTWBstWfu-nq52X1M7fDBbdWpr4KopLd0TZbP-M8rX0r1gUSOrvf~Cp93HL-4t1vD7GTSj-Y3Ai4-svgRele2RcMb1njKMT4PCgFcRrFKMS1nPkp-hYcrGz3QS-BcP4tDhXKrrSj5xk6H~PpTJ9aAMhikNlC~wGzsIwGDqYvJkLOKUwTGE0usnyaUhS7pQki4XTepnuZ0Qcs~RQ91Yl37ye6muxVGOb5Mp5KUVBkLjEEEtVT0gR6TLPhEw-hVCK6VlXKlm7HHTmM-Ew9CI0POHQv~NHDMnRA8cnF~jrv5SVezn2r8q8FrJHnVwUHTT~VKxjXtTz8kvw__',
-                width: 28, // Adjust size of the trailing image
-                height: 20,
-              ),
               onTap: () {},
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CreateGroup extends StatefulWidget {
+  const CreateGroup({
+    super.key,
+  });
+
+  @override
+  State<CreateGroup> createState() => _CreateGroupState();
+}
+
+class _CreateGroupState extends State<CreateGroup> {
+
+  var groupName = TextEditingController();
+  var description = TextEditingController();
+  GlobalKey<FormState> key = GlobalKey<FormState>();
+
+  bool isLoading = false;
+
+  Future<void> submitUser() async {
+    try {
+      if (key.currentState!.validate()) {
+        setState(() {
+          isLoading = true;
+        });
+        Map<String, dynamic> data = {
+          "group_name": groupName.text.trim(),
+          "description": description.text.trim(),
+        };
+        print(data);
+
+        await APIMethods.post
+            .post(url: APIEndpoints.group.createGroup, map: data)
+            .then((value) {
+          if (APIStatus.success(value.statusCode)) {
+            // clearDetails();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Create Group Successful!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else {
+            // printError("Auth Controller", "Signup", value.data);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Group is not created.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        });
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+    // if (_formKey.currentState!.validate()) {
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        height: 400,
+        padding: EdgeInsets.all(10),
+        child: Form(
+          key: key,
+          child: Column(
+            children: [
+              SizedBox(height: 30,),
+              TextFormField(
+                controller: groupName,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Color(0XFF242522),
+                  hintText: 'enter your email address',
+                  prefixIcon: Icon(Icons.email_outlined, color: Colors.white54),
+                  hintStyle: TextStyle(color: Colors.white54),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  // Custom Border Properties
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                ),
+                style: TextStyle(color: Colors.white),
+              ),
+              SizedBox(height: 30,),
+              TextFormField(
+                controller: description,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Color(0XFF242522),
+                  hintText: 'enter your email address',
+                  prefixIcon: Icon(Icons.email_outlined, color: Colors.white54),
+                  hintStyle: TextStyle(color: Colors.white54),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  // Custom Border Properties
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                ),
+                style: TextStyle(color: Colors.white),
+              ),
+              SizedBox(
+                height: 60,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 18),
+                      child: ElevatedButton(
+                        onPressed: () => submitUser(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0XFFCDE26D),
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: isLoading
+                            ? const Center(
+                                child: CircularProgressIndicator(),
+                              )
+                            : const Text(
+                                'Create Group',
+                                style:
+                                    TextStyle(color: Color(0XFF242522), fontSize: 18),
+                              ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

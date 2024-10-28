@@ -25,10 +25,12 @@ class AuthController extends GetxController {
   }
 
   setAuth(String token, String refToken) async {
-    authToken = token;
     isAuthenticated.value = true;
-    await box.write('authToken', authToken);
+
+    await box.write('authToken', token);
     await box.write('refreshToken', refToken);
+    authToken = box.read("authToken");
+
     print("sdadada${token},${refToken}");
     Get.toNamed(Routes.NUTRITION_GOAL);
   }
@@ -57,7 +59,7 @@ class AuthController extends GetxController {
   }
 
   tokenVaildate() {
-    var authTokenr = box.read("authToken");
+    authToken = box.read("authToken");
     var refreshTokend = box.read("refreshToken");
     print("ddf $authToken");
     if (box.hasData("authToken")) {
@@ -65,7 +67,7 @@ class AuthController extends GetxController {
 
       Get.toNamed(Routes.NUTRITION_GOAL);
 
-      print("ddff $authTokenr");
+      print("ddff $authToken");
     } else {
       isAuthenticated.value = false;
     }

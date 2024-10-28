@@ -34,7 +34,9 @@ class _MyAppState extends State<MyApp> {
         title: 'Total Healthy',
         onReady: () {
           Get.find<AuthController>().tokenVaildate();
+          print("asdasdadada${Get.find<AuthController>().authToken}");
         },
+
         scrollBehavior: MyCustomScrollBehavior(),
         debugShowCheckedModeBanner: false,
         theme: Get.find<ThemeController>().themeData);

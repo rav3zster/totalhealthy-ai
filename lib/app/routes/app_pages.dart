@@ -43,7 +43,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.CreateMeal;
+  static const INITIAL = Routes.Registration;
 
   static final routes = [
     GetPage(
@@ -65,7 +65,7 @@ class AppPages {
       name: _Paths.Registration,
       page: () => RegistrationView(),
       binding: RegistrationBinding(),
-    ),
+  middlewares: [AuthCheckMiddleware()]),
     GetPage(
       name: _Paths.Login,
       page: () => LoginView(),

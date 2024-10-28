@@ -83,6 +83,7 @@ class _Group {
   String get groupMember => "${APIEndpoints.baseURL}groups_with_members";
   String get userGroup => "${APIEndpoints.baseURL}users";
   String get pooledRequests => "${APIEndpoints.baseURL}pooled_requests";
+  String get createGroup => "${APIEndpoints.baseURL}groups";
 }
 
 class _Link {
