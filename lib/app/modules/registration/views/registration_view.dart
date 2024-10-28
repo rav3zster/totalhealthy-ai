@@ -257,6 +257,7 @@ class _CreateGroupState extends State<CreateGroup> {
                 backgroundColor: Colors.green,
               ),
             );
+            Get.back();
           } else {
             // printError("Auth Controller", "Signup", value.data);
             ScaffoldMessenger.of(context).showSnackBar(

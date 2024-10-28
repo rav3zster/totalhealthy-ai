@@ -133,7 +133,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                           duration: Duration(milliseconds: 500),
                           curve: Curves.easeIn);
                     } else {
-                      Get.toNamed(Routes.CreateMeal);
+                      Get.toNamed(Routes.Registration);
                     }
                   },
                   child: Text("Continue",
