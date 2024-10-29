@@ -62,10 +62,10 @@ class AppPages {
       binding: WelcomeScreenBindings(),
     ),
     GetPage(
-      name: _Paths.Registration,
-      page: () => RegistrationView(),
-      binding: RegistrationBinding(),
-  middlewares: [AuthCheckMiddleware()]),
+        name: _Paths.Registration,
+        page: () => RegistrationView(),
+        binding: RegistrationBinding(),
+        middlewares: [AuthCheckMiddleware()]),
     GetPage(
       name: _Paths.Login,
       page: () => LoginView(),

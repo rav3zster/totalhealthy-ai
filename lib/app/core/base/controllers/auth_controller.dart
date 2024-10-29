@@ -59,16 +59,18 @@ class AuthController extends GetxController {
   }
 
   tokenVaildate() {
-    authToken = box.read("authToken");
-    var refreshTokend = box.read("refreshToken");
     print("ddf $authToken");
     if (box.hasData("authToken")) {
       isAuthenticated.value = true;
+      authToken = box.read("authToken");
+      var refreshTokend = box.read("refreshToken");
 
       Get.toNamed(Routes.NUTRITION_GOAL);
 
       print("ddff $authToken");
     } else {
+      Get.toNamed(Routes.Login);
+
       isAuthenticated.value = false;
     }
   }
