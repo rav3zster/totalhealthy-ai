@@ -257,6 +257,7 @@ class _CreateGroupState extends State<CreateGroup> {
                 backgroundColor: Colors.green,
               ),
             );
+            Get.back();
           } else {
             // printError("Auth Controller", "Signup", value.data);
             ScaffoldMessenger.of(context).showSnackBar(
@@ -294,8 +295,7 @@ class _CreateGroupState extends State<CreateGroup> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Color(0XFF242522),
-                  hintText: 'enter your email address',
-                  prefixIcon: Icon(Icons.email_outlined, color: Colors.white54),
+                  hintText: 'Enter your Group Name',
                   hintStyle: TextStyle(color: Colors.white54),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -319,8 +319,7 @@ class _CreateGroupState extends State<CreateGroup> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Color(0XFF242522),
-                  hintText: 'enter your email address',
-                  prefixIcon: Icon(Icons.email_outlined, color: Colors.white54),
+                  hintText: 'Enter your Description',
                   hintStyle: TextStyle(color: Colors.white54),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
