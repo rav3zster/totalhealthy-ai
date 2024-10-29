@@ -30,7 +30,7 @@ class _LoginViewState extends State<LoginView> {
           "email": email.text.trim(),
           "password": pass.text.trim(),
         };
-
+        print(data);
         await APIMethods.post
             .post(url: APIEndpoints.auth.login, map: data)
             .then((value) {

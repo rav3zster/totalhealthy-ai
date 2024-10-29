@@ -45,12 +45,15 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(onPressed: (){
-        } ,icon:Icon(Icons.arrow_back_ios), color: Colors.white),
+        leading: IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.arrow_back_ios),
+            color: Colors.white),
         actions: [
           TextButton(
             onPressed: () {}, // Skip action
-            child: Text('Skip', style: TextStyle(color: Color(0XFFFFFFFF),fontSize: 16)),
+            child: Text('Skip',
+                style: TextStyle(color: Color(0XFFFFFFFF), fontSize: 16)),
           )
         ],
       ),
@@ -76,7 +79,10 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                     SizedBox(height: 10),
                     Text(
                       "Choose a more suitable option.",
-                      style: TextStyle(color: Color(0XFFCDE26D), fontSize: 18,fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          color: Color(0XFFCDE26D),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -133,7 +139,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                           duration: Duration(milliseconds: 500),
                           curve: Curves.easeIn);
                     } else {
-                      Get.toNamed(Routes.Registration);
+                      Get.toNamed(Routes.MEAL_TIMING);
                     }
                   },
                   child: Text("Continue",

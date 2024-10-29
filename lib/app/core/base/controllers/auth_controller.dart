@@ -3,9 +3,14 @@ import 'package:get_storage/get_storage.dart';
 
 import '../../../routes/app_pages.dart';
 import '../../../routes/route_access.dart';
+import 'theme_controller.dart';
 
 class AuthController extends GetxController {
-  Future<AuthController> init() async => this;
+  Future<AuthController> init() async {
+    Get.putAsync<ThemeController>(() async => ThemeController());
+    tokenVaildate();
+    return this;
+  }
 
   final _authToken = "".obs;
   RxBool isLogOut = false.obs;
@@ -35,14 +40,14 @@ class AuthController extends GetxController {
     Get.toNamed(Routes.NUTRITION_GOAL);
   }
 
-  // initAuth() async {
-  //   // await configureAmplify();
+  initAuth() async {
+    // await configureAmplify();
 
-  //   await validateAuth();
-  //   ever(isAuthenticated, (auth) => handleAuthChange());
+    await validateAuth();
+    ever(isAuthenticated, (auth) => handleAuthChange());
 
-  //   // FlutterNativeSplash.remove();
-  // }
+    // FlutterNativeSplash.remove();
+  }
 
   validateAuth() async {
     await tokenVaildate();
@@ -51,25 +56,27 @@ class AuthController extends GetxController {
 
   handleAuthChange() {
     print("handleAuthChange  ${Get.currentRoute}");
+
     if (isLogOut.value) {
       Get.offAllNamed(Routes.Login);
-    } else {
-      AppRouteAccess.handleRedirect(Get.currentRoute, isAuthChange: true);
+    } else if (isAuthenticated.value) {
+      print(isAuthenticated.value);
+      Get.offAllNamed(Get.currentRoute == '/login'
+          ? Routes.NUTRITION_GOAL
+          : Get.currentRoute);
     }
   }
 
   tokenVaildate() {
-    print("ddf $authToken");
     if (box.hasData("authToken")) {
       isAuthenticated.value = true;
       authToken = box.read("authToken");
+      print("ddf $authToken");
       var refreshTokend = box.read("refreshToken");
-
-      Get.toNamed(Routes.NUTRITION_GOAL);
 
       print("ddff $authToken");
     } else {
-      Get.toNamed(Routes.Login);
+      // Get.toNamed(Routes.Login);
 
       isAuthenticated.value = false;
     }

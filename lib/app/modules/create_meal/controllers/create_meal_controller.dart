@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
-import '../../../routes/app_pages.dart';
 
 class CreateMealController extends GetxController {
   final fullNameController = TextEditingController();
@@ -27,6 +26,61 @@ class CreateMealController extends GetxController {
     "Dinner",
   ];
 
+  GlobalKey<FormState> key = GlobalKey<FormState>();
+
+  var isLoading = false.obs;
+
+  submitUser(context) async {
+    try {
+      if (key.currentState!.validate()) {
+        isLoading.value = true;
+
+        Map<String, dynamic> data = {
+          "groupId": "string",
+          "userId": "string",
+          "from_date": "2024-10-29T10:08:30.384Z",
+          "to_date": "2024-10-29T10:08:30.384Z",
+          "imageUrl": "https://example.com/",
+          "categorys": selectedCategories,
+          "name": fullNameController.text.trim(),
+          "description": descriptionController.text.trim(),
+          "ingredients": [
+            {"name": "string", "amount": "string", "unit": "string"}
+          ],
+          "created_at": "2024-10-29T10:08:30.384Z"
+        };
+
+        await APIMethods.post
+            .post(url: APIEndpoints.createData.createMeal, map: data)
+            .then((value) {
+          if (APIStatus.success(value.statusCode)) {
+            // clearDetails();
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Create Meal Successful!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else {
+            // printError("Auth Controller", "Signup", value.data);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Meals not created'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        });
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      isLoading.value = false;
+    }
+    // if (_formKey.currentState!.validate()) {
+  }
+
   void addIngredientRow() {
     ingredientControllers.add({
       'name': TextEditingController(),
@@ -37,7 +91,6 @@ class CreateMealController extends GetxController {
   void removeIngredientRow(int index) {
     ingredientControllers.removeAt(index);
   }
-
 
   // GlobalKey<FormState> key = GlobalKey<FormState>();
   // bool isLoading = false;
@@ -112,7 +165,8 @@ class CreateMealController extends GetxController {
     print("Selected Categories: $selectedCategories");
     print("Ingredients:");
     for (var controller in ingredientControllers) {
-      print("Name: ${controller['name']!.text}, Amount: ${controller['amount']!.text}");
+      print(
+          "Name: ${controller['name']!.text}, Amount: ${controller['amount']!.text}");
     }
     if (calculateAutomatically.value) {
       print("Nutritional Info: Calculated Automatically");

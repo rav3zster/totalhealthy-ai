@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 
 import 'app/core/base/constants/custom_scroll.dart';
@@ -8,13 +9,15 @@ import 'app/routes/app_pages.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
   await initializeControllers();
+
   runApp(const MyApp());
 }
 
-initializeControllers() {
-  Get.putAsync<ThemeController>(() async => ThemeController());
-  Get.putAsync<AuthController>(() async => AuthController());
+initializeControllers() async {
+  Get.putAsync<AuthController>(() async => AuthController().init(),
+      permanent: true);
 }
 
 class MyApp extends StatefulWidget {
@@ -29,14 +32,15 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+        // onInit: () {
+        //   Get.find<AuthController>().initAuth();
+        // },
         getPages: AppPages.routes,
         initialRoute: AppPages.INITIAL,
         title: 'Total Healthy',
         onReady: () {
-          Get.find<AuthController>().tokenVaildate();
-          print("asdasdadada${Get.find<AuthController>().authToken}");
+          Get.find<AuthController>().handleAuthChange();
         },
-
         scrollBehavior: MyCustomScrollBehavior(),
         debugShowCheckedModeBanner: false,
         theme: Get.find<ThemeController>().themeData);

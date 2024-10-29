@@ -49,6 +49,7 @@ class _CreateData {
   const _CreateData();
   // String get assignTank => "${APIEndpoints.baseURL}api/assign-tank/";
   String get createGroup => "${APIEndpoints.baseURL}groups";
+  String get createMeal => "${APIEndpoints.baseURL}meals";
 }
 
 class _Employee {

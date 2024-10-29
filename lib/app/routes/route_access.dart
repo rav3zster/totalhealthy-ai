@@ -10,13 +10,8 @@ class AppRouteAccess {
   static RouteSettings? handleRedirect(String currentRoute,
       {bool? isAuthChange = false}) {
     if (Get.find<AuthController>().isAuthenticated.value) {
-      print(currentRoute);
-      print("ss ${Get.find<AuthController>().isAuthenticated.value}");
-
-      return null;
+      return RouteSettings(name: currentRoute);
     } else {
-      print("ss ${Get.find<AuthController>().isAuthenticated.value}");
-
       return const RouteSettings(name: Routes.Login);
     }
   }

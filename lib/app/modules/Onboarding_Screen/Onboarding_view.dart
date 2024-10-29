@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:totalhealthy/app/modules/Registration_Screen/Registration_view.dart';
+
+import '../../routes/app_pages.dart';
 
 class OnboardingView extends StatefulWidget {
   const OnboardingView({super.key});
@@ -34,7 +39,8 @@ class _OnboardingViewState extends State<OnboardingView> {
       // Assuming there are 3 pages (index 0, 1, 2)
       _pageController.animateToPage(_currentPage + 1,
           duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
-    }
+    } else
+      (Get.offAllNamed(Routes.SIGNUP));
   }
 
   @override
