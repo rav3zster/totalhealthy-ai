@@ -8,16 +8,16 @@ class HomeView extends BaseView {
 
   @override
   Widget vBuilderTablet() {
-    return HomeScreenView();
+    return const HomeScreenView();
   }
 
   @override
   Widget vBuilderDesktop() {
-    return HomeScreenView();
+    return const HomeScreenView();
   }
 
   @override
   Widget vBuilderPhone() {
-    return HomeScreenView();
+    return const HomeScreenView();
   }
 }

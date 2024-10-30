@@ -9,6 +9,6 @@ class HomeScreenView extends GetView<HomeController> {
   const HomeScreenView({super.key});
   @override
   Widget build(BuildContext context) {
-    return HomeScreen();
+    return const HomeScreen();
   }
 }

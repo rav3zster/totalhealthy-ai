@@ -2,14 +2,13 @@ import '../core/base/constants/appcolor.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 
 import 'drawer_menu.dart';
 import 'phone_nav_bar.dart';
 
 class BaseScreen extends StatefulWidget {
   BaseScreen({
-    Key? key,
+    super.key,
     required this.child,
     this.isDrawer = true,
     this.isfloaingbutton = true,
@@ -18,8 +17,8 @@ class BaseScreen extends StatefulWidget {
     this.isBottomNavbar = false,
     this.backgroundheight = 80,
     this.floatingActionButton,
-    this.backgroundColor = AppColors.pageBackground,
-  }) : super(key: key);
+    this.backgroundColor = AppColors.white,
+  });
   final Widget child;
   double backgroundheight;
 
@@ -72,23 +71,25 @@ class _BaseScreenState extends State<BaseScreen> {
       child: Scaffold(
         key: _scaffoldKey,
         bottomNavigationBar:
-            widget.isBottomNavbar == true ? MobileNavBar() : null,
+            widget.isBottomNavbar == true ? const MobileNavBar() : null,
         backgroundColor: widget.backgroundColor,
         floatingActionButton:
             widget.isfloaingbutton ? widget.floatingActionButton : null,
-        drawer: widget.isDrawer ? DrawerMenu() : null,
+        drawer: widget.isDrawer ? const DrawerMenu() : null,
         body: widget.istheme
             ? Stack(
                 children: [
                   Container(
                     constraints:
                         BoxConstraints(maxHeight: widget.backgroundheight),
-                    decoration: const BoxDecoration(color: Colors.blue
-                        // gradient: LinearGradient(
-                        //     begin: Alignment.topLeft,
-                        //     end: Alignment.bottomRight,
-                        //     colors: [Colors.grey, Colors.blue]),
-                        ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.black,
+                          ]),
+                    ),
                     padding: const EdgeInsets.only(
                       top: 20,
                       left: 20,
@@ -130,7 +131,7 @@ class _BaseScreenState extends State<BaseScreen> {
                                 fontSize: 22,
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 20,
                             ),
                             // Image.asset('assets/Ellipse 2149.png',

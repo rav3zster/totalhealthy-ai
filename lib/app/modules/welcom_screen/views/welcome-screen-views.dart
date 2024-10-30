@@ -12,12 +12,12 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Color(0XFF0C0C0C),
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
+        // appBar: AppBar(
+        //   backgroundColor: Color(0XFF0C0C0C),
+        //   elevation: 0,
+        // ),
         extendBodyBehindAppBar: true,
-        body: Container(
+        body: SingleChildScrollView(
           child: Column(
             children: [
               SizedBox(
@@ -71,7 +71,6 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                   fit: BoxFit.cover,
                 ),
               ),
-
               Container(
                 width: double.infinity,
                 height: 250,
@@ -88,12 +87,9 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                     Container(
                       width: 430,
                       decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Color(0XFFCDE26D),
-                          width: 1
-                        ),
-                        borderRadius: BorderRadius.circular(30)
-                      ),
+                          border:
+                              Border.all(color: Color(0XFFCDE26D), width: 1),
+                          borderRadius: BorderRadius.circular(30)),
                       child: TextButton(
                           onPressed: () {},
                           child: Text(
@@ -101,13 +97,14 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                             style: TextStyle(color: Color(0XFFCDE26D)),
                           )),
                     ),
-                    SizedBox(height: 30,),
+                    SizedBox(
+                      height: 30,
+                    ),
                     Container(
                       width: 430,
                       decoration: BoxDecoration(
-                        color: AppColors.chineseGreen,
-                          borderRadius: BorderRadius.circular(30)
-                      ),
+                          color: AppColors.chineseGreen,
+                          borderRadius: BorderRadius.circular(30)),
                       child: TextButton(
                           onPressed: () {},
                           child: Text(
@@ -115,7 +112,6 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                             style: TextStyle(color: Color(0XFF242522)),
                           )),
                     ),
-
                   ],
                 ),
               )

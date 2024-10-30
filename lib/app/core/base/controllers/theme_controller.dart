@@ -10,7 +10,7 @@ class ThemeController extends GetxController {
 
   static ThemeData lightTheme = ThemeData(
     primarySwatch: Colors.blue,
-    datePickerTheme: DatePickerThemeData(
+    datePickerTheme: const DatePickerThemeData(
       todayForegroundColor: WidgetStatePropertyAll(Colors.black),
       weekdayStyle: TextStyle(color: Colors.black),
       yearForegroundColor:
@@ -18,7 +18,7 @@ class ThemeController extends GetxController {
       dayForegroundColor: WidgetStatePropertyAll(Colors.black),
       headerForegroundColor: Colors.black,
     ),
-    listTileTheme: ListTileThemeData(
+    listTileTheme: const ListTileThemeData(
         titleTextStyle:
             TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
     // cardTheme: CardTheme(color: AppColors.primarygreen),
@@ -27,22 +27,22 @@ class ThemeController extends GetxController {
       color: AppColors.customGreen,
     ),
     textTheme: const TextTheme(
-      displayLarge: TextStyle(color: Colors.black),
-      displayMedium: TextStyle(color: Colors.black), // Equivalent to headline2
-      displaySmall: TextStyle(color: Colors.black), // Equivalent to headline3
-      headlineLarge: TextStyle(color: Colors.black), // Equivalent to headline4
-      headlineMedium: TextStyle(color: Colors.black), // Equivalent to headline5
-      headlineSmall: TextStyle(color: Colors.black), // Equivalent to headline6
-      bodyLarge: TextStyle(color: Colors.black), // Equivalent to bodyText1
-      bodyMedium: TextStyle(color: Colors.black), // Equivalent to bodyText2
-      titleLarge: TextStyle(color: Colors.black), // Equivalent to subtitle1
-      titleMedium: TextStyle(color: Colors.black), // Equivalent to subtitle2
-      labelLarge: TextStyle(color: Colors.black), // Equivalent to button
-      bodySmall: TextStyle(color: Colors.black), // Equivalent to caption
-      labelSmall: TextStyle(color: Colors.black), // Equivalent to overline
+      displayLarge: TextStyle(color: Colors.white),
+      displayMedium: TextStyle(color: Colors.white), // Equivalent to headline2
+      displaySmall: TextStyle(color: Colors.white), // Equivalent to headline3
+      headlineLarge: TextStyle(color: Colors.white), // Equivalent to headline4
+      headlineMedium: TextStyle(color: Colors.white), // Equivalent to headline5
+      headlineSmall: TextStyle(color: Colors.white), // Equivalent to headline6
+      bodyLarge: TextStyle(color: Colors.white), // Equivalent to bodyText1
+      bodyMedium: TextStyle(color: Colors.white), // Equivalent to bodyText2
+      titleLarge: TextStyle(color: Colors.white), // Equivalent to subtitle1
+      titleMedium: TextStyle(color: Colors.white), // Equivalent to subtitle2
+      labelLarge: TextStyle(color: Colors.white), // Equivalent to button
+      bodySmall: TextStyle(color: Colors.white), // Equivalent to caption
+      labelSmall: TextStyle(color: Colors.white), // Equivalent to overline
     ),
 
-    elevatedButtonTheme: ElevatedButtonThemeData(
+    elevatedButtonTheme: const ElevatedButtonThemeData(
         style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(
               AppColors.chineseGreen,
@@ -68,6 +68,7 @@ class ThemeController extends GetxController {
         borderRadius: BorderRadius.circular(4.0),
       ),
     ),
+
     colorScheme: AppColorSchemes.lightColorScheme,
     useMaterial3: true,
     appBarTheme: const AppBarTheme(
@@ -109,7 +110,6 @@ class ThemeController extends GetxController {
       ),
     ),
     colorScheme: AppColorSchemes.darkColorScheme,
-    useMaterial3: true,
     appBarTheme: const AppBarTheme(
       color: AppColors.lightGrey,
       iconTheme: IconThemeData(color: AppColors.white),
