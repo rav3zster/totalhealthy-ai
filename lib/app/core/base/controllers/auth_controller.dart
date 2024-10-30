@@ -67,6 +67,7 @@ class AuthController extends GetxController {
     }
   }
 
+  var groupId = "".obs;
   tokenVaildate() {
     if (box.hasData("authToken")) {
       isAuthenticated.value = true;

@@ -8,7 +8,9 @@ class CreateMealScreen extends GetView<CreateMealController> {
 
   @override
   Widget build(BuildContext context) {
+    String id = Get.parameters["id"] ?? "";
     return CreateMealPage(
+      id: id,
       controller: controller,
     );
   }

@@ -1,15 +1,25 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/modules/create_meal/controllers/create_meal_controller.dart';
 
-class CreateMealPage extends StatelessWidget {
-  final CreateMealController controller;
+import '../../../routes/app_pages.dart';
 
-  const CreateMealPage({super.key, required this.controller});
+class CreateMealPage extends StatefulWidget {
+  final CreateMealController controller;
+  final String id;
+  const CreateMealPage({super.key, required this.controller, required this.id});
+
+  @override
+  State<CreateMealPage> createState() => _CreateMealPageState();
+}
+
+List<int> ingredients = [];
+
+class _CreateMealPageState extends State<CreateMealPage> {
   @override
   Widget build(BuildContext context) {
-    String id = Get.parameters["id"] ?? "";
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -18,7 +28,7 @@ class CreateMealPage extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, color: Color(0XFFDBDBDB)),
           onPressed: () {
-            Navigator.pop(context);
+            Get.toNamed('/emptyscreen?id=${widget.id}');
           },
         ),
         title: Row(
@@ -42,7 +52,7 @@ class CreateMealPage extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
-          key: controller.key,
+          key: widget.controller.key,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -102,7 +112,7 @@ class CreateMealPage extends StatelessWidget {
                 height: 10,
               ),
               TextField(
-                controller: controller.fullNameController,
+                controller: widget.controller.fullNameController,
                 decoration: InputDecoration(
                   labelText: "Enter your recipe name",
                   labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
@@ -151,18 +161,20 @@ class CreateMealPage extends StatelessWidget {
                         "Breakfast",
                         style: TextStyle(color: Color(0XFF7E7E7E)),
                       ),
-                      children: controller.categories.map((category) {
+                      children: widget.controller.categories.map((category) {
                         return Obx(() {
                           return CheckboxListTile(
                             title: Text(category,
                                 style: TextStyle(color: Colors.white)),
-                            value: controller.selectedCategories
+                            value: widget.controller.selectedCategories
                                 .contains(category),
                             onChanged: (selected) {
                               if (selected == true) {
-                                controller.selectedCategories.add(category);
+                                widget.controller.selectedCategories
+                                    .add(category);
                               } else {
-                                controller.selectedCategories.remove(category);
+                                widget.controller.selectedCategories
+                                    .remove(category);
                               }
                             },
                             controlAffinity: ListTileControlAffinity.leading,
@@ -181,7 +193,7 @@ class CreateMealPage extends StatelessWidget {
               ),
               SizedBox(height: 10),
               TextField(
-                controller: controller.descriptionController,
+                controller: widget.controller.descriptionController,
                 maxLines: 3,
                 decoration: InputDecoration(
                   labelText: "Describe the recipe",
@@ -214,25 +226,36 @@ class CreateMealPage extends StatelessWidget {
               SizedBox(
                 height: 10,
               ),
-              Obx(() {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: controller.ingredientControllers.length,
-                  itemBuilder: (context, index) {
-                    final ingredient = controller.ingredientControllers[index];
-                    return IngredientInput(
-                      nameController: ingredient['name']!,
-                      amountController: ingredient['amount']!,
-                      onRemove: () => controller.removeIngredientRow(index),
-                    );
-                  },
-                );
-              }),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: ingredients.length,
+                itemBuilder: (context, index) {
+                  // final ingredient =
+                  //     widget.controller.ingredientControllers[index];
+
+                  return IngredientInput(
+                      index: index,
+                      controller: widget.controller,
+                      onRemove: () {
+                        setState(() {
+                          ingredients.removeAt(index);
+                        });
+                      });
+                },
+              ),
               SizedBox(height: 12),
               Center(
                 child: ElevatedButton.icon(
-                  onPressed: controller.addIngredientRow,
+                  onPressed: () {
+                    setState(() {
+                      ingredients.isEmpty
+                          ? ingredients.insert(0, 0)
+                          : ingredients.add(ingredients.length - 1 + 1);
+                    });
+                    widget.controller.ingredientControllers
+                        .add({"name": "", "amount": "", "unit": ""});
+                  },
                   icon: Icon(Icons.add),
                   label: Text("Add Meal"),
                   style: ElevatedButton.styleFrom(
@@ -249,9 +272,9 @@ class CreateMealPage extends StatelessWidget {
                       style: TextStyle(color: Color(0XFFDBDBDB))),
                   Obx(() {
                     return Switch(
-                      value: controller.calculateAutomatically.value,
+                      value: widget.controller.calculateAutomatically.value,
                       onChanged: (value) {
-                        controller.calculateAutomatically.value = value;
+                        widget.controller.calculateAutomatically.value = value;
                       },
                       activeColor:
                           Colors.greenAccent, // Color when the switch is on
@@ -265,7 +288,7 @@ class CreateMealPage extends StatelessWidget {
               ),
               SizedBox(height: 10),
               Obx(() {
-                if (!controller.calculateAutomatically.value) {
+                if (!widget.controller.calculateAutomatically.value) {
                   return Column(
                     children: [
                       Row(
@@ -273,7 +296,7 @@ class CreateMealPage extends StatelessWidget {
                         children: [
                           Expanded(
                             child: TextField(
-                              controller: controller.kcalController,
+                              controller: widget.controller.kcalController,
                               decoration: InputDecoration(
                                 labelText: "kcal",
                                 labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
@@ -307,7 +330,7 @@ class CreateMealPage extends StatelessWidget {
                           SizedBox(width: 10), // Space between the fields
                           Expanded(
                             child: TextField(
-                              controller: controller.carbsController,
+                              controller: widget.controller.carbsController,
                               decoration: InputDecoration(
                                 labelText: "Carbs",
                                 labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
@@ -340,13 +363,13 @@ class CreateMealPage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 10), // Space between the rows
+                      SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
                             child: TextField(
-                              controller: controller.proteinController,
+                              controller: widget.controller.proteinController,
                               decoration: InputDecoration(
                                 labelText: "Protein",
                                 labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
@@ -380,7 +403,7 @@ class CreateMealPage extends StatelessWidget {
                           SizedBox(width: 10), // Space between the fields
                           Expanded(
                             child: TextField(
-                              controller: controller.fatsController,
+                              controller: widget.controller.fatsController,
                               decoration: InputDecoration(
                                 labelText: "Fats",
                                 labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
@@ -431,9 +454,11 @@ class CreateMealPage extends StatelessWidget {
                             .infinity, // Make the button take the full width
                         child: ElevatedButton(
                           onPressed: () {
-                            controller.submitUser(context);
+                            widget.controller.submitUser(context, widget.id);
+
+                            // print(widget.controller.ingredientControllers);
                           },
-                          child: controller.isLoading.value
+                          child: widget.controller.isLoading.value
                               ? Center(
                                   child: CircularProgressIndicator(),
                                 )
@@ -466,14 +491,14 @@ class CreateMealPage extends StatelessWidget {
 }
 
 class IngredientInput extends StatelessWidget {
-  final TextEditingController nameController;
-  final TextEditingController amountController;
+  final int index;
+  final CreateMealController controller;
   final VoidCallback onRemove;
 
   IngredientInput({
-    required this.nameController,
-    required this.amountController,
     required this.onRemove,
+    required this.index,
+    required this.controller,
   });
 
   @override
@@ -485,10 +510,41 @@ class IngredientInput extends StatelessWidget {
         children: [
           Expanded(
             child: TextField(
-              controller: nameController,
+              onChanged: (value) {
+                controller.ingredientControllers[index]["name"] = value;
+              },
               maxLines: 1,
               decoration: InputDecoration(
                 labelText: "Describe the recipe",
+                labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
+                filled: true,
+                fillColor: Color(0XFF242522),
+                border: InputBorder.none,
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8), // Rounded corners
+                  borderSide: BorderSide(
+                      color: Colors
+                          .transparent), // Transparent border when focused
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8), // Rounded corners
+                  borderSide: BorderSide(
+                      color: Colors
+                          .transparent), // Transparent border when enabled
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 10),
+          Container(
+            width: 80, // Set width for the quantity field to make it smaller
+            child: TextField(
+              onChanged: (value) {
+                controller.ingredientControllers[index]["amount"] = value;
+              },
+              maxLines: 1,
+              decoration: InputDecoration(
+                labelText: "Amount",
                 labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
                 filled: true,
                 fillColor: Color(0XFF242522),
@@ -512,7 +568,9 @@ class IngredientInput extends StatelessWidget {
           Container(
             width: 80, // Set width for the quantity field to make it smaller
             child: TextField(
-              controller: amountController,
+              onChanged: (value) {
+                controller.ingredientControllers[index]["unit"] = value;
+              },
               maxLines: 1,
               decoration: InputDecoration(
                 labelText: "Q-Ty",
@@ -535,6 +593,7 @@ class IngredientInput extends StatelessWidget {
               ),
             ),
           ),
+
           IconButton(
             icon: Icon(Icons.remove_circle_outline, color: Colors.red),
             onPressed: onRemove,

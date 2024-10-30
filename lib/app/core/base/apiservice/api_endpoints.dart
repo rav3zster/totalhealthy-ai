@@ -50,6 +50,8 @@ class _CreateData {
       "${APIEndpoints.baseURL}user-details?email=$email";
   String searchUserByPhone(String phone) =>
       "${APIEndpoints.baseURL}user-details?phone_number=$phone";
+  String get generateDiet => "${APIEndpoints.baseURL}generate-diet-plan";
+  String get copyMeals => "${APIEndpoints.baseURL}meals/copy";
 }
 
 class _Profile {

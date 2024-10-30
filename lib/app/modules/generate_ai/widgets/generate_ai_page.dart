@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../../core/base/apiservice/api_endpoints.dart';
+import '../../../core/base/apiservice/api_status.dart';
+import '../../../core/base/apiservice/base_methods.dart';
 
 class GenerateAiPage extends StatefulWidget {
+  final String id;
+
+  const GenerateAiPage({super.key, required this.id});
+
   @override
   _GenerateAiPageState createState() => _GenerateAiPageState();
 }
@@ -34,17 +43,73 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
   TextEditingController specialInstructionsController = TextEditingController();
   TextEditingController preferredStartDateController = TextEditingController();
 
-  @override
-  void dispose() {
-    currentWeightController.dispose();
-    targetWeightController.dispose();
-    nutritionalController.dispose();
-    specificFoodsController.dispose();
-    foodsToAvoidController.dispose();
-    medicalConditionController.dispose();
-    specialInstructionsController.dispose();
-    preferredStartDateController.dispose();
-    super.dispose();
+  GlobalKey<FormState> key = GlobalKey<FormState>();
+
+  var isLoading = false;
+//  {"name": "string", "amount": "string", "unit": "string"}
+  submitUser(
+    context,
+  ) async {
+    // DateTime now = DateTime.now();
+    // int timestamp = now.millisecondsSinceEpoch;
+    try {
+      // String id = userId.toString();
+      setState(() {
+        isLoading = true;
+      });
+
+      Map<String, dynamic> data = {
+        "client_details": {
+          "weight": targetWeightController.text.trim(),
+          "target_weight": targetWeightController.text.trim(),
+          "height": "5.5",
+          "age": 25,
+          "gender": "Male",
+          "activity_level": "High",
+          "dietary_preferences": selectedDietType,
+          "health_conditions": ["string"],
+          "caloric_goal": "string",
+          "macronutrient_goal": {},
+          "preferred_meal_composition": "string",
+          "hydration_requirements": "string",
+          "meal_timing": {}
+        },
+        "categories": ["string"]
+      };
+
+      print(data);
+
+      await APIMethods.post
+          .post(url: APIEndpoints.createData.generateDiet, map: data)
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          // clearDetails();
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Generate Meal Successful!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          // printError("Auth Controller", "Signup", value.data);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Meals not created'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
+      // }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+    // if (_formKey.currentState!.validate()) {
   }
 
   @override
@@ -52,9 +117,17 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Icon(Icons.arrow_back, color: Colors.white),
+        leading: IconButton(
+            onPressed: () {
+              Get.toNamed('/emptyscreen?id=${widget.id}');
+            },
+            icon: Icon(
+              Icons.arrow_back_ios_sharp,
+              color: Colors.white,
+            )),
         title: Text('Creating A Meal', style: TextStyle(color: Colors.white)),
       ),
       body: SingleChildScrollView(
@@ -401,20 +474,28 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           fontWeight: FontWeight.bold,
                           fontSize: 18),
                     ),
-                    SizedBox(height: 10,),
+                    SizedBox(
+                      height: 10,
+                    ),
                     buildIncrementDecrementRow(
                       "Number of Meals Per Day",
                       numberOfMeals,
                       () => setState(() => numberOfMeals++),
                       () => setState(() => numberOfMeals--),
                     ),
-                    SizedBox(height: 10,),
-                    Text("Meal Type",style: TextStyle(
-                      color: Color(0XFFDBDBDB),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18
-                    ),),
-                    SizedBox(height: 10,),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Meal Type",
+                      style: TextStyle(
+                          color: Color(0XFFDBDBDB),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
                     Row(
                       children: [
                         Expanded(
@@ -424,10 +505,12 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                             ],
                             foodAllergies,
                             // For example purposes, adjust according to real data
-                                (value) => setState(() {}),
+                            (value) => setState(() {}),
                           ),
                         ),
-                        SizedBox(width: 12,),
+                        SizedBox(
+                          width: 12,
+                        ),
                         Expanded(
                           child: buildCheckboxRow(
                             [
@@ -435,7 +518,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                             ],
                             foodAllergies,
                             // For example purposes, adjust according to real data
-                                (value) => setState(() {}),
+                            (value) => setState(() {}),
                           ),
                         ),
                       ],
@@ -449,10 +532,12 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                             ],
                             foodAllergies,
                             // For example purposes, adjust according to real data
-                                (value) => setState(() {}),
+                            (value) => setState(() {}),
                           ),
                         ),
-                        SizedBox(width: 12,),
+                        SizedBox(
+                          width: 12,
+                        ),
                         Expanded(
                           child: buildCheckboxRow(
                             [
@@ -460,7 +545,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                             ],
                             foodAllergies,
                             // For example purposes, adjust according to real data
-                                (value) => setState(() {}),
+                            (value) => setState(() {}),
                           ),
                         ),
                       ],
@@ -474,10 +559,12 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                             ],
                             foodAllergies,
                             // For example purposes, adjust according to real data
-                                (value) => setState(() {}),
+                            (value) => setState(() {}),
                           ),
                         ),
-                        SizedBox(width: 12,),
+                        SizedBox(
+                          width: 12,
+                        ),
                         Expanded(
                           child: buildCheckboxRow(
                             [
@@ -485,7 +572,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                             ],
                             foodAllergies,
                             // For example purposes, adjust according to real data
-                                (value) => setState(() {}),
+                            (value) => setState(() {}),
                           ),
                         ),
                       ],
@@ -512,28 +599,35 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                 content: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Exercise Frequency",style: TextStyle(
-                      color: Color(0XFFDBDBDB),
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold
-                    ),),
-                    SizedBox(height: 10,),
-
+                    Text(
+                      "Exercise Frequency",
+                      style: TextStyle(
+                          color: Color(0XFFDBDBDB),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
                     Row(
                       children: [
                         Expanded(
                           child: buildSelectableContainerRow(
                             ["1-2 Days/Week"],
                             exerciseFrequency,
-                                (value) => setState(() => exerciseFrequency = value),
+                            (value) =>
+                                setState(() => exerciseFrequency = value),
                           ),
                         ),
-                        SizedBox(width: 12,),
+                        SizedBox(
+                          width: 12,
+                        ),
                         Expanded(
                           child: buildSelectableContainerRow(
                             ["3-4 Days/Week"],
                             exerciseFrequency,
-                                (value) => setState(() => exerciseFrequency = value),
+                            (value) =>
+                                setState(() => exerciseFrequency = value),
                           ),
                         ),
                       ],
@@ -544,40 +638,51 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["5 Days/Week"],
                             exerciseFrequency,
-                                (value) => setState(() => exerciseFrequency = value),
+                            (value) =>
+                                setState(() => exerciseFrequency = value),
                           ),
                         ),
-                        SizedBox(width: 12,),
+                        SizedBox(
+                          width: 12,
+                        ),
                         Expanded(
                           child: buildSelectableContainerRow(
                             ["5-7 Days/Week"],
                             exerciseFrequency,
-                                (value) => setState(() => exerciseFrequency = value),
+                            (value) =>
+                                setState(() => exerciseFrequency = value),
                           ),
                         ),
                       ],
                     ),
-                    Text("Types Of Exercise",style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Color(0XFFDBDBDB),
-                    ),),
-                    SizedBox(height: 10,),
+                    Text(
+                      "Types Of Exercise",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Color(0XFFDBDBDB),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
                     Row(
                       children: [
                         Expanded(
                           child: buildSelectableContainerRow(
                             ["Cardio"],
                             typeOfExercise,
-                                (value) => setState(() => typeOfExercise = value),
+                            (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
-                        SizedBox(width: 12,),
+                        SizedBox(
+                          width: 12,
+                        ),
                         Expanded(
                           child: buildSelectableContainerRow(
                             ["Strength Training"],
                             typeOfExercise,
-                                (value) => setState(() => typeOfExercise = value),
+                            (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
                       ],
@@ -588,15 +693,17 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Calisthenics"],
                             typeOfExercise,
-                                (value) => setState(() => typeOfExercise = value),
+                            (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
-                        SizedBox(width: 12,),
+                        SizedBox(
+                          width: 12,
+                        ),
                         Expanded(
                           child: buildSelectableContainerRow(
                             ["Zumba"],
                             typeOfExercise,
-                                (value) => setState(() => typeOfExercise = value),
+                            (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
                       ],
@@ -607,40 +714,48 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Powerlifting"],
                             typeOfExercise,
-                                (value) => setState(() => typeOfExercise = value),
+                            (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
-                        SizedBox(width: 12,),
+                        SizedBox(
+                          width: 12,
+                        ),
                         Expanded(
                           child: buildSelectableContainerRow(
                             ["Mixed"],
                             typeOfExercise,
-                                (value) => setState(() => typeOfExercise = value),
+                            (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
                       ],
                     ),
-                    Text("Pre/Post Workout Nutrition",style: TextStyle(
-                      color: Color(0XFFDBDBDB),
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold
-                    ),),
-                    SizedBox(height: 10,),
+                    Text(
+                      "Pre/Post Workout Nutrition",
+                      style: TextStyle(
+                          color: Color(0XFFDBDBDB),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
                     Row(
                       children: [
                         Expanded(
                           child: buildSelectableContainerRow(
                             ["Yes"],
                             typeOfExercise,
-                                (value) => setState(() => typeOfExercise = value),
+                            (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
-                        SizedBox(width: 12,),
+                        SizedBox(
+                          width: 12,
+                        ),
                         Expanded(
                           child: buildSelectableContainerRow(
                             ["No"],
                             typeOfExercise,
-                                (value) => setState(() => typeOfExercise = value),
+                            (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
                       ],
@@ -661,20 +776,24 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                 content: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Any Medical Condition",style: TextStyle(
-                      color: Color(0XFFDBDBDB),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18
-                    ),),
-                    SizedBox(height: 10,),
+                    Text(
+                      "Any Medical Condition",
+                      style: TextStyle(
+                          color: Color(0XFFDBDBDB),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
                     buildTextInputRow(
                         "Any Medical Condition", medicalConditionController),
                     buildTextInputRow(
                         "Preferred Start Date", preferredStartDateController),
                     SizedBox(
                       height: 150,
-                      child: buildTextInputRow(
-                          "Special Instructions", specialInstructionsController),
+                      child: buildTextInputRow("Special Instructions",
+                          specialInstructionsController),
                     ),
                   ],
                 ),
@@ -694,10 +813,16 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                   ),
                   onPressed: () {
                     // Action on submit (print the selected values)
+                    submitUser(context);
                     printData();
                   },
-                  child: Text("Generate Using AI",
-                      style: TextStyle(color: Color(0XFF242522), fontSize: 18)),
+                  child: isLoading
+                      ? Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : Text("Generate Using AI",
+                          style: TextStyle(
+                              color: Color(0XFF242522), fontSize: 18)),
                 ),
               ),
             ],

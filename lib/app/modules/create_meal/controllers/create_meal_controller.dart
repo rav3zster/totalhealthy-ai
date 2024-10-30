@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
+import '../../../core/base/controllers/auth_controller.dart';
 
 class CreateMealController extends GetxController {
   final fullNameController = TextEditingController();
@@ -13,7 +14,7 @@ class CreateMealController extends GetxController {
   final proteinController = TextEditingController();
   final fatsController = TextEditingController();
 
-  var ingredientControllers = <Map<String, TextEditingController>>[].obs;
+  var ingredientControllers = <Map<String, dynamic>>[].obs;
   var selectedCategories = <String>[].obs;
   var calculateAutomatically = false.obs;
 
@@ -29,26 +30,29 @@ class CreateMealController extends GetxController {
   GlobalKey<FormState> key = GlobalKey<FormState>();
 
   var isLoading = false.obs;
-
-  submitUser(context) async {
+//  {"name": "string", "amount": "string", "unit": "string"}
+  submitUser(context, userId) async {
+    DateTime now = DateTime.now();
+    int timestamp = now.millisecondsSinceEpoch;
     try {
+      String id = userId.toString();
       if (key.currentState!.validate()) {
         isLoading.value = true;
 
         Map<String, dynamic> data = {
-          "groupId": "string",
-          "userId": "string",
+          "groupId": Get.find<AuthController>().groupId.value,
+          "userId": id,
           "from_date": "2024-10-29T10:08:30.384Z",
           "to_date": "2024-10-29T10:08:30.384Z",
           "imageUrl": "https://example.com/",
           "categorys": selectedCategories,
           "name": fullNameController.text.trim(),
           "description": descriptionController.text.trim(),
-          "ingredients": [
-            {"name": "string", "amount": "string", "unit": "string"}
-          ],
-          "created_at": "2024-10-29T10:08:30.384Z"
+          "ingredients": ingredientControllers,
+          "created_at": "$timestamp"
         };
+
+        print(data);
 
         await APIMethods.post
             .post(url: APIEndpoints.createData.createMeal, map: data)
@@ -164,6 +168,7 @@ class CreateMealController extends GetxController {
     print("Description: ${descriptionController.text}");
     print("Selected Categories: $selectedCategories");
     print("Ingredients:");
+    print(ingredientControllers);
     for (var controller in ingredientControllers) {
       print(
           "Name: ${controller['name']!.text}, Amount: ${controller['amount']!.text}");
