@@ -10,11 +10,7 @@ class APIEndpoints {
 
   static const logs = _Logs();
 
-  static const link = _Link();
-
   static const table = _Table();
-
-  static const employee = _Employee();
 
   static const profile = _Profile();
 
@@ -50,26 +46,16 @@ class _CreateData {
   // String get assignTank => "${APIEndpoints.baseURL}api/assign-tank/";
   String get createGroup => "${APIEndpoints.baseURL}groups";
   String get createMeal => "${APIEndpoints.baseURL}meals";
-}
-
-class _Employee {
-  const _Employee();
-  String get getClosingSift =>
-      "${APIEndpoints.baseURL}api/all-assigned-employees";
-  String get createEmployee => "${APIEndpoints.baseURL}api/employees";
-  String get employeeStatus =>
-      "${APIEndpoints.baseURL}api/update_employees_status/";
-  String get designnation => "${APIEndpoints.baseURL}api/designations";
-  // String get assignNozzel => "${APIEndpoints.baseURL}api/assign-nozzel";
-  String get updateEmployeeStatus =>
-      "${APIEndpoints.baseURL}api/update-employee-assi-status";
+  String searchUserByemail(String email) =>
+      "${APIEndpoints.baseURL}user-details?email=$email";
+  String searchUserByPhone(String phone) =>
+      "${APIEndpoints.baseURL}user-details?phone_number=$phone";
 }
 
 class _Profile {
   const _Profile();
 
   String get userProfile => "${APIEndpoints.baseURL}api/profile";
-  String get getprofile => "${APIEndpoints.baseURL}api/profile";
 }
 
 class _Auth {
@@ -84,13 +70,7 @@ class _Group {
   String get groupMember => "${APIEndpoints.baseURL}groups_with_members";
   String get userGroup => "${APIEndpoints.baseURL}users";
   String get pooledRequests => "${APIEndpoints.baseURL}pooled_requests";
-  String get createGroup => "${APIEndpoints.baseURL}groups";
-}
-
-class _Link {
-  const _Link();
-  String get terms => "http://uden.tech/terms-and-conditions";
-  String get privacy => "http://uden.tech/privacy-policy";
+  String get createGroup => "${APIEndpoints.baseURL}admin/groups";
 }
 
 class _Customer {

@@ -37,7 +37,7 @@ class AuthController extends GetxController {
     authToken = box.read("authToken");
 
     print("sdadada${token},${refToken}");
-    Get.toNamed(Routes.NUTRITION_GOAL);
+    Get.toNamed(Routes.TrainerDashboard);
   }
 
   initAuth() async {
@@ -61,8 +61,8 @@ class AuthController extends GetxController {
       Get.offAllNamed(Routes.Login);
     } else if (isAuthenticated.value) {
       print(isAuthenticated.value);
-      Get.offAllNamed(Get.currentRoute == '/login'
-          ? Routes.NUTRITION_GOAL
+      Get.toNamed(Get.currentRoute == '/login' || Get.currentRoute == '/signup'
+          ? Routes.TrainerDashboard
           : Get.currentRoute);
     }
   }

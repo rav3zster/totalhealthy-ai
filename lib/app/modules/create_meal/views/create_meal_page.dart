@@ -9,6 +9,7 @@ class CreateMealPage extends StatelessWidget {
   const CreateMealPage({super.key, required this.controller});
   @override
   Widget build(BuildContext context) {
+    String id = Get.parameters["id"] ?? "";
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(

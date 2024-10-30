@@ -1,6 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class TrainerDashboardView extends StatelessWidget {
+import '../../../core/base/apiservice/api_endpoints.dart';
+import '../../../core/base/apiservice/api_status.dart';
+import '../../../core/base/apiservice/base_methods.dart';
+import '../../../core/base/constants/appcolor.dart';
+import '../../../routes/app_pages.dart';
+import '../../../widgets/custom_button.dart';
+
+class TrainerDashboardView extends StatefulWidget {
+  @override
+  State<TrainerDashboardView> createState() => _TrainerDashboardViewState();
+}
+
+class _TrainerDashboardViewState extends State<TrainerDashboardView> {
+  var searchController = TextEditingController();
+  bool isLoading = false;
+  var userData = {};
+  Future<void> submitUser() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      // print(data);  String input = searchController.text.trim();
+      String input = searchController.text.trim();
+      var phone = int.tryParse(input);
+      await APIMethods.get
+          .get(
+        url: phone != null
+            ? APIEndpoints.createData.searchUserByPhone(input)
+            : APIEndpoints.createData.searchUserByemail(input),
+      )
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          setState(() {
+            userData = value.data;
+          });
+
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   const SnackBar(
+          //     content: Text('User  Successful!'),
+          //     backgroundColor: Colors.green,
+          //   ),
+          // );
+        } else {
+          // printError("Auth Controller", "Signup", value.data);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${value.data["detail"]}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
+      // }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+    // if (_formKey.currentState!.validate()) {
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +96,7 @@ class TrainerDashboardView extends StatelessWidget {
         actions: [
           Container(
             decoration:
-            BoxDecoration(color: Color(0XFF242424), shape: BoxShape.circle),
+                BoxDecoration(color: Color(0XFF242424), shape: BoxShape.circle),
             child: IconButton(
               icon: Icon(
                 Icons.notifications_none,
@@ -79,7 +142,9 @@ class TrainerDashboardView extends StatelessWidget {
                           Text(
                             '08',
                             style: TextStyle(
-                                color: Color(0XFFF57552), fontSize: 22, fontWeight: FontWeight.bold),
+                                color: Color(0XFFF57552),
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 5),
                           Text(
@@ -100,7 +165,9 @@ class TrainerDashboardView extends StatelessWidget {
                           Text(
                             '05',
                             style: TextStyle(
-                                color: Color(0XFFF5D657), fontSize: 22, fontWeight: FontWeight.bold),
+                                color: Color(0XFFF5D657),
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 5),
                           Text(
@@ -121,7 +188,9 @@ class TrainerDashboardView extends StatelessWidget {
                           Text(
                             '07',
                             style: TextStyle(
-                                color: Color(0XFFD0B4F9), fontSize: 22, fontWeight: FontWeight.bold),
+                                color: Color(0XFFD0B4F9),
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 5),
                           Text(
@@ -140,25 +209,36 @@ class TrainerDashboardView extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Color(0XFF242522),
-                        borderRadius: BorderRadius.circular(50)
-                    ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        enabledBorder: InputBorder.none,
-                        hintText: 'Search here...',
-                        hintStyle: TextStyle(
-                            color: Color(0XFFDBDBDB)
-                        ),
-                        prefixIcon: Icon(Icons.search, color: Color(0XFFDBDBDB)),
-                      ),
+                  child: TextFormField(
+                    controller: searchController,
+                    onChanged: (value) {},
+                    decoration: InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50)),
+                      fillColor: Color(0XFF242522),
+                      filled: true,
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50)),
+                      hintText: 'Search here...',
+                      hintStyle: TextStyle(color: Color(0XFFDBDBDB)),
+                      prefixIcon: Icon(Icons.search, color: Color(0XFFDBDBDB)),
                     ),
                   ),
                 ),
-                SizedBox(width: 10),
-                Icon(Icons.filter_list, color: Colors.white, size: 30),
+                CustomButton(
+                    child: isLoading
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : Text(
+                            "Search",
+                            style: TextStyle(color: AppColors.buttonText),
+                          ),
+                    onPressed: () => submitUser(),
+                    size: ButtonSize.small,
+                    type: ButtonType.elevated),
+                // SizedBox(width: 10),
+                // Icon(Icons.filter_list, color: Colors.white, size: 30),
               ],
             ),
             SizedBox(height: 20),
@@ -168,12 +248,16 @@ class TrainerDashboardView extends StatelessWidget {
               children: [
                 Text(
                   'Client List',
-                  style: TextStyle(color: Color(0XFFFFFFFF),
+                  style: TextStyle(
+                      color: Color(0XFFFFFFFF),
                       fontSize: 24,
                       fontWeight: FontWeight.bold),
                 ),
                 ElevatedButton.icon(
-                  icon: Icon(Icons.add,color: Color(0XFF242522),),
+                  icon: Icon(
+                    Icons.add,
+                    color: Color(0XFF242522),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFFCDE26D),
                     // Add Client Button Color
@@ -182,36 +266,44 @@ class TrainerDashboardView extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {},
-                  label: Text(
-                      'Add Client', style: TextStyle(color: Color(0XFF242522))),
+                  label: Text('Add Client',
+                      style: TextStyle(color: Color(0XFF242522))),
                 ),
               ],
             ),
             SizedBox(height: 10),
             // Client List
-            Expanded(
-              child: ListView(
-                children: [
-                  clientCard('Ayush Shukla', 'Keto Plan', 'Oct 1 - Nov 1', 85,
-                      context),
-                  clientCard(
-                      'Rahul Sharma', 'Vegan Balanced Diet', 'Oct 1 - Nov 1',
-                      55, context),
-                  clientCard(
-                      'Pankaj Singh', 'High Protein Diet', 'Oct 1 - Nov 1', 85,
-                      context),
-                  clientCard(
-                      'Manoj Tiwari', 'Mediterranean Plan', 'Oct 1 - Nov 1', 55,
-                      context),
-                ],
-              ),
-            ),
+
+            userData.isNotEmpty
+                ? Expanded(
+                    child: ListView(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Get.toNamed("/emptyscreen?id=${userData["id"]}");
+                          },
+                          child: clientCard(
+                              userData["id"],
+                              "${userData["email"]}",
+                              "${userData["phone_number"]}",
+                              56,
+                              context),
+                        ),
+                        // clientCard('Rahul Sharma', 'Vegan Balanced Diet',
+                        //     'Oct 1 - Nov 1', 55, context),
+                        // clientCard('Pankaj Singh', 'High Protein Diet',
+                        //     'Oct 1 - Nov 1', 85, context),
+                        // clientCard('Manoj Tiwari', 'Mediterranean Plan',
+                        //     'Oct 1 - Nov 1', 55, context),
+                      ],
+                    ),
+                  )
+                : SizedBox(),
           ],
         ),
       ),
     );
   }
-
 
   Widget clientCard(String name, String plan, String duration, int progress,
       BuildContext context) {
@@ -237,7 +329,8 @@ class TrainerDashboardView extends StatelessWidget {
                   height: 60, // Set the height for the square
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage('https://s3-alpha-sig.figma.com/img/4edc/c0b0/bdaf584c291418ad88b679516504a43c?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=IbcOURmNXhwmkM99WKqGORFkJ7KSTt0pp1OmymlK631~CIyf1SmXCL1KpE48OQ-5lUnzil5KzGReYJzSCncgs5qVicHLfvqkeM0ZeVv8dxIoaRluWoWbtDIq~8o~rFf5dObR7~UjhQpLyoNdgm8McqhDSxuRwT-oaTTV5ytgkQD3z0Nx75TsIBf~CgAgnxoDPMa-VLnkFrYU8n-wqj5sZW2VF8GFLzywTbLHjCst79zdudCa-1ZUMKV3jaMnCKcsDONFeJtfUFUZMAgTXV7RbQ7~5UAxyWeTgjeEDwN5K7wBOJOtLKAtyA7lbf019miLdNDr~xAzxDgZidpkm~9Rbg__'),
+                      image: NetworkImage(
+                          'https://s3-alpha-sig.figma.com/img/4edc/c0b0/bdaf584c291418ad88b679516504a43c?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=IbcOURmNXhwmkM99WKqGORFkJ7KSTt0pp1OmymlK631~CIyf1SmXCL1KpE48OQ-5lUnzil5KzGReYJzSCncgs5qVicHLfvqkeM0ZeVv8dxIoaRluWoWbtDIq~8o~rFf5dObR7~UjhQpLyoNdgm8McqhDSxuRwT-oaTTV5ytgkQD3z0Nx75TsIBf~CgAgnxoDPMa-VLnkFrYU8n-wqj5sZW2VF8GFLzywTbLHjCst79zdudCa-1ZUMKV3jaMnCKcsDONFeJtfUFUZMAgTXV7RbQ7~5UAxyWeTgjeEDwN5K7wBOJOtLKAtyA7lbf019miLdNDr~xAzxDgZidpkm~9Rbg__'),
                       fit: BoxFit.cover,
                     ),
                     borderRadius: BorderRadius.circular(8), // Rounded corners
@@ -298,21 +391,25 @@ class TrainerDashboardView extends StatelessWidget {
                           color: Color(0XFFCDE26D), // Circle color for message
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.local_post_office_outlined,color: Color(0XFF242522),)
-                    ),
-                    onTap: (){},
+                        child: Icon(
+                          Icons.local_post_office_outlined,
+                          color: Color(0XFF242522),
+                        )),
+                    onTap: () {},
                   ),
                   SizedBox(width: 8),
                   GestureDetector(
-                    onTap: (){},
+                    onTap: () {},
                     child: Container(
                         padding: EdgeInsets.all(8), // Padding inside the circle
                         decoration: BoxDecoration(
                           color: Color(0XFFF5D657), // Circle color for phone
                           shape: BoxShape.circle,
                         ),
-                        child:Icon(Icons.call_outlined,color: Color(0XFF242522),)
-                    ),
+                        child: Icon(
+                          Icons.call_outlined,
+                          color: Color(0XFF242522),
+                        )),
                   ),
                 ],
               ),
