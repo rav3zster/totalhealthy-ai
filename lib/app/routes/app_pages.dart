@@ -45,11 +45,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-<<<<<<< HEAD
-  static const INITIAL = Routes.EmptyScreen;
-=======
   static const INITIAL = Routes.HOME;
->>>>>>> 81502e93ee64e00013172309050a04af883bcb1d
 
   static final routes = [
     GetPage(
