@@ -37,7 +37,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.MEALS_DETAILS;
+  static const INITIAL = Routes.MEAL_TIMING;
 
   static final routes = [
     GetPage(
