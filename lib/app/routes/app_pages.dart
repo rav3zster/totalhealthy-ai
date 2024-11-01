@@ -30,6 +30,8 @@ import '../modules/nutrition_goal/views/nutrition_goal_view.dart';
 import '../modules/registration/bindings/registration_binding.dart';
 import '../modules/registration/views/registration_view.dart';
 
+import '../modules/swipe_screen/bindings/swipe_screen_bindings.dart';
+import '../modules/swipe_screen/views/swipe_screen_views.dart';
 import '../modules/welcom_screen/bindings/welcome-screen-bindings.dart';
 import '../modules/welcom_screen/views/welcome-screen-views.dart';
 import '../modules/trainer_dashboard/bindings/trainer_dashboard_bindings.dart';
@@ -42,7 +44,6 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.GROUP;
   static const INITIAL = Routes.MEAL_TIMING;
 
   static final routes = [
