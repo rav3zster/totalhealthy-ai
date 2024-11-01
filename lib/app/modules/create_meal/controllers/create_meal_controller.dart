@@ -49,7 +49,11 @@ class CreateMealController extends GetxController {
           "name": fullNameController.text.trim(),
           "description": descriptionController.text.trim(),
           "ingredients": ingredientControllers,
-          "created_at": "$timestamp"
+          "created_at": "$timestamp",
+          "kcal": kcalController.text.trim(),
+          "carbs": carbsController.text.trim(),
+          "protein": proteinController.text.trim(),
+          "fat": fatsController.text.trim(),
         };
 
         print(data);

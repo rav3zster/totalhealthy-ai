@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../core/base/constants/appcolor.dart';
+import '../../../routes/app_pages.dart';
+import '../controllers/user_diet_screen_controllers.dart';
 
 class NutritionalCard extends StatelessWidget {
+  final String id;
   final String title;
-  final int kcal;
+  final String kcal;
   final int weight;
-  final int protein;
-  final int fat;
-  final int carbs;
+  final String protein;
+  final String fat;
+  final String carbs;
   final String? image;
 
   NutritionalCard({
@@ -19,6 +23,7 @@ class NutritionalCard extends StatelessWidget {
     required this.fat,
     required this.carbs,
     this.image,
+    required this.id,
   });
 
   @override
@@ -99,12 +104,40 @@ class NutritionalCard extends StatelessWidget {
                   ),
                 ],
               ),
-              Container(
-                  height: 30,
-                  width: 30,
-                  decoration: BoxDecoration(
-                      color: AppColors.chineseGreen, shape: BoxShape.circle),
-                  child: Icon(Icons.more_horiz, color: Colors.black)),
+              PopupMenuButton<String>(
+                // foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+
+                onSelected: (value) {},
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    onTap: () {
+                      Get.toNamed('/meals-details?id=$id');
+                    },
+                    child: Text(
+                      "Meal Details",
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    value: "Meal Details",
+                  ),
+                  PopupMenuItem(
+                    value: "Option 2",
+                    child:
+                        Text("Option 2", style: TextStyle(color: Colors.black)),
+                  ),
+                  PopupMenuItem(
+                    value: "Option 3",
+                    child:
+                        Text("Option 3", style: TextStyle(color: Colors.black)),
+                  ),
+                ],
+                child: Container(
+                    height: 30,
+                    width: 30,
+                    decoration: BoxDecoration(
+                        color: AppColors.chineseGreen, shape: BoxShape.circle),
+                    child: Icon(Icons.more_horiz, color: Colors.black)),
+                // Icon that opens the menu
+              ),
             ],
           ),
           SizedBox(height: 8),

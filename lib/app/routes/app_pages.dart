@@ -31,25 +31,19 @@ import '../modules/registration/views/registration_view.dart';
 
 import '../modules/swipe_screen/bindings/swipe_screen_bindings.dart';
 import '../modules/swipe_screen/views/swipe_screen_views.dart';
+import '../modules/user_diet_screen/views/user_diet_view.dart';
 import '../modules/welcom_screen/bindings/welcome-screen-bindings.dart';
 import '../modules/welcom_screen/views/welcome-screen-views.dart';
 import '../modules/trainer_dashboard/bindings/trainer_dashboard_bindings.dart';
 import '../modules/trainer_dashboard/views/trainer_dashboard_views.dart';
 import '../modules/user_diet_screen/bindings/user_diet_screen_bindings.dart';
-import '../modules/user_diet_screen/views/user_diet_screen_view.dart';
-<<<<<<< HEAD
-import '../modules/user_diet_screen/views/user_diet_view.dart';
-import '../modules/welcom_screen/bindings/welcome-screen-bindings.dart';
-import '../modules/welcom_screen/views/welcome-screen-views.dart';
-=======
->>>>>>> 85cf40917e0a8f93c2f5d800fc92f7284dd3fc86
 
 part 'app_routes.dart';
 
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.MEAL_TIMING;
+  static const INITIAL = Routes.HOME;
 
   static final routes = [
     GetPage(
@@ -113,7 +107,6 @@ class AppPages {
       binding: TrainerDashboardBindings(),
     ),
     GetPage(
-<<<<<<< HEAD
         name: _Paths.UserDiet,
         page: () => UserDietView(),
         binding: UserDietScreenBindings(),
@@ -123,26 +116,6 @@ class AppPages {
         page: () => ClientDashboardScreen(),
         binding: ClientDashboardBindings(),
         middlewares: [AuthCheckMiddleware()]),
-    GetPage(
-      name: _Paths.SIGNUP,
-      binding: SignupBinding(),
-      page: () => SignupView(),
-=======
-      name: _Paths.UserDiet,
-      page: () => UserDietScreen(),
-      binding: UserDietScreenBindings(),
-    ),
-    GetPage(
-      name: _Paths.EmptyScreen,
-      page: () => EmptyScreenView(),
-      binding: EmptyScreenBindings(),
-    ),
-    GetPage(
-      name: _Paths.ClientDashboard,
-      page: () => ClientDashboardScreen(),
-      binding: ClientDashboardBindings(),
->>>>>>> 85cf40917e0a8f93c2f5d800fc92f7284dd3fc86
-    ),
     GetPage(
       name: _Paths.FORGETPASSWORD,
       binding: ForgetPasswordScreenBindings(),

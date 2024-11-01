@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:get/get.dart';
-
 import '../../../core/base/views/base_view.dart';
-import '../../meal_history/views/meal_history_screen.dart';
+
 import 'meals_details_screen.dart';
 
 class MealsDetailsView extends BaseView {
@@ -11,16 +9,16 @@ class MealsDetailsView extends BaseView {
 
   @override
   Widget vBuilderTablet() {
-    return const MealsDetailsScreen();
+    return MealsDetailsScreen();
   }
 
   @override
   Widget vBuilderDesktop() {
-    return const MealsDetailsScreen();
+    return MealsDetailsScreen();
   }
 
   @override
   Widget vBuilderPhone() {
-    return const MealsDetailsScreen();
+    return MealsDetailsScreen();
   }
 }

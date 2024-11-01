@@ -1,10 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/modules/create_meal/controllers/create_meal_controller.dart';
-
-import '../../../routes/app_pages.dart';
 
 class CreateMealPage extends StatefulWidget {
   final CreateMealController controller;
@@ -296,6 +295,11 @@ class _CreateMealPageState extends State<CreateMealPage> {
                         children: [
                           Expanded(
                             child: TextField(
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                FilteringTextInputFormatter.allow(RegExp(
+                                    r'^[0-9]+$')), // Restricts input to digits
+                              ],
                               controller: widget.controller.kcalController,
                               decoration: InputDecoration(
                                 labelText: "kcal",
@@ -329,7 +333,12 @@ class _CreateMealPageState extends State<CreateMealPage> {
                           ),
                           SizedBox(width: 10), // Space between the fields
                           Expanded(
-                            child: TextField(
+                            child: TextFormField(
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                FilteringTextInputFormatter.allow(RegExp(
+                                    r'^[0-9]+$')), // Restricts input to digits
+                              ],
                               controller: widget.controller.carbsController,
                               decoration: InputDecoration(
                                 labelText: "Carbs",
@@ -369,6 +378,11 @@ class _CreateMealPageState extends State<CreateMealPage> {
                         children: [
                           Expanded(
                             child: TextField(
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                FilteringTextInputFormatter.allow(RegExp(
+                                    r'^[0-9]+$')), // Restricts input to digits
+                              ],
                               controller: widget.controller.proteinController,
                               decoration: InputDecoration(
                                 labelText: "Protein",
@@ -403,6 +417,11 @@ class _CreateMealPageState extends State<CreateMealPage> {
                           SizedBox(width: 10), // Space between the fields
                           Expanded(
                             child: TextField(
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                FilteringTextInputFormatter.allow(RegExp(
+                                    r'^[0-9]+$')), // Restricts input to digits// Restricts input to digits
+                              ],
                               controller: widget.controller.fatsController,
                               decoration: InputDecoration(
                                 labelText: "Fats",

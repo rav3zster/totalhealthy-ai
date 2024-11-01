@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:totalhealthy/app/modules/meals_details/controllers/meals_details_controller.dart';
 import 'package:totalhealthy/app/modules/user_diet_screen/controllers/user_diet_screen_controllers.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
@@ -27,6 +29,7 @@ class _UserDietPageState extends State<UserDietPage> {
 
   var dataList = [];
   var isLoading = false;
+
   Future<void> getMeals() async {
     try {
       setState(() {
@@ -42,6 +45,7 @@ class _UserDietPageState extends State<UserDietPage> {
           setState(() {
             dataList = value.data;
           });
+          Get.find<MealsDetailsController>().data(dataList);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -59,14 +63,19 @@ class _UserDietPageState extends State<UserDietPage> {
         isLoading = false;
       });
     }
-    // if (_formKey.currentState!.validate()) {
   }
 
+  bool containsDigits(String input) {
+    return RegExp(r'\d').hasMatch(input);
+  }
+
+// final box = GetStorage();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0XFF0C0C0C),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Row(
@@ -150,12 +159,13 @@ class _UserDietPageState extends State<UserDietPage> {
                         return Padding(
                           padding: EdgeInsets.only(bottom: 15),
                           child: NutritionalCard(
+                            id: widget.id,
                             title: "${data["name"] ?? "Not Found"}",
-                            kcal: 500,
-                            weight: 100,
-                            protein: 20,
-                            fat: 21,
-                            carbs: 30,
+                            kcal: "${data["kcal"]}",
+                            weight: 80,
+                            protein: "${data["protein"]}",
+                            fat: "${data["fat"]}",
+                            carbs: "${data["carbs"]}",
                           ),
                         );
                       },

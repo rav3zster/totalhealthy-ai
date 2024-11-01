@@ -1,8 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:totalhealthy/app/modules/meals_details/controllers/meals_details_controller.dart';
+
+import '../../../routes/app_pages.dart';
 
 class MealsDetailsPage extends StatefulWidget {
+  final String id;
+  final MealsDetailsController controller;
+  MealsDetailsPage({Key? key, required this.id, required this.controller});
   @override
   _MealsDetailsPageState createState() => _MealsDetailsPageState();
 }
@@ -44,6 +51,7 @@ class _MealsDetailsPageState extends State<MealsDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final String id = Get.parameters["id"] ?? "";
     if (recipeData == null) {
       return Scaffold(
         backgroundColor: Colors.black,
@@ -61,7 +69,7 @@ class _MealsDetailsPageState extends State<MealsDetailsPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.greenAccent),
           onPressed: () {
-            // Back button logic
+            Get.toNamed('/userdiet?id=$id');
           },
         ),
         actions: [
