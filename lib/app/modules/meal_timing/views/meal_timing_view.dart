@@ -9,16 +9,16 @@ class MealTimingView extends BaseView {
 
   @override
   Widget vBuilderTablet() {
-    return const MealTimingScreen();
+    return  MealTimingScreen();
   }
 
   @override
   Widget vBuilderDesktop() {
-    return const MealTimingScreen();
+    return  MealTimingScreen();
   }
 
   @override
   Widget vBuilderPhone() {
-    return const MealTimingScreen();
+    return  MealTimingScreen();
   }
 }

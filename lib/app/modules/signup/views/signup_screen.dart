@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:totalhealthy/app/modules/Registration_Screen/Registration_view.dart';
-
 import '../../../core/base/apiservice/api_endpoints.dart';
+
+
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../routes/app_pages.dart';
