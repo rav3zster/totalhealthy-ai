@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:totalhealthy/app/modules/group/views/groups.dart';
+import 'package:totalhealthy/app/modules/group/controllers/group_controller.dart';
+import 'package:totalhealthy/app/modules/group/views/groups_details.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
@@ -13,6 +14,7 @@ class GroupListPage extends StatefulWidget {
 }
 
 class _GroupListPageState extends State<GroupListPage> {
+  var controller = Get.find<GroupController>();
   bool isLoading = false;
   var groupData = [];
 
@@ -83,11 +85,10 @@ class _GroupListPageState extends State<GroupListPage> {
         ),
         title: Text(
           'Groups',
-          style: TextStyle(color: Color(0XFFB3B3B3),fontSize: 24),
+          style: TextStyle(color: Color(0XFFB3B3B3), fontSize: 24),
         ),
         actions: [
           Container(
-
             decoration: BoxDecoration(
                 color: Color(0XFFCDE26D),
                 borderRadius: BorderRadius.circular(30)),
@@ -124,16 +125,21 @@ class _GroupListPageState extends State<GroupListPage> {
               itemBuilder: (context, index) {
                 final group = groupData[index];
                 return GestureDetector(
-                  onTap: (){
-                    Get.to(GroupsViewScreen());
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => GroupsViewScreen()),
+                    );
+
+                    controller.group(group);
                   },
                   child: Card(
                     margin: EdgeInsets.all(8.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Color(0XFF242522),
-                        borderRadius: BorderRadius.circular(10)
-                      ),
+                          color: Color(0XFF242522),
+                          borderRadius: BorderRadius.circular(10)),
                       child: Padding(
                         padding: EdgeInsets.all(16.0),
                         child: Column(
@@ -158,7 +164,8 @@ class _GroupListPageState extends State<GroupListPage> {
                                 Container(
                                     padding: EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                        color: Color(0XFFCDE26D).withOpacity(0.1),
+                                        color:
+                                            Color(0XFFCDE26D).withOpacity(0.1),
                                         shape: BoxShape.circle),
                                     child: Icon(
                                       Icons.calendar_today_outlined,
@@ -173,41 +180,40 @@ class _GroupListPageState extends State<GroupListPage> {
                                   width: 10,
                                 ),
                                 Text(
-                                  group["created_at"],
+                                  "${group["created_at"]}",
                                   style: TextStyle(
                                       fontSize: 14, color: Color(0XFFFFFFFF)),
                                 ),
                               ],
                             ),
-
-                            Row(
-                              children: [
-                                Container(
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                        color: Color(0XFFCDE26D).withOpacity(0.1),
-                                        shape: BoxShape.circle),
-                                    child: Icon(
-                                      Icons.people_outline,
-                                      color: Color(0XFFCDE26D),
-                                      size: 18,
-                                    )),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text("Total Members:"),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  "12 Members",
-                                  style: TextStyle(
-                                      fontSize: 14, color: Color(0XFFFFFFFF)),
-                                ),
-                              ],
-                            ),
-
-
+                            // Row(
+                            //   children: [
+                            //     Container(
+                            //         padding: EdgeInsets.all(8),
+                            //         decoration: BoxDecoration(
+                            //             color:
+                            //                 Color(0XFFCDE26D).withOpacity(0.1),
+                            //             shape: BoxShape.circle),
+                            //         child: Icon(
+                            //           Icons.people_outline,
+                            //           color: Color(0XFFCDE26D),
+                            //           size: 18,
+                            //         )),
+                            //     SizedBox(
+                            //       width: 5,
+                            //     ),
+                            //     // Text("Total Members:"),
+                            //     // SizedBox(
+                            //     //   width: 10,
+                            //     // ),
+                            //     // Text(
+                            //     //   "12 Members",
+                            //     //   style: TextStyle(
+                            //     //       fontSize: 14, color: Color(0XFFFFFFFF)),
+                            //     // ),
+                            //   ],
+                            // ),
+                            //
                           ],
                         ),
                       ),

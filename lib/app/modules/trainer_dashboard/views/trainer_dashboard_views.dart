@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
-import '../../../routes/app_pages.dart';
+
 import '../../../widgets/custom_button.dart';
 
 class TrainerDashboardView extends StatefulWidget {
@@ -64,11 +65,118 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
     // if (_formKey.currentState!.validate()) {
   }
 
+  var isGroupLoading = false;
+  var dataList = [];
+  var uniqueDataList = [];
+
+  Future<void> getGroup() async {
+    try {
+      setState(() {
+        isGroupLoading = true;
+      });
+      // print(data);  String input = searchController.text.trim();
+
+      await APIMethods.get
+          .get(
+        url: APIEndpoints.group.createGroup,
+      )
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          setState(() {
+            dataList = value.data;
+            uniqueDataList = dataList
+                .map((item) => item["group_name"])
+                .toSet()
+                .map((groupName) => dataList
+                    .firstWhere((item) => item["group_name"] == groupName))
+                .toList();
+          });
+
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   const SnackBar(
+          //     content: Text('User  Successful!'),
+          //     backgroundColor: Colors.green,
+          //   ),
+          // );
+        } else {
+          // printError("Auth Controller", "Signup", value.data);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${value.data["detail"]}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
+      // }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isGroupLoading = false;
+      });
+    }
+    // if (_formKey.currentState!.validate()) {
+  }
+
+  bool isMemberLoading = false;
+  var groupMemberData = [];
+  Future<void> getMember(id) async {
+    try {
+      setState(() {
+        isMemberLoading = true;
+      });
+
+      await APIMethods.get
+          .get(
+        url: "${APIEndpoints.group.createGroup}/$id/members",
+      )
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          setState(() {
+            groupMemberData = value.data;
+          });
+
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   const SnackBar(
+          //     content: Text('User  Successful!'),
+          //     backgroundColor: Colors.green,
+          //   ),
+          // );
+        } else {
+          // printError("Auth Controller", "Signup", value.data);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${value.data["detail"]}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
+      // }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isMemberLoading = false;
+      });
+    }
+    // if (_formKey.currentState!.validate()) {
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getGroup();
+  }
+
+  String? valueDropDown;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0XFF0C0C0C),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Row(
@@ -94,6 +202,51 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
           ],
         ),
         actions: [
+          isGroupLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : SizedBox(
+                  width: 200,
+                  child: DropdownButtonFormField(
+                    hint: Text(
+                      "Select Group",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    value: valueDropDown,
+                    onTap: () {},
+                    items: uniqueDataList.map((value) {
+                      //  bool exists = dataList.any((item) => item["group_name"] == newItem["group_name"]);
+                      return DropdownMenuItem(
+                        onTap: () {
+                          setState(() {
+                            getMember("${value["group_id"]}");
+                            Get.find<AuthController>()
+                                .groupIdStore(value["group_id"]);
+                          });
+                        },
+                        value:
+                            "${value["group_name"]}", // Set a value for each item
+                        child: Text(
+                          "${value["group_name"]}",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        valueDropDown = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+          SizedBox(
+            width: 20,
+          ),
           Container(
             decoration:
                 BoxDecoration(color: Color(0XFF242424), shape: BoxShape.circle),
@@ -241,6 +394,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                 // Icon(Icons.filter_list, color: Colors.white, size: 30),
               ],
             ),
+
             SizedBox(height: 20),
             // Add Client Button
             Row(
@@ -265,7 +419,9 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    // Get.toNamed(Routes.UserDiet);
+                  },
                   label: Text('Add Client',
                       style: TextStyle(color: Color(0XFF242522))),
                 ),
@@ -280,7 +436,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                       children: [
                         InkWell(
                           onTap: () {
-                            Get.toNamed("/emptyscreen?id=${userData["id"]}");
+                            Get.toNamed("/userdiet?id=${userData["id"]}");
                           },
                           child: clientCard(
                               userData["id"],
@@ -289,16 +445,33 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                               56,
                               context),
                         ),
-                        // clientCard('Rahul Sharma', 'Vegan Balanced Diet',
-                        //     'Oct 1 - Nov 1', 55, context),
-                        // clientCard('Pankaj Singh', 'High Protein Diet',
-                        //     'Oct 1 - Nov 1', 85, context),
-                        // clientCard('Manoj Tiwari', 'Mediterranean Plan',
-                        //     'Oct 1 - Nov 1', 55, context),
                       ],
                     ),
                   )
                 : SizedBox(),
+
+            isGroupLoading
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: groupMemberData.length,
+                    itemBuilder: (context, index) {
+                      var data = groupMemberData[index];
+                      return InkWell(
+                        onTap: () {
+                          Get.toNamed("/userdiet?id=${data["user_id"]}");
+                        },
+                        child: clientCard(
+                            data["user_id"],
+                            "${data["user_details"]["email"]}",
+                            "${data["user_details"]["phone_number"]}",
+                            56,
+                            context),
+                      );
+                    },
+                  )
           ],
         ),
       ),

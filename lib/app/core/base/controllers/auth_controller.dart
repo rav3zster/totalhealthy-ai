@@ -67,7 +67,12 @@ class AuthController extends GetxController {
     }
   }
 
-  var groupId = "".obs;
+  groupgetId() => box.read("groupId");
+  groupIdStore(String id) async {
+    await box.write("groupId", id);
+    print(box.read("groupId"));
+  }
+
   tokenVaildate() {
     if (box.hasData("authToken")) {
       isAuthenticated.value = true;

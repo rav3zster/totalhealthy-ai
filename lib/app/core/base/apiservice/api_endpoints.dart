@@ -14,7 +14,7 @@ class APIEndpoints {
 
   static const profile = _Profile();
 
-  static const customer = _Customer();
+  static const meals = _Meals();
 
   static const createData = _CreateData();
 }
@@ -73,17 +73,14 @@ class _Group {
   String get userGroup => "${APIEndpoints.baseURL}users";
   String get pooledRequests => "${APIEndpoints.baseURL}pooled_requests";
   String get createGroup => "${APIEndpoints.baseURL}admin/groups";
+  String addGroupMember(groupId, userId) =>
+      "${APIEndpoints.baseURL}groups/$groupId/send-request/$userId";
 }
 
-class _Customer {
-  const _Customer();
+class _Meals {
+  const _Meals();
 
-  String get vehicle => "${APIEndpoints.baseURL}api/vehicles";
-  String get vehicleGet => "${APIEndpoints.baseURL}api/vehicles?customerId=";
-  String get company => "${APIEndpoints.baseURL}api/customers";
-  String get customerAssignwithID =>
-      "${APIEndpoints.baseURL}api/customers_assign_shit/";
-  String get openday => "${APIEndpoints.baseURL}api/open-days";
+  String getadmindMeals(id) => "${APIEndpoints.baseURL}admin/meals?groupId=$id";
 }
 
 class _Logs {

@@ -18,7 +18,7 @@ abstract class Routes {
   static const FORGETPASSWORD = _Paths.FORGETPASSWORD;
   static const UserDiet = _Paths.UserDiet;
   static const TrainerDashboard = _Paths.TrainerDashboard;
-  static const EmptyScreen = _Paths.EmptyScreen;
+
   static const ClientDashboard = _Paths.ClientDashboard;
   static const CreateMeal = _Paths.CreateMeal;
   static const SIGNUP = _Paths.SIGNUP;
@@ -40,7 +40,7 @@ abstract class _Paths {
   static const MEAL_TIMING = '/meal-timing';
   static const UserDiet = '/userdiet';
   static const TrainerDashboard = '/trainerdashboard';
-  static const EmptyScreen = '/emptyscreen';
+
   static const ClientDashboard = '/clientdashboard';
   static const CreateMeal = '/createmeal';
   static const SIGNUP = '/signup';

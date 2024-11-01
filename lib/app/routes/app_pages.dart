@@ -6,8 +6,7 @@ import '../modules/client_dashboard/bindings/client_dashboard_bindings.dart';
 import '../modules/client_dashboard/views/client_dashboard_views.dart';
 import '../modules/create_meal/bindings/create_meal_binding.dart';
 import '../modules/create_meal/views/create_meal_view.dart';
-import '../modules/empty_data_screen/bindings/empty_data_screen_bindings.dart';
-import '../modules/empty_data_screen/views/empty_data_screen_views.dart';
+
 import '../modules/forget_passowrd_screen/bindings/forget_passowrd_screen_bindings.dart';
 import '../modules/forget_passowrd_screen/views/forget_password_screen_views.dart';
 import '../modules/generate_ai/bindings/generate_ai_binding.dart';
@@ -37,6 +36,7 @@ import '../modules/trainer_dashboard/bindings/trainer_dashboard_bindings.dart';
 import '../modules/trainer_dashboard/views/trainer_dashboard_views.dart';
 import '../modules/user_diet_screen/bindings/user_diet_screen_bindings.dart';
 import '../modules/user_diet_screen/views/user_diet_screen_view.dart';
+import '../modules/user_diet_screen/views/user_diet_view.dart';
 import '../modules/welcom_screen/bindings/welcome-screen-bindings.dart';
 import '../modules/welcom_screen/views/welcome-screen-views.dart';
 
@@ -110,13 +110,8 @@ class AppPages {
         middlewares: [AuthCheckMiddleware()]),
     GetPage(
         name: _Paths.UserDiet,
-        page: () => UserDietScreen(),
+        page: () => UserDietView(),
         binding: UserDietScreenBindings(),
-        middlewares: [AuthCheckMiddleware()]),
-    GetPage(
-        name: _Paths.EmptyScreen,
-        page: () => EmptyScreenView(),
-        binding: EmptyScreenBindings(),
         middlewares: [AuthCheckMiddleware()]),
     GetPage(
         name: _Paths.ClientDashboard,

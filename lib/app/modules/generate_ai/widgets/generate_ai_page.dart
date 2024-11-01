@@ -122,7 +122,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
         elevation: 0,
         leading: IconButton(
             onPressed: () {
-              Get.toNamed('/emptyscreen?id=${widget.id}');
+              Get.toNamed('/userdiet?id=${widget.id}');
             },
             icon: Icon(
               Icons.arrow_back_ios_sharp,

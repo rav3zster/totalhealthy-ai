@@ -20,4 +20,5 @@ class GroupController extends GetxController {
   }
 
   void increment() => count.value++;
+  var group = {}.obs;
 }

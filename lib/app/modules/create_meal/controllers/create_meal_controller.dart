@@ -40,7 +40,7 @@ class CreateMealController extends GetxController {
         isLoading.value = true;
 
         Map<String, dynamic> data = {
-          "groupId": Get.find<AuthController>().groupId.value,
+          "groupId": Get.find<AuthController>().groupgetId(),
           "userId": id,
           "from_date": "2024-10-29T10:08:30.384Z",
           "to_date": "2024-10-29T10:08:30.384Z",

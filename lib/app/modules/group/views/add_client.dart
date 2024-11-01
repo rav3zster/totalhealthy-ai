@@ -1,0 +1,606 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../../core/base/apiservice/api_endpoints.dart';
+import '../../../core/base/apiservice/api_status.dart';
+import '../../../core/base/apiservice/base_methods.dart';
+import '../../../core/base/constants/appcolor.dart';
+import '../../../widgets/custom_button.dart';
+import '../controllers/group_controller.dart';
+
+class AddClient extends StatefulWidget {
+  @override
+  State<AddClient> createState() => _AddClientState();
+}
+
+class _AddClientState extends State<AddClient> {
+  var controller = Get.find<GroupController>();
+  var searchController = TextEditingController();
+  bool isLoading = false;
+  var userData = [];
+  Future<void> submitUser() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      // print(data);  String input = searchController.text.trim();
+      String input = searchController.text.trim();
+      var phone = int.tryParse(input);
+      await APIMethods.get
+          .get(
+        url: phone != null
+            ? APIEndpoints.createData.searchUserByPhone(input)
+            : APIEndpoints.createData.searchUserByemail(input),
+      )
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          setState(() {
+            userData = [value.data];
+          });
+        } else {
+          // printError("Auth Controller", "Signup", value.data);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${value.data["detail"]}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
+      // }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+    // if (_formKey.currentState!.validate()) {
+  }
+
+  var isAddLoading = false;
+//  {"name": "string", "amount": "string", "unit": "string"}
+  addMember(userId) async {
+    try {
+      setState(() {
+        isAddLoading = true;
+      });
+      Map<String, dynamic> data = {};
+
+      print(data);
+
+      await APIMethods.post
+          .post(
+              url: APIEndpoints.group
+                  .addGroupMember(controller.group["group_id"], userId),
+              map: data)
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          // clearDetails();
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Request Send Successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          // printError("Auth Controller", "Signup", value.data);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("${value.data["detail"]}"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isAddLoading = false;
+      });
+    }
+    // if (_formKey.currentState!.validate()) {
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Color(0XFF0C0C0C),
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: Icon(Icons.arrow_back_ios),
+          color: Color(0XFFD9D9D9),
+        ),
+        title: Text(
+          'Groups',
+          style: TextStyle(color: Color(0XFFB3B3B3), fontSize: 24),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Group Info Section
+            // Card(
+            //   margin: EdgeInsets.all(8.0),
+            //   child: Container(
+            //     decoration: BoxDecoration(
+            //         color: Color(0XFF242522),
+            //         borderRadius: BorderRadius.circular(10)),
+            //     child: Padding(
+            //       padding: EdgeInsets.all(16.0),
+            //       child: Column(
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         children: [
+            //           Text(
+            //             controller.group["group_name"],
+            //             style: TextStyle(
+            //                 fontSize: 18,
+            //                 fontWeight: FontWeight.bold,
+            //                 color: Color(0XFFDBDBDB)),
+            //           ),
+            //           SizedBox(height: 8),
+            //           Text(
+            //             controller.group["description"],
+            //             style:
+            //                 TextStyle(fontSize: 16, color: Color(0XFF7E7E7E)),
+            //           ),
+            //           SizedBox(height: 8),
+            //           Row(
+            //             children: [
+            //               Container(
+            //                   padding: EdgeInsets.all(8),
+            //                   decoration: BoxDecoration(
+            //                       color: Color(0XFFCDE26D).withOpacity(0.1),
+            //                       shape: BoxShape.circle),
+            //                   child: Icon(
+            //                     Icons.calendar_today_outlined,
+            //                     color: Color(0XFFCDE26D),
+            //                     size: 18,
+            //                   )),
+            //               SizedBox(
+            //                 width: 5,
+            //               ),
+            //               Text("Created On:"),
+            //               SizedBox(
+            //                 width: 10,
+            //               ),
+            //               Text(
+            //                 "${controller.group["created_at"]}",
+            //                 style: TextStyle(
+            //                     fontSize: 14, color: Color(0XFFFFFFFF)),
+            //               ),
+            //             ],
+            //           ),
+            //           // Row(
+            //           //   children: [
+            //           //     Container(
+            //           //         padding: EdgeInsets.all(8),
+            //           //         decoration: BoxDecoration(
+            //           //             color:
+            //           //                 Color(0XFFCDE26D).withOpacity(0.1),
+            //           //             shape: BoxShape.circle),
+            //           //         child: Icon(
+            //           //           Icons.people_outline,
+            //           //           color: Color(0XFFCDE26D),
+            //           //           size: 18,
+            //           //         )),
+            //           //     SizedBox(
+            //           //       width: 5,
+            //           //     ),
+            //           //     // Text("Total Members:"),
+            //           //     // SizedBox(
+            //           //     //   width: 10,
+            //           //     // ),
+            //           //     // Text(
+            //           //     //   "12 Members",
+            //           //     //   style: TextStyle(
+            //           //     //       fontSize: 14, color: Color(0XFFFFFFFF)),
+            //           //     // ),
+            //           //   ],
+            //           // ),
+            //           //
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
+
+            SizedBox(height: 16),
+            // Search Box
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: searchController,
+                    onChanged: (value) {},
+                    decoration: InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50)),
+                      fillColor: Color(0XFF242522),
+                      filled: true,
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50)),
+                      hintText: 'Search here...',
+                      hintStyle: TextStyle(color: Color(0XFFDBDBDB)),
+                      prefixIcon: Icon(Icons.search, color: Color(0XFFDBDBDB)),
+                    ),
+                  ),
+                ),
+                CustomButton(
+                    child: isLoading
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : Text(
+                            "Search",
+                            style: TextStyle(color: AppColors.buttonText),
+                          ),
+                    onPressed: () => submitUser(),
+                    size: ButtonSize.medium,
+                    type: ButtonType.elevated),
+                // SizedBox(width: 10),
+                // Icon(Icons.filter_list, color: Colors.white, size: 30),
+              ],
+            ),
+
+            SizedBox(height: 16),
+            // Client List Header
+            Text(
+              'Client List',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
+            // Client List
+            isLoading
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : userData.isEmpty
+                    ? Text("No Data Found")
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: userData.length,
+                        itemBuilder: (context, index) {
+                          var data = userData[index];
+                          return buildClientCard(
+                            context,
+                            "${data["phone_number"]}",
+                            "${data["email"]}",
+                            "${data["id"]}",
+
+                            // Replace with actual image asset
+                          );
+                        }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildClientCard(
+    BuildContext context,
+    String phone,
+    String email,
+    String id,
+  ) {
+    return Card(
+      color: Colors.grey[900],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    height: 100,
+                    width: 90,
+                    "https://s3-alpha-sig.figma.com/img/4edc/c0b0/bdaf584c291418ad88b679516504a43c?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=UdYv6gXu3HLjJOuTpuslOJFTnTwT2KQcWHHFZ40C3amr6q~lbYYeTeUazXnkhx9iDs7upBBXnrawq4I16CuHiNLRwMENc-qHsuopkkuUTq9D9RrtZOYnziambRB2JZCAvpckWeh012RWmn-ChTAPNsbz5kbXX7FFDDocPVheFsAK0w9e51bxuPMhtUyePaEpJZMR6UprF4wncShleGoLZU9NmCd7s66xHwdFaMB8ndKZqz7E8NYH7Bv2pQjLCZSiAgL7L5DcgVxxwmF82lWoo1xS-7rp4G~JGZ7zDIiuk4oHXYS4gz-mFJE6QUrzqtLcpIYgJlJVeIX2ZQSVK67K4g__",
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'PhoneNumber: $phone',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Email: $email',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      Text(
+                        'Id: $id',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                          color: Color(0XFFF5D657), shape: BoxShape.circle),
+                      child: IconButton(
+                        icon: Icon(Icons.phone_outlined,
+                            color: Color(0XFF242522)),
+                        onPressed: () {},
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                          color: Color(0XFFCDE26D), shape: BoxShape.circle),
+                      child: IconButton(
+                        icon: Icon(Icons.local_post_office_outlined,
+                            color: Color(0XFF242522)),
+                        onPressed: () {},
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                          color: Color(0XFFF5D657), shape: BoxShape.circle),
+                      child: IconButton(
+                        icon: Icon(Icons.message, color: Color(0XFF242522)),
+                        onPressed: () {},
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            CustomButton(
+              size: ButtonSize.medium,
+              type: ButtonType.elevated,
+              onPressed: () {
+                addMember(id);
+              },
+              child: isAddLoading
+                  ? CircularProgressIndicator()
+                  : Text(
+                      "Add Client",
+                      style: TextStyle(
+                        color: Color(0XFF242522),
+                      ),
+                    ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CreateGroup extends StatefulWidget {
+  const CreateGroup({
+    super.key,
+  });
+
+  @override
+  State<CreateGroup> createState() => _CreateGroupState();
+}
+
+class _CreateGroupState extends State<CreateGroup> {
+  var groupName = TextEditingController();
+  var description = TextEditingController();
+  GlobalKey<FormState> key = GlobalKey<FormState>();
+
+  bool isLoading = false;
+
+  Future<void> submitUser() async {
+    try {
+      if (key.currentState!.validate()) {
+        setState(() {
+          isLoading = true;
+        });
+        Map<String, dynamic> data = {
+          "group_name": groupName.text.trim(),
+          "description": description.text.trim(),
+        };
+        print(data);
+
+        await APIMethods.post
+            .post(url: APIEndpoints.group.createGroup, map: data)
+            .then((value) {
+          if (APIStatus.success(value.statusCode)) {
+            // clearDetails();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Create Group Successful!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            Get.back();
+          } else {
+            // printError("Auth Controller", "Signup", value.data);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Group is not created.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        });
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+    // if (_formKey.currentState!.validate()) {
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        decoration: BoxDecoration(color: Color(0XFF0C0C0C)),
+        height: 450,
+        padding: EdgeInsets.all(10),
+        child: Form(
+          key: key,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.arrow_back_ios),
+                    color: Color(0XFFD9D9D9),
+                  ),
+                  Text(
+                    "Create New group",
+                    style: TextStyle(
+                      color: Color(0XFFD9D9D9),
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                "Group Name",
+                style: TextStyle(color: Color(0XFFDBDBDB)),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              TextFormField(
+                controller: groupName,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Color(0XFF242522),
+                  hintText: 'Enter your Group Name',
+                  hintStyle: TextStyle(color: Colors.white54),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  // Custom Border Properties
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                ),
+                style: TextStyle(color: Colors.white),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Text(
+                "Description",
+                style: TextStyle(
+                  color: Color(0XFFDBDBDB),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              TextFormField(
+                controller: description,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Color(0XFF242522),
+                  hintText: 'Describe the recipe',
+
+                  hintStyle: TextStyle(color: Colors.white54),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  // Custom Border Properties
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
+                ),
+                style: TextStyle(color: Colors.white),
+              ),
+              SizedBox(
+                height: 60,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 18),
+                      child: ElevatedButton(
+                        onPressed: () => submitUser(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0XFFCDE26D),
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: isLoading
+                            ? const Center(
+                                child: CircularProgressIndicator(),
+                              )
+                            : const Text(
+                                'Save Group',
+                                style: TextStyle(
+                                    color: Color(0XFF242522), fontSize: 18),
+                              ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
