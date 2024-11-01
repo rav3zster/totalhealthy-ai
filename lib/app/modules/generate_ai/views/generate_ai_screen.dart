@@ -9,6 +9,10 @@ class GenerateAiScreen extends GetView<GenerateAiController> {
   const GenerateAiScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    return GenerateAiPage();
+    final String id = Get.parameters["id"] ?? '';
+
+    return GenerateAiPage(
+      id: id,
+    );
   }
 }

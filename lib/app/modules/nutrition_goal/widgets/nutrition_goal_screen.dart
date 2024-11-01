@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
+import 'package:get/get_common/get_reset.dart';
+import 'package:get/get_core/src/get_main.dart';
+
+import '../../../routes/app_pages.dart';
 
 class NutritionGoalsScreen extends StatefulWidget {
   @override
@@ -40,11 +45,15 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Icon(Icons.arrow_back, color: Colors.white),
+        leading: IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.arrow_back_ios),
+            color: Colors.white),
         actions: [
           TextButton(
             onPressed: () {}, // Skip action
-            child: Text('Skip', style: TextStyle(color: Colors.white)),
+            child: Text('Skip',
+                style: TextStyle(color: Color(0XFFFFFFFF), fontSize: 16)),
           )
         ],
       ),
@@ -70,7 +79,10 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                     SizedBox(height: 10),
                     Text(
                       "Choose a more suitable option.",
-                      style: TextStyle(color: Colors.greenAccent, fontSize: 16),
+                      style: TextStyle(
+                          color: Color(0XFFCDE26D),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -91,12 +103,12 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                         padding: EdgeInsets.all(15),
                         decoration: BoxDecoration(
                           color: selectedIndex == index
-                              ? Colors.greenAccent.withOpacity(0.2)
-                              : Colors.grey.withOpacity(0.1),
+                              ? Color(0XFF333333)
+                              : Color(0XFF333333),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: selectedIndex == index
-                                ? Colors.greenAccent
+                                ? Color(0XFFCDE26D)
                                 : Colors.transparent,
                             width: 2,
                           ),
@@ -115,10 +127,10 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.greenAccent, // Replaces `primary`
+                    backgroundColor: Color(0XFFCDE26D), // Replaces `primary`
                     minimumSize: Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
+                        borderRadius: BorderRadius.circular(30)),
                   ),
                   onPressed: () {
                     // Continue button action
@@ -127,11 +139,11 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                           duration: Duration(milliseconds: 500),
                           curve: Curves.easeIn);
                     } else {
-                      // Final action on last page
+                      Get.toNamed(Routes.MEAL_TIMING);
                     }
                   },
                   child: Text("Continue",
-                      style: TextStyle(color: Colors.black, fontSize: 18)),
+                      style: TextStyle(color: Color(0XFF242522), fontSize: 18)),
                 ),
               ),
             ],

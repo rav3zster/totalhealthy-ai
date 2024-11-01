@@ -1,140 +1,93 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
+import '../../../routes/app_pages.dart';
+import '../../../routes/route_access.dart';
 import 'theme_controller.dart';
 
 class AuthController extends GetxController {
-  Future<AuthController> init() async => this;
+  Future<AuthController> init() async {
+    Get.putAsync<ThemeController>(() async => ThemeController());
+    tokenVaildate();
+    return this;
+  }
 
-  final ThemeController themeController = Get.put(ThemeController());
+  final _authToken = "".obs;
+  RxBool isLogOut = false.obs;
+  RxBool flowloader = false.obs;
 
-  final RxBool isAuthenticated = false.obs;
-  final RxBool isLogOut = false.obs;
-  var user = <String, dynamic>{}.obs; // Observable map to store user data
+  final _deviceToken = "".obs;
+  String get authToken => _authToken.value;
+  String get deviceToken => _deviceToken.value;
+  RxBool isAuthenticated = false.obs;
+
+  set authToken(value) => _authToken.value = value;
+  set deviceToken(value) => _deviceToken.value = value;
+  final box = GetStorage();
 
   void refreshAuth() {
     isAuthenticated.refresh();
   }
 
-  initAuth() async {
+  setAuth(String token, String refToken) async {
     isAuthenticated.value = true;
-    // await validateAuth();
-    // ever(isAuthenticated, (auth) => handleAuthChange());
+
+    await box.write('authToken', token);
+    await box.write('refreshToken', refToken);
+    authToken = box.read("authToken");
+
+    print("sdadada${token},${refToken}");
+    Get.toNamed(Routes.TrainerDashboard);
   }
 
-  bool initialAuthStateReceived = false;
+  initAuth() async {
+    // await configureAmplify();
 
-  // Future<bool> validateAuth() async {
-  //   fetchUserByUid();
-  //   FirebaseAuth.instance.authStateChanges().listen((User? user) {
-  //     if (user == null) {
-  //       if (initialAuthStateReceived) {
-  //         print('User is currently signed out!');
-  //       }
-  //     } else {
-  //       isAuthenticated(true);
-  //       Get.offAllNamed(Routes.HOME);
+    await validateAuth();
+    ever(isAuthenticated, (auth) => handleAuthChange());
 
-  //       print('User is signed in!');
-  //     }
-  //     initialAuthStateReceived = true;
-  //   });
+    // FlutterNativeSplash.remove();
+  }
 
-  //   return isAuthenticated.value;
-  // }
+  validateAuth() async {
+    await tokenVaildate();
+    return isAuthenticated.value;
+  }
 
-  // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  handleAuthChange() {
+    print("handleAuthChange  ${Get.currentRoute}");
 
-  // void fetchUserByUid() async {
-  //   var uid = FirebaseAuth.instance.currentUser!.uid;
-  //   try {
-  //     // Query Firestore for the document with the matching UID
-  //     QuerySnapshot snapshot = await _firestore
-  //         .collection('users')
-  //         .where('id', isEqualTo: uid)
-  //         .get();
+    if (isLogOut.value) {
+      Get.offAllNamed(Routes.Login);
+    } else if (isAuthenticated.value) {
+      print(isAuthenticated.value);
+      Get.toNamed(Get.currentRoute == '/login' || Get.currentRoute == '/signup'
+          ? Routes.TrainerDashboard
+          : Get.currentRoute);
+    }
+  }
 
-  //     if (snapshot.docs.isNotEmpty) {
-  //       // If a document is found, store the data
-  //       user.value = snapshot.docs.first.data() as Map<String, dynamic>;
-  //     } else {
-  //       // If no document is found, clear the user data
-  //       user.clear();
-  //       print('No user found with the given UID.');
-  //     }
-  //   } catch (e) {
-  //     print("Error fetching user: $e");
-  //   }
-  // }
+  var groupId = "".obs;
+  tokenVaildate() {
+    if (box.hasData("authToken")) {
+      isAuthenticated.value = true;
+      authToken = box.read("authToken");
+      print("ddf $authToken");
+      var refreshTokend = box.read("refreshToken");
 
-  // void handleAuthChange() {
-  //   if (isLogOut.value) {
-  //     Get.offAllNamed(Routes.SIGNIN);
-  //   } else {
-  //     print("sffs ${Get.find<AuthController>().isAuthenticated.value}");
+      print("ddff $authToken");
+    } else {
+      // Get.toNamed(Routes.Login);
 
-  //     AppRouteAccess.handleRedirect(Get.currentRoute, isAuthChange: true);
-  //   }
-  // }
+      isAuthenticated.value = false;
+    }
+  }
 
-  // var uuid = Uuid();
-  // Future<void> createUser(data) async {
-  //   try {
-  //     UserCredential userCredential =
-  //         await FirebaseAuth.instance.createUserWithEmailAndPassword(
-  //       email: data['email'],
-  //       password: data['password'],
-  //     );
-  //     var userData = {
-  //       "id": userCredential.user!.uid,
-  //       "email": data['email'],
-  //       "username": data['username'],
-  //       "phone": data['phone'],
-  //     };
-  //     await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(userCredential.user!.uid)
-  //         .set(userData);
-  //     isAuthenticated(true);
-  //     Get.offAllNamed(Routes.SIGNIN);
-  //   } catch (e) {
-  //     showErrorMessage("Sign up Failed", e.toString());
-  //   }
-  // }
-
-  // Future<void> reset(data) async {
-  //   try {
-  //     await FirebaseAuth.instance.sendPasswordResetEmail(
-  //       email: data['email'],
-  //     );
-
-  //     isAuthenticated(true);
-
-  //     Get.offAllNamed(Routes.SIGNIN);
-  //   } catch (e) {
-  //     showErrorMessage("Password reset failed", e.toString());
-  //   }
-  // }
-
-  // Future<void> login(data) async {
-  //   try {
-  //     await FirebaseAuth.instance.signInWithEmailAndPassword(
-  //       email: data['email'],
-  //       password: data['password'],
-  //     );
-
-  //     isAuthenticated(true);
-
-  //     Get.offAllNamed(Routes.ORDERS);
-  //     fetchUserByUid();
-  //   } catch (e) {
-  //     showErrorMessage("Login Failed", e.toString());
-  //   }
-  // }
-
-  // void showErrorMessage(String title, String message) {
-  //   Get.defaultDialog(
-  //     title: title,
-  //     content: Text(message),
-  //   );
-  // }
+  void clearAuth() {
+    authToken = "";
+    box.remove('redirect');
+    isAuthenticated.value = false;
+    box.remove('authToken');
+    box.remove('refreshToken');
+  }
 }

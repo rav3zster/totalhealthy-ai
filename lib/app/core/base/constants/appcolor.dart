@@ -7,6 +7,7 @@ class AppColors {
   static const Color mandarin = Color(0xFFF57552);
   static const Color chineseGreen = Color(0xFFCDE26D);
   static const Color cardbackground = Color(0xFF242522);
+  static const Color buttonText = Color(0XFF242522);
   static const Color pageBackground = Color(0xFFFFFFFF);
   static const Color violet = Color(0xFF8A2BE2);
   static const Color heading = Color(0xFF9A74D9);

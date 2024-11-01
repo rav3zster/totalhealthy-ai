@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:totalhealthy/app/modules/Signup_Screen/Signup_view.dart';
+import 'package:get/get.dart';
+
+import '../../routes/app_pages.dart';
 
 class RegistrationView extends StatefulWidget {
   const RegistrationView({super.key});
@@ -50,11 +52,9 @@ class _RegistrationViewState extends State<RegistrationView> {
                     Text(
                       "Account",
                       style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w500,
-                        color:  Colors
-                            .amberAccent
-                      ),
+                          fontSize: 28,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.amberAccent),
                     ),
                   ],
                 ),
@@ -124,8 +124,7 @@ class _RegistrationViewState extends State<RegistrationView> {
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
                           color: isFemaleSelected
-                              ?  Colors
-                              .amberAccent // Yellow when selected
+                              ? Colors.amberAccent // Yellow when selected
                               : Colors
                                   .transparent, // Transparent when not selected
                           width: 3,
@@ -230,11 +229,7 @@ class _RegistrationViewState extends State<RegistrationView> {
                     margin: EdgeInsets.only(right: 0),
                     child: GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SignupView(),
-                              ));
+                          Get.toNamed(Routes.SIGNUP);
                         },
                         child: Text(
                           "Sign up",

@@ -1,14 +1,19 @@
 import 'package:get/get.dart';
 
+import '../core/middlewares/global_middleware.dart';
 import '../modules/Onboarding_Screen/Onboarding_view.dart';
-import '../modules/generate_ai/bindings/generate_ai_binding.dart';
-import '../modules/generate_ai/views/generate_ai_view.dart';
-import 'package:totalhealthy/app/modules/client_dashboard/bindings/client_dashboard_bindings.dart';
-import 'package:totalhealthy/app/modules/client_dashboard/views/client_dashboard_views.dart';
-import 'package:totalhealthy/app/modules/swipe_screen/bindings/swipe_screen_bindings.dart';
-import 'package:totalhealthy/app/modules/swipe_screen/views/swipe_screen_views.dart';
+import '../modules/client_dashboard/bindings/client_dashboard_bindings.dart';
+import '../modules/client_dashboard/views/client_dashboard_views.dart';
+import '../modules/create_meal/bindings/create_meal_binding.dart';
+import '../modules/create_meal/views/create_meal_view.dart';
 import '../modules/empty_data_screen/bindings/empty_data_screen_bindings.dart';
 import '../modules/empty_data_screen/views/empty_data_screen_views.dart';
+import '../modules/forget_passowrd_screen/bindings/forget_passowrd_screen_bindings.dart';
+import '../modules/forget_passowrd_screen/views/forget_password_screen_views.dart';
+import '../modules/generate_ai/bindings/generate_ai_binding.dart';
+import '../modules/generate_ai/views/generate_ai_view.dart';
+import '../modules/group/bindings/group_binding.dart';
+import '../modules/group/views/group_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
@@ -37,6 +42,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
+  static const INITIAL = Routes.GROUP;
   static const INITIAL = Routes.MEAL_TIMING;
 
   static final routes = [
@@ -115,5 +121,20 @@ class AppPages {
       page: () => ClientDashboardScreen(),
       binding: ClientDashboardBindings(),
     ),
+    GetPage(
+      name: _Paths.FORGETPASSWORD,
+      binding: ForgetPasswordScreenBindings(),
+      page: () => ForgetPasswordScreenViews(),
+    ),
+    GetPage(
+        name: _Paths.CreateMeal,
+        binding: CreateMealBinding(),
+        page: () => CreateMealScreen(),
+        middlewares: [AuthCheckMiddleware()]),
+    GetPage(
+        name: _Paths.GROUP,
+        page: () => GroupView(),
+        binding: GroupBinding(),
+        middlewares: [AuthCheckMiddleware()]),
   ];
 }
