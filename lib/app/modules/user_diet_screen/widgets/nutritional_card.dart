@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../../../core/base/constants/appcolor.dart';
-import '../../../routes/app_pages.dart';
-import '../controllers/user_diet_screen_controllers.dart';
 
-class NutritionalCard extends StatelessWidget {
+class NutritionalCard extends StatefulWidget {
+  final dynamic data;
   final String id;
   final String title;
   final String kcal;
@@ -14,6 +15,9 @@ class NutritionalCard extends StatelessWidget {
   final String fat;
   final String carbs;
   final String? image;
+
+  final bool isChecked;
+  final ValueChanged<bool?> onChanged;
 
   NutritionalCard({
     required this.title,
@@ -24,7 +28,18 @@ class NutritionalCard extends StatelessWidget {
     required this.carbs,
     this.image,
     required this.id,
+    this.data,
+    required this.isChecked,
+    required this.onChanged,
   });
+
+  @override
+  State<NutritionalCard> createState() => _NutritionalCardState();
+}
+
+class _NutritionalCardState extends State<NutritionalCard> {
+  final GetStorage box = GetStorage();
+  Map<int, bool> isCheck = {};
 
   @override
   Widget build(BuildContext context) {
@@ -51,30 +66,30 @@ class NutritionalCard extends StatelessWidget {
                     width: 50,
                   ),
                   SizedBox(
-                    width: 20,
+                    width: 15,
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        title,
+                        widget.title,
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Row(
                         children: [
                           Icon(Icons.local_fire_department,
-                              color: Colors.red, size: 25),
+                              color: Colors.red, size: 20),
                           SizedBox(width: 4),
                           Text(
-                            "$kcal Kcal",
+                            "${widget.kcal} Kcal",
                             style: TextStyle(
                               color: AppColors.neplesYellow,
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                           SizedBox(width: 10),
@@ -89,11 +104,11 @@ class NutritionalCard extends StatelessWidget {
                                 width: 10,
                               ),
                               Text(
-                                "$weight g",
+                                "${widget.weight} g",
                                 style: TextStyle(
                                   color: AppColors.neplesYellow,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  fontSize: 14,
                                 ),
                               ),
                             ],
@@ -104,39 +119,57 @@ class NutritionalCard extends StatelessWidget {
                   ),
                 ],
               ),
-              PopupMenuButton<String>(
-                // foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+              Row(
+                children: [
+                  PopupMenuButton<String>(
+                    // foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
 
-                onSelected: (value) {},
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    onTap: () {
-                      Get.toNamed('/meals-details?id=$id');
-                    },
-                    child: Text(
-                      "Meal Details",
-                      style: TextStyle(color: Colors.black),
+                    onSelected: (value) {},
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        onTap: () {
+                          box.write("mealdetails", widget.data);
+                          Get.toNamed('/meals-details?id=${widget.id}');
+                        },
+                        child: Text(
+                          "Meal Details",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        value: "Meal Details",
+                      ),
+                      PopupMenuItem(
+                        value: "Option 2",
+                        child: Text("Option 2",
+                            style: TextStyle(color: Colors.black)),
+                      ),
+                      PopupMenuItem(
+                        value: "Option 3",
+                        child: Text("Option 3",
+                            style: TextStyle(color: Colors.black)),
+                      ),
+                    ],
+                    child: Container(
+                        height: 30,
+                        width: 30,
+                        decoration: BoxDecoration(
+                            color: AppColors.chineseGreen,
+                            shape: BoxShape.circle),
+                        child: Icon(Icons.more_horiz, color: Colors.black)),
+                    // Icon that opens the menu
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Checkbox(
+                    checkColor: Colors.white,
+                    side: BorderSide(
+                      width: 2,
+                      color: AppColors.chineseGreen,
                     ),
-                    value: "Meal Details",
-                  ),
-                  PopupMenuItem(
-                    value: "Option 2",
-                    child:
-                        Text("Option 2", style: TextStyle(color: Colors.black)),
-                  ),
-                  PopupMenuItem(
-                    value: "Option 3",
-                    child:
-                        Text("Option 3", style: TextStyle(color: Colors.black)),
-                  ),
+                    value: widget.isChecked,
+                    onChanged: widget.onChanged,
+                  )
                 ],
-                child: Container(
-                    height: 30,
-                    width: 30,
-                    decoration: BoxDecoration(
-                        color: AppColors.chineseGreen, shape: BoxShape.circle),
-                    child: Icon(Icons.more_horiz, color: Colors.black)),
-                // Icon that opens the menu
               ),
             ],
           ),
@@ -146,11 +179,22 @@ class NutritionalCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               NutrientIndicator(
-                  label: "Protein", amount: "$protein g", color: Colors.green),
+                label: "Protein",
+                amount: widget.protein,
+                color: Colors.green,
+                // textcolor: Colors.black,
+              ),
               NutrientIndicator(
-                  label: "Fat", amount: "$fat g", color: Colors.blue),
+                label: "Fat",
+                amount: widget.fat,
+                color: Colors.blue,
+                // textcolor: Colors.black,
+              ),
               NutrientIndicator(
-                  label: "Carbs", amount: "$carbs g", color: Colors.red),
+                label: "Carbs",
+                amount: widget.carbs,
+                color: Colors.red,
+              ),
             ],
           ),
         ],
@@ -163,9 +207,12 @@ class NutrientIndicator extends StatelessWidget {
   final String label;
   final String amount;
   final Color color;
-
+  final Color? textcolor;
   NutrientIndicator(
-      {required this.label, required this.amount, required this.color});
+      {required this.label,
+      required this.amount,
+      required this.color,
+      this.textcolor});
 
   @override
   Widget build(BuildContext context) {
@@ -175,8 +222,8 @@ class NutrientIndicator extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            height: 50,
-            width: 8,
+            height: 40,
+            width: 6,
             child: RotatedBox(
               quarterTurns: 3,
               child: LinearProgressIndicator(
@@ -194,16 +241,17 @@ class NutrientIndicator extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                amount,
+                "$amount g",
                 style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
+                    color: textcolor ?? Colors.white,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold),
               ),
               Text(
                 label,
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: textcolor ?? Colors.white,
+                    fontWeight: FontWeight.bold),
               ),
             ],
           ),

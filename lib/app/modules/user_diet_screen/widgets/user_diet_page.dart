@@ -3,11 +3,13 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/modules/meals_details/controllers/meals_details_controller.dart';
 import 'package:totalhealthy/app/modules/user_diet_screen/controllers/user_diet_screen_controllers.dart';
-
+import 'package:easy_date_timeline/easy_date_timeline.dart';
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
+import '../../../core/base/constants/appcolor.dart';
 import '../../../core/base/controllers/auth_controller.dart';
+import '../../../routes/app_pages.dart';
 import '../../client_dashboard/views/client_dashboard_views.dart';
 import 'add_meal_button.dart';
 import 'nutritional_card.dart';
@@ -45,7 +47,9 @@ class _UserDietPageState extends State<UserDietPage> {
           setState(() {
             dataList = value.data;
           });
-          Get.find<MealsDetailsController>().data(dataList);
+
+          isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
+          box.write("mealPlan", dataList);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -65,14 +69,87 @@ class _UserDietPageState extends State<UserDietPage> {
     }
   }
 
-  bool containsDigits(String input) {
-    return RegExp(r'\d').hasMatch(input);
+  Map<String, dynamic> generateJson() {
+    return {
+      "meal_ids": selectedMealIds,
+      "userId": widget.id,
+      "groupId": Get.find<AuthController>().groupgetId(),
+      "history_on_day": DateTime.now().toIso8601String(),
+    };
   }
 
-// final box = GetStorage();
+  GetStorage box = GetStorage();
+  var isGetLoading = false;
+  Future<void> postHistory() async {
+    try {
+      setState(() {
+        isGetLoading = true;
+      });
+
+      var data = generateJson();
+      await APIMethods.post
+          .post(
+        url: APIEndpoints.createData.mealHistory,
+        map: data,
+      )
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          setState(() {
+            isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
+            selectedMealIds.clear();
+          });
+
+          Get.toNamed("/meal-history?id=${widget.id}");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Successfull!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Not Found'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
+      // }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isGetLoading = false;
+      });
+    }
+  }
+
+  Map<int, bool> isCheck = {};
+
+  List<String> selectedMealIds = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: selectedMealIds.isNotEmpty
+          ? isGetLoading
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                )
+              : FloatingActionButton(
+                  backgroundColor: AppColors.chineseGreen,
+                  child: Icon(
+                    Icons.done,
+                    color: AppColors.cardbackground,
+                  ),
+                  onPressed: () {
+                    postHistory();
+                  })
+          : SizedBox(),
       backgroundColor: Color(0XFF0C0C0C),
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -159,13 +236,27 @@ class _UserDietPageState extends State<UserDietPage> {
                         return Padding(
                           padding: EdgeInsets.only(bottom: 15),
                           child: NutritionalCard(
+                            isChecked: isCheck[index] ?? false,
+                            onChanged: (value) {
+                              setState(() {
+                                isCheck[index] = value ?? false;
+
+                                if (isCheck[index] == true) {
+                                  selectedMealIds.add(data['_id'] ?? '0');
+                                } else {
+                                  selectedMealIds.remove(data['_id'] ?? '0');
+                                }
+                                print(selectedMealIds);
+                              });
+                            },
+                            data: data,
                             id: widget.id,
                             title: "${data["name"] ?? "Not Found"}",
-                            kcal: "${data["kcal"]}",
+                            kcal: "${data["kcal"] ?? "0"}",
                             weight: 80,
-                            protein: "${data["protein"]}",
-                            fat: "${data["fat"]}",
-                            carbs: "${data["carbs"]}",
+                            protein: "${data["protein"] ?? "0"}",
+                            fat: "${data["fat"] ?? "0"}",
+                            carbs: "${data["carbs"] ?? "0"}",
                           ),
                         );
                       },
@@ -208,6 +299,9 @@ class _UserDietPageState extends State<UserDietPage> {
           //   carbs: 80,
           // ),
           // SizedBox(height: 15,)
+          SizedBox(
+            height: 50,
+          ),
         ],
       ),
     );

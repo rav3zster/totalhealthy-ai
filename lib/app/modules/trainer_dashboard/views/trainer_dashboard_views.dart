@@ -1,3 +1,4 @@
+import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
@@ -238,6 +239,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                         valueDropDown = value;
                       });
                     },
+                    dropdownColor: const Color.fromARGB(221, 36, 31, 31),
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.symmetric(horizontal: 10),
                       border: OutlineInputBorder(),
@@ -248,8 +250,9 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
             width: 20,
           ),
           Container(
-            decoration:
-                BoxDecoration(color: Color(0XFF242424), shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: Colors.black,
+            ),
             child: IconButton(
               icon: Icon(
                 Icons.notifications_none,
@@ -357,6 +360,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                 ],
               ),
             ),
+
             SizedBox(height: 20),
             // Search Bar
             Row(

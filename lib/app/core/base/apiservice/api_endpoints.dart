@@ -46,6 +46,7 @@ class _CreateData {
   // String get assignTank => "${APIEndpoints.baseURL}api/assign-tank/";
   String get createGroup => "${APIEndpoints.baseURL}groups";
   String get createMeal => "${APIEndpoints.baseURL}meals";
+  String get mealHistory => "${APIEndpoints.baseURL}meals/history";
   String searchUserByemail(String email) =>
       "${APIEndpoints.baseURL}user-details?email=$email";
   String searchUserByPhone(String phone) =>

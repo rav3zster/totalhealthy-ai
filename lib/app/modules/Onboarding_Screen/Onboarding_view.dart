@@ -39,8 +39,9 @@ class _OnboardingViewState extends State<OnboardingView> {
       // Assuming there are 3 pages (index 0, 1, 2)
       _pageController.animateToPage(_currentPage + 1,
           duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
-    } else
-      (Get.offAllNamed(Routes.SIGNUP));
+    } else {
+      Get.offAllNamed(Routes.SIGNUP);
+    }
   }
 
   @override

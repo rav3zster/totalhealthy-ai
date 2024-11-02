@@ -1,103 +1,106 @@
 import 'dart:convert';
 
+import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:totalhealthy/app/modules/create_meal/views/create_meal_page.dart';
+import 'package:totalhealthy/app/modules/meal_history/controllers/meal_history_controller.dart';
 
 class MealHistoryPage extends StatefulWidget {
+  final MealHistoryController controller;
+  final String id;
+
+  const MealHistoryPage(
+      {super.key, required this.controller, required this.id});
+
   @override
   _MealHistoryPageState createState() => _MealHistoryPageState();
 }
 
 class _MealHistoryPageState extends State<MealHistoryPage> {
-  // Sample JSON data for meal plans
+  // final String jsonData = '''
 
-  final String jsonData = '''
+  // [
 
-  [
+  //   {
 
-    {
+  //     "day": "Monday",
 
-      "day": "Monday",
+  //     "dishesCount": 11,
 
-      "dishesCount": 11,
+  //     "meals": [
 
-      "meals": [
+  //       {
 
-        {
+  //         "mealType": "Breakfast",
 
-          "mealType": "Breakfast",
+  //         "dishes": ["Oats Porridge", "Avocado Toast", "Veg Omelette"],
 
-          "dishes": ["Oats Porridge", "Avocado Toast", "Veg Omelette"],
+  //         "extraDishes": "+2 Dish"
 
-          "extraDishes": "+2 Dish"
+  //       },
 
-        },
+  //       {
 
-        {
+  //         "mealType": "Lunch",
 
-          "mealType": "Lunch",
+  //         "dishes": ["Quinoa Stir Fry", "Chickpea Salad", "Hummus Wrap"],
 
-          "dishes": ["Quinoa Stir Fry", "Chickpea Salad", "Hummus Wrap"],
+  //         "extraDishes": "+2 Dish"
 
-          "extraDishes": "+2 Dish"
+  //       }
 
-        }
+  //     ]
 
-      ]
+  //   },
 
-    },
+  //   {
 
-    {
+  //     "day": "Tuesday",
 
-      "day": "Tuesday",
+  //     "dishesCount": 9,
 
-      "dishesCount": 9,
+  //     "meals": [
 
-      "meals": [
+  //       {
 
-        {
+  //         "mealType": "Breakfast",
 
-          "mealType": "Breakfast",
+  //         "dishes": ["Smoothie Bowl", "Fruit Salad"],
 
-          "dishes": ["Smoothie Bowl", "Fruit Salad"],
+  //         "extraDishes": "+1 Dish"
 
-          "extraDishes": "+1 Dish"
+  //       },
 
-        },
+  //       {
 
-        {
+  //         "mealType": "Lunch",
 
-          "mealType": "Lunch",
+  //         "dishes": ["Lentil Soup", "Grilled Veg Sandwich"],
 
-          "dishes": ["Lentil Soup", "Grilled Veg Sandwich"],
+  //         "extraDishes": "+2 Dish"
 
-          "extraDishes": "+2 Dish"
+  //       }
 
-        }
+  //     ]
 
-      ]
+  //   }
 
-    }
+  // ]
 
-  ]
-
-  ''';
-
-  List<dynamic> mealPlanData = [];
+  // ''';
+  GetStorage box = GetStorage();
 
   List<bool> isExpandedList = [];
-
+  List<dynamic> mealPlanData = [];
   @override
   void initState() {
     super.initState();
 
-    // Parse the JSON data
-
-    mealPlanData = json.decode(jsonData);
-
-    // Initialize the isExpandedList with false values
-
+    mealPlanData = box.read('mealPlan');
     isExpandedList = List<bool>.filled(mealPlanData.length, false);
+    print(mealPlanData);
   }
 
   @override
@@ -109,23 +112,64 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
         elevation: 0,
         title: Text('Meal Plan', style: TextStyle(color: Colors.white)),
       ),
-      body: ListView.builder(
-        itemCount: mealPlanData.length,
-        itemBuilder: (context, index) {
-          var dayData = mealPlanData[index];
+      body: ListView(
+        children: [
+          SizedBox(
+            height: 200,
+            child: EasyDateTimeLine(
+              initialDate: DateTime.now(),
+              onDateChange: (selectedDate) {},
+              headerProps: const EasyHeaderProps(
+                monthPickerType: MonthPickerType.switcher,
+                dateFormatter: DateFormatter.fullDateDMY(),
+              ),
+              dayProps: EasyDayProps(
+                dayStructure: DayStructure.dayStrDayNum,
+                todayNumStyle: TextStyle(
+                    color: Colors.grey.shade400, fontWeight: FontWeight.bold),
+                inactiveDayNumStyle: TextStyle(
+                    color: Colors.grey.shade400, fontWeight: FontWeight.bold),
+                disabledDayStyle: DayStyle(
+                  dayNumStyle: TextStyle(color: Colors.white),
+                ),
+                activeDayStyle: DayStyle(
+                  // dayNumStyle: TextStyle(color: Colors.white),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xff3371FF),
+                        Color(0xff8426D6),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: mealPlanData.length,
+            itemBuilder: (context, index) {
+              var dayData = mealPlanData[index];
 
-          return buildAccordion(
-            day: dayData['day'],
-            dishesCount: dayData['dishesCount'],
-            meals: dayData['meals'],
-            isExpanded: isExpandedList[index],
-            onToggle: () {
-              setState(() {
-                isExpandedList[index] = !isExpandedList[index];
-              });
+              return buildAccordion(
+                day: "Sundey",
+                dishesCount: dayData['ingredients'].length,
+                ingredients: dayData['ingredients'],
+                meals: dayData['categorys'],
+                isExpanded: isExpandedList[index],
+                onToggle: () {
+                  setState(() {
+                    isExpandedList[index] = !isExpandedList[index];
+                  });
+                },
+              );
             },
-          );
-        },
+          ),
+        ],
       ),
     );
   }
@@ -135,6 +179,7 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
   Widget buildAccordion({
     required String day,
     required int dishesCount,
+    required List<dynamic> ingredients,
     required List<dynamic> meals,
     required bool isExpanded,
     required VoidCallback onToggle,
@@ -194,9 +239,9 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
               scrollDirection: Axis.horizontal,
               children: meals.map<Widget>((meal) {
                 return buildMealCard(
-                  meal['mealType'],
-                  List<String>.from(meal['dishes']),
-                  meal['extraDishes'],
+                  meal,
+                  ingredients,
+                  // meal['unit'],
                 );
               }).toList(),
             ),
@@ -208,7 +253,10 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
   // Function to build a single meal card
 
   Widget buildMealCard(
-      String mealType, List<String> dishes, String extraDishes) {
+    String mealType,
+    List<dynamic> ingredients,
+  ) {
+    print(ingredients);
     return Card(
       color: Colors.grey[850],
       margin: EdgeInsets.symmetric(horizontal: 8),
@@ -240,15 +288,15 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
               ],
             ),
             SizedBox(height: 8),
-            for (var dish in dishes)
-              Text("• $dish",
+            for (var dish in ingredients)
+              Text("• ${dish["name"]}",
                   style: TextStyle(color: Colors.white70, fontSize: 14)),
             SizedBox(height: 8),
-            Text(
-              extraDishes,
-              style: TextStyle(
-                  color: Colors.greenAccent, fontWeight: FontWeight.bold),
-            ),
+            // Text(
+            //   extraDishes,
+            //   style: TextStyle(
+            //       color: Colors.greenAccent, fontWeight: FontWeight.bold),
+            // ),
           ],
         ),
       ),

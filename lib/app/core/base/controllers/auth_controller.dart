@@ -94,5 +94,6 @@ class AuthController extends GetxController {
     isAuthenticated.value = false;
     box.remove('authToken');
     box.remove('refreshToken');
+    box.erase();
   }
 }
