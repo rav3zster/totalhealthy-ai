@@ -1,11 +1,18 @@
-import 'dart:convert';
-
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:totalhealthy/app/modules/create_meal/views/create_meal_page.dart';
+
 import 'package:totalhealthy/app/modules/meal_history/controllers/meal_history_controller.dart';
+import 'package:totalhealthy/app/modules/meal_history/widgets/button_selector.dart';
+
+import '../../../core/base/apiservice/api_endpoints.dart';
+import '../../../core/base/apiservice/api_status.dart';
+import '../../../core/base/apiservice/base_methods.dart';
+import '../../../core/base/constants/appcolor.dart';
+import '../../../core/base/controllers/auth_controller.dart';
+import 'nutritional_history_card.dart';
 
 class MealHistoryPage extends StatefulWidget {
   final MealHistoryController controller;
@@ -19,155 +26,581 @@ class MealHistoryPage extends StatefulWidget {
 }
 
 class _MealHistoryPageState extends State<MealHistoryPage> {
-  // final String jsonData = '''
-
-  // [
-
-  //   {
-
-  //     "day": "Monday",
-
-  //     "dishesCount": 11,
-
-  //     "meals": [
-
-  //       {
-
-  //         "mealType": "Breakfast",
-
-  //         "dishes": ["Oats Porridge", "Avocado Toast", "Veg Omelette"],
-
-  //         "extraDishes": "+2 Dish"
-
-  //       },
-
-  //       {
-
-  //         "mealType": "Lunch",
-
-  //         "dishes": ["Quinoa Stir Fry", "Chickpea Salad", "Hummus Wrap"],
-
-  //         "extraDishes": "+2 Dish"
-
-  //       }
-
-  //     ]
-
-  //   },
-
-  //   {
-
-  //     "day": "Tuesday",
-
-  //     "dishesCount": 9,
-
-  //     "meals": [
-
-  //       {
-
-  //         "mealType": "Breakfast",
-
-  //         "dishes": ["Smoothie Bowl", "Fruit Salad"],
-
-  //         "extraDishes": "+1 Dish"
-
-  //       },
-
-  //       {
-
-  //         "mealType": "Lunch",
-
-  //         "dishes": ["Lentil Soup", "Grilled Veg Sandwich"],
-
-  //         "extraDishes": "+2 Dish"
-
-  //       }
-
-  //     ]
-
-  //   }
-
-  // ]
-
-  // ''';
-  GetStorage box = GetStorage();
-
-  List<bool> isExpandedList = [];
-  List<dynamic> mealPlanData = [];
   @override
   void initState() {
     super.initState();
 
-    mealPlanData = box.read('mealPlan');
-    isExpandedList = List<bool>.filled(mealPlanData.length, false);
-    print(mealPlanData);
+    dataList = box.read(
+      "mealPlan",
+    );
   }
 
+  var dataList = [];
+  var isLoading = false;
+
+  Future<void> getMeals() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      await APIMethods.get
+          .get(
+        url: APIEndpoints.meals.getadmindHistory(
+          widget.id,
+          Get.find<AuthController>().groupgetId(),
+        ),
+      )
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          setState(() {
+            dataList = value.data;
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Group id Not Found'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
+      // }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  GetStorage box = GetStorage();
+
+  List<bool> isExpandedList = [];
+  List<dynamic> mealPlanData = [];
+
+  var buttonName = [
+    {
+      "name": "Today",
+      "icon": Icons.today,
+    },
+    {
+      "name": "Calender",
+      "icon": Icons.calendar_month,
+    },
+    {
+      "name": "Week",
+      "icon": Icons.calendar_view_week,
+    },
+    {
+      "name": "15 Days",
+      "icon": Icons.calendar_view_day,
+    },
+  ];
+  //  List<dynamic> mealPlanData = [];
+
+  var shedule = [
+    {
+      "name": "Breakfast",
+      "icon": Icons.breakfast_dining,
+    },
+    {
+      "name": "Lunch",
+      "icon": Icons.lunch_dining,
+    },
+    {
+      "name": "Dinner",
+      "icon": Icons.dinner_dining,
+    },
+  ];
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+            onPressed: () {
+              Get.toNamed("/userdiet?id=${widget.id}");
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+            )),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('Meal Plan', style: TextStyle(color: Colors.white)),
+        title: Row(
+          children: [
+            CircleAvatar(
+              maxRadius: 28,
+              backgroundImage: NetworkImage(
+                  'https://s3-alpha-sig.figma.com/img/519d/a5b3/5dd7c94081b46b1030716f9a99bda058?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=jenxaaauev~xejor2UuGg8xXNQB-ugvjmHoiV6RcNYBQnj-hr1VQ20Pbprvw3fWQXO15QJFXc0Y3th0TAjya4d2TDqRdQBfcw171WpKTXMLmNMY0JHYemzsMAxDhHBEj-YGN~mHOiegyTMzi0~RjHZygBWfR4QbwdmR1ec3ITjoqefk8JaSfq4fbIXemlAvJsTO4-vTxp0ZGSZ2U24NawVgj0FP9BkCADm41VTdZg7bQLe0quP~0-~oUARPGRnm83vvDLQSjdFNn3sKVNMMXsbNSYLKtZOyA6OdcroUS8lEZvrKXyLjLYffXv~3IGOH1yVMMFdwyNId06kR32T468g__'), // Profile image
+            ),
+            SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 5,
+                ),
+                Text('Ayush Shukla',
+                    style: TextStyle(fontSize: 20, color: Colors.white)),
+                Text('Welcome!',
+                    style: TextStyle(fontSize: 14, color: Color(0XFF7B7B7A))),
+              ],
+            ),
+          ],
+        ),
       ),
       body: ListView(
         children: [
-          SizedBox(
-            height: 200,
-            child: EasyDateTimeLine(
-              initialDate: DateTime.now(),
-              onDateChange: (selectedDate) {},
-              headerProps: const EasyHeaderProps(
-                monthPickerType: MonthPickerType.switcher,
-                dateFormatter: DateFormatter.fullDateDMY(),
-              ),
-              dayProps: EasyDayProps(
-                dayStructure: DayStructure.dayStrDayNum,
-                todayNumStyle: TextStyle(
-                    color: Colors.grey.shade400, fontWeight: FontWeight.bold),
-                inactiveDayNumStyle: TextStyle(
-                    color: Colors.grey.shade400, fontWeight: FontWeight.bold),
-                disabledDayStyle: DayStyle(
-                  dayNumStyle: TextStyle(color: Colors.white),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 20,
                 ),
-                activeDayStyle: DayStyle(
-                  // dayNumStyle: TextStyle(color: Colors.white),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xff3371FF),
-                        Color(0xff8426D6),
+                SizedBox(
+                  height: 40,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      var data = buttonName[index];
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = index;
+                          });
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: ButtonSelector(
+                            title: data["name"].toString(),
+                            icon: data["icon"] as IconData,
+                            active: index == selectedIndex,
+                          ),
+                        ),
+                      );
+                    },
+                    itemCount: buttonName.length,
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Card(
+                  color: AppColors.cardbackground,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "See Meals Taken On Specific Date",
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          height: 200,
+                          child: EasyDateTimeLine(
+                            activeColor: AppColors.chineseGreen,
+                            initialDate: DateTime.now(),
+                            onDateChange: (selectedDate) {},
+                            headerProps: const EasyHeaderProps(
+                                monthPickerType: MonthPickerType.switcher,
+                                dateFormatter: DateFormatter.fullDateDMY(),
+                                selectedDateStyle:
+                                    TextStyle(color: Colors.white)),
+                            dayProps: const EasyDayProps(
+                              dayStructure: DayStructure.dayStrDayNum,
+                              todayNumStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                              inactiveDayNumStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold),
+                              disabledDayStyle: DayStyle(
+                                dayNumStyle: TextStyle(color: Colors.white),
+                              ),
+                              // todayHighlightColor: Colors.white,
+                              borderColor: AppColors.chineseGreen,
+                              activeDayNumStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold),
+                              activeDayStyle: DayStyle(
+                                decoration: BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8)),
+                                    color: AppColors.chineseGreen),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ),
-          ),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: mealPlanData.length,
-            itemBuilder: (context, index) {
-              var dayData = mealPlanData[index];
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF2E2E2E),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    children: [
+                      // Live Stats Title
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Body Status And Goal',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ), // Space below the title
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Target Weight',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                '75 kg',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    // crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.monitor_weight,
+                                        color: Colors.blue,
+                                        size: 50,
+                                      ),
+                                      Text(
+                                        "94 kg",
+                                        style: TextStyle(
+                                            color: AppColors.mandarin,
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    "Body Weight",
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 12),
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          // Vertical Divider
+                          Container(
+                            height: 100,
+                            width: 1,
+                            color: Colors.grey,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Target Fat%',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                '75 kg',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              ),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.fact_check,
+                                    color: Colors.yellow,
+                                    size: 50,
+                                  ),
+                                  Text(
+                                    '44%',
+                                    style: TextStyle(
+                                        color: Color(0XFFF5D657),
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                'Fat Percentage',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                          // Vertical Divider
 
-              return buildAccordion(
-                day: "Sundey",
-                dishesCount: dayData['ingredients'].length,
-                ingredients: dayData['ingredients'],
-                meals: dayData['categorys'],
-                isExpanded: isExpandedList[index],
-                onToggle: () {
-                  setState(() {
-                    isExpandedList[index] = !isExpandedList[index];
-                  });
-                },
-              );
-            },
+                          // Column(
+                          //   crossAxisAlignment: CrossAxisAlignment.start,
+                          //   children: [
+                          //     Text(
+                          //       '07',
+                          //       style: TextStyle(
+                          //           color: Color(0XFFD0B4F9),
+                          //           fontSize: 22,
+                          //           fontWeight: FontWeight.bold),
+                          //     ),
+                          //     SizedBox(height: 5),
+                          //     Text(
+                          //       'Pending Requests',
+                          //       style: TextStyle(color: Colors.white, fontSize: 14),
+                          //     ),
+                          //   ],
+                          // ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF2E2E2E),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    children: [
+                      // Live Stats Title
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Live Stats',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10), // Space below the title
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '60',
+                                    style: TextStyle(
+                                        color: Color(0XFFF57552),
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    '/150',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                'Proteins',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              ),
+                            ],
+                          ),
+                          // Vertical Divider
+                          Container(
+                            height: 50,
+                            width: 1,
+                            color: Colors.grey,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '120',
+                                    style: TextStyle(
+                                        color: Color(0XFFF5D657),
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    '/200',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                'Carbs',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              ),
+                            ],
+                          ),
+                          // Vertical Divider
+                          Container(
+                            height: 50,
+                            width: 1,
+                            color: Colors.grey,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '35',
+                                    style: TextStyle(
+                                        color: Color(0XFFD0B4F9),
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    '/65',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                'Fats',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                SizedBox(
+                  height: 40,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      var data = shedule[index];
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = index;
+                            print("press");
+                          });
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: ButtonSelector(
+                            title: data["name"].toString(),
+                            icon: data["icon"] as IconData,
+                            active: index == selectedIndex,
+                          ),
+                        ),
+                      );
+                    },
+                    itemCount: shedule.length,
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : dataList.isEmpty
+                        ? Center(
+                            child: Column(
+                              children: [
+                                // Add the image asset with black background
+                                Image.asset(
+                                  'assets/no_diet.png',
+                                  height: 250,
+                                  width: 250,
+                                  fit: BoxFit.cover,
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: dataList.length,
+                            itemBuilder: (context, index) {
+                              var data = dataList[index];
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: 15),
+                                child: NutritionalHistoryCard(
+                                  data: data,
+                                  id: widget.id,
+                                  title: "${data["name"] ?? "Not Found"}",
+                                  kcal: "${data["kcal"] ?? "0"}",
+                                  weight: 80,
+                                  protein: "${data["protein"] ?? "0"}",
+                                  fat: "${data["fat"] ?? "0"}",
+                                  carbs: "${data["carbs"] ?? "0"}",
+                                ),
+                              );
+                            },
+                          ),
+              ],
+            ),
           ),
         ],
       ),

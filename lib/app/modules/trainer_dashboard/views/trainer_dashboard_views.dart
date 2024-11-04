@@ -208,7 +208,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                   child: CircularProgressIndicator(),
                 )
               : SizedBox(
-                  width: 200,
+                  width: 150,
                   child: DropdownButtonFormField(
                     hint: Text(
                       "Select Group",
@@ -247,11 +247,11 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                   ),
                 ),
           SizedBox(
-            width: 20,
+            width: 10,
           ),
           Container(
             decoration: BoxDecoration(
-              color: Colors.black,
+              color: AppColors.cardbackground,
             ),
             child: IconButton(
               icon: Icon(
@@ -259,6 +259,23 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                 color: Colors.white,
               ),
               onPressed: () {},
+            ),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.cardbackground,
+            ),
+            child: IconButton(
+              icon: Icon(
+                Icons.logout,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Get.find<AuthController>().clearAuth();
+              },
             ),
           ),
         ],

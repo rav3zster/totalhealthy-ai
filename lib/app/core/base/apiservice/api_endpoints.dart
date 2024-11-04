@@ -17,6 +17,7 @@ class APIEndpoints {
   static const meals = _Meals();
 
   static const createData = _CreateData();
+  static const notification = _Notification();
 }
 
 class _Table {
@@ -61,6 +62,14 @@ class _Profile {
   String get userProfile => "${APIEndpoints.baseURL}api/profile";
 }
 
+class _Notification {
+  const _Notification();
+
+  String get getNotification => "${APIEndpoints.baseURL}notifications";
+  String postNotification(id, action) =>
+      "${APIEndpoints.baseURL}notifications/$id/respond?action=$action";
+}
+
 class _Auth {
   const _Auth();
   String get signup =>
@@ -82,6 +91,8 @@ class _Meals {
   const _Meals();
 
   String getadmindMeals(id) => "${APIEndpoints.baseURL}admin/meals?groupId=$id";
+  String getadmindHistory(userId, groupId) =>
+      "${APIEndpoints.baseURL}admin/meals_history_meals?groupId=$groupId&userId=$userId";
 }
 
 class _Logs {

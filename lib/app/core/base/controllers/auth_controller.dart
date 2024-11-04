@@ -90,10 +90,10 @@ class AuthController extends GetxController {
 
   void clearAuth() {
     authToken = "";
-    box.remove('redirect');
+
     isAuthenticated.value = false;
-    box.remove('authToken');
-    box.remove('refreshToken');
+
     box.erase();
+    Get.offAllNamed(Routes.LoginView);
   }
 }

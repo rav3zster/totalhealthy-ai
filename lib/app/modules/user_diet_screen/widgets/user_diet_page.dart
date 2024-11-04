@@ -9,7 +9,7 @@ import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
 import '../../../core/base/controllers/auth_controller.dart';
-import '../../../routes/app_pages.dart';
+
 import '../../client_dashboard/views/client_dashboard_views.dart';
 import 'add_meal_button.dart';
 import 'nutritional_card.dart';
@@ -194,7 +194,9 @@ class _UserDietPageState extends State<UserDietPage> {
                 Icons.notifications_none,
                 color: Colors.white,
               ),
-              onPressed: () {},
+              onPressed: () {
+                Get.toNamed('/notification?id=${widget.id}');
+              },
             ),
           ),
         ],

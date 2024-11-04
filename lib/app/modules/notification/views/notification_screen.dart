@@ -7,8 +7,10 @@ import '../widgets/notification_page.dart';
 
 class NotificationScreen extends GetView<NotificationController> {
   const NotificationScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return NotificationsPage();
+    String id = Get.parameters["id"] ?? "";
+    return NotificationsPage(id: id, controller: controller);
   }
 }

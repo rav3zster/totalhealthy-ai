@@ -6,6 +6,7 @@ enum ButtonType { elevated, text, outlined, icon }
 
 class CustomButton extends StatelessWidget {
   final Widget child;
+  final Color? color;
   final VoidCallback? onPressed;
   final ButtonSize size;
   final ButtonType type;
@@ -19,7 +20,8 @@ class CustomButton extends StatelessWidget {
     required this.size,
     required this.type,
     this.icon,
-    this.isFullWidth = false, // Default to sizing according to the content
+    this.isFullWidth = false,
+    this.color, // Default to sizing according to the content
   });
 
   // Define button sizes
@@ -63,19 +65,33 @@ class CustomButton extends StatelessWidget {
   Widget _buildButton() {
     switch (type) {
       case ButtonType.elevated:
-        return ElevatedButton(onPressed: onPressed, child: child);
+        return ElevatedButton(
+            onPressed: onPressed,
+            style: ElevatedButton.styleFrom(backgroundColor: color),
+            child: child);
       case ButtonType.text:
-        return TextButton(onPressed: onPressed, child: child);
+        return TextButton(
+          onPressed: onPressed,
+          style: TextButton.styleFrom(backgroundColor: color),
+          child: child,
+        );
       case ButtonType.outlined:
-        return OutlinedButton(onPressed: onPressed, child: child);
+        return OutlinedButton(
+          onPressed: onPressed,
+          style: OutlinedButton.styleFrom(backgroundColor: color),
+          child: child,
+        );
       case ButtonType.icon:
         return IconButton(
-          icon: Icon(icon),
-          onPressed: onPressed,
-          tooltip: 'Icon Button',
-        );
+            icon: Icon(icon),
+            onPressed: onPressed,
+            tooltip: 'Icon Button',
+            style: IconButton.styleFrom(backgroundColor: color));
       default:
-        return ElevatedButton(onPressed: onPressed, child: child);
+        return ElevatedButton(
+            onPressed: onPressed,
+            style: ElevatedButton.styleFrom(backgroundColor: color),
+            child: child);
     }
   }
 }
