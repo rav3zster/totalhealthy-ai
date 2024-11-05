@@ -8,10 +8,10 @@ import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
+import '../../../core/base/controllers/auth_controller.dart';
+import '../../../routes/app_pages.dart';
 import '../../../widgets/drawer_menu.dart';
 import '../../registration/views/registration_view.dart';
-import '../views/add_client.dart';
-import 'create_group.dart';
 
 class GroupListPage extends StatefulWidget {
   @override
@@ -41,34 +41,34 @@ class _GroupListPageState extends State<GroupListPage> {
           'Groups',
           style: TextStyle(color: Color(0XFFB3B3B3), fontSize: 24),
         ),
-        actions: [
-          Container(
-            decoration: BoxDecoration(
-                color: Color(0XFFCDE26D),
-                borderRadius: BorderRadius.circular(30)),
-            child: ElevatedButton.icon(
-              icon: Icon(
-                Icons.add,
-                color: Color(0XFF242522),
-                size: 28,
-              ),
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return CreateGroup();
-                    });
-              },
-              label: const Text(
-                "Add group",
-                style: TextStyle(
-                    color: Color(0XFF242522),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18),
-              ),
-            ),
-          ),
-        ],
+        // actions: [
+        //   Container(
+        //     decoration: BoxDecoration(
+        //         color: Color(0XFFCDE26D),
+        //         borderRadius: BorderRadius.circular(30)),
+        //     child: ElevatedButton.icon(
+        //       icon: Icon(
+        //         Icons.add,
+        //         color: Color(0XFF242522),
+        //         size: 28,
+        //       ),
+        //       onPressed: () {
+        //         showDialog(
+        //             context: context,
+        //             builder: (context) {
+        //               return CreateGroup();
+        //             });
+        //       },
+        //       label: const Text(
+        //         "Add group",
+        //         style: TextStyle(
+        //             color: Color(0XFF242522),
+        //             fontWeight: FontWeight.bold,
+        //             fontSize: 18),
+        //       ),
+        //     ),
+        //   ),
+        // ],
       ),
       body: Obx(() {
         return controller.isLoading.value
@@ -81,11 +81,14 @@ class _GroupListPageState extends State<GroupListPage> {
                   final group = controller.groupData[index];
                   return GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => GroupsViewScreen()),
-                      );
+                      Get.toNamed(Routes.TrainerDashboard);
+                      Get.find<AuthController>()
+                          .groupIdStore(group["group_id"]);
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //       builder: (context) => GroupsViewScreen()),
+                      // );
 
                       controller.group(group);
                     },

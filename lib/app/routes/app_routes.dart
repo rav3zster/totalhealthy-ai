@@ -23,11 +23,14 @@ abstract class Routes {
   static const CreateMeal = _Paths.CreateMeal;
   static const SIGNUP = _Paths.SIGNUP;
   static const GROUP = _Paths.GROUP;
+  static const ONBOARDING = _Paths.ONBOARDING;
+  static const USER_GROUP_VIEW = _Paths.USER_GROUP_VIEW;
 }
 
 abstract class _Paths {
   _Paths._();
   static const HOME = '/home';
+  static const ONBOARDING = '/onboarding';
   static const SwipeScreen = '/swipescreen';
   static const WelcomeScreen = '/welcomescreen';
   static const Registration = '/registration';
@@ -46,4 +49,5 @@ abstract class _Paths {
   static const SIGNUP = '/signup';
   static const FORGETPASSWORD = '/forgot-password';
   static const GROUP = '/group';
+  static const USER_GROUP_VIEW = '/user-group-view';
 }

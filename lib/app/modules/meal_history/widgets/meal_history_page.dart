@@ -293,6 +293,7 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 14),
                               ),
+                              SizedBox(height: 5),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -300,11 +301,11 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     // crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Icon(
-                                        Icons.monitor_weight,
-                                        color: Colors.blue,
-                                        size: 50,
+                                      Image.asset(
+                                        "assets/weight.png",
+                                        height: 50,
                                       ),
+                                      SizedBox(width: 5),
                                       Text(
                                         "94 kg",
                                         style: TextStyle(
@@ -314,6 +315,7 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                                       ),
                                     ],
                                   ),
+                                  SizedBox(height: 5),
                                   Text(
                                     "Body Weight",
                                     style: TextStyle(
@@ -344,17 +346,18 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                '75 kg',
+                                '30%',
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 14),
                               ),
+                              SizedBox(height: 5),
                               Row(
                                 children: [
-                                  Icon(
-                                    Icons.fact_check,
-                                    color: Colors.yellow,
-                                    size: 50,
+                                  Image.asset(
+                                    "assets/fat.png",
+                                    height: 50,
                                   ),
+                                  SizedBox(width: 5),
                                   Text(
                                     '44%',
                                     style: TextStyle(

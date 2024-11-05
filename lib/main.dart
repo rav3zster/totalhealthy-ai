@@ -4,6 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 
 import 'app/core/base/constants/custom_scroll.dart';
+
 import 'app/core/base/controllers/theme_controller.dart';
 import 'app/routes/app_pages.dart';
 
@@ -32,15 +33,12 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-        // onInit: () {
-        //   Get.find<AuthController>().initAuth();
-        // },
         getPages: AppPages.routes,
-        initialRoute: AppPages.INITIAL,
+        initialRoute: Get.find<AuthController>().isAuthenticated.value
+            ? Get.find<AuthController>().handleAuthChange()
+            : AppPages.INITIAL,
         title: 'Total Healthy',
-        onReady: () {
-          Get.find<AuthController>().handleAuthChange();
-        },
+        onReady: () {},
         scrollBehavior: MyCustomScrollBehavior(),
         debugShowCheckedModeBanner: false,
         theme: Get.find<ThemeController>().themeData);

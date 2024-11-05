@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+
 import 'package:totalhealthy/app/widgets/custom_button.dart';
 
-import '../../../core/base/apiservice/api_endpoints.dart';
-import '../../../core/base/apiservice/api_status.dart';
-import '../../../core/base/apiservice/base_methods.dart';
-import '../../../core/base/controllers/auth_controller.dart';
+import '../../group/widgets/create_group.dart';
 
 class RegistrationView extends StatelessWidget {
   @override
@@ -148,9 +144,7 @@ class RegistrationView extends StatelessWidget {
                       });
                 },
                 size: ButtonSize.medium,
-                type: ButtonType.elevated
-
-            )
+                type: ButtonType.elevated)
           ],
         ),
       ),
@@ -210,165 +204,6 @@ class RegistrationView extends StatelessWidget {
               ),
               onTap: () {},
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class CreateGroup extends StatefulWidget {
-  const CreateGroup({
-    super.key,
-  });
-
-  @override
-  State<CreateGroup> createState() => _CreateGroupState();
-}
-
-class _CreateGroupState extends State<CreateGroup> {
-
-  var groupName = TextEditingController();
-  var description = TextEditingController();
-  GlobalKey<FormState> key = GlobalKey<FormState>();
-
-  bool isLoading = false;
-
-  Future<void> submitUser() async {
-    try {
-      if (key.currentState!.validate()) {
-        setState(() {
-          isLoading = true;
-        });
-        Map<String, dynamic> data = {
-          "group_name": groupName.text.trim(),
-          "description": description.text.trim(),
-        };
-        print(data);
-
-        await APIMethods.post
-            .post(url: APIEndpoints.group.createGroup, map: data)
-            .then((value) {
-          if (APIStatus.success(value.statusCode)) {
-            // clearDetails();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Create Group Successful!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            Get.back();
-          } else {
-            // printError("Auth Controller", "Signup", value.data);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Group is not created.'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        });
-      }
-    } catch (e) {
-      print(e);
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-    // if (_formKey.currentState!.validate()) {
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      child: Container(
-        height: 400,
-        padding: EdgeInsets.all(10),
-        child: Form(
-          key: key,
-          child: Column(
-            children: [
-              SizedBox(height: 30,),
-              TextFormField(
-                controller: groupName,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Color(0XFF242522),
-                  hintText: 'Enter your Group Name',
-                  hintStyle: TextStyle(color: Colors.white54),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  // Custom Border Properties
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.transparent),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.transparent),
-                  ),
-                ),
-                style: TextStyle(color: Colors.white),
-              ),
-              SizedBox(height: 30,),
-              TextFormField(
-                controller: description,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Color(0XFF242522),
-                  hintText: 'Enter your Description',
-                  hintStyle: TextStyle(color: Colors.white54),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  // Custom Border Properties
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.transparent),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.transparent),
-                  ),
-                ),
-                style: TextStyle(color: Colors.white),
-              ),
-              SizedBox(
-                height: 60,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 18),
-                      child: ElevatedButton(
-                        onPressed: () => submitUser(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0XFFCDE26D),
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child: isLoading
-                            ? const Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            : const Text(
-                                'Create Group',
-                                style:
-                                    TextStyle(color: Color(0XFF242522), fontSize: 18),
-                              ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
           ),
         ),
       ),

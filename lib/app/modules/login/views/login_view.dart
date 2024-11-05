@@ -83,7 +83,7 @@ class _LoginViewState extends State<LoginView> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SizedBox(
-                    height: 200,
+                    height: 40,
                   ),
                   // Title
                   Text(
@@ -227,7 +227,7 @@ class _LoginViewState extends State<LoginView> {
                                 color: Color(0XFF242522), fontSize: 18),
                           ),
                   ),
-                  SizedBox(height: 100),
+                  SizedBox(height: 50),
 
                   // Dotted Line and "Or"
                   Center(

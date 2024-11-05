@@ -8,7 +8,11 @@ import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
 
+import '../../../routes/app_pages.dart';
 import '../../../widgets/custom_button.dart';
+import '../../../widgets/drawer_menu.dart';
+import '../../../widgets/phone_nav_bar.dart';
+import '../../group/views/add_client.dart';
 
 class TrainerDashboardView extends StatefulWidget {
   @override
@@ -36,7 +40,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
           .then((value) {
         if (APIStatus.success(value.statusCode)) {
           setState(() {
-            userData = value.data;
+            groupMemberData = [value.data];
           });
 
           // ScaffoldMessenger.of(context).showSnackBar(
@@ -55,7 +59,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
           );
         }
       });
-      // }
+      // }new
     } catch (e) {
       print(e);
     } finally {
@@ -168,123 +172,55 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   @override
   void initState() {
     super.initState();
-    getGroup();
+    getMember(Get.find<AuthController>().groupgetId());
   }
 
   String? valueDropDown;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: MobileNavBar(),
+      drawer: DrawerMenu(),
       backgroundColor: Color(0XFF0C0C0C),
       appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Row(
           children: [
-            CircleAvatar(
-              maxRadius: 28,
-              backgroundImage: NetworkImage(
-                  'https://s3-alpha-sig.figma.com/img/519d/a5b3/5dd7c94081b46b1030716f9a99bda058?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=jenxaaauev~xejor2UuGg8xXNQB-ugvjmHoiV6RcNYBQnj-hr1VQ20Pbprvw3fWQXO15QJFXc0Y3th0TAjya4d2TDqRdQBfcw171WpKTXMLmNMY0JHYemzsMAxDhHBEj-YGN~mHOiegyTMzi0~RjHZygBWfR4QbwdmR1ec3ITjoqefk8JaSfq4fbIXemlAvJsTO4-vTxp0ZGSZ2U24NawVgj0FP9BkCADm41VTdZg7bQLe0quP~0-~oUARPGRnm83vvDLQSjdFNn3sKVNMMXsbNSYLKtZOyA6OdcroUS8lEZvrKXyLjLYffXv~3IGOH1yVMMFdwyNId06kR32T468g__'), // Profile image
+            Builder(
+              builder: (context) => IconButton(
+                icon: Icon(Icons.menu), // Use any icon you prefer
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+              ),
             ),
-            SizedBox(width: 10),
+            CircleAvatar(
+              maxRadius: 20,
+              child: Icon(Icons.person),
+            ),
+            // SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Welcome!',
-                    style: TextStyle(fontSize: 20, color: Color(0XFFFFFFFF))),
+                    style: TextStyle(fontSize: 16, color: Color(0XFFFFFFFF))),
                 SizedBox(
                   height: 5,
                 ),
                 Text('Ayush Shukla',
-                    style: TextStyle(fontSize: 16, color: Color(0XFF7B7B7A))),
+                    style: TextStyle(fontSize: 12, color: Color(0XFF7B7B7A))),
               ],
             ),
           ],
         ),
-        actions: [
-          isGroupLoading
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : SizedBox(
-                  width: 150,
-                  child: DropdownButtonFormField(
-                    hint: Text(
-                      "Select Group",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    value: valueDropDown,
-                    onTap: () {},
-                    items: uniqueDataList.map((value) {
-                      //  bool exists = dataList.any((item) => item["group_name"] == newItem["group_name"]);
-                      return DropdownMenuItem(
-                        onTap: () {
-                          setState(() {
-                            getMember("${value["group_id"]}");
-                            Get.find<AuthController>()
-                                .groupIdStore(value["group_id"]);
-                          });
-                        },
-                        value:
-                            "${value["group_name"]}", // Set a value for each item
-                        child: Text(
-                          "${value["group_name"]}",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        valueDropDown = value;
-                      });
-                    },
-                    dropdownColor: const Color.fromARGB(221, 36, 31, 31),
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-          SizedBox(
-            width: 10,
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.cardbackground,
-            ),
-            child: IconButton(
-              icon: Icon(
-                Icons.notifications_none,
-                color: Colors.white,
-              ),
-              onPressed: () {},
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.cardbackground,
-            ),
-            child: IconButton(
-              icon: Icon(
-                Icons.logout,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Get.find<AuthController>().clearAuth();
-              },
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Live Stats Section
             Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -313,7 +249,9 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '08',
+                            groupMemberData.length.isLowerThan(10)
+                                ? "0${groupMemberData.length}"
+                                : "${groupMemberData.length}",
                             style: TextStyle(
                                 color: Color(0XFFF57552),
                                 fontSize: 22,
@@ -409,7 +347,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                             style: TextStyle(color: AppColors.buttonText),
                           ),
                     onPressed: () => submitUser(),
-                    size: ButtonSize.small,
+                    size: ButtonSize.medium,
                     type: ButtonType.elevated),
                 // SizedBox(width: 10),
                 // Icon(Icons.filter_list, color: Colors.white, size: 30),
@@ -441,37 +379,20 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                     ),
                   ),
                   onPressed: () {
-                    // Get.toNamed(Routes.UserDiet);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AddClient()),
+                    );
                   },
                   label: Text('Add Client',
                       style: TextStyle(color: Color(0XFF242522))),
                 ),
               ],
             ),
-            SizedBox(height: 10),
+            // SizedBox(height: 10),
             // Client List
 
-            userData.isNotEmpty
-                ? Expanded(
-                    child: ListView(
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            Get.toNamed("/userdiet?id=${userData["id"]}");
-                          },
-                          child: clientCard(
-                              userData["id"],
-                              "${userData["email"]}",
-                              "${userData["phone_number"]}",
-                              56,
-                              context),
-                        ),
-                      ],
-                    ),
-                  )
-                : SizedBox(),
-
-            isGroupLoading
+            isGroupLoading || isLoading
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
@@ -480,17 +401,25 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                     itemCount: groupMemberData.length,
                     itemBuilder: (context, index) {
                       var data = groupMemberData[index];
-                      return InkWell(
-                        onTap: () {
-                          Get.toNamed("/userdiet?id=${data["user_id"]}");
-                        },
-                        child: clientCard(
-                            data["user_id"],
-                            "${data["user_details"]["email"]}",
-                            "${data["user_details"]["phone_number"]}",
-                            56,
-                            context),
-                      );
+                      return data["id"] != null
+                          ? InkWell(
+                              onTap: () {
+                                Get.toNamed("/userdiet?id=${data["id"]}");
+                              },
+                              child: clientCard("Not Found", "${data["email"]}",
+                                  "${data["phone_number"]}", 56, context),
+                            )
+                          : InkWell(
+                              onTap: () {
+                                Get.toNamed("/userdiet?id=${data["user_id"]}");
+                              },
+                              child: clientCard(
+                                  data["user_details"]["name"],
+                                  "${data["user_details"]["email"] ?? data["email"]}",
+                                  "${data["user_details"]["phone_number"] ?? data["phone_number"]}",
+                                  56,
+                                  context),
+                            );
                     },
                   )
           ],

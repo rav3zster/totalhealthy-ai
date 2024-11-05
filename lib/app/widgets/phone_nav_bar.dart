@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../core/base/constants/appcolor.dart';
 import '../routes/app_pages.dart';
 // ignore_for_file: prefer_const_constructors
 
@@ -16,13 +17,15 @@ class MobileNavBar extends StatefulWidget {
 class OntapStore {
   static var index = 0;
   static List<String> routes = [
-    Routes.HOME,
+    Routes.ClientDashboard,
+    Routes.GROUP,
+    Routes.NOTIFICATION,
   ];
 }
 
 class _MobileNavBarState extends State<MobileNavBar> {
   ontapFunction(int value) {
-    Get.offAllNamed(OntapStore.routes[value]);
+    Get.toNamed(OntapStore.routes[value]);
 
     setState(() {
       OntapStore.index = value;
@@ -45,71 +48,65 @@ class _MobileNavBarState extends State<MobileNavBar> {
             (Set<WidgetState> states) {
               if (states.contains(WidgetState.selected)) {
                 return TextStyle(
-                    color: Colors.pink.shade400,
+                    color: AppColors.chineseGreen,
                     fontWeight: FontWeight.bold,
                     fontSize: 12);
               }
               return TextStyle(
-                  color: Colors.grey,
+                  color: Colors.white,
                   fontSize: 12); // Default style for unselected
             },
           ),
         ),
       ),
       child: NavigationBar(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.white,
-          indicatorColor: Colors.pink.shade300,
-          height: 50,
+          backgroundColor: AppColors.cardbackground,
+          surfaceTintColor: Colors.black,
+          indicatorColor: AppColors.chineseGreen,
+          height: 60,
           selectedIndex: OntapStore.index,
           onDestinationSelected: (value) => ontapFunction(value),
           destinations: const [
             NavigationDestination(
                 icon: Icon(
-                  Icons.shopping_cart_outlined,
-                ),
-                selectedIcon: Icon(
-                  Icons.shopping_cart,
-                  color: Colors.white,
-                ),
-                label: "HOME"),
-            NavigationDestination(
-                icon: Icon(
                   Icons.person_outlined,
+                  color: Colors.white,
                 ),
                 selectedIcon: Icon(
                   Icons.person,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
-                label: "FOOD DETAILS"),
+                label: "User"),
             NavigationDestination(
                 icon: Icon(
                   Icons.group_outlined,
+                  color: Colors.white,
                 ),
                 selectedIcon: Icon(
                   Icons.group,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
-                label: "Customer"),
+                label: "Group"),
             NavigationDestination(
                 icon: Icon(
-                  Icons.shopping_bag_outlined,
-                ),
-                selectedIcon: Icon(
-                  Icons.shopping_bag,
+                  Icons.notifications_outlined,
                   color: Colors.white,
                 ),
-                label: "Product"),
-
-            // NavigationDestination(
-            //     icon: Icon(
-            //       Icons.settings_outlined,
-            //     ),
-            //     selectedIcon: Icon(
-            //       Icons.settings,
-            //       color: Colors.white,
-            //     ),
-            //     label: "Setting"),
+                selectedIcon: Icon(
+                  Icons.notifications,
+                  color: Colors.black,
+                ),
+                label: "Notification"),
+            NavigationDestination(
+                icon: Icon(
+                  Icons.settings_outlined,
+                  color: Colors.white,
+                ),
+                selectedIcon: Icon(
+                  Icons.settings,
+                  color: Colors.black,
+                ),
+                label: "Setting"),
           ]),
     );
   }

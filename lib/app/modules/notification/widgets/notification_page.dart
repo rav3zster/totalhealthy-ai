@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/modules/notification/controllers/notification_controller.dart';
 import 'package:totalhealthy/app/widgets/custom_button.dart';
+import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
@@ -133,16 +134,20 @@ class _NotificationsPageState extends State<NotificationsPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
+      bottomNavigationBar: MobileNavBar(),
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+      automaticallyImplyLeading: false,
+        backgroundColor: Colors.black,
         elevation: 0,
-        leading: IconButton(
-            onPressed: () {
-              Get.toNamed("/userdiet?=id${widget.id}");
-            },
-            icon: Icon(Icons.arrow_back_ios_new_outlined),
-            color: Color(0XFFDBDBDB)),
+        // leading: IconButton(
+        //     onPressed: () {
+        //       Get.back();
+        //       // Get.toNamed("/userdiet?=id${widget.id}");
+        //     },
+        //     icon: Icon(Icons.arrow_back_ios_new_outlined),
+        //     color: Color(0XFFDBDBDB)),
         title: SizedBox(
           width: double.infinity,
           child: Padding(
@@ -162,6 +167,7 @@ class _NotificationsPageState extends State<NotificationsPage>
             elevation: 0, // Remove any elevation that might cause a shadow line
             color: Colors.black, // TabBar background color
             child: TabBar(
+              padding: EdgeInsets.symmetric(horizontal: 10),
               controller: _tabController,
               tabs: [
                 Tab(text: 'All'),

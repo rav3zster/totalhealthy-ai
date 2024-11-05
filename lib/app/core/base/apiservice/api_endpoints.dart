@@ -72,8 +72,7 @@ class _Notification {
 
 class _Auth {
   const _Auth();
-  String get signup =>
-      "https://uxtaxcxe54qbnsse3mffqq2i6i0vbnqd.lambda-url.us-east-1.on.aws/registration";
+  String get signup => "${APIEndpoints.baseURL}registration";
   String get login => "${APIEndpoints.baseURL}login";
 }
 
@@ -83,6 +82,8 @@ class _Group {
   String get userGroup => "${APIEndpoints.baseURL}users";
   String get pooledRequests => "${APIEndpoints.baseURL}pooled_requests";
   String get createGroup => "${APIEndpoints.baseURL}admin/groups";
+  String get addGroup => "${APIEndpoints.baseURL}groups";
+
   String addGroupMember(groupId, userId) =>
       "${APIEndpoints.baseURL}groups/$groupId/send-request/$userId";
 }
@@ -90,7 +91,8 @@ class _Group {
 class _Meals {
   const _Meals();
 
-  String getadmindMeals(id) => "${APIEndpoints.baseURL}admin/meals?groupId=$id";
+  String getadmindMeals(id, role) =>
+      "${APIEndpoints.baseURL}$role/meals?groupId=$id";
   String getadmindHistory(userId, groupId) =>
       "${APIEndpoints.baseURL}admin/meals_history_meals?groupId=$groupId&userId=$userId";
 }

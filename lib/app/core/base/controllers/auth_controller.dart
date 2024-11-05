@@ -2,12 +2,13 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import '../../../routes/app_pages.dart';
-import '../../../routes/route_access.dart';
+
 import 'theme_controller.dart';
 
 class AuthController extends GetxController {
   Future<AuthController> init() async {
     Get.putAsync<ThemeController>(() async => ThemeController());
+
     tokenVaildate();
     return this;
   }
@@ -15,16 +16,13 @@ class AuthController extends GetxController {
   final _authToken = "".obs;
   RxBool isLogOut = false.obs;
   RxBool flowloader = false.obs;
-
   final _deviceToken = "".obs;
   String get authToken => _authToken.value;
   String get deviceToken => _deviceToken.value;
   RxBool isAuthenticated = false.obs;
-
   set authToken(value) => _authToken.value = value;
   set deviceToken(value) => _deviceToken.value = value;
   final box = GetStorage();
-
   void refreshAuth() {
     isAuthenticated.refresh();
   }
@@ -45,8 +43,6 @@ class AuthController extends GetxController {
 
     await validateAuth();
     ever(isAuthenticated, (auth) => handleAuthChange());
-
-    // FlutterNativeSplash.remove();
   }
 
   validateAuth() async {
@@ -58,19 +54,30 @@ class AuthController extends GetxController {
     print("handleAuthChange  ${Get.currentRoute}");
 
     if (isLogOut.value) {
-      Get.offAllNamed(Routes.Login);
+      return Routes.Login;
     } else if (isAuthenticated.value) {
       print(isAuthenticated.value);
-      Get.toNamed(Get.currentRoute == '/login' || Get.currentRoute == '/signup'
-          ? Routes.TrainerDashboard
-          : Get.currentRoute);
+      return Get.currentRoute == '/login' ||
+              Get.currentRoute == '/signup' ||
+              Get.currentRoute == '/onboarding' ||
+              Get.currentRoute.isEmpty
+          ? Routes.ClientDashboard
+          : Get.currentRoute;
+    } else {
+      return '/onboarding';
     }
   }
 
   groupgetId() => box.read("groupId");
+  usergetId() => box.read("userId");
   groupIdStore(String id) async {
     await box.write("groupId", id);
     print(box.read("groupId"));
+  }
+
+  userIdStore(String id) async {
+    await box.write("userId", id);
+    print(box.read("userId"));
   }
 
   tokenVaildate() {

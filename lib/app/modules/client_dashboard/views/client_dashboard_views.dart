@@ -1,12 +1,104 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 
-class ClientDashboardScreen extends StatelessWidget {
+import '../../../core/base/apiservice/api_endpoints.dart';
+import '../../../core/base/apiservice/api_status.dart';
+import '../../../core/base/apiservice/base_methods.dart';
+import '../../../core/base/controllers/auth_controller.dart';
+import '../../../widgets/drawer_menu.dart';
+import '../../meal_history/widgets/button_selector.dart';
+import '../../meal_history/widgets/nutritional_history_card.dart';
+import '../../user_diet_screen/widgets/add_meal_button.dart';
+
+class ClientDashboardScreen extends StatefulWidget {
+  ClientDashboardScreen({
+    super.key,
+  });
+
+//
+  // final String id;
+  @override
+  State<ClientDashboardScreen> createState() => _ClientDashboardScreenState();
+}
+
+class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
+  int selectedIndex = 0;
+  var shedule = [
+    {
+      "name": "Breakfast",
+      "icon": Icons.breakfast_dining,
+    },
+    {
+      "name": "Lunch",
+      "icon": Icons.lunch_dining,
+    },
+    {
+      "name": "Dinner",
+      "icon": Icons.dinner_dining,
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    getMeals();
+  }
+
+  var dataList = [];
+  var isLoading = false;
+
+  Future<void> getMeals() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      await APIMethods.get
+          .get(
+        url: APIEndpoints.meals
+            .getadmindMeals(Get.find<AuthController>().groupgetId(), "user"),
+      )
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          setState(() {
+            dataList = value.data;
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Group id Not Found'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
+      // }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    String id = Get.parameters["id"] ?? "";
     return Scaffold(
+      drawer: DrawerMenu(),
+      bottomNavigationBar: MobileNavBar(),
       backgroundColor: Colors.black,
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              Get.toNamed('/userdiet?id=$id');
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+            )),
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Row(
@@ -40,8 +132,13 @@ class ClientDashboardScreen extends StatelessWidget {
                 Icons.notifications_none,
                 color: Colors.white,
               ),
-              onPressed: () {},
+              onPressed: () {
+                Get.toNamed('/notification?id=$id');
+              },
             ),
+          ),
+          SizedBox(
+            width: 10,
           ),
         ],
       ),
@@ -51,119 +148,126 @@ class ClientDashboardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Enlarged Daily Calories Tracking Section
-              Container(
-                height: 250, // Increase the height of the container
-                decoration: BoxDecoration(
-                  color: Color(0XFFCDE26D),
-                  borderRadius: BorderRadius.circular(
-                      16), // Increase the border radius for smoother edges
-                ),
-                padding: EdgeInsets.all(20), // Increase padding
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  // Align items to the far ends
-                  children: [
-                    // Text content on the left
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Track \nYour Daily \nCalories',
-                          style: TextStyle(
-                              color: Color(0XFF000000),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 30), // Increase font size
+              Stack(
+                children: [
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: 35,
+                      ),
+                      Container(
+                        height: 250, // Increase the height of the container
+                        decoration: BoxDecoration(
+                          color: Color(0XFFCDE26D),
+                          borderRadius: BorderRadius.circular(
+                              16), // Increase the border radius for smoother edges
                         ),
-                        SizedBox(height: 10),
-                        // More space between the title and summary
-                        Row(
+                        padding: EdgeInsets.all(10), // Increase padding
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          // Align items to the far ends
                           children: [
+                            // Text content on the left
                             Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(
-                                  Icons.circle_outlined,
-                                  color: Color(0XFFFFFFFF),
-                                ),
                                 Text(
-                                  'Gain',
+                                  'Track \nYour Daily \nCalories',
                                   style: TextStyle(
                                       color: Color(0XFF000000),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 30), // Increase font size
                                 ),
-                                // Slightly bigger text
-                                Text(
-                                  '1258 Kcal',
-                                  style: TextStyle(
-                                      color: Color(0XFF000000),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
+                                SizedBox(height: 10),
+                                // More space between the title and summary
+                                Row(
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Icon(
+                                          Icons.circle_outlined,
+                                          color: Color(0XFFFFFFFF),
+                                        ),
+                                        Text(
+                                          'Gain',
+                                          style: TextStyle(
+                                              color: Color(0XFF000000),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        // Slightly bigger text
+                                        Text(
+                                          '1258 Kcal',
+                                          style: TextStyle(
+                                              color: Color(0XFF000000),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(width: 24),
+                                    // More space between 'Gain' and 'Burn'
+                                    Column(
+                                      children: [
+                                        Icon(
+                                          Icons.circle_outlined,
+                                          color: Color(0XFFFFFFFF),
+                                        ),
+                                        Text(
+                                          'Burn',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Color(0XFF000000),
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          '658 Kcal',
+                                          style: TextStyle(
+                                            color: Color(0XFF000000),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                            SizedBox(width: 24),
-                            // More space between 'Gain' and 'Burn'
-                            Column(
-                              children: [
-                                Icon(
-                                  Icons.circle_outlined,
-                                  color: Color(0XFFFFFFFF),
-                                ),
-                                Text(
-                                  'Burn',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: Color(0XFF000000),
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  '658 Kcal',
-                                  style: TextStyle(
-                                    color: Color(0XFF000000),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
-                            ),
+
+                            // Image on the right
                           ],
                         ),
-                      ],
-                    ),
-
-                    // Image on the right
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        // Match the container's border radius
-                        child: Image.network(
-                          'https://s3-alpha-sig.figma.com/img/aa46/ce5c/25f392ef813edfc388ecc9ed434b2756?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=LHuB591vRnvEVBOpHOCngxfNp4AwL-YESi5~qFq6bmZkyp6lo94Y~Vf-wU40M5hYl7aY8cymBMa54f7IQ4Pva1HFFM5wHt70EBT89zgwQRwjvCue1xXX20WDeslIE2ZNTCKt50hKHm72948keAWryeOjCKuP~ZEPN~-hqj-7w5NhbHkbOQh9EahSHJoFRI-mv3Q-VojJCBw4u6nHZYRa6dl-yIeuLe6msjVH0X93-CHLq5MAKodID-cyHCxC3GVPZuKry--zU2wzrTwGQHLaP11nJojaSB7V-yOxs1B5NmadqeJncGj-8ncSAhuTglHEtVQxKYVua3qK7gUFJS-brA__',
-                          fit: BoxFit
-                              .cover, // Image will cover the entire container
-                        ),
+                      ),
+                    ],
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ClipRRect(
+                      // Match the container's border radius
+                      child: Image.asset(
+                        "assets/clientimage.png",
+                        height: 285,
+                        fit: BoxFit
+                            .cover, // Image will cover the entire container
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
 
               SizedBox(height: 16),
 
-// Daily Nutrient Summary Section with more space between sections
               Container(
                 margin: EdgeInsets.only(top: 16, bottom: 16),
-                // Space around the container
                 decoration: BoxDecoration(
                   color: Color(0XFF222222),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 padding: EdgeInsets.all(20),
-                // Added more padding inside the container
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header for the Daily Nutrient Summary
                     Text(
                       'Daily Nutrient Summary',
                       style: TextStyle(
@@ -266,7 +370,7 @@ class ClientDashboardScreen extends StatelessWidget {
                         ),
                         // Adjusted for Carbs
                         _buildVerticalDivider(),
-                        // Vertical divider
+
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           // Align labels and values to the left
@@ -343,49 +447,84 @@ class ClientDashboardScreen extends StatelessWidget {
               ),
               SizedBox(height: 16),
 
-              // "Today's Diet Plan" and "Add Meal" button
+              AddMealButton(
+                id: Get.find<AuthController>().usergetId() ?? "",
+              ),
+              SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "Today's Diet Plan",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 26),
-                  ),
-                  ElevatedButton.icon(
-                    icon: Icon(
-                      Icons.add,
-                      color: Color(0XFF242522),
+                  SizedBox(
+                    height: 40,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        var data = shedule[index];
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedIndex = index;
+                            });
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 10),
+                            child: ButtonSelector(
+                              title: data["name"].toString(),
+                              icon: data["icon"] as IconData,
+                              active: index == selectedIndex,
+                            ),
+                          ),
+                        );
+                      },
+                      itemCount: shedule.length,
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFCDE26D),
-                      // Add Client Button Color
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    onPressed: () {},
-                    label: Text('Add Meal',
-                        style: TextStyle(color: Color(0XFF242522))),
                   ),
                 ],
               ),
+              SizedBox(height: 20),
 
-              MealTypeSelector(),
-              SizedBox(height: 16),
+              isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : dataList.isEmpty
+                      ? Center(
+                          child: Column(
+                            children: [
+                              // Add the image asset with black background
+                              Image.asset(
+                                'assets/no_diet.png',
+                                height: 250,
+                                width: 250,
+                                fit: BoxFit.cover,
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: dataList.length,
+                          itemBuilder: (context, index) {
+                            var data = dataList[index];
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: 15),
+                              child: NutritionalHistoryCard(
+                                // isChecked: isCheck[index] ?? false,
 
-              // Meal Items (ListView inside SingleChildScrollView)
-              _buildMealItem('Oats And Banana Smoothie', '1000 Kcal',
-                  '250 Carbs, 50 Protein, 25 Fats', 'assets/oats_smoothie.png'),
-              _buildMealItem('Scrambled Eggs With Spinach', '500 Kcal',
-                  '150 Carbs, 30 Protein, 15 Fats', 'assets/eggs_spinach.png'),
-              _buildMealItem(
-                  'Greek Yogurt With Mixed Berries',
-                  '1050 Kcal',
-                  '180 Carbs, 45 Protein, 20 Fats',
-                  'assets/yogurt_berries.png'),
+                                data: data,
+                                id: "0",
+                                title: "${data["name"] ?? "Not Found"}",
+                                kcal: "${data["kcal"] ?? "0"}",
+                                weight: 80,
+                                protein: "${data["protein"] ?? "0"}",
+                                fat: "${data["fat"] ?? "0"}",
+                                carbs: "${data["carbs"] ?? "0"}",
+                              ),
+                            );
+                          },
+                        ),
             ],
           ),
         ),
@@ -417,34 +556,34 @@ class ClientDashboardScreen extends StatelessWidget {
               padding: const EdgeInsets.only(top: 190),
               child: Container(
                 margin: EdgeInsets.symmetric(horizontal: 8),
-                padding: EdgeInsets.symmetric(horizontal: 10,vertical: 14),
-                
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 14),
                 width: double.infinity,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: TextStyle(color: Colors.white,fontSize: 18)),
+                    Text(title,
+                        style: TextStyle(color: Colors.white, fontSize: 18)),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(kcal, style: TextStyle(color: Color(0XFFF5D657),fontSize: 18)),
+                        Text(kcal,
+                            style: TextStyle(
+                                color: Color(0XFFF5D657), fontSize: 18)),
                         SizedBox(height: 4),
                         Text(nutrients,
-                            style: TextStyle(color: Color(0XFFDBDBDB),fontSize: 16)),
+                            style: TextStyle(
+                                color: Color(0XFFDBDBDB), fontSize: 16)),
                       ],
                     )
                   ],
                 ),
                 decoration: BoxDecoration(
-                  color: Color(0XFF242522).withOpacity(0.50),
-                  borderRadius: BorderRadius.circular(10)
-                ),
+                    color: Color(0XFF242522).withOpacity(0.50),
+                    borderRadius: BorderRadius.circular(10)),
               ),
             )
           ],
-        )
-
-        );
+        ));
   }
 }
 

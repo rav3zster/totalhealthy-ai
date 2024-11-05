@@ -80,9 +80,7 @@ class _MealsDetailsPageState extends State<MealsDetailsPage> {
                                     child: Icon(Icons.favorite_border,
                                         color: Colors.black),
                                   ),
-                                  onPressed: () {
-                                    // Favorite button logic
-                                  },
+                                  onPressed: () {},
                                 ),
                                 IconButton(
                                   icon: CircleAvatar(

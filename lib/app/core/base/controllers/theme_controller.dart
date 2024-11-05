@@ -18,6 +18,7 @@ class ThemeController extends GetxController {
       dayForegroundColor: WidgetStatePropertyAll(Colors.black),
       headerForegroundColor: Colors.black,
     ),
+
     listTileTheme: const ListTileThemeData(
         titleTextStyle:
             TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
@@ -73,7 +74,7 @@ class ThemeController extends GetxController {
     useMaterial3: true,
     appBarTheme: const AppBarTheme(
       color: AppColors.lightGrey,
-      iconTheme: IconThemeData(color: AppColors.black),
+      iconTheme: IconThemeData(color: AppColors.white),
       titleTextStyle: TextStyle(
         color: AppColors.black,
         fontSize: 20,

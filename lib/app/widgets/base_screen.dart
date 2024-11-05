@@ -9,7 +9,7 @@ import 'phone_nav_bar.dart';
 class BaseScreen extends StatefulWidget {
   BaseScreen({
     super.key,
-    required this.child,
+    required this.body,
     this.isDrawer = true,
     this.isfloaingbutton = true,
     this.istheme = true,
@@ -19,7 +19,7 @@ class BaseScreen extends StatefulWidget {
     this.floatingActionButton,
     this.backgroundColor = AppColors.white,
   });
-  final Widget child;
+  final Widget body;
   double backgroundheight;
 
   final Widget? floatingActionButton;
@@ -77,18 +77,22 @@ class _BaseScreenState extends State<BaseScreen> {
             widget.isfloaingbutton ? widget.floatingActionButton : null,
         drawer: widget.isDrawer ? const DrawerMenu() : null,
         body: widget.istheme
-            ? Stack(
+            ? Column(
                 children: [
                   Container(
                     constraints:
                         BoxConstraints(maxHeight: widget.backgroundheight),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.black,
-                          ]),
+                        colors: [
+                          Color(0xFF272e23),
+                          Color.fromARGB(255, 12, 12, 12),
+                          Color.fromARGB(255, 12, 12, 12),
+                          Color(0xFF272e23),
+                        ],
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                      ),
                     ),
                     padding: const EdgeInsets.only(
                       top: 20,
@@ -100,29 +104,28 @@ class _BaseScreenState extends State<BaseScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            widget.isDrawer == false
-                                ? InkWell(
-                                    onTap: () {
-                                      // Get.back();
-                                      Navigator.pop(context);
-                                      // _scaffoldKey.currentState?.openDrawer();
-                                    },
-                                    child: const Icon(
-                                      Icons.arrow_back,
-                                      color: Colors.white,
-                                      size: 35,
-                                    ),
-                                  )
-                                : InkWell(
-                                    onTap: () {
-                                      _scaffoldKey.currentState?.openDrawer();
-                                    },
-                                    child: const Icon(
-                                      Icons.menu,
-                                      color: Colors.white,
-                                      size: 35,
-                                    ),
-                                  ),
+                            //  InkWell(
+                            //           onTap: () {
+                            //             // Get.back();
+                            //             Navigator.pop(context);
+                            //             // _scaffoldKey.currentState?.openDrawer();
+                            //           },
+                            //           child: const Icon(
+                            //             Icons.arrow_back,
+                            //             color: Colors.white,
+                            //             size: 35,
+                            //           ),
+                            //         ),
+                            // : InkWell(
+                            //     onTap: () {
+                            //       _scaffoldKey.currentState?.openDrawer();
+                            //     },
+                            //     child: const Icon(
+                            //       Icons.menu,
+                            //       color: Colors.white,
+                            //       size: 35,
+                            //     ),
+                            //   ),
                             Text(
                               widget.heading,
                               style: const TextStyle(
@@ -134,6 +137,7 @@ class _BaseScreenState extends State<BaseScreen> {
                             const SizedBox(
                               width: 20,
                             ),
+
                             // Image.asset('assets/Ellipse 2149.png',
                             //     width: 30, height: 50)
                           ],
@@ -145,7 +149,7 @@ class _BaseScreenState extends State<BaseScreen> {
                   Column(
                     children: [
                       const SizedBox(height: 90),
-                      Expanded(child: widget.child),
+                      Expanded(child: widget.body),
                     ],
                   ),
                 ],
@@ -153,7 +157,7 @@ class _BaseScreenState extends State<BaseScreen> {
             : Column(
                 children: [
                   const SizedBox(height: 200),
-                  Expanded(child: widget.child),
+                  Expanded(child: widget.body),
                 ],
               ),
       ),

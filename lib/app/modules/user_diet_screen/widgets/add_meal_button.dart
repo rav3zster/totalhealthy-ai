@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/widgets/custom_button.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
 import '../../../core/base/controllers/auth_controller.dart';
+import '../../../routes/app_pages.dart';
 
 class AddMealButton extends StatefulWidget {
   final String id;
@@ -173,11 +175,11 @@ class _AddMealButtonState extends State<AddMealButton> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Image.network(
-            imageUrl, // Load image from the network
-            width: 50, // Set the width of the image
-            height: 50, // Set the height of the image
-          ),
+          // Image.network(
+          //   imageUrl, // Load image from the network
+          //   width: 50, // Set the width of the image
+          //   height: 50, // Set the height of the image
+          // ),
           SizedBox(width: 8), // Add some space between the image and text
           Text(
             label,

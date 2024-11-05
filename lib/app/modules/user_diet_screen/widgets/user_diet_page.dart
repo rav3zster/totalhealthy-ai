@@ -4,13 +4,16 @@ import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/modules/meals_details/controllers/meals_details_controller.dart';
 import 'package:totalhealthy/app/modules/user_diet_screen/controllers/user_diet_screen_controllers.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
+import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
 import '../../../core/base/controllers/auth_controller.dart';
 
+import '../../../routes/app_pages.dart';
 import '../../client_dashboard/views/client_dashboard_views.dart';
+import '../../meal_history/widgets/button_selector.dart';
 import 'add_meal_button.dart';
 import 'nutritional_card.dart';
 
@@ -40,7 +43,7 @@ class _UserDietPageState extends State<UserDietPage> {
       await APIMethods.get
           .get(
         url: APIEndpoints.meals
-            .getadmindMeals(Get.find<AuthController>().groupgetId()),
+            .getadmindMeals(Get.find<AuthController>().groupgetId(), "admin"),
       )
           .then((value) {
         if (APIStatus.success(value.statusCode)) {
@@ -129,9 +132,25 @@ class _UserDietPageState extends State<UserDietPage> {
 
   List<String> selectedMealIds = [];
 
+  var shedule = [
+    {
+      "name": "Breakfast",
+      "icon": Icons.breakfast_dining,
+    },
+    {
+      "name": "Lunch",
+      "icon": Icons.lunch_dining,
+    },
+    {
+      "name": "Dinner",
+      "icon": Icons.dinner_dining,
+    },
+  ];
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: MobileNavBar(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: selectedMealIds.isNotEmpty
           ? isGetLoading
@@ -208,7 +227,38 @@ class _UserDietPageState extends State<UserDietPage> {
           SizedBox(height: 20),
           AddMealButton(id: widget.id),
           SizedBox(height: 20),
-          MealTypeSelector(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                height: 40,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    var data = shedule[index];
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedIndex = index;
+                          print("press");
+                        });
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: ButtonSelector(
+                          title: data["name"].toString(),
+                          icon: data["icon"] as IconData,
+                          active: index == selectedIndex,
+                        ),
+                      ),
+                    );
+                  },
+                  itemCount: shedule.length,
+                ),
+              ),
+            ],
+          ),
           SizedBox(height: 20),
 
           isLoading
@@ -436,31 +486,31 @@ class UserCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(4),
-                      child: Icon(
-                        Icons.local_post_office_outlined,
-                        color: Color(0XFF242522),
-                      ),
-                      decoration: BoxDecoration(
-                          color: Color(0XFFCDE26D), shape: BoxShape.circle),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                          color: Color(0XFFF5D657), shape: BoxShape.circle),
-                      child: Icon(
-                        Icons.call_outlined,
-                        color: Color(0XFF242522),
-                      ),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     Container(
+                //       padding: EdgeInsets.all(4),
+                //       child: Icon(
+                //         Icons.local_post_office_outlined,
+                //         color: Color(0XFF242522),
+                //       ),
+                //       decoration: BoxDecoration(
+                //           color: Color(0XFFCDE26D), shape: BoxShape.circle),
+                //     ),
+                //     SizedBox(
+                //       width: 10,
+                //     ),
+                //     Container(
+                //       padding: EdgeInsets.all(4),
+                //       decoration: BoxDecoration(
+                //           color: Color(0XFFF5D657), shape: BoxShape.circle),
+                //       child: Icon(
+                //         Icons.call_outlined,
+                //         color: Color(0XFF242522),
+                //       ),
+                //     ),
+                //   ],
+                // ),
               ],
             ),
             Text(

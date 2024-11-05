@@ -83,10 +83,10 @@ class CustomButton extends StatelessWidget {
         );
       case ButtonType.icon:
         return IconButton(
-            icon: Icon(icon),
-            onPressed: onPressed,
-            tooltip: 'Icon Button',
-            style: IconButton.styleFrom(backgroundColor: color));
+          icon: Icon(icon, color: color),
+          onPressed: onPressed,
+          tooltip: 'Icon Button',
+        );
       default:
         return ElevatedButton(
             onPressed: onPressed,

@@ -1,3 +1,5 @@
+import '../core/base/controllers/auth_controller.dart';
+import '../routes/app_pages.dart';
 import '/app/core/base/constants/appcolor.dart';
 
 import 'package:flutter/material.dart';
@@ -18,7 +20,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
   Widget build(BuildContext context) {
     return Responsive.isMobile(context)
         ? Drawer(
-            backgroundColor: AppColors.white,
+            backgroundColor: AppColors.cardbackground,
             width: 300,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
@@ -43,8 +45,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             children: [
                               CircleAvatar(
                                 radius: 25,
-                                backgroundImage:
-                                    AssetImage("assets/screen_1.jpg"),
+                                backgroundImage: AssetImage("assets/male.png"),
                               ),
                               SizedBox(
                                 width: 10,
@@ -77,32 +78,55 @@ class _DrawerMenuState extends State<DrawerMenu> {
                           children: [
                             ListTile(
                               onTap: () {
+                                Get.offAllNamed(OntapStore.routes[1]);
+
+                                setState(() {
+                                  OntapStore.index = 1;
+                                });
+                              },
+                              title: const Text(
+                                "Group",
+                              ),
+                              leading: const Icon(Icons.group),
+                            ),
+                            ListTile(
+                              onTap: () {
                                 Get.offAllNamed(OntapStore.routes[0]);
 
                                 setState(() {
                                   OntapStore.index = 0;
                                 });
                               },
-                              title: const Text(
-                                "Home",
-                                style: TextStyle(color: Colors.black),
+                              title: Text(
+                                "User",
                               ),
-                              leading: const Icon(Icons.person),
+                              leading: Icon(Icons.person),
                             ),
-                            // ListTile(
-                            //   onTap: () {
-                            //     Get.offAllNamed(OntapStore.routes[1]);
-
-                            //     setState(() {
-                            //       OntapStore.index = 1;
-                            //     });
-                            //   },
-                            //   title: Text(
-                            //     "Food Details",
-                            //     style: TextStyle(color: Colors.black),
-                            //   ),
-                            //   leading: Icon(Icons.person),
-                            // ),
+                            ListTile(
+                              onTap: () {
+                                Get.toNamed(Routes.USER_GROUP_VIEW);
+                                setState(() {
+                                  OntapStore.index = 1;
+                                });
+                              },
+                              title: Text(
+                                "SwitchUser",
+                              ),
+                              leading: Icon(Icons.person),
+                            ),
+                            ListTile(
+                              onTap: () {
+                                // Get.offAllNamed(OntapStore.routes[0]);
+                                Get.toNamed(Routes.UserDiet);
+                                // setState(() {
+                                //   OntapStore.index = 0;
+                                // });
+                              },
+                              title: Text(
+                                "SwitchAdmin",
+                              ),
+                              leading: Icon(Icons.person),
+                            ),
                           ],
                         ),
                         const SizedBox(
@@ -112,13 +136,24 @@ class _DrawerMenuState extends State<DrawerMenu> {
                         const SizedBox(
                           height: 20,
                         ),
-                        IconButton(
-                          onPressed: () async {},
-                          icon: const Icon(
-                            color: Colors.grey,
-                            Icons.exit_to_app,
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.cardbackground,
                           ),
-                          tooltip: 'Logout',
+                          child: IconButton(
+                            icon: Row(
+                              children: [
+                                Text("Logout"),
+                                Icon(
+                                  Icons.logout,
+                                  color: Colors.white,
+                                ),
+                              ],
+                            ),
+                            onPressed: () {
+                              Get.find<AuthController>().clearAuth();
+                            },
+                          ),
                         ),
                       ],
                     ),
