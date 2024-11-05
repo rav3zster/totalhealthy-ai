@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/modules/settings/bindings/settings_bindings.dart';
 
 import '../core/middlewares/global_middleware.dart';
 import '../modules/Onboarding_Screen/Onboarding_view.dart';
@@ -30,6 +31,7 @@ import '../modules/nutrition_goal/views/nutrition_goal_view.dart';
 import '../modules/registration/bindings/registration_binding.dart';
 import '../modules/registration/views/registration_view.dart';
 
+import '../modules/settings/views/settings_views.dart';
 import '../modules/swipe_screen/bindings/swipe_screen_bindings.dart';
 import '../modules/swipe_screen/views/swipe_screen_views.dart';
 import '../modules/welcom_screen/bindings/welcome-screen-bindings.dart';
@@ -44,7 +46,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.MEAL_TIMING;
+  static const INITIAL = Routes.Settings;
 
   static final routes = [
     GetPage(
@@ -137,5 +139,10 @@ class AppPages {
         page: () => GroupView(),
         binding: GroupBinding(),
         middlewares: [AuthCheckMiddleware()]),
+    GetPage(
+        name: _Paths.Settings,
+        page: () => SettingsView(),
+        binding: SettingsBinding(),
+        ),
   ];
 }
