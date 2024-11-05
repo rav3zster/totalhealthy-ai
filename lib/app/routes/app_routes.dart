@@ -23,6 +23,7 @@ abstract class Routes {
   static const CreateMeal = _Paths.CreateMeal;
   static const SIGNUP = _Paths.SIGNUP;
   static const GROUP = _Paths.GROUP;
+
 }
 
 abstract class _Paths {
@@ -46,4 +47,6 @@ abstract class _Paths {
   static const SIGNUP = '/signup';
   static const FORGETPASSWORD = '/forgot-password';
   static const GROUP = '/group';
+
+
 }

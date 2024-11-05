@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
-
 import 'app/core/base/constants/custom_scroll.dart';
 import 'app/core/base/controllers/theme_controller.dart';
 import 'app/routes/app_pages.dart';
@@ -13,6 +12,9 @@ void main() async {
   await initializeControllers();
 
   runApp(const MyApp());
+  // runApp(MaterialApp(
+  //   debugShowCheckedModeBanner: false,
+  //   home: notification_SettingsScreen(),));
 }
 
 initializeControllers() async {
