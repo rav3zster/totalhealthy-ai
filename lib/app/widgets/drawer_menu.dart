@@ -1,3 +1,5 @@
+import 'package:totalhealthy/app/core/utitlity/debug_print.dart';
+
 import '../core/base/controllers/auth_controller.dart';
 import '../routes/app_pages.dart';
 import '/app/core/base/constants/appcolor.dart';
@@ -16,6 +18,8 @@ class DrawerMenu extends StatefulWidget {
 }
 
 class _DrawerMenuState extends State<DrawerMenu> {
+  bool isTrainer = false;
+
   @override
   Widget build(BuildContext context) {
     return Responsive.isMobile(context)
@@ -28,7 +32,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
               child: Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(10),
                     width: double.infinity,
                     decoration: const BoxDecoration(),
                     child: Column(
@@ -45,7 +49,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             children: [
                               CircleAvatar(
                                 radius: 25,
-                                backgroundImage: AssetImage("assets/male.png"),
+                                backgroundImage:
+                                    AssetImage("assets/user_avatar.png"),
                               ),
                               SizedBox(
                                 width: 10,
@@ -59,74 +64,121 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                       height: 20,
                                     ),
                                     Text(
-                                      "Username",
-                                      // style: TextStyle(color: Colors.white),
+                                      "Aysuh Shukla",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontFamily: "Public Sans",
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
                                     Text(
-                                      "User@gmail.com",
-                                      // style: TextStyle(color: Colors.white)),
+                                      "Ayush Shukla",
+                                      style: TextStyle(
+                                          fontFamily: "inter",
+                                          fontSize: 12,
+                                          color: Color(0xff7B7B7A)),
                                     ),
                                   ]),
                             ],
                           ),
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
+                        // const SizedBox(
+                        //   height: 20,
+                        // ),
                         ListView(
                           shrinkWrap: true,
                           children: [
-                            ListTile(
-                              onTap: () {
-                                Get.offAllNamed(OntapStore.routes[1]);
+                            // Swtich user switch bar
 
-                                setState(() {
-                                  OntapStore.index = 1;
-                                });
-                              },
-                              title: const Text(
-                                "Group",
-                              ),
-                              leading: const Icon(Icons.group),
-                            ),
-                            ListTile(
-                              onTap: () {
-                                Get.offAllNamed(OntapStore.routes[0]);
 
-                                setState(() {
-                                  OntapStore.index = 0;
-                                });
-                              },
-                              title: Text(
-                                "User",
-                              ),
-                              leading: Icon(Icons.person),
-                            ),
-                            ListTile(
-                              onTap: () {
-                                Get.toNamed(Routes.USER_GROUP_VIEW);
-                                setState(() {
-                                  OntapStore.index = 1;
-                                });
-                              },
-                              title: Text(
-                                "SwitchUser",
-                              ),
-                              leading: Icon(Icons.person),
-                            ),
-                            ListTile(
-                              onTap: () {
-                                // Get.offAllNamed(OntapStore.routes[0]);
-                                Get.toNamed(Routes.UserDiet);
-                                // setState(() {
-                                //   OntapStore.index = 0;
-                                // });
-                              },
-                              title: Text(
-                                "SwitchAdmin",
-                              ),
-                              leading: Icon(Icons.person),
-                            ),
+                            nav_row(
+                                redirect: () {},
+                                heading: "Profile",
+                                icon_v: Icons.perm_identity_outlined),
+                            nav_row(
+                                redirect: () {},
+                                heading: "Setting",
+                                icon_v: Icons.settings_outlined),
+                            nav_row(
+                                redirect: () {},
+                                heading: "Your Deit History",
+                                icon_v: Icons.list_alt_rounded),
+
+                            nav_row(
+                                redirect: () {
+                                  Get.offAllNamed(OntapStore.routes[0]);
+                                      Get.toNamed(Routes.UserDiet);
+                                      setState(() {
+                                        OntapStore.index = 0;});
+                                },
+                                heading: "Switch as Trainer ",
+                                icon_v: Icons.supervised_user_circle_outlined),
+                            nav_row(
+                                redirect: () {
+                                  Get.toNamed(Routes.USER_GROUP_VIEW);
+                                      setState(() {
+                                        OntapStore.index = 1;
+                                      });
+                                },
+                                heading: "Switch as user",
+                                icon_v: Icons.person),
+
+                            nav_row(
+                                redirect: () {},
+                                heading: "Help & Support",
+                                icon_v: Icons.headset_mic_outlined),
+                            // ListTile(
+                            //   onTap: () {
+                            //     Get.offAllNamed(OntapStore.routes[1]);
+                            //
+                            //     setState(() {
+                            //       OntapStore.index = 1;
+                            //     });
+                            //   },
+                            //   title: const Text(
+                            //     "Group",
+                            //   ),
+                            //   leading: const Icon(Icons.group),
+                            // ),
+                            // ListTile(
+                            //   onTap: () {
+                            //     Get.offAllNamed(OntapStore.routes[0]);
+                            //
+                            //     setState(() {
+                            //       OntapStore.index = 0;
+                            //     });
+                            //   },
+                            //   title: Text(
+                            //     "User",
+                            //   ),
+                            //   leading: Icon(Icons.person),
+                            // ),
+                            // ListTile(
+                            //   onTap: () {
+                            //     Get.toNamed(Routes.USER_GROUP_VIEW);
+                            //     setState(() {
+                            //       OntapStore.index = 1;
+                            //     });
+                            //   },
+                            //   title: Text(
+                            //     "SwitchUser",
+                            //   ),
+                            //   leading: Icon(Icons.person),
+                            // ),
+                            // ListTile(
+                            //   onTap: () {
+                            //     // Get.offAllNamed(OntapStore.routes[0]);
+                            //     Get.toNamed(Routes.UserDiet);
+                            //     // setState(() {
+                            //     //   OntapStore.index = 0;
+                            //     // });
+                            //   },
+                            //   title: Text(
+                            //     "SwitchAdmin",
+                            //   ),
+                            //   leading: Icon(Icons.person),
+                            // ),
                           ],
                         ),
                         const SizedBox(
@@ -163,6 +215,46 @@ class _DrawerMenuState extends State<DrawerMenu> {
             ),
           )
         : const SizedBox();
+  }
+}
+
+class nav_row extends StatelessWidget {
+  const nav_row(
+      {super.key,
+      required this.redirect,
+      required this.heading,
+      required this.icon_v});
+
+  final VoidCallback redirect;
+  final String heading;
+  final IconData icon_v;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 20),
+      alignment: Alignment.center,
+      width: double.infinity,
+      height: 50,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: Color(0xff333333),
+      ),
+      child: ListTile(
+        onTap: () {
+          redirect();
+        },
+        leading: Icon(
+          icon_v,
+          color: Color(0xffDBDBDB),
+        ),
+        title: Text(
+          "$heading",
+          style: TextStyle(color: Color(0xffDBDBDB)),
+        ),
+        trailing: Icon(Icons.arrow_forward_ios, color: Color(0xffDBDBDB)),
+      ),
+    );
   }
 }
 
