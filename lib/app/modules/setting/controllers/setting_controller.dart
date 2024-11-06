@@ -1,23 +1,24 @@
 import 'package:get/get.dart';
 
 class SettingController extends GetxController {
-  //TODO: Implement SettingController
+  // Define any observable variables or methods if needed, e.g.:
+  var isChatSelected = false.obs;
 
-  final count = 0.obs;
-  @override
-  void onInit() {
-    super.onInit();
+  // Method examples for handling button presses
+  void onChatPressed() {
+    isChatSelected.value = true;
+    // Add your chat functionality here
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  void onVoiceCallPressed() {
+    // Add your voice call functionality here
   }
 
-  @override
-  void onClose() {
-    super.onClose();
+  void onVideoCallPressed() {
+    // Add your video call functionality here
   }
 
-  void increment() => count.value++;
+  void onChatbotPressed() {
+    // Add your chatbot chat functionality here
+  }
 }
