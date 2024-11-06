@@ -5,6 +5,9 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/modules/create_meal/controllers/create_meal_controller.dart';
 
+import '../../../widgets/ingredient_input.dart';
+import '../../../widgets/secondary_text_fileds.dart';
+
 class CreateMealPage extends StatefulWidget {
   final CreateMealController controller;
   final String id;
@@ -256,7 +259,7 @@ class _CreateMealPageState extends State<CreateMealPage> {
                         .add({"name": "", "amount": "", "unit": ""});
                   },
                   icon: Icon(Icons.add),
-                  label: Text("Add Meal"),
+                  label: Text("Add ingredient"),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Color(0XFF242522),
                     backgroundColor: Color(0XFFCDE26D),
@@ -294,80 +297,33 @@ class _CreateMealPageState extends State<CreateMealPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            child: TextField(
+                            child: ReusableTextField(
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                                 FilteringTextInputFormatter.allow(RegExp(
                                     r'^[0-9]+$')), // Restricts input to digits
                               ],
                               controller: widget.controller.kcalController,
-                              decoration: InputDecoration(
-                                labelText: "kcal",
-                                labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
-                                filled: true,
-                                fillColor: Color(0XFF242522),
-                                // Setting the border with a slight rounding effect
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent), // Transparent border
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent), // Transparent border
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent), // Transparent border
-                                ),
-                              ),
+
+                              labelText: "kcal",
+                              // labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
+                              filled: true,
+                              fillColor: Color(0XFF242522),
                             ),
                           ),
+
                           SizedBox(width: 10), // Space between the fields
                           Expanded(
-                            child: TextFormField(
+                            child: ReusableTextField(
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                                 FilteringTextInputFormatter.allow(RegExp(
                                     r'^[0-9]+$')), // Restricts input to digits
                               ],
+                              labelText: "Carbs",
                               controller: widget.controller.carbsController,
-                              decoration: InputDecoration(
-                                labelText: "Carbs",
-                                labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
-                                filled: true,
-                                fillColor: Color(0XFF242522),
-                                // Setting the border with a slight rounding effect
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent), // Transparent border
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent), // Transparent border
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent), // Transparent border
-                                ),
-                              ),
+
+                              // Setting the border with a slight rounding effect
                             ),
                           ),
                         ],
@@ -377,80 +333,33 @@ class _CreateMealPageState extends State<CreateMealPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            child: TextField(
+                            child: ReusableTextField(
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                                 FilteringTextInputFormatter.allow(RegExp(
                                     r'^[0-9]+$')), // Restricts input to digits
                               ],
                               controller: widget.controller.proteinController,
-                              decoration: InputDecoration(
-                                labelText: "Protein",
-                                labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
-                                filled: true,
-                                fillColor: Color(0XFF242522),
-                                // Setting the border with a slight rounding effect
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent), // Transparent border
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent), // Transparent border
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent), // Transparent border
-                                ),
-                              ),
+
+                              labelText: "Protein",
+                              // labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
                             ),
                           ),
                           SizedBox(width: 10), // Space between the fields
                           Expanded(
-                            child: TextField(
+                            child: ReusableTextField(
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                                 FilteringTextInputFormatter.allow(RegExp(
                                     r'^[0-9]+$')), // Restricts input to digits// Restricts input to digits
                               ],
                               controller: widget.controller.fatsController,
-                              decoration: InputDecoration(
-                                labelText: "Fats",
-                                labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
-                                filled: true,
-                                fillColor: Color(0XFF242522),
-                                // Setting the border with a slight rounding effect
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent), // Transparent border
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent), // Transparent border
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                  borderSide: BorderSide(
-                                      color: Colors
-                                          .transparent), // Transparent border
-                                ),
-                              ),
+                              // decoration: InputDecoration(
+                              labelText: "Fats",
+                              // labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
+                              // filled: true,
+                              // fillColor: Color(0XFF242522),
+                              // // Setting the border with a slight rounding effect
                             ),
                           ),
                         ],
@@ -504,120 +413,6 @@ class _CreateMealPageState extends State<CreateMealPage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class IngredientInput extends StatelessWidget {
-  final int index;
-  final CreateMealController controller;
-  final VoidCallback onRemove;
-
-  IngredientInput({
-    required this.onRemove,
-    required this.index,
-    required this.controller,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin:
-          EdgeInsets.only(bottom: 10), // Add margin at the bottom for spacing
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              onChanged: (value) {
-                controller.ingredientControllers[index]["name"] = value;
-              },
-              maxLines: 1,
-              decoration: InputDecoration(
-                labelText: "Describe the recipe",
-                labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
-                filled: true,
-                fillColor: Color(0XFF242522),
-                border: InputBorder.none,
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  borderSide: BorderSide(
-                      color: Colors
-                          .transparent), // Transparent border when focused
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  borderSide: BorderSide(
-                      color: Colors
-                          .transparent), // Transparent border when enabled
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: 10),
-          Container(
-            width: 80, // Set width for the quantity field to make it smaller
-            child: TextField(
-              onChanged: (value) {
-                controller.ingredientControllers[index]["amount"] = value;
-              },
-              maxLines: 1,
-              decoration: InputDecoration(
-                labelText: "Amount",
-                labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
-                filled: true,
-                fillColor: Color(0XFF242522),
-                border: InputBorder.none,
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  borderSide: BorderSide(
-                      color: Colors
-                          .transparent), // Transparent border when focused
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  borderSide: BorderSide(
-                      color: Colors
-                          .transparent), // Transparent border when enabled
-                ),
-              ),
-            ),
-          ),
-          SizedBox(width: 10), // Space between the two fields
-          Container(
-            width: 80, // Set width for the quantity field to make it smaller
-            child: TextField(
-              onChanged: (value) {
-                controller.ingredientControllers[index]["unit"] = value;
-              },
-              maxLines: 1,
-              decoration: InputDecoration(
-                labelText: "Q-Ty",
-                labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
-                filled: true,
-                fillColor: Color(0XFF242522),
-                border: InputBorder.none,
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  borderSide: BorderSide(
-                      color: Colors
-                          .transparent), // Transparent border when focused
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  borderSide: BorderSide(
-                      color: Colors
-                          .transparent), // Transparent border when enabled
-                ),
-              ),
-            ),
-          ),
-
-          IconButton(
-            icon: Icon(Icons.remove_circle_outline, color: Colors.red),
-            onPressed: onRemove,
-          ),
-        ],
       ),
     );
   }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-import '../../../core/base/constants/appcolor.dart';
+import '../core/base/constants/appcolor.dart';
 
-class NutritionalHistoryCard extends StatefulWidget {
+class NutritionalCard extends StatefulWidget {
   final dynamic data;
   final String id;
   final String title;
@@ -15,9 +16,10 @@ class NutritionalHistoryCard extends StatefulWidget {
   final String carbs;
   final String? image;
 
-  // final ValueChanged<bool?> onChanged;
+  final bool isChecked;
+  final ValueChanged<bool?> onChanged;
 
-  NutritionalHistoryCard({
+  NutritionalCard({
     required this.title,
     required this.kcal,
     required this.weight,
@@ -27,13 +29,15 @@ class NutritionalHistoryCard extends StatefulWidget {
     this.image,
     required this.id,
     this.data,
+    required this.isChecked,
+    required this.onChanged,
   });
 
   @override
-  State<NutritionalHistoryCard> createState() => _NutritionalHistoryCardState();
+  State<NutritionalCard> createState() => _NutritionalCardState();
 }
 
-class _NutritionalHistoryCardState extends State<NutritionalHistoryCard> {
+class _NutritionalCardState extends State<NutritionalCard> {
   final GetStorage box = GetStorage();
   Map<int, bool> isCheck = {};
 
@@ -115,40 +119,57 @@ class _NutritionalHistoryCardState extends State<NutritionalHistoryCard> {
                   ),
                 ],
               ),
-              PopupMenuButton<String>(
-                // foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+              Row(
+                children: [
+                  PopupMenuButton<String>(
+                    // foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
 
-                onSelected: (value) {},
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    onTap: () {
-                      box.write("mealdetails", widget.data);
-                      Get.toNamed('/meals-details?id=${widget.id}');
-                    },
-                    child: Text(
-                      "Meal Details",
-                      style: TextStyle(color: Colors.black),
+                    onSelected: (value) {},
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        onTap: () {
+                          box.write("mealdetails", widget.data);
+                          Get.toNamed('/meals-details?id=${widget.id}');
+                        },
+                        child: Text(
+                          "Meal Details",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        value: "Meal Details",
+                      ),
+                      PopupMenuItem(
+                        value: "Option 2",
+                        child: Text("Option 2",
+                            style: TextStyle(color: Colors.black)),
+                      ),
+                      PopupMenuItem(
+                        value: "Option 3",
+                        child: Text("Option 3",
+                            style: TextStyle(color: Colors.black)),
+                      ),
+                    ],
+                    child: Container(
+                        height: 30,
+                        width: 30,
+                        decoration: BoxDecoration(
+                            color: AppColors.chineseGreen,
+                            shape: BoxShape.circle),
+                        child: Icon(Icons.more_horiz, color: Colors.black)),
+                    // Icon that opens the menu
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Checkbox(
+                    checkColor: Colors.white,
+                    side: BorderSide(
+                      width: 2,
+                      color: AppColors.chineseGreen,
                     ),
-                    value: "Meal Details",
-                  ),
-                  PopupMenuItem(
-                    value: "Option 2",
-                    child:
-                        Text("Option 2", style: TextStyle(color: Colors.black)),
-                  ),
-                  PopupMenuItem(
-                    value: "Option 3",
-                    child:
-                        Text("Option 3", style: TextStyle(color: Colors.black)),
-                  ),
+                    value: widget.isChecked,
+                    onChanged: widget.onChanged,
+                  )
                 ],
-                child: Container(
-                    height: 30,
-                    width: 30,
-                    decoration: BoxDecoration(
-                        color: AppColors.chineseGreen, shape: BoxShape.circle),
-                    child: Icon(Icons.more_horiz, color: Colors.black)),
-                // Icon that opens the menu
               ),
             ],
           ),

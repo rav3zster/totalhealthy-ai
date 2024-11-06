@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/meals_details_controller.dart';
-import '../widgets/meals_details_page.dart';
+import 'meals_details_page.dart';
 
 class MealsDetailsScreen extends GetView<MealsDetailsController> {
   MealsDetailsScreen({super.key});

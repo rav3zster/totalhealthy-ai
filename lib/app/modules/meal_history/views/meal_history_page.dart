@@ -5,14 +5,14 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import 'package:totalhealthy/app/modules/meal_history/controllers/meal_history_controller.dart';
-import 'package:totalhealthy/app/modules/meal_history/widgets/button_selector.dart';
+import 'package:totalhealthy/app/widgets/button_selector.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
 import '../../../core/base/controllers/auth_controller.dart';
-import 'nutritional_history_card.dart';
+import '../../../widgets/nutritional_history_card.dart';
 
 class MealHistoryPage extends StatefulWidget {
   final MealHistoryController controller;

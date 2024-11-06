@@ -7,7 +7,7 @@ import 'package:totalhealthy/app/modules/meals_details/controllers/meals_details
 
 import '../../../core/base/constants/appcolor.dart';
 
-import '../../user_diet_screen/widgets/nutritional_card.dart';
+import '../../../widgets/nutritional_card.dart';
 
 class MealsDetailsPage extends StatefulWidget {
   final String id;

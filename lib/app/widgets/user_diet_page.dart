@@ -5,15 +5,16 @@ import 'package:totalhealthy/app/modules/meals_details/controllers/meals_details
 import 'package:totalhealthy/app/modules/user_diet_screen/controllers/user_diet_screen_controllers.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
-import '../../../core/base/apiservice/api_endpoints.dart';
-import '../../../core/base/apiservice/api_status.dart';
-import '../../../core/base/apiservice/base_methods.dart';
-import '../../../core/base/constants/appcolor.dart';
-import '../../../core/base/controllers/auth_controller.dart';
+import '../core/base/apiservice/api_endpoints.dart';
+import '../core/base/apiservice/api_status.dart';
+import '../core/base/apiservice/base_methods.dart';
+import '../core/base/constants/appcolor.dart';
+import '../core/base/controllers/auth_controller.dart';
 
-import '../../../routes/app_pages.dart';
-import '../../client_dashboard/views/client_dashboard_views.dart';
-import '../../meal_history/widgets/button_selector.dart';
+import '../routes/app_pages.dart';
+import 'client_card.dart';
+import '../modules/client_dashboard/views/client_dashboard_views.dart';
+import 'button_selector.dart';
 import 'add_meal_button.dart';
 import 'nutritional_card.dart';
 
@@ -26,9 +27,13 @@ class UserDietPage extends StatefulWidget {
 }
 
 class _UserDietPageState extends State<UserDietPage> {
+  var userData = {};
   @override
   void initState() {
     super.initState();
+    GetStorage().hasData("userData")
+        ? userData = GetStorage().read("userData")
+        : null;
     getMeals();
   }
 
@@ -147,6 +152,7 @@ class _UserDietPageState extends State<UserDietPage> {
     },
   ];
   int selectedIndex = 0;
+  var userController = Get.find<UserDietScreenController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -223,7 +229,11 @@ class _UserDietPageState extends State<UserDietPage> {
       body: ListView(
         padding: EdgeInsets.all(16),
         children: [
-          UserCard(),
+          ClientCard(
+            progress: 56,
+            email: "${userData["user_details"]["email"]}",
+            name: "${userData["user_details"]["name"]}",
+          ),
           SizedBox(height: 20),
           AddMealButton(id: widget.id),
           SizedBox(height: 20),
@@ -355,180 +365,6 @@ class _UserDietPageState extends State<UserDietPage> {
             height: 50,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class UserCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      color: Color(0XFF242424),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  children: [
-                    Container(
-                      width: 70,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.network(
-                          fit: BoxFit.cover,
-                          height: 90,
-                          'https://s3-alpha-sig.figma.com/img/4edc/c0b0/bdaf584c291418ad88b679516504a43c?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=IbcOURmNXhwmkM99WKqGORFkJ7KSTt0pp1OmymlK631~CIyf1SmXCL1KpE48OQ-5lUnzil5KzGReYJzSCncgs5qVicHLfvqkeM0ZeVv8dxIoaRluWoWbtDIq~8o~rFf5dObR7~UjhQpLyoNdgm8McqhDSxuRwT-oaTTV5ytgkQD3z0Nx75TsIBf~CgAgnxoDPMa-VLnkFrYU8n-wqj5sZW2VF8GFLzywTbLHjCst79zdudCa-1ZUMKV3jaMnCKcsDONFeJtfUFUZMAgTXV7RbQ7~5UAxyWeTgjeEDwN5K7wBOJOtLKAtyA7lbf019miLdNDr~xAzxDgZidpkm~9Rbg__',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(width: 15),
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'User Name:',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0XFFFFFFFF).withOpacity(0.75),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'Ayush Shukla',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Color(0XFFFFFFFF),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            'Plan Name:',
-                            style: TextStyle(
-                              color: Color(0XFFFFFFFF).withOpacity(0.75),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'Keto Plan',
-                            style: TextStyle(
-                              color: Color(0XFFFFFFFF),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            'Plan Duration:',
-                            style: TextStyle(
-                              color: Color(0XFFFFFFFF).withOpacity(0.75),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'Oct 1 - Nov 1',
-                            style: TextStyle(
-                              color: Color(0XFFFFFFFF),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            'Email:',
-                            style: TextStyle(
-                              color: Color(0XFFFFFFFF).withOpacity(0.75),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            'ayush@gmail.com',
-                            style: TextStyle(
-                              color: Color(0XFFFFFFFF),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                    ],
-                  ),
-                ),
-                // Row(
-                //   children: [
-                //     Container(
-                //       padding: EdgeInsets.all(4),
-                //       child: Icon(
-                //         Icons.local_post_office_outlined,
-                //         color: Color(0XFF242522),
-                //       ),
-                //       decoration: BoxDecoration(
-                //           color: Color(0XFFCDE26D), shape: BoxShape.circle),
-                //     ),
-                //     SizedBox(
-                //       width: 10,
-                //     ),
-                //     Container(
-                //       padding: EdgeInsets.all(4),
-                //       decoration: BoxDecoration(
-                //           color: Color(0XFFF5D657), shape: BoxShape.circle),
-                //       child: Icon(
-                //         Icons.call_outlined,
-                //         color: Color(0XFF242522),
-                //       ),
-                //     ),
-                //   ],
-                // ),
-              ],
-            ),
-            Text(
-              '85% Progress',
-              style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0XFFFFFFFF),
-                  fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 5),
-            LinearProgressIndicator(
-              value: 0.85,
-              backgroundColor: Colors.grey,
-              color: Color(0XFFF57552),
-              minHeight: 8, // Thickness of the progress bar
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/widgets/custom_button.dart';
 
-import '../../../core/base/apiservice/api_endpoints.dart';
-import '../../../core/base/apiservice/api_status.dart';
-import '../../../core/base/apiservice/base_methods.dart';
-import '../../../core/base/constants/appcolor.dart';
-import '../../../core/base/controllers/auth_controller.dart';
-import '../../../routes/app_pages.dart';
+import '../core/base/apiservice/api_endpoints.dart';
+import '../core/base/apiservice/api_status.dart';
+import '../core/base/apiservice/base_methods.dart';
+import '../core/base/constants/appcolor.dart';
+import '../core/base/controllers/auth_controller.dart';
+import '../routes/app_pages.dart';
 
 class AddMealButton extends StatefulWidget {
   final String id;

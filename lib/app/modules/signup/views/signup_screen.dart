@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/base/apiservice/api_endpoints.dart';
 
-
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../routes/app_pages.dart';
@@ -19,7 +18,6 @@ class SignupScreen extends StatefulWidget {
 class SignupScreenState extends State<SignupScreen> {
   bool isMaleSelected = false; // Track Male selection
   bool isFemaleSelected = false; // Track Female selection
-
 
   GlobalKey<FormState> key = GlobalKey<FormState>();
 
@@ -317,7 +315,7 @@ class SignupScreenState extends State<SignupScreen> {
                         fillColor: Color(0XFF242522),
                         hintText: 'Enter Your Password',
                         prefixIcon:
-                        Icon(Icons.lock_outline, color: Colors.white54),
+                            Icon(Icons.lock_outline, color: Colors.white54),
                         suffixIcon: Icon(Icons.visibility_outlined,
                             color: Colors.white54),
                         hintStyle: TextStyle(color: Colors.white54),
@@ -338,7 +336,9 @@ class SignupScreenState extends State<SignupScreen> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-                  SizedBox(height: 20,),
+                  SizedBox(
+                    height: 20,
+                  ),
                   Container(
                     margin: const EdgeInsets.only(right: 290),
                     child: const Text(

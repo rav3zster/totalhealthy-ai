@@ -1,6 +1,7 @@
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
@@ -9,10 +10,12 @@ import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
 
 import '../../../routes/app_pages.dart';
+import '../../../widgets/client_card.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/drawer_menu.dart';
 import '../../../widgets/phone_nav_bar.dart';
 import '../../group/views/add_client.dart';
+import '../../user_diet_screen/controllers/user_diet_screen_controllers.dart';
 
 class TrainerDashboardView extends StatefulWidget {
   @override
@@ -396,149 +399,46 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: groupMemberData.length,
-                    itemBuilder: (context, index) {
-                      var data = groupMemberData[index];
-                      return data["id"] != null
-                          ? InkWell(
-                              onTap: () {
-                                Get.toNamed("/userdiet?id=${data["id"]}");
-                              },
-                              child: clientCard("Not Found", "${data["email"]}",
-                                  "${data["phone_number"]}", 56, context),
-                            )
-                          : InkWell(
-                              onTap: () {
-                                Get.toNamed("/userdiet?id=${data["user_id"]}");
-                              },
-                              child: clientCard(
-                                  data["user_details"]["name"],
-                                  "${data["user_details"]["email"] ?? data["email"]}",
-                                  "${data["user_details"]["phone_number"] ?? data["phone_number"]}",
-                                  56,
-                                  context),
-                            );
-                    },
+                : Expanded(
+                    child: SingleChildScrollView(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: groupMemberData.length,
+                        itemBuilder: (context, index) {
+                          var data = groupMemberData[index];
+                          return data["id"] != null
+                              ? InkWell(
+                                  onTap: () {
+                                    // Get.toNamed("/userdiet?id=${data["id"]}");
+                                  },
+                                  child: ClientCard(
+                                    name: "Not Found",
+                                    email: "${data["email"]}",
+                                    progress: 56,
+                                  ),
+                                )
+                              : InkWell(
+                                  onTap: () {
+                                    Get.toNamed(
+                                        "/userdiet?id=${data["user_id"]}");
+                                    GetStorage().write("userData", data);
+                                  },
+                                  child: ClientCard(
+                                    name: "${data["user_details"]["name"]}",
+                                    email: "${data["user_details"]["email"]}",
+
+                                    // "${data["user_details"]["phone_number"] ?? data["phone_number"]}",
+
+                                    progress: 56,
+                                  ),
+                                );
+                        },
+                      ),
+                    ),
                   )
           ],
         ),
-      ),
-    );
-  }
-
-  Widget clientCard(String name, String plan, String duration, int progress,
-      BuildContext context) {
-    return Container(
-      height: 160,
-      // Increased height to make space for progress text
-      margin: EdgeInsets.symmetric(vertical: 10),
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Color(0xFF2E2E2E),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Stack(
-        children: [
-          // Content for client card
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Container(
-                  width: 60, // Set the width for the square
-                  height: 60, // Set the height for the square
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(
-                          'https://s3-alpha-sig.figma.com/img/4edc/c0b0/bdaf584c291418ad88b679516504a43c?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=IbcOURmNXhwmkM99WKqGORFkJ7KSTt0pp1OmymlK631~CIyf1SmXCL1KpE48OQ-5lUnzil5KzGReYJzSCncgs5qVicHLfvqkeM0ZeVv8dxIoaRluWoWbtDIq~8o~rFf5dObR7~UjhQpLyoNdgm8McqhDSxuRwT-oaTTV5ytgkQD3z0Nx75TsIBf~CgAgnxoDPMa-VLnkFrYU8n-wqj5sZW2VF8GFLzywTbLHjCst79zdudCa-1ZUMKV3jaMnCKcsDONFeJtfUFUZMAgTXV7RbQ7~5UAxyWeTgjeEDwN5K7wBOJOtLKAtyA7lbf019miLdNDr~xAzxDgZidpkm~9Rbg__'),
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.circular(8), // Rounded corners
-                  ),
-                ),
-                title: Text(
-                  'Client Name: $name',
-                  style: TextStyle(color: Color(0XFFFFFFFF), fontSize: 16),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Plan Name: $plan',
-                      style: TextStyle(color: Color(0XFFFFFFFF), fontSize: 14),
-                    ),
-                    Text(
-                      'Plan Duration: $duration',
-                      style: TextStyle(color: Color(0XFFFFFFFF), fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 5),
-              // Progress bar
-
-              // Progress Text below the progress bar
-
-              Text(
-                '$progress%', // Display progress percentage
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 5),
-              LinearProgressIndicator(
-                value: progress / 100,
-                backgroundColor: Colors.grey,
-                color: progress > 55 ? Colors.green : Colors.yellow,
-              ),
-            ],
-          ),
-          // Positioned Icons inside a circle at the top-right corner
-          Align(
-            alignment: Alignment.topRight,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 0.2, right: 8.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Space between the two icons
-                  GestureDetector(
-                    child: Container(
-                        padding: EdgeInsets.all(8), // Padding inside the circle
-                        decoration: BoxDecoration(
-                          color: Color(0XFFCDE26D), // Circle color for message
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.local_post_office_outlined,
-                          color: Color(0XFF242522),
-                        )),
-                    onTap: () {},
-                  ),
-                  SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                        padding: EdgeInsets.all(8), // Padding inside the circle
-                        decoration: BoxDecoration(
-                          color: Color(0XFFF5D657), // Circle color for phone
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.call_outlined,
-                          color: Color(0XFF242522),
-                        )),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

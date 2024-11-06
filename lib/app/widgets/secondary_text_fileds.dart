@@ -101,37 +101,34 @@ class ReusableTextField extends StatelessWidget {
           suffixText: suffixText,
           contentPadding: padding,
           hintStyle: hintStyle,
-          labelStyle: const TextStyle(
-            fontSize: 18,
-          ),
+          filled: true,
+          fillColor: Color(0XFF242522),
+          labelStyle: const TextStyle(color: Color(0XFF7E7E7E)),
           prefixIconConstraints: prefixIconConstraints,
           floatingLabelBehavior: floatingLabelBehavior,
 
           suffixIcon: suffixIcon,
           prefixIcon: prefixIcon,
-          fillColor: fillColor,
-          filled: filled,
+
           alignLabelWithHint: true,
           // suffix: Text("data"),
 
           labelText: labelText,
           hintText: hintText, // Set the hintText
-          disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
-            borderSide:
-                const BorderSide(color: Color.fromARGB(255, 215, 215, 215)),
-          ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
-            borderSide: borderSide,
+            borderRadius: BorderRadius.circular(8), // Rounded corners
+            borderSide:
+                BorderSide(color: Colors.transparent), // Transparent border
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
-            borderSide: borderSide,
+            borderRadius: BorderRadius.circular(8), // Rounded corners
+            borderSide:
+                BorderSide(color: Colors.transparent), // Transparent border
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
-            borderSide: borderSide,
+            borderRadius: BorderRadius.circular(8), // Rounded corners
+            borderSide:
+                BorderSide(color: Colors.transparent), // Transparent border
           ),
         ),
         maxLines: maxLines,

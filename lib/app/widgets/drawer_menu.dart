@@ -79,7 +79,6 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             ListTile(
                               onTap: () {
                                 Get.offAllNamed(OntapStore.routes[1]);
-
                                 setState(() {
                                   OntapStore.index = 1;
                                 });

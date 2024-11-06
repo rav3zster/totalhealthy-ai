@@ -9,6 +9,7 @@ import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../widgets/drawer_menu.dart';
+import '../../../widgets/group_card.dart';
 import '../../registration/views/registration_view.dart';
 import '../views/add_client.dart';
 import 'create_group.dart';
@@ -89,91 +90,7 @@ class _GroupListPageState extends State<GroupListPage> {
 
                       controller.group(group);
                     },
-                    child: Card(
-                      margin: EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Color(0XFF242522),
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                group["group_name"],
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0XFFDBDBDB)),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                group["description"],
-                                style: TextStyle(
-                                    fontSize: 16, color: Color(0XFF7E7E7E)),
-                              ),
-                              SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Container(
-                                      padding: EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                          color: Color(0XFFCDE26D)
-                                              .withOpacity(0.1),
-                                          shape: BoxShape.circle),
-                                      child: Icon(
-                                        Icons.calendar_today_outlined,
-                                        color: Color(0XFFCDE26D),
-                                        size: 18,
-                                      )),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text("Created On:"),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    "${group["created_at"]}",
-                                    style: TextStyle(
-                                        fontSize: 14, color: Color(0XFFFFFFFF)),
-                                  ),
-                                ],
-                              ),
-                              // Row(
-                              //   children: [
-                              //     Container(
-                              //         padding: EdgeInsets.all(8),
-                              //         decoration: BoxDecoration(
-                              //             color:
-                              //                 Color(0XFFCDE26D).withOpacity(0.1),
-                              //             shape: BoxShape.circle),
-                              //         child: Icon(
-                              //           Icons.people_outline,
-                              //           color: Color(0XFFCDE26D),
-                              //           size: 18,
-                              //         )),
-                              //     SizedBox(
-                              //       width: 5,
-                              //     ),
-                              //     // Text("Total Members:"),
-                              //     // SizedBox(
-                              //     //   width: 10,
-                              //     // ),
-                              //     // Text(
-                              //     //   "12 Members",
-                              //     //   style: TextStyle(
-                              //     //       fontSize: 14, color: Color(0XFFFFFFFF)),
-                              //     // ),
-                              //   ],
-                              // ),
-                              //
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                    child: GroupCard(group: group),
                   );
                 },
               );
