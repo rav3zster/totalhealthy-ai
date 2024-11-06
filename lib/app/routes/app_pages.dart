@@ -29,6 +29,8 @@ import '../modules/nutrition_goal/bindings/nutrition_goal_binding.dart';
 import '../modules/nutrition_goal/views/nutrition_goal_view.dart';
 import '../modules/registration/bindings/registration_binding.dart';
 import '../modules/registration/views/registration_view.dart';
+import '../modules/setting/bindings/setting_binding.dart';
+import '../modules/setting/views/setting_view.dart';
 import '../modules/signup/bindings/signup_binding.dart';
 import '../modules/signup/views/signup_view.dart';
 import '../modules/swipe_screen/bindings/swipe_screen_bindings.dart';
@@ -148,6 +150,11 @@ class AppPages {
       name: _Paths.USER_GROUP_VIEW,
       page: () => const UserGroupView(),
       binding: UserGroupViewBinding(),
+    ),
+    GetPage(
+      name: _Paths.SETTING,
+      page: () => const SettingView(),
+      binding: SettingBinding(),
     ),
   ];
 }

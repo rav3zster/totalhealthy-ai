@@ -25,6 +25,7 @@ abstract class Routes {
   static const GROUP = _Paths.GROUP;
   static const ONBOARDING = _Paths.ONBOARDING;
   static const USER_GROUP_VIEW = _Paths.USER_GROUP_VIEW;
+  static const SETTING = _Paths.SETTING;
 }
 
 abstract class _Paths {
@@ -50,4 +51,5 @@ abstract class _Paths {
   static const FORGETPASSWORD = '/forgot-password';
   static const GROUP = '/group';
   static const USER_GROUP_VIEW = '/user-group-view';
+  static const SETTING = '/setting';
 }
