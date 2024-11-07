@@ -19,6 +19,7 @@ class _LoginViewState extends State<LoginView> {
   GlobalKey<FormState> key = GlobalKey<FormState>();
 
   bool isLoading = false;
+  bool _isObscured = true;
 
   Future<void> submitUser() async {
     try {
@@ -86,20 +87,35 @@ class _LoginViewState extends State<LoginView> {
                     height: 40,
                   ),
                   // Title
-                  Text(
-                    'Login To TotalHealthy',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0XFFFFFFFF),
-                    ),
-                    textAlign: TextAlign.center,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Login To Total',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0XFFFFFFFF),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        'Healthy',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFF5D657),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                   SizedBox(height: 10),
                   Text(
                     'Welcome Back!',
                     style: TextStyle(
                       fontSize: 20,
+                      fontWeight: FontWeight.w400,
                       color: Color(0XFFFFFFFF),
                     ),
                     textAlign: TextAlign.center,
@@ -122,7 +138,7 @@ class _LoginViewState extends State<LoginView> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Color(0XFF242522),
-                      hintText: 'enter your email address',
+                      hintText: 'Enter your email address',
                       prefixIcon:
                           Icon(Icons.email_outlined, color: Colors.white54),
                       hintStyle: TextStyle(color: Colors.white54),
@@ -157,14 +173,27 @@ class _LoginViewState extends State<LoginView> {
                   // Password Field
                   TextFormField(
                     controller: pass,
+                    obscureText: _isObscured,
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Color(0XFF242522),
                       hintText: 'Enter Your Password',
                       prefixIcon:
                           Icon(Icons.lock_outline, color: Colors.white54),
-                      suffixIcon: Icon(Icons.visibility_outlined,
-                          color: Colors.white54),
+
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isObscured
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          color: Colors.white54,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isObscured = !_isObscured;
+                          });
+                        },
+                      ),
                       hintStyle: TextStyle(color: Colors.white54),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
