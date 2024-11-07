@@ -9,6 +9,9 @@ class UserGroupView extends GetView<UserGroupViewController> {
   const UserGroupView({super.key});
   @override
   Widget build(BuildContext context) {
-    return GroupListPage();
+    bool isUser = (Get.parameters["isUser"] ?? "false") == "true";
+    return GroupListPage(
+      isUser: isUser,
+    );
   }
 }

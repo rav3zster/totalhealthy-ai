@@ -1,8 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import '../../../routes/app_pages.dart';
 
+import '../../../widgets/switch_role_screen.dart';
 import 'theme_controller.dart';
 
 class AuthController extends GetxController {
@@ -35,7 +37,9 @@ class AuthController extends GetxController {
     authToken = box.read("authToken");
 
     print("sdadada${token},${refToken}");
-    Get.toNamed(Routes.TrainerDashboard);
+    Get.to(() => SwitchRoleScreen());
+
+    // Get.toNamed(Routes.ClientDashboard);
   }
 
   initAuth() async {

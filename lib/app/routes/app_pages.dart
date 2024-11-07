@@ -43,6 +43,7 @@ import '../modules/user_group_view/bindings/user_group_view_binding.dart';
 import '../modules/user_group_view/views/user_group_view.dart';
 import '../modules/welcom_screen/bindings/welcome-screen-bindings.dart';
 import '../modules/welcom_screen/views/welcome-screen-views.dart';
+import '../widgets/switch_role_screen.dart';
 
 part 'app_routes.dart';
 
@@ -116,6 +117,10 @@ class AppPages {
         page: () => TrainerDashboardView(),
         binding: TrainerDashboardBindings(),
         middlewares: [AuthCheckMiddleware()]),
+    GetPage(
+      name: _Paths.SWITCHROLE,
+      page: () => SwitchRoleScreen(),
+    ),
     GetPage(
         name: _Paths.UserDiet,
         page: () => UserDietView(),

@@ -35,10 +35,7 @@ class SignupScreenState extends State<SignupScreen> {
           "phone_number": phoneNumberController.text.trim()
         };
         print(data);
-        // signupUser(
-        //   APIEndpoints.auth.signup,
-        //   data,
-        // );
+
         await APIMethods.post
             .post(url: APIEndpoints.auth.signup, map: data)
             .then((value) {
@@ -218,6 +215,7 @@ class SignupScreenState extends State<SignupScreen> {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 20),
                   Container(
                     margin: const EdgeInsets.only(right: 320),

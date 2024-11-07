@@ -92,22 +92,34 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       bottomNavigationBar: MobileNavBar(),
       backgroundColor: Colors.black,
       appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              Get.toNamed('/userdiet?id=$id');
-            },
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Colors.white,
-            )),
+        automaticallyImplyLeading: false,
+        // leading: IconButton(
+        //     onPressed: () {
+        //       Get.toNamed('/userdiet?id=$id');
+        //     },
+        //     icon: Icon(
+        //       Icons.arrow_back_ios,
+        //       color: Colors.white,
+        //     )),
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Row(
           children: [
-            CircleAvatar(
-              maxRadius: 28,
-              backgroundImage: NetworkImage(
-                  'https://s3-alpha-sig.figma.com/img/519d/a5b3/5dd7c94081b46b1030716f9a99bda058?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=jenxaaauev~xejor2UuGg8xXNQB-ugvjmHoiV6RcNYBQnj-hr1VQ20Pbprvw3fWQXO15QJFXc0Y3th0TAjya4d2TDqRdQBfcw171WpKTXMLmNMY0JHYemzsMAxDhHBEj-YGN~mHOiegyTMzi0~RjHZygBWfR4QbwdmR1ec3ITjoqefk8JaSfq4fbIXemlAvJsTO4-vTxp0ZGSZ2U24NawVgj0FP9BkCADm41VTdZg7bQLe0quP~0-~oUARPGRnm83vvDLQSjdFNn3sKVNMMXsbNSYLKtZOyA6OdcroUS8lEZvrKXyLjLYffXv~3IGOH1yVMMFdwyNId06kR32T468g__'), // Profile image
+            Builder(
+              builder: (context) {
+                return Center(
+                  child: InkWell(
+                    onTap: () {
+                      Scaffold.of(context).openDrawer();
+                    },
+                    child: CircleAvatar(
+                      maxRadius: 28,
+                      backgroundImage: NetworkImage(
+                          'https://s3-alpha-sig.figma.com/img/519d/a5b3/5dd7c94081b46b1030716f9a99bda058?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=jenxaaauev~xejor2UuGg8xXNQB-ugvjmHoiV6RcNYBQnj-hr1VQ20Pbprvw3fWQXO15QJFXc0Y3th0TAjya4d2TDqRdQBfcw171WpKTXMLmNMY0JHYemzsMAxDhHBEj-YGN~mHOiegyTMzi0~RjHZygBWfR4QbwdmR1ec3ITjoqefk8JaSfq4fbIXemlAvJsTO4-vTxp0ZGSZ2U24NawVgj0FP9BkCADm41VTdZg7bQLe0quP~0-~oUARPGRnm83vvDLQSjdFNn3sKVNMMXsbNSYLKtZOyA6OdcroUS8lEZvrKXyLjLYffXv~3IGOH1yVMMFdwyNId06kR32T468g__'), // Profile image
+                    ),
+                  ),
+                );
+              },
             ),
             SizedBox(width: 10),
             Column(

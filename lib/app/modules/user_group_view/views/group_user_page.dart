@@ -13,6 +13,9 @@ import '../../user_diet_screen/controllers/user_diet_screen_controllers.dart';
 import '../controllers/user_group_view_controller.dart';
 
 class GroupListPage extends StatefulWidget {
+  const GroupListPage({super.key, this.isUser = false});
+  final bool isUser;
+
   @override
   State<GroupListPage> createState() => _GroupListPageState();
 }
@@ -72,7 +75,9 @@ class _GroupListPageState extends State<GroupListPage> {
                   final group = controller.groupData[index];
                   return GestureDetector(
                       onTap: () {
-                        Get.toNamed(Routes.TrainerDashboard);
+                        widget.isUser
+                            ? Get.toNamed(Routes.ClientDashboard)
+                            : Get.toNamed(Routes.TrainerDashboard);
                         Get.find<AuthController>()
                             .groupIdStore(group["group_id"]);
                       },

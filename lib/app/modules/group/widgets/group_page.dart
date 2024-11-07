@@ -27,8 +27,9 @@ class _GroupListPageState extends State<GroupListPage> {
     return Scaffold(
       bottomNavigationBar: MobileNavBar(),
       backgroundColor: const Color(0XFF0C0C0C),
-      drawer: DrawerMenu(),
+      // drawer: DrawerMenu(),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Color(0XFF0C0C0C),
 
         // leading: IconButton(

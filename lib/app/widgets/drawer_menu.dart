@@ -91,32 +91,32 @@ class _DrawerMenuState extends State<DrawerMenu> {
                           children: [
                             // Swtich user switch bar
 
-                            nav_row(
+                            NavRow(
                                 redirect: () {},
                                 heading: "Profile",
                                 icon_v: Icons.perm_identity_outlined),
-                            nav_row(
+                            NavRow(
                                 redirect: () {},
                                 heading: "Setting",
                                 icon_v: Icons.settings_outlined),
-                            nav_row(
+                            NavRow(
                                 redirect: () {},
                                 heading: "Your Deit History",
                                 icon_v: Icons.list_alt_rounded),
 
-                            nav_row(
+                            NavRow(
                                 redirect: () {
-                                  Get.offAllNamed(OntapStore.routes[0]);
-                                  Get.toNamed(Routes.UserDiet);
+                                  Get.toNamed(Routes.USER_GROUP_VIEW);
                                   setState(() {
-                                    OntapStore.index = 0;
+                                    OntapStore.index = 1;
                                   });
                                 },
                                 heading: "Switch as Trainer ",
                                 icon_v: Icons.supervised_user_circle_outlined),
-                            nav_row(
+                            NavRow(
                                 redirect: () {
-                                  Get.toNamed(Routes.USER_GROUP_VIEW);
+                                  Get.toNamed(
+                                      "${Routes.USER_GROUP_VIEW}?isUser=true");
                                   setState(() {
                                     OntapStore.index = 1;
                                   });
@@ -124,7 +124,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                 heading: "Switch as user",
                                 icon_v: Icons.person),
 
-                            nav_row(
+                            NavRow(
                                 redirect: () {},
                                 heading: "Help & Support",
                                 icon_v: Icons.headset_mic_outlined),
@@ -218,8 +218,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
   }
 }
 
-class nav_row extends StatelessWidget {
-  const nav_row(
+class NavRow extends StatelessWidget {
+  const NavRow(
       {super.key,
       required this.redirect,
       required this.heading,

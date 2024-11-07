@@ -52,4 +52,5 @@ abstract class _Paths {
   static const GROUP = '/group';
   static const USER_GROUP_VIEW = '/user-group-view';
   static const SETTING = '/setting';
+  static const SWITCHROLE = '/switch-role';
 }

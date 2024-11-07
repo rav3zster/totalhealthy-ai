@@ -20,12 +20,14 @@ class ThemeController extends GetxController {
     ),
 
     listTileTheme: const ListTileThemeData(
+        iconColor: Colors.white,
         titleTextStyle:
-            TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
     // cardTheme: CardTheme(color: AppColors.primarygreen),
-    scaffoldBackgroundColor: AppColors.white,
+    scaffoldBackgroundColor: AppColors.black,
+
     iconTheme: const IconThemeData(
-      color: AppColors.customGreen,
+      color: AppColors.white,
     ),
     textTheme: const TextTheme(
       displayLarge: TextStyle(color: Colors.white),
@@ -69,15 +71,15 @@ class ThemeController extends GetxController {
         borderRadius: BorderRadius.circular(4.0),
       ),
     ),
-
     colorScheme: AppColorSchemes.lightColorScheme,
     useMaterial3: true,
+
     appBarTheme: const AppBarTheme(
-      color: AppColors.lightGrey,
+      color: AppColors.black,
       iconTheme: IconThemeData(color: AppColors.white),
       titleTextStyle: TextStyle(
-        color: AppColors.black,
-        fontSize: 20,
+        color: AppColors.white,
+        fontSize: 18,
         fontWeight: FontWeight.bold,
       ),
     ),
