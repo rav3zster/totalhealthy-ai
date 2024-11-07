@@ -13,7 +13,8 @@ class SwitchRoleScreen extends StatefulWidget {
   State<SwitchRoleScreen> createState() => _SwitchRoleScreenState();
 }
 
-class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
+class _SwitchRoleScreenState extends State<SwitchRoleScreen>
+{
   bool isMaleSelected = false; // Track Male selection
   bool isFemaleSelected = false;
   String slectedValue = "";
