@@ -29,10 +29,10 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
   @override
   void initState() {
     super.initState();
-
-    dataList = box.read(
-      "mealPlan",
-    );
+    getMeals();
+    // dataList = box.read(
+    //   "mealPlan",
+    // );
   }
 
   var dataList = [];
@@ -45,8 +45,7 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
       });
       await APIMethods.get
           .get(
-        url: APIEndpoints.meals.getadmindHistory(
-          widget.id,
+        url: APIEndpoints.meals.getuserdHistory(
           Get.find<AuthController>().groupgetId(),
         ),
       )
@@ -122,7 +121,7 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
         automaticallyImplyLeading: false,
         leading: IconButton(
             onPressed: () {
-              Get.toNamed("/userdiet?id=${widget.id}");
+              Get.back();
             },
             icon: Icon(
               Icons.arrow_back_ios,

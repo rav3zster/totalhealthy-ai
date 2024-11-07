@@ -93,6 +93,10 @@ class _Meals {
 
   String getadmindMeals(id, role) =>
       "${APIEndpoints.baseURL}$role/meals?groupId=$id";
+  String getuserdHistory(
+    id,
+  ) =>
+      "${APIEndpoints.baseURL}user/meals_history_meals?groupId=$id";
   String getadmindHistory(userId, groupId) =>
       "${APIEndpoints.baseURL}admin/meals_history_meals?groupId=$groupId&userId=$userId";
 }

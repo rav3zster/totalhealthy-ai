@@ -31,9 +31,7 @@ class _UserDietPageState extends State<UserDietPage> {
   @override
   void initState() {
     super.initState();
-    GetStorage().hasData("userData")
-        ? userData = GetStorage().read("userData")
-        : null;
+
     getMeals();
   }
 
@@ -47,8 +45,9 @@ class _UserDietPageState extends State<UserDietPage> {
       });
       await APIMethods.get
           .get(
-        url: APIEndpoints.meals
-            .getadmindMeals(Get.find<AuthController>().groupgetId(), "admin"),
+        url: APIEndpoints.meals.getuserdHistory(
+          Get.find<AuthController>().groupgetId(),
+        ),
       )
           .then((value) {
         if (APIStatus.success(value.statusCode)) {

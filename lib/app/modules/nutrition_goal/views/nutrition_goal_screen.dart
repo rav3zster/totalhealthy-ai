@@ -138,9 +138,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                       _pageController.nextPage(
                           duration: Duration(milliseconds: 500),
                           curve: Curves.easeIn);
-                    } else {
-                      Get.toNamed(Routes.MEAL_TIMING);
-                    }
+                    } else {}
                   },
                   child: Text("Continue",
                       style: TextStyle(color: Color(0XFF242522), fontSize: 18)),
