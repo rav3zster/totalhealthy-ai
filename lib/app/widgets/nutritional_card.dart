@@ -17,6 +17,7 @@ class NutritionalCard extends StatefulWidget {
   final String? image;
 
   final bool isChecked;
+  final String? role;
   final ValueChanged<bool?> onChanged;
 
   NutritionalCard({
@@ -31,6 +32,7 @@ class NutritionalCard extends StatefulWidget {
     this.data,
     required this.isChecked,
     required this.onChanged,
+    this.role,
   });
 
   @override
@@ -160,15 +162,17 @@ class _NutritionalCardState extends State<NutritionalCard> {
                   SizedBox(
                     width: 10,
                   ),
-                  Checkbox(
-                    checkColor: Colors.white,
-                    side: BorderSide(
-                      width: 2,
-                      color: AppColors.chineseGreen,
-                    ),
-                    value: widget.isChecked,
-                    onChanged: widget.onChanged,
-                  )
+                  widget.role == "admin"
+                      ? SizedBox()
+                      : Checkbox(
+                          checkColor: Colors.white,
+                          side: BorderSide(
+                            width: 2,
+                            color: AppColors.chineseGreen,
+                          ),
+                          value: widget.isChecked,
+                          onChanged: widget.onChanged,
+                        )
                 ],
               ),
             ],

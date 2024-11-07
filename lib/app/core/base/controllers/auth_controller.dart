@@ -29,11 +29,15 @@ class AuthController extends GetxController {
     isAuthenticated.refresh();
   }
 
-  setAuth(String token, String refToken) async {
+  roleStore(String role) => box.write("role", role);
+  String roleGet() => box.read("role");
+
+  setAuth(String token, String refToken, Map<String, dynamic> userData) async {
     isAuthenticated.value = true;
 
     await box.write('authToken', token);
     await box.write('refreshToken', refToken);
+    await userdataStore(userData);
     authToken = box.read("authToken");
 
     print("sdadada${token},${refToken}");
@@ -42,17 +46,17 @@ class AuthController extends GetxController {
     // Get.toNamed(Routes.ClientDashboard);
   }
 
-  initAuth() async {
-    // await configureAmplify();
+  // initAuth() async {
+  //   // await configureAmplify();
 
-    await validateAuth();
-    ever(isAuthenticated, (auth) => handleAuthChange());
-  }
+  //   await validateAuth();
+  //   ever(isAuthenticated, (auth) => handleAuthChange());
+  // }
 
-  validateAuth() async {
-    await tokenVaildate();
-    return isAuthenticated.value;
-  }
+  // validateAuth() async {
+  //   await tokenVaildate();
+  //   return isAuthenticated.value;
+  // }
 
   handleAuthChange() {
     print("handleAuthChange  ${Get.currentRoute}");
@@ -73,21 +77,21 @@ class AuthController extends GetxController {
   }
 
   groupgetId() => box.read("groupId");
-  usergetId() => box.read("userId");
+  userdataget() => box.read("userdata");
   groupIdStore(String id) async {
     await box.write("groupId", id);
     print(box.read("groupId"));
   }
 
-  userIdStore(String id) async {
-    await box.write("userId", id);
-    print(box.read("userId"));
+  userdataStore(userData) async {
+    await box.write("userdata", userData);
   }
 
   tokenVaildate() {
     if (box.hasData("authToken")) {
       isAuthenticated.value = true;
       authToken = box.read("authToken");
+
       print("ddf $authToken");
       var refreshTokend = box.read("refreshToken");
 

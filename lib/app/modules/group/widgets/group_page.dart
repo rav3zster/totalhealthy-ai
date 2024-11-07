@@ -75,26 +75,30 @@ class _GroupListPageState extends State<GroupListPage> {
       body: Obx(() {
         return controller.isLoading.value
             ? Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
               )
-            : ListView.builder(
-                itemCount: controller.groupData.length,
-                itemBuilder: (context, index) {
-                  final group = controller.groupData[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => GroupsViewScreen()),
-                      );
+            : controller.groupData.isEmpty
+                ? Center(child: Text("No data found"))
+                : ListView.builder(
+                    itemCount: controller.groupData.length,
+                    itemBuilder: (context, index) {
+                      final group = controller.groupData[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => GroupsViewScreen()),
+                          );
 
-                      controller.group(group);
+                          controller.group(group);
+                        },
+                        child: GroupCard(group: group),
+                      );
                     },
-                    child: GroupCard(group: group),
                   );
-                },
-              );
       }),
     );
   }

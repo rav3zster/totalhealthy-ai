@@ -298,6 +298,7 @@ class _UserDietPageState extends State<UserDietPage> {
                         return Padding(
                           padding: EdgeInsets.only(bottom: 15),
                           child: NutritionalCard(
+                            role: Get.find<AuthController>().roleGet(),
                             isChecked: isCheck[index] ?? false,
                             onChanged: (value) {
                               setState(() {

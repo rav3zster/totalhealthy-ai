@@ -1,16 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
+import '../../../core/base/constants/appcolor.dart';
 import '../../../core/base/controllers/auth_controller.dart';
 import '../../../widgets/daily_summery_card.dart';
 import '../../../widgets/drawer_menu.dart';
 import '../../../widgets/button_selector.dart';
-import '../../../widgets/nutritional_history_card.dart';
+import '../../../widgets/nutritional_card.dart';
+
 import '../../../widgets/add_meal_button.dart';
 
 class ClientDashboardScreen extends StatefulWidget {
@@ -40,10 +43,13 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       "icon": Icons.dinner_dining,
     },
   ];
-
+  var userData = {};
   @override
   void initState() {
     super.initState();
+    GetStorage().hasData("userdata")
+        ? userData = GetStorage().read("userdata")
+        : null;
     getMeals();
   }
 
@@ -84,10 +90,86 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     }
   }
 
+  Map<String, dynamic> generateJson() {
+    return {
+      "meal_ids": selectedMealIds,
+      "userId": userData["_id"],
+      "groupId": Get.find<AuthController>().groupgetId(),
+      "history_on_day": DateTime.now().toIso8601String(),
+    };
+  }
+
+  var isGetLoading = false;
+  Future<void> postHistory() async {
+    try {
+      setState(() {
+        isGetLoading = true;
+      });
+
+      var data = generateJson();
+      await APIMethods.post
+          .post(
+        url: APIEndpoints.createData.mealHistory,
+        map: data,
+      )
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          setState(() {
+            isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
+            selectedMealIds.clear();
+          });
+
+          Get.toNamed("/meal-history?id=${userData["_id"]}");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Successfull!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Not Found'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
+      // }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isGetLoading = false;
+      });
+    }
+  }
+
+  Map<int, bool> isCheck = {};
+
+  List<String> selectedMealIds = [];
   @override
   Widget build(BuildContext context) {
     String id = Get.parameters["id"] ?? "";
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: selectedMealIds.isNotEmpty
+          ? isGetLoading
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                )
+              : FloatingActionButton(
+                  backgroundColor: AppColors.chineseGreen,
+                  child: Icon(
+                    Icons.done,
+                    color: AppColors.cardbackground,
+                  ),
+                  onPressed: () {
+                    postHistory();
+                  })
+          : SizedBox(),
       drawer: DrawerMenu(),
       bottomNavigationBar: MobileNavBar(),
       backgroundColor: Colors.black,
@@ -300,7 +382,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
               SizedBox(height: 16),
 
               AddMealButton(
-                id: Get.find<AuthController>().usergetId() ?? "",
+                id: userData["_id"] ?? "",
               ),
               SizedBox(height: 16),
               Row(
@@ -362,11 +444,24 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                             var data = dataList[index];
                             return Padding(
                               padding: EdgeInsets.only(bottom: 15),
-                              child: NutritionalHistoryCard(
-                                // isChecked: isCheck[index] ?? false,
+                              child: NutritionalCard(
+                                // role: Get.find<AuthController>().roleGet(),
+                                isChecked: isCheck[index] ?? false,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isCheck[index] = value ?? false;
 
+                                    if (isCheck[index] == true) {
+                                      selectedMealIds.add(data['_id'] ?? '0');
+                                    } else {
+                                      selectedMealIds
+                                          .remove(data['_id'] ?? '0');
+                                    }
+                                    print(selectedMealIds);
+                                  });
+                                },
                                 data: data,
-                                id: "0",
+                                id: userData["_id"],
                                 title: "${data["name"] ?? "Not Found"}",
                                 kcal: "${data["kcal"] ?? "0"}",
                                 weight: 80,

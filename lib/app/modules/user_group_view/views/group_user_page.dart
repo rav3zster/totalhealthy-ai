@@ -25,7 +25,7 @@ class _GroupListPageState extends State<GroupListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: MobileNavBar(),
+      // bottomNavigationBar: MobileNavBar(),
       backgroundColor: const Color(0XFF0C0C0C),
       drawer: DrawerMenu(),
       appBar: AppBar(

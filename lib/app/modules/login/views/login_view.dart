@@ -37,10 +37,8 @@ class _LoginViewState extends State<LoginView> {
             .then((value) {
           if (APIStatus.success(value.statusCode)) {
             // clearDetails();
-            Get.find<AuthController>().setAuth(
-              value.data["access_token"],
-              value.data["refresh_token"],
-            );
+            Get.find<AuthController>().setAuth(value.data["access_token"],
+                value.data["refresh_token"], value.data["user_details"]);
 
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(

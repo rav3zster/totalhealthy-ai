@@ -235,10 +235,10 @@ class _GroupsViewScreenState extends State<GroupsViewScreen> {
                               itemCount: userData.length,
                               itemBuilder: (context, index) {
                                 var data = userData[index];
-                                data["role"] == "admin"
-                                    ? Get.find<AuthController>()
-                                        .userIdStore(data["user_id"])
-                                    : null;
+                                // data["role"] == "admin"
+                                //     ? Get.find<AuthController>()
+                                //         .userIdStore(data["user_id"])
+                                //     : null;
 
                                 return buildClientCard(
                                   context,

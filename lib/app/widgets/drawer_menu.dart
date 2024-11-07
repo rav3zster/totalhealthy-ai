@@ -96,40 +96,36 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                   Get.toNamed(Routes.Registration);
                                 },
                                 heading: "Profile",
-                                icon_v: Icons.perm_identity_outlined),
+                                icon: Icons.perm_identity_outlined),
                             NavRow(
                                 redirect: () {},
                                 heading: "Setting",
-                                icon_v: Icons.settings_outlined),
+                                icon: Icons.settings_outlined),
                             NavRow(
                                 redirect: () {},
                                 heading: "Your Deit History",
-                                icon_v: Icons.list_alt_rounded),
+                                icon: Icons.list_alt_rounded),
 
                             NavRow(
                                 redirect: () {
                                   Get.toNamed(Routes.USER_GROUP_VIEW);
-                                  setState(() {
-                                    OntapStore.index = 1;
-                                  });
+                                  Get.find<AuthController>().roleStore("admin");
                                 },
-                                heading: "Switch as Trainer ",
-                                icon_v: Icons.supervised_user_circle_outlined),
+                                heading: "Switch as Advisor",
+                                icon: Icons.supervised_user_circle_outlined),
                             NavRow(
                                 redirect: () {
                                   Get.toNamed(
                                       "${Routes.USER_GROUP_VIEW}?isUser=true");
-                                  setState(() {
-                                    OntapStore.index = 1;
-                                  });
+                                  Get.find<AuthController>().roleStore("user");
                                 },
-                                heading: "Switch as user",
-                                icon_v: Icons.person),
+                                heading: "Switch as Member",
+                                icon: Icons.person),
 
                             NavRow(
                                 redirect: () {},
                                 heading: "Help & Support",
-                                icon_v: Icons.headset_mic_outlined),
+                                icon: Icons.headset_mic_outlined),
                             // ListTile(
                             //   onTap: () {
                             //     Get.offAllNamed(OntapStore.routes[1]);
@@ -225,11 +221,11 @@ class NavRow extends StatelessWidget {
       {super.key,
       required this.redirect,
       required this.heading,
-      required this.icon_v});
+      required this.icon});
 
   final VoidCallback redirect;
   final String heading;
-  final IconData icon_v;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -247,7 +243,7 @@ class NavRow extends StatelessWidget {
           redirect();
         },
         leading: Icon(
-          icon_v,
+          icon,
           color: Color(0xffDBDBDB),
         ),
         title: Text(
