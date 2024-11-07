@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:totalhealthy/app/modules/generate_ai/views/generate_ai_screen.dart';
 import 'package:totalhealthy/app/modules/manage_accounts/views/manage_accounts_views.dart';
 
@@ -40,7 +42,9 @@ class RegistrationView extends StatelessWidget {
 
                     // Name
                     Text(
-                      'Jacob Jones',
+                      Get.find<AuthController>()
+                          .userdataget()["name"]
+                          .toString(),
                       style: TextStyle(
                           fontSize: 22,
                           color: Color(0XFFB2B2B2),
@@ -86,10 +90,10 @@ class RegistrationView extends StatelessWidget {
                       icon: Icons.link,
                       onTap: () {
                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ManageAccountScreen()),
-                      );
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ManageAccountScreen()),
+                        );
                       },
                     ),
                     _buildMenuOptionContainer(
@@ -100,7 +104,9 @@ class RegistrationView extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => GenerateAiPage(id: '',)),
+                              builder: (context) => GenerateAiPage(
+                                    id: '',
+                                  )),
                         );
                       },
                     ),

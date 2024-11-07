@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../core/base/constants/appcolor.dart';
+import '../core/base/controllers/auth_controller.dart';
 import '../routes/app_pages.dart';
 // ignore_for_file: prefer_const_constructors
 
@@ -26,7 +27,11 @@ class OntapStore {
 
 class _MobileNavBarState extends State<MobileNavBar> {
   ontapFunction(int value) {
-    Get.toNamed(OntapStore.routes[value]);
+    Get.toNamed(value == 0
+        ? Get.find<AuthController>().roleGet() == "admin"
+            ? Routes.TrainerDashboard
+            : OntapStore.routes[value]
+        : OntapStore.routes[value]);
 
     setState(() {
       OntapStore.index = value;
@@ -51,7 +56,7 @@ class _MobileNavBarState extends State<MobileNavBar> {
               borderRadius: BorderRadius.circular(20), // Circular shape
             ),
             labelTextStyle: MaterialStateProperty.resolveWith<TextStyle?>(
-                  (Set<MaterialState> states) {
+              (Set<MaterialState> states) {
                 if (states.contains(MaterialState.selected)) {
                   return TextStyle(
                     color: Color(0XFF808B4D),
@@ -72,7 +77,7 @@ class _MobileNavBarState extends State<MobileNavBar> {
           height: 65,
           selectedIndex: OntapStore.index,
           onDestinationSelected: (value) => ontapFunction(value),
-          destinations: const [
+          destinations: [
             NavigationDestination(
               icon: Icon(
                 Icons.person_outlined,
@@ -82,7 +87,9 @@ class _MobileNavBarState extends State<MobileNavBar> {
                 Icons.person,
                 color: Color(0xFFCDE26D),
               ),
-              label: "User",
+              label: Get.find<AuthController>().roleGet() == "admin"
+                  ? "Adviser"
+                  : "Member",
             ),
             NavigationDestination(
               icon: Icon(

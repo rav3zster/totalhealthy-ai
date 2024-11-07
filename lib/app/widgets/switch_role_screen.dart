@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/widgets/custom_button.dart';
 
+import '../core/base/controllers/auth_controller.dart';
 import '../routes/app_pages.dart';
 
 class SwitchRoleScreen extends StatefulWidget {
@@ -53,6 +54,7 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
             onTap: () {
               setState(() {
                 slectedValue = "isUser=false";
+                Get.find<AuthController>().roleStore("admin");
                 isMaleSelected = true;
                 isFemaleSelected = false; // Deselect female
               });
@@ -102,6 +104,7 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
             onTap: () {
               setState(() {
                 slectedValue = "isUser=true";
+                Get.find<AuthController>().roleStore("user");
                 isFemaleSelected = true;
                 isMaleSelected = false; // Deselect male
               });

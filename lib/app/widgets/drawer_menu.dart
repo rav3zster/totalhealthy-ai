@@ -102,7 +102,9 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                 heading: "Setting",
                                 icon: Icons.settings_outlined),
                             NavRow(
-                                redirect: () {},
+                                redirect: () {
+                                  Get.toNamed(Routes.MEAL_HISTORY);
+                                },
                                 heading: "Your Deit History",
                                 icon: Icons.list_alt_rounded),
 

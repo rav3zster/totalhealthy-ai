@@ -69,7 +69,9 @@ class AuthController extends GetxController {
               Get.currentRoute == '/signup' ||
               Get.currentRoute == '/onboarding' ||
               Get.currentRoute.isEmpty
-          ? Routes.ClientDashboard
+          ? box.read("role") == "admin"
+              ? Routes.TrainerDashboard
+              : Routes.ClientDashboard
           : Get.currentRoute;
     } else {
       return '/onboarding';
@@ -92,10 +94,9 @@ class AuthController extends GetxController {
       isAuthenticated.value = true;
       authToken = box.read("authToken");
 
-      print("ddf $authToken");
       var refreshTokend = box.read("refreshToken");
 
-      print("ddff $authToken");
+      print("authToken $authToken");
     } else {
       // Get.toNamed(Routes.Login);
 

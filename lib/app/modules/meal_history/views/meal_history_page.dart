@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-
+import 'package:intl/intl.dart';
 import 'package:totalhealthy/app/modules/meal_history/controllers/meal_history_controller.dart';
 import 'package:totalhealthy/app/widgets/button_selector.dart';
 
@@ -13,6 +13,7 @@ import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
 import '../../../core/base/controllers/auth_controller.dart';
 import '../../../widgets/nutritional_history_card.dart';
+import '../../../widgets/profile_card.dart';
 
 class MealHistoryPage extends StatefulWidget {
   final MealHistoryController controller;
@@ -35,9 +36,22 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
     // );
   }
 
-  var dataList = [];
-  var isLoading = false;
+  DateTime selectedDate = DateTime.now();
+  List<Map<String, dynamic>> recipesCotegory = [];
+  void filterRecipesBySingleCategory(String selectedCategory) {
+    setState(() {
+      recipesCotegory = filteredRecipes.where((recipe) {
+        final categories = recipe["categorys"] as List<dynamic>;
 
+        return categories.contains(selectedCategory);
+      }).toList();
+    });
+    print(filteredRecipes);
+  }
+
+  List<Map<String, dynamic>> dataList = [];
+  var isLoading = false;
+  var category = "Breakfast";
   Future<void> getMeals() async {
     try {
       setState(() {
@@ -52,8 +66,9 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
           .then((value) {
         if (APIStatus.success(value.statusCode)) {
           setState(() {
-            dataList = value.data;
+            dataList = List<Map<String, dynamic>>.from(value.data);
           });
+          _filterRecipesByDate(selectedDate);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -113,6 +128,21 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
     },
   ];
   int selectedIndex = 0;
+  int selectedIndex1 = 0;
+  List<Map<String, dynamic>> filteredRecipes = [];
+  void _filterRecipesByDate(DateTime selectedDate) {
+    setState(() {
+      filteredRecipes = dataList.where((recipe) {
+        final createdAt = DateTime.parse(recipe["created_at"]);
+        // Check if the year, month, and day match
+        return createdAt.year == selectedDate.year &&
+            createdAt.month == selectedDate.month &&
+            createdAt.day == selectedDate.day;
+      }).toList();
+    });
+    filterRecipesBySingleCategory(category);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,27 +159,8 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
             )),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Row(
-          children: [
-            CircleAvatar(
-              maxRadius: 28,
-              backgroundImage: NetworkImage(
-                  'https://s3-alpha-sig.figma.com/img/519d/a5b3/5dd7c94081b46b1030716f9a99bda058?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=jenxaaauev~xejor2UuGg8xXNQB-ugvjmHoiV6RcNYBQnj-hr1VQ20Pbprvw3fWQXO15QJFXc0Y3th0TAjya4d2TDqRdQBfcw171WpKTXMLmNMY0JHYemzsMAxDhHBEj-YGN~mHOiegyTMzi0~RjHZygBWfR4QbwdmR1ec3ITjoqefk8JaSfq4fbIXemlAvJsTO4-vTxp0ZGSZ2U24NawVgj0FP9BkCADm41VTdZg7bQLe0quP~0-~oUARPGRnm83vvDLQSjdFNn3sKVNMMXsbNSYLKtZOyA6OdcroUS8lEZvrKXyLjLYffXv~3IGOH1yVMMFdwyNId06kR32T468g__'), // Profile image
-            ),
-            SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 5,
-                ),
-                Text('Ayush Shukla',
-                    style: TextStyle(fontSize: 20, color: Colors.white)),
-                Text('Welcome!',
-                    style: TextStyle(fontSize: 14, color: Color(0XFF7B7B7A))),
-              ],
-            ),
-          ],
+        title: ProfileCard(
+          isDrawer: false,
         ),
       ),
       body: ListView(
@@ -209,7 +220,13 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                           child: EasyDateTimeLine(
                             activeColor: AppColors.chineseGreen,
                             initialDate: DateTime.now(),
-                            onDateChange: (selectedDate) {},
+                            onDateChange: (selectedDate) {
+                              print(selectedDate);
+                              setState(() {
+                                _filterRecipesByDate(selectedDate);
+                              });
+                              //
+                            },
                             headerProps: const EasyHeaderProps(
                                 monthPickerType: MonthPickerType.switcher,
                                 dateFormatter: DateFormatter.fullDateDMY(),
@@ -542,16 +559,18 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                       return GestureDetector(
                         onTap: () {
                           setState(() {
-                            selectedIndex = index;
+                            selectedIndex1 = index;
                             print("press");
                           });
+                          filterRecipesBySingleCategory(
+                              data["name"].toString());
                         },
                         child: Padding(
                           padding: EdgeInsets.only(left: 10),
                           child: ButtonSelector(
                             title: data["name"].toString(),
                             icon: data["icon"] as IconData,
-                            active: index == selectedIndex,
+                            active: index == selectedIndex1,
                           ),
                         ),
                       );
@@ -566,7 +585,7 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                     ? Center(
                         child: CircularProgressIndicator(),
                       )
-                    : dataList.isEmpty
+                    : recipesCotegory.isEmpty
                         ? Center(
                             child: Column(
                               children: [
@@ -583,9 +602,9 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                         : ListView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
-                            itemCount: dataList.length,
+                            itemCount: recipesCotegory.length,
                             itemBuilder: (context, index) {
-                              var data = dataList[index];
+                              var data = recipesCotegory[index];
                               return Padding(
                                 padding: EdgeInsets.only(bottom: 15),
                                 child: NutritionalHistoryCard(

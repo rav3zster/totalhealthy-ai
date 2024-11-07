@@ -211,17 +211,21 @@ class NutrientIndicator extends StatelessWidget {
   final String label;
   final String amount;
   final Color color;
+  final bool isPadding;
   final Color? textcolor;
   NutrientIndicator(
       {required this.label,
       required this.amount,
       required this.color,
-      this.textcolor});
+      this.textcolor,
+      this.isPadding = true});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 25, right: 25, top: 10, bottom: 10),
+      padding: isPadding
+          ? EdgeInsets.only(left: 25, right: 25, top: 10, bottom: 10)
+          : EdgeInsets.zero,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

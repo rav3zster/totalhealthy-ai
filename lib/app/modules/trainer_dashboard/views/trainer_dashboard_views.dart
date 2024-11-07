@@ -9,11 +9,11 @@ import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
 
-import '../../../routes/app_pages.dart';
 import '../../../widgets/client_card.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/drawer_menu.dart';
 import '../../../widgets/phone_nav_bar.dart';
+import '../../../widgets/profile_card.dart';
 import '../../group/views/add_client.dart';
 import '../../user_diet_screen/controllers/user_diet_screen_controllers.dart';
 
@@ -144,13 +144,6 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
           setState(() {
             groupMemberData = value.data;
           });
-
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   const SnackBar(
-          //     content: Text('User  Successful!'),
-          //     backgroundColor: Colors.green,
-          //   ),
-          // );
         } else {
           // printError("Auth Controller", "Signup", value.data);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -190,39 +183,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Row(
-          children: [
-            Builder(
-              builder: (context) {
-                return Center(
-                  child: InkWell(
-                    onTap: () {
-                      Scaffold.of(context).openDrawer();
-                    },
-                    child: CircleAvatar(
-                      maxRadius: 28,
-                      backgroundImage: NetworkImage(
-                          'https://s3-alpha-sig.figma.com/img/519d/a5b3/5dd7c94081b46b1030716f9a99bda058?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=jenxaaauev~xejor2UuGg8xXNQB-ugvjmHoiV6RcNYBQnj-hr1VQ20Pbprvw3fWQXO15QJFXc0Y3th0TAjya4d2TDqRdQBfcw171WpKTXMLmNMY0JHYemzsMAxDhHBEj-YGN~mHOiegyTMzi0~RjHZygBWfR4QbwdmR1ec3ITjoqefk8JaSfq4fbIXemlAvJsTO4-vTxp0ZGSZ2U24NawVgj0FP9BkCADm41VTdZg7bQLe0quP~0-~oUARPGRnm83vvDLQSjdFNn3sKVNMMXsbNSYLKtZOyA6OdcroUS8lEZvrKXyLjLYffXv~3IGOH1yVMMFdwyNId06kR32T468g__'), // Profile image
-                    ),
-                  ),
-                );
-              },
-            ),
-            SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Welcome!',
-                    style: TextStyle(fontSize: 20, color: Color(0XFFFFFFFF))),
-                SizedBox(
-                  height: 5,
-                ),
-                Text('Ayush Shukla',
-                    style: TextStyle(fontSize: 16, color: Color(0XFF7B7B7A))),
-              ],
-            ),
-          ],
-        ),
+        title: ProfileCard(),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

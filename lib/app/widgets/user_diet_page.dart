@@ -5,6 +5,7 @@ import 'package:totalhealthy/app/modules/meals_details/controllers/meals_details
 import 'package:totalhealthy/app/modules/user_diet_screen/controllers/user_diet_screen_controllers.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
+import 'package:totalhealthy/app/widgets/profile_card.dart';
 import '../core/base/apiservice/api_endpoints.dart';
 import '../core/base/apiservice/api_status.dart';
 import '../core/base/apiservice/base_methods.dart';
@@ -31,11 +32,13 @@ class _UserDietPageState extends State<UserDietPage> {
   @override
   void initState() {
     super.initState();
-
+    GetStorage().hasData("userData")
+        ? userData = GetStorage().read("userData")
+        : null;
     getMeals();
   }
 
-  var dataList = [];
+  List<Map<String, dynamic>> dataList = [];
   var isLoading = false;
 
   Future<void> getMeals() async {
@@ -52,8 +55,9 @@ class _UserDietPageState extends State<UserDietPage> {
           .then((value) {
         if (APIStatus.success(value.statusCode)) {
           setState(() {
-            dataList = value.data;
+            dataList = List<Map<String, dynamic>>.from(value.data);
           });
+          filterRecipesBySingleCategory("Breakfast");
 
           isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
           box.write("mealPlan", dataList);
@@ -150,12 +154,23 @@ class _UserDietPageState extends State<UserDietPage> {
       "icon": Icons.dinner_dining,
     },
   ];
+  List<Map<String, dynamic>> filteredRecipes = [];
+  void filterRecipesBySingleCategory(String selectedCategory) {
+    setState(() {
+      filteredRecipes = dataList.where((recipe) {
+        final categories = recipe["categorys"] as List<dynamic>;
+
+        return categories.contains(selectedCategory);
+      }).toList();
+    });
+    print(filteredRecipes);
+  }
+
   int selectedIndex = 0;
   var userController = Get.find<UserDietScreenController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: MobileNavBar(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: selectedMealIds.isNotEmpty
           ? isGetLoading
@@ -183,30 +198,13 @@ class _UserDietPageState extends State<UserDietPage> {
           children: [
             IconButton(
                 onPressed: () {
-                  Get.toNamed("/trainerdashboard");
+                  Get.back();
                 },
                 icon: Icon(
                   Icons.arrow_back_ios,
                   color: Colors.white,
                 )),
-            CircleAvatar(
-              maxRadius: 28,
-              backgroundImage: NetworkImage(
-                  'https://s3-alpha-sig.figma.com/img/519d/a5b3/5dd7c94081b46b1030716f9a99bda058?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=jenxaaauev~xejor2UuGg8xXNQB-ugvjmHoiV6RcNYBQnj-hr1VQ20Pbprvw3fWQXO15QJFXc0Y3th0TAjya4d2TDqRdQBfcw171WpKTXMLmNMY0JHYemzsMAxDhHBEj-YGN~mHOiegyTMzi0~RjHZygBWfR4QbwdmR1ec3ITjoqefk8JaSfq4fbIXemlAvJsTO4-vTxp0ZGSZ2U24NawVgj0FP9BkCADm41VTdZg7bQLe0quP~0-~oUARPGRnm83vvDLQSjdFNn3sKVNMMXsbNSYLKtZOyA6OdcroUS8lEZvrKXyLjLYffXv~3IGOH1yVMMFdwyNId06kR32T468g__'), // Profile image
-            ),
-            SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Welcome!',
-                    style: TextStyle(fontSize: 20, color: Color(0XFFFFFFFF))),
-                SizedBox(
-                  height: 5,
-                ),
-                Text('Ayush Shukla',
-                    style: TextStyle(fontSize: 16, color: Color(0XFF7B7B7A))),
-              ],
-            ),
+            ProfileCard(),
           ],
         ),
         actions: [
@@ -250,8 +248,8 @@ class _UserDietPageState extends State<UserDietPage> {
                       onTap: () {
                         setState(() {
                           selectedIndex = index;
-                          print("press");
                         });
+                        filterRecipesBySingleCategory(data["name"].toString());
                       },
                       child: Padding(
                         padding: EdgeInsets.only(left: 10),
@@ -274,7 +272,7 @@ class _UserDietPageState extends State<UserDietPage> {
               ? Center(
                   child: CircularProgressIndicator(),
                 )
-              : dataList.isEmpty
+              : filteredRecipes.isEmpty
                   ? Center(
                       child: Column(
                         children: [
@@ -291,9 +289,10 @@ class _UserDietPageState extends State<UserDietPage> {
                   : ListView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: dataList.length,
+                      itemCount: filteredRecipes.length,
                       itemBuilder: (context, index) {
-                        var data = dataList[index];
+                        var data = filteredRecipes[index];
+
                         return Padding(
                           padding: EdgeInsets.only(bottom: 15),
                           child: NutritionalCard(

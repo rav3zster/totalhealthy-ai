@@ -69,7 +69,7 @@ class _MealsDetailsPageState extends State<MealsDetailsPage> {
                                     Icon(Icons.arrow_back, color: Colors.black),
                               ),
                               onPressed: () {
-                                Get.toNamed('/userdiet?id=${widget.id}');
+                                Get.back();
                               },
                             ),
                             Row(
@@ -201,8 +201,8 @@ class _MealsDetailsPageState extends State<MealsDetailsPage> {
                           height: 10,
                         ),
                         Container(
-                          margin: EdgeInsets.symmetric(horizontal: 30),
-                          padding: EdgeInsets.all(10),
+                          margin: EdgeInsets.symmetric(horizontal: 20),
+                          padding: EdgeInsets.all(15),
                           decoration: BoxDecoration(
                             color: AppColors.chineseGreen,
                             borderRadius: BorderRadius.circular(50),
@@ -211,22 +211,31 @@ class _MealsDetailsPageState extends State<MealsDetailsPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               NutrientIndicator(
+                                isPadding: false,
                                 amount: "${recipeData['protein'] ?? "0"}",
                                 color: Colors.green,
                                 label: "Protein",
                                 textcolor: Colors.black,
                               ),
+                              SizedBox(
+                                width: 20,
+                              ),
                               NutrientIndicator(
+                                isPadding: false,
                                 amount: "${recipeData['fat'] ?? "0"}",
                                 color: Colors.blue,
                                 label: "Protein",
                                 textcolor: Colors.black,
+                              ),
+                              SizedBox(
+                                width: 20,
                               ),
                               NutrientIndicator(
                                 amount: "${recipeData['carbs'] ?? "0"}",
                                 color: Colors.red,
                                 label: 'Carbs',
                                 textcolor: Colors.black,
+                                isPadding: false,
                               ),
                             ],
                           ),

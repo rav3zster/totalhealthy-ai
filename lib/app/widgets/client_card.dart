@@ -33,7 +33,7 @@ class ClientCard extends StatelessWidget {
                   height: 60, // Set the height for the square
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage("assets/clientimage.png"),
+                      image: AssetImage("assets/clientimage.png"),
                       fit: BoxFit.cover,
                     ),
                     borderRadius: BorderRadius.circular(8), // Rounded corners
