@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:totalhealthy/app/widgets/custom_button.dart';
-
-import '../../group/widgets/create_group.dart';
-
 class RegistrationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -134,17 +130,6 @@ class RegistrationView extends StatelessWidget {
             //     ),
             //   ],
             // ),
-            CustomButton(
-                child: Text("Create group"),
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return CreateGroup();
-                      });
-                },
-                size: ButtonSize.medium,
-                type: ButtonType.elevated)
           ],
         ),
       ),

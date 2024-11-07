@@ -92,7 +92,9 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             // Swtich user switch bar
 
                             NavRow(
-                                redirect: () {},
+                                redirect: () {
+                                  Get.toNamed(Routes.Registration);
+                                },
                                 heading: "Profile",
                                 icon_v: Icons.perm_identity_outlined),
                             NavRow(

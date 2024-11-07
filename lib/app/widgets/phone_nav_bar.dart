@@ -20,7 +20,7 @@ class OntapStore {
     Routes.ClientDashboard,
     Routes.GROUP,
     Routes.NOTIFICATION,
-    Routes.SETTING,
+    Routes.Registration,
   ];
 }
 
