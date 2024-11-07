@@ -24,104 +24,38 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    slectedValue = "isUser=true";
-                    isMaleSelected = true;
-                    isFemaleSelected = false; // Deselect female
-                  });
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(left: 0),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 36, 36, 36),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(
-                      color: isMaleSelected
-                          ? const Color.fromARGB(255, 146, 159, 83)
-                          : Colors.transparent,
-                      width: 3,
-                    ),
-                  ),
-                  width: 110,
-                  height: 110,
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 20),
-                      Icon(Icons.person, size: 35),
-                      SizedBox(height: 20),
-                      Text(
-                        "User",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 100,
-              ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    slectedValue = "isUser=false";
-                    isFemaleSelected = true;
-                    isMaleSelected = false; // Deselect male
-                  });
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(right: 0),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 36, 36, 36),
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(
-                      color: isFemaleSelected
-                          ? Colors.amberAccent
-                          : Colors.transparent,
-                      width: 3,
-                    ),
-                  ),
-                  width: 110,
-                  height: 110,
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 20),
-                      Icon(Icons.group, size: 35),
-                      SizedBox(height: 20),
-                      Text(
-                        "Group",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+          SizedBox(
+            height: 150,
+          ),
+          Text(
+            "Choose As Who You Want",
+            style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Color(0XFFFFFFFF)),
+          ),
+          Text(
+            "To Continue!",
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Color(0XFFFFFFFF),
+            ),
+          ),
+          Text(
+            "How Do You Identify Yourself?",
+            style: TextStyle(color: Color(0XFF7B7B7A), fontSize: 16),
           ),
           SizedBox(
             height: 60,
           ),
-          CustomButton(
-            type: ButtonType.elevated,
-            size: ButtonSize.medium,
-            onPressed: () {
-              slectedValue == ""
-                  ? null
-                  : Get.toNamed("${Routes.USER_GROUP_VIEW}?$slectedValue");
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                slectedValue = "isUser=false";
+                isMaleSelected = true;
+                isFemaleSelected = false; // Deselect female
+              });
             },
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -167,7 +101,7 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
           GestureDetector(
             onTap: () {
               setState(() {
-                slectedValue = Routes.USER_GROUP_VIEW;
+                slectedValue = "isUser=true";
                 isFemaleSelected = true;
                 isMaleSelected = false; // Deselect male
               });
@@ -222,7 +156,10 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
                   borderRadius: BorderRadius.circular(30)),
               child: ElevatedButton(
                 onPressed: () {
-                  slectedValue == "" ? null : Get.offAllNamed(slectedValue);
+                  slectedValue == ""
+                      ? null
+                      : Get.offAllNamed(
+                          "${Routes.USER_GROUP_VIEW}?$slectedValue");
                 },
                 child: const Text(
                   "Continue",
