@@ -30,7 +30,8 @@ class _CreateMealPageState extends State<CreateMealPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, color: Color(0XFFDBDBDB)),
           onPressed: () {
-            Get.toNamed('/userdiet?id=${widget.id}');
+            Get.back();
+            // Get.toNamed('/userdiet?id=${widget.id}');
           },
         ),
         title: Row(

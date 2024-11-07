@@ -34,7 +34,7 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    slectedValue = Routes.ClientDashboard;
+                    slectedValue = "isUser=true";
                     isMaleSelected = true;
                     isFemaleSelected = false; // Deselect female
                   });
@@ -77,7 +77,7 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    slectedValue = Routes.USER_GROUP_VIEW;
+                    slectedValue = "isUser=false";
                     isFemaleSelected = true;
                     isMaleSelected = false; // Deselect male
                   });
@@ -121,7 +121,9 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
           ),
           CustomButton(
             onPressed: () {
-              slectedValue == "" ? null : Get.offAllNamed(slectedValue);
+              slectedValue == ""
+                  ? null
+                  : Get.toNamed("${Routes.USER_GROUP_VIEW}?$slectedValue");
             },
             child: Text("Submit"),
             size: ButtonSize.medium,
