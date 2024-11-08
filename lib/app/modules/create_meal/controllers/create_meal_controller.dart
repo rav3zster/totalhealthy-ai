@@ -5,6 +5,7 @@ import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/controllers/auth_controller.dart';
+import '../../../routes/app_pages.dart';
 
 class CreateMealController extends GetxController {
   final fullNameController = TextEditingController();
@@ -63,7 +64,7 @@ class CreateMealController extends GetxController {
             .then((value) {
           if (APIStatus.success(value.statusCode)) {
             // clearDetails();
-
+            Get.offAllNamed(Routes.UserDiet);
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Create Meal Successful!'),
