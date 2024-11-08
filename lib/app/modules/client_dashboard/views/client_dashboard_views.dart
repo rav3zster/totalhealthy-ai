@@ -463,9 +463,6 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                     )
                   : SizedBox(),
 
-              SizedBox(
-                height: 10,
-              ),
               // Search bar, Filter button, Today's Diet Plan, and Add Meal button
               // Row(
               //   children: [
@@ -489,12 +486,19 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
               //     Icon(Icons.filter_list, color: Colors.white, size: 30),
               //   ],
               // ),
-              SizedBox(height: 16),
-
+              Divider(
+                color: Colors.grey.shade600,
+                endIndent: 20,
+                indent: 20,
+                height: 2,
+              ),
+              SizedBox(
+                height: 10,
+              ),
               //          Get.find<AuthController>().roleGet()   AddMealButton(
               //   id: userData["_id"] ?? "",
               // ),
-              SizedBox(height: 16),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

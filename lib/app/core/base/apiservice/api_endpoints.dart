@@ -83,6 +83,8 @@ class _Group {
   String get pooledRequests => "${APIEndpoints.baseURL}pooled_requests";
   String getGroup(role) => "${APIEndpoints.baseURL}$role/groups";
   String get addGroup => "${APIEndpoints.baseURL}groups";
+  String getGroupMember(groupId) =>
+      "${APIEndpoints.baseURL}admin/groups/$groupId/members";
 
   String addGroupMember(groupId, userId) =>
       "${APIEndpoints.baseURL}groups/$groupId/send-request/$userId";

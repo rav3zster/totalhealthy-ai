@@ -130,7 +130,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
 
   bool isMemberLoading = false;
   var groupMemberData = [];
-  Future<void> getMember(id) async {
+  Future<void> getMember() async {
     try {
       setState(() {
         isMemberLoading = true;
@@ -138,7 +138,8 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
 
       await APIMethods.get
           .get(
-        url: "${APIEndpoints.group.getGroup}/$id/members",
+        url: APIEndpoints.group
+            .getGroupMember(Get.find<AuthController>().groupgetId()),
       )
           .then((value) {
         if (APIStatus.success(value.statusCode)) {
@@ -169,7 +170,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   @override
   void initState() {
     super.initState();
-    getMember(Get.find<AuthController>().groupgetId());
+    getMember();
   }
 
   String? valueDropDown;

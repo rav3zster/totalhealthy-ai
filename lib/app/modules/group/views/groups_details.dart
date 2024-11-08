@@ -27,9 +27,9 @@ class _GroupsViewScreenState extends State<GroupsViewScreen> {
 
       await APIMethods.get
           .get(
-        url:
-            "${APIEndpoints.group.getGroup}/${controller.group["group_id"]}/members",
-      )
+              url: APIEndpoints.group.getGroupMember(
+        controller.group["group_id"],
+      ))
           .then((value) {
         if (APIStatus.success(value.statusCode)) {
           setState(() {
@@ -105,7 +105,7 @@ class _GroupsViewScreenState extends State<GroupsViewScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        controller.group["group_name"],
+                        "${controller.group["group_name"]}",
                         style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -113,7 +113,7 @@ class _GroupsViewScreenState extends State<GroupsViewScreen> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        controller.group["description"],
+                        "${controller.group["description"]}",
                         style:
                             TextStyle(fontSize: 16, color: Color(0XFF7E7E7E)),
                       ),

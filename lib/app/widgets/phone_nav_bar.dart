@@ -27,7 +27,7 @@ class OntapStore {
 
 class _MobileNavBarState extends State<MobileNavBar> {
   ontapFunction(int value) {
-    Get.toNamed(value == 0
+    Get.offAllNamed(value == 0
         ? Get.find<AuthController>().roleGet() == "admin"
             ? Routes.TrainerDashboard
             : OntapStore.routes[value]
