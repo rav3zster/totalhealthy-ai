@@ -194,7 +194,10 @@ class _GroupsViewScreenState extends State<GroupsViewScreen> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => AddClient()),
+                        MaterialPageRoute(
+                            builder: (context) => AddClient(
+                                  id: controller.group["group_id"] ?? '',
+                                )),
                       );
                     },
                     label: const Text(

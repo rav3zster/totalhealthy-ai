@@ -9,12 +9,15 @@ import '../../../widgets/custom_button.dart';
 import '../controllers/group_controller.dart';
 
 class AddClient extends StatefulWidget {
+  final String id;
+
+  const AddClient({super.key, required this.id});
   @override
   State<AddClient> createState() => _AddClientState();
 }
 
 class _AddClientState extends State<AddClient> {
-  var controller = Get.find<GroupController>();
+  // var controller = Get.find<GroupController>();
   var searchController = TextEditingController();
   bool isLoading = false;
   var userData = [];
@@ -71,8 +74,7 @@ class _AddClientState extends State<AddClient> {
 
       await APIMethods.post
           .post(
-              url: APIEndpoints.group
-                  .addGroupMember(controller.group["group_id"], userId),
+              url: APIEndpoints.group.addGroupMember(widget.id, userId),
               map: data)
           .then((value) {
         if (APIStatus.success(value.statusCode)) {

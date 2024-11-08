@@ -349,7 +349,9 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => AddClient()),
+                      MaterialPageRoute(
+                          builder: (context) => AddClient(
+                              id: Get.find<AuthController>().groupgetId())),
                     );
                   },
                   label: Text('Add Client',
