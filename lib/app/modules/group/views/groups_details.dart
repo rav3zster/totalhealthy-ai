@@ -28,7 +28,7 @@ class _GroupsViewScreenState extends State<GroupsViewScreen> {
       await APIMethods.get
           .get(
         url:
-            "${APIEndpoints.group.createGroup}/${controller.group["group_id"]}/members",
+            "${APIEndpoints.group.getGroup}/${controller.group["group_id"]}/members",
       )
           .then((value) {
         if (APIStatus.success(value.statusCode)) {
@@ -225,8 +225,7 @@ class _GroupsViewScreenState extends State<GroupsViewScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MealTimingPage()
-                        ),
+                            builder: (context) => MealTimingPage()),
                       );
                     },
                     label: const Text(

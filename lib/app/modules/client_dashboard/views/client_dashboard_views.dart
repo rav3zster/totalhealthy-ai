@@ -386,7 +386,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                       onTap: () {
                         setState(() {
                           selectedIndex1 = index;
-
+                          data["name"] == "Today" ? isCalender = false : null;
                           data["name"] == "Today"
                               ? _filterRecipesByDate(selectedDate)
                               : data["name"] == "Calender"
@@ -491,9 +491,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
               // ),
               SizedBox(height: 16),
 
-              AddMealButton(
-                id: userData["_id"] ?? "",
-              ),
+              //          Get.find<AuthController>().roleGet()   AddMealButton(
+              //   id: userData["_id"] ?? "",
+              // ),
               SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

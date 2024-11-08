@@ -8,6 +8,7 @@ import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
+import '../../../core/base/controllers/auth_controller.dart';
 import '../../../widgets/drawer_menu.dart';
 import '../../../widgets/group_card.dart';
 import '../../registration/views/registration_view.dart';
@@ -87,11 +88,13 @@ class _GroupListPageState extends State<GroupListPage> {
                       final group = controller.groupData[index];
                       return GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => GroupsViewScreen()),
-                          );
+                          Get.find<AuthController>().roleGet() == "user"
+                              ? null
+                              : Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => GroupsViewScreen()),
+                                );
 
                           controller.group(group);
                         },

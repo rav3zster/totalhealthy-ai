@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
+import '../../../core/base/controllers/auth_controller.dart';
 
 class UserGroupViewController extends GetxController {
   //TODO: Implement UserGroupViewController
@@ -26,7 +27,8 @@ class UserGroupViewController extends GetxController {
       // var phone = int.tryParse(input);
       await APIMethods.get
           .get(
-        url: APIEndpoints.group.createGroup,
+        url: APIEndpoints.group.getGroup(
+            Get.find<AuthController>().roleGet() == "admin" ? "admin" : "user"),
       )
           .then((value) {
         if (APIStatus.success(value.statusCode)) {

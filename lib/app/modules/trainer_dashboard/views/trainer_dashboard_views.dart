@@ -86,7 +86,8 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
 
       await APIMethods.get
           .get(
-        url: APIEndpoints.group.createGroup,
+        url: APIEndpoints.group.getGroup(
+            Get.find<AuthController>().roleGet() == "admin" ? "admin" : "user"),
       )
           .then((value) {
         if (APIStatus.success(value.statusCode)) {
@@ -137,7 +138,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
 
       await APIMethods.get
           .get(
-        url: "${APIEndpoints.group.createGroup}/$id/members",
+        url: "${APIEndpoints.group.getGroup}/$id/members",
       )
           .then((value) {
         if (APIStatus.success(value.statusCode)) {
