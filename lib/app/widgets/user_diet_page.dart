@@ -48,9 +48,9 @@ class _UserDietPageState extends State<UserDietPage> {
       });
       await APIMethods.get
           .get(
-        url: APIEndpoints.meals.getadmindHistory(
-          widget.id,
+        url: APIEndpoints.meals.getadminMeals(
           Get.find<AuthController>().groupgetId(),
+          widget.id,
         ),
       )
           .then((value) {

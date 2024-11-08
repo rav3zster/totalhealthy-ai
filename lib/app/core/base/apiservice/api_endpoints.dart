@@ -93,12 +93,12 @@ class _Group {
 class _Meals {
   const _Meals();
 
-  String getadmindMeals(id, role) =>
-      "${APIEndpoints.baseURL}$role/meals?groupId=$id";
-  String getuserdHistory(
-    id,
-  ) =>
+  String getMeals(id, role) => "${APIEndpoints.baseURL}$role/meals?groupId=$id";
+
+  String getuserHistory(id) =>
       "${APIEndpoints.baseURL}user/meals_history_meals?groupId=$id";
+  String getadminMeals(groupId, userId) =>
+      "${APIEndpoints.baseURL}admin/meals?groupId=$groupId&userId=$userId";
   String getadmindHistory(userId, groupId) =>
       "${APIEndpoints.baseURL}admin/meals_history_meals?groupId=$groupId&userId=$userId";
 }

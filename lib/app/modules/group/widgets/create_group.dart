@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:totalhealthy/app/modules/user_group_view/controllers/user_group_view_controller.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
-import '../controllers/group_controller.dart';
-import 'group_page.dart';
 
 class CreateGroup extends StatefulWidget {
   const CreateGroup({
@@ -23,7 +20,7 @@ class _CreateGroupState extends State<CreateGroup> {
   GlobalKey<FormState> key = GlobalKey<FormState>();
 
   bool isLoading = false;
-  var controller = Get.find<UserGroupViewController>();
+  // var controller = Get.find<UserGroupViewController>();
   Future<void> submitUser(context) async {
     try {
       if (key.currentState!.validate()) {
@@ -40,8 +37,6 @@ class _CreateGroupState extends State<CreateGroup> {
             .post(url: APIEndpoints.group.addGroup, map: data)
             .then((value) {
           if (APIStatus.success(value.statusCode)) {
-            controller.submitUser();
-            // clearDetails();
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Create Group Successful!'),
@@ -50,7 +45,6 @@ class _CreateGroupState extends State<CreateGroup> {
             );
             Get.back();
           } else {
-            // printError("Auth Controller", "Signup", value.data);
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Group is not created.'),
@@ -67,7 +61,6 @@ class _CreateGroupState extends State<CreateGroup> {
         isLoading = false;
       });
     }
-    // if (_formKey.currentState!.validate()) {
   }
 
   @override

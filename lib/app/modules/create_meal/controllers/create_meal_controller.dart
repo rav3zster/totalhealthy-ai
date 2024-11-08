@@ -64,7 +64,8 @@ class CreateMealController extends GetxController {
             .then((value) {
           if (APIStatus.success(value.statusCode)) {
             // clearDetails();
-            Get.offAllNamed(Routes.UserDiet);
+            Get.toNamed("${Routes.UserDiet}?id=$userId");
+
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Create Meal Successful!'),

@@ -67,7 +67,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       await APIMethods.get
           .get(
         url: APIEndpoints.meals
-            .getadmindMeals(Get.find<AuthController>().groupgetId(), "user"),
+            .getMeals(Get.find<AuthController>().groupgetId(), "user"),
       )
           .then((value) {
         if (APIStatus.success(value.statusCode)) {

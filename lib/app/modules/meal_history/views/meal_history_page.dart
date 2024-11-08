@@ -59,7 +59,7 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
       });
       await APIMethods.get
           .get(
-        url: APIEndpoints.meals.getuserdHistory(
+        url: APIEndpoints.meals.getuserHistory(
           Get.find<AuthController>().groupgetId(),
         ),
       )

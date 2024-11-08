@@ -27,7 +27,7 @@ class IngredientInput extends StatelessWidget {
               },
               maxLines: 1,
               decoration: InputDecoration(
-                labelText: "Describe the recipe",
+                labelText: "Describe the Meal",
                 labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
                 filled: true,
                 fillColor: Color(0XFF242522),

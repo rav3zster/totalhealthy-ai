@@ -81,7 +81,7 @@ class _CreateMealPageState extends State<CreateMealPage> {
                       color: Colors.black
                           .withOpacity(0.3), // Semi-transparent black overlay
                     ),
-                    // Camera Icon with Circle Background
+
                     Positioned(
                       top: 60, // Position the icon a bit lower
                       child: Container(
@@ -117,7 +117,7 @@ class _CreateMealPageState extends State<CreateMealPage> {
               TextField(
                 controller: widget.controller.fullNameController,
                 decoration: InputDecoration(
-                  labelText: "Enter your recipe name",
+                  labelText: "Enter your Meal name",
                   labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
                   filled: true,
                   fillColor: Color(0XFF242522),
@@ -199,7 +199,7 @@ class _CreateMealPageState extends State<CreateMealPage> {
                 controller: widget.controller.descriptionController,
                 maxLines: 3,
                 decoration: InputDecoration(
-                  labelText: "Describe the recipe",
+                  labelText: "Describe the Meal",
                   labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
                   filled: true,
                   fillColor: Color(0XFF242522),
@@ -234,9 +234,6 @@ class _CreateMealPageState extends State<CreateMealPage> {
                 physics: NeverScrollableScrollPhysics(),
                 itemCount: ingredients.length,
                 itemBuilder: (context, index) {
-                  // final ingredient =
-                  //     widget.controller.ingredientControllers[index];
-
                   return IngredientInput(
                       index: index,
                       controller: widget.controller,
