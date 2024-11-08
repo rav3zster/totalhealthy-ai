@@ -14,7 +14,7 @@ import '../core/base/controllers/auth_controller.dart';
 
 import '../routes/app_pages.dart';
 import 'client_card.dart';
-import '../modules/client_dashboard/views/client_dashboard_views.dart';
+
 import 'button_selector.dart';
 import 'add_meal_button.dart';
 import 'nutritional_card.dart';
@@ -48,7 +48,8 @@ class _UserDietPageState extends State<UserDietPage> {
       });
       await APIMethods.get
           .get(
-        url: APIEndpoints.meals.getuserdHistory(
+        url: APIEndpoints.meals.getadmindHistory(
+          widget.id,
           Get.find<AuthController>().groupgetId(),
         ),
       )
