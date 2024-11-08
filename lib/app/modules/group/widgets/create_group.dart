@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/modules/user_group_view/controllers/user_group_view_controller.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
@@ -22,7 +23,7 @@ class _CreateGroupState extends State<CreateGroup> {
   GlobalKey<FormState> key = GlobalKey<FormState>();
 
   bool isLoading = false;
-  var controller = Get.find<GroupController>();
+  var controller = Get.find<UserGroupViewController>();
   Future<void> submitUser(context) async {
     try {
       if (key.currentState!.validate()) {

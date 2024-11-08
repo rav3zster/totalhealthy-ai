@@ -86,7 +86,7 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
                   ),
                   SizedBox(width: 18),
                   Text(
-                    "Member Advisor",
+                    "Advisor",
                     style: TextStyle(
                       color: Color(0XFF8C8C8C),
                       fontWeight: FontWeight.w500,

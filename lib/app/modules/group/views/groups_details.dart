@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/modules/meal_timing/views/meal_timing_page.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
@@ -17,6 +18,7 @@ class _GroupsViewScreenState extends State<GroupsViewScreen> {
   var controller = Get.find<GroupController>();
   bool isLoading = false;
   var userData = [];
+
   Future<void> submitUser() async {
     try {
       setState(() {
@@ -202,6 +204,33 @@ class _GroupsViewScreenState extends State<GroupsViewScreen> {
                     },
                     label: const Text(
                       "Add Client",
+                      style: TextStyle(
+                          color: Color(0XFF242522),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18),
+                    ),
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                      color: Color(0XFFCDE26D),
+                      borderRadius: BorderRadius.circular(30)),
+                  child: ElevatedButton.icon(
+                    icon: Icon(
+                      Icons.add,
+                      color: Color(0XFF242522),
+                      size: 28,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MealTimingPage()
+                        ),
+                      );
+                    },
+                    label: const Text(
+                      "Add Category",
                       style: TextStyle(
                           color: Color(0XFF242522),
                           fontWeight: FontWeight.bold,
