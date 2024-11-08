@@ -99,16 +99,16 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
       "icon": Icons.today,
     },
     {
-      "name": "Calender",
-      "icon": Icons.calendar_month,
-    },
-    {
       "name": "Week",
       "icon": Icons.calendar_view_week,
     },
     {
       "name": "15 Days",
       "icon": Icons.calendar_view_day,
+    },
+    {
+      "name": "Calender",
+      "icon": Icons.calendar_month,
     },
   ];
   //  List<dynamic> mealPlanData = [];
@@ -143,6 +143,7 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
     filterRecipesBySingleCategory(category);
   }
 
+  bool isCalender = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -183,6 +184,11 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                         onTap: () {
                           setState(() {
                             selectedIndex = index;
+                            data["name"] == "Today"
+                                ? _filterRecipesByDate(selectedDate)
+                                : data["name"] == "Calender"
+                                    ? isCalender = true
+                                    : isCalender = false;
                           });
                         },
                         child: Padding(
@@ -201,22 +207,12 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                 SizedBox(
                   height: 10,
                 ),
-                Card(
-                  color: AppColors.cardbackground,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "See Meals Taken On Specific Date",
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 200,
+                isCalender
+                    ? Card(
+                        color: AppColors.cardbackground,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 0, bottom: 15, left: 10, right: 10),
                           child: EasyDateTimeLine(
                             activeColor: AppColors.chineseGreen,
                             initialDate: DateTime.now(),
@@ -229,10 +225,12 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                             },
                             headerProps: const EasyHeaderProps(
                                 monthPickerType: MonthPickerType.switcher,
-                                dateFormatter: DateFormatter.fullDateDMY(),
+                                dateFormatter: DateFormatter.monthOnly(),
                                 selectedDateStyle:
                                     TextStyle(color: Colors.white)),
                             dayProps: const EasyDayProps(
+                              height: 70,
+
                               dayStructure: DayStructure.dayStrDayNum,
                               todayNumStyle: TextStyle(
                                   color: Colors.white,
@@ -259,10 +257,8 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
+                      )
+                    : SizedBox(),
                 SizedBox(
                   height: 10,
                 ),

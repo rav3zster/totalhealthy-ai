@@ -1,3 +1,4 @@
+import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,6 +31,7 @@ class ClientDashboardScreen extends StatefulWidget {
 
 class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   int selectedIndex = 0;
+  int selectedIndex1 = 0;
   var shedule = [
     {
       "name": "Breakfast",
@@ -72,7 +74,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
           setState(() {
             dataList = List<Map<String, dynamic>>.from(value.data);
           });
-          filterRecipesBySingleCategory('Breakfast');
+          _filterRecipesByDate(selectedDate);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -147,10 +149,11 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     }
   }
 
+  DateTime selectedDate = DateTime.now();
   List<Map<String, dynamic>> filteredRecipes = [];
   void filterRecipesBySingleCategory(String selectedCategory) {
     setState(() {
-      filteredRecipes = dataList.where((recipe) {
+      filteredRecipes = filtered.where((recipe) {
         final categories = recipe["categorys"] as List<dynamic>;
 
         return categories.contains(selectedCategory);
@@ -159,9 +162,44 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     print(filteredRecipes);
   }
 
+  var category = "Breakfast";
+
+  var buttonName = [
+    {
+      "name": "Today",
+      "icon": Icons.today,
+    },
+    {
+      "name": "Week",
+      "icon": Icons.calendar_view_week,
+    },
+    {
+      "name": "15 Days",
+      "icon": Icons.calendar_view_day,
+    },
+    {
+      "name": "Calender",
+      "icon": Icons.calendar_month,
+    },
+  ];
+  List<Map<String, dynamic>> filtered = [];
+  void _filterRecipesByDate(DateTime selectedDate) {
+    setState(() {
+      filtered = dataList.where((recipe) {
+        final createdAt = DateTime.parse(recipe["created_at"]);
+        // Check if the year, month, and day match
+        return createdAt.year == selectedDate.year &&
+            createdAt.month == selectedDate.month &&
+            createdAt.day == selectedDate.day;
+      }).toList();
+    });
+    filterRecipesBySingleCategory(category);
+  }
+
   Map<int, bool> isCheck = {};
 
   List<String> selectedMealIds = [];
+  bool isCalender = false;
   @override
   Widget build(BuildContext context) {
     String id = Get.parameters["id"] ?? "";
@@ -337,30 +375,120 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
               DailySummeryCard(),
 
               SizedBox(height: 16),
+              SizedBox(
+                height: 40,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    var data = buttonName[index];
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedIndex1 = index;
 
-              // Search bar, Filter button, Today's Diet Plan, and Add Meal button
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Color(0XFF242522),
-                          borderRadius: BorderRadius.circular(50)),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          enabledBorder: InputBorder.none,
-                          hintText: 'Search here...',
-                          hintStyle: TextStyle(color: Color(0XFFDBDBDB)),
-                          prefixIcon:
-                              Icon(Icons.search, color: Color(0XFFDBDBDB)),
+                          data["name"] == "Today"
+                              ? _filterRecipesByDate(selectedDate)
+                              : data["name"] == "Calender"
+                                  ? isCalender = true
+                                  : isCalender = false;
+                        });
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: ButtonSelector(
+                          title: data["name"].toString(),
+                          icon: data["icon"] as IconData,
+                          active: index == selectedIndex1,
                         ),
                       ),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Icon(Icons.filter_list, color: Colors.white, size: 30),
-                ],
+                    );
+                  },
+                  itemCount: buttonName.length,
+                ),
               ),
+              SizedBox(
+                height: 10,
+              ),
+              isCalender
+                  ? Card(
+                      color: AppColors.cardbackground,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 0, bottom: 15, left: 10, right: 10),
+                        child: EasyDateTimeLine(
+                          activeColor: AppColors.chineseGreen,
+                          initialDate: DateTime.now(),
+                          onDateChange: (selectedDate) {
+                            print(selectedDate);
+                            setState(() {
+                              _filterRecipesByDate(selectedDate);
+                            });
+                            //
+                          },
+                          headerProps: const EasyHeaderProps(
+                              monthPickerType: MonthPickerType.switcher,
+                              dateFormatter: DateFormatter.monthOnly(),
+                              selectedDateStyle:
+                                  TextStyle(color: Colors.white)),
+                          dayProps: const EasyDayProps(
+                            height: 70,
+
+                            dayStructure: DayStructure.dayStrDayNum,
+                            todayNumStyle: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                            inactiveDayNumStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold),
+                            disabledDayStyle: DayStyle(
+                              dayNumStyle: TextStyle(color: Colors.white),
+                            ),
+                            // todayHighlightColor: Colors.white,
+                            borderColor: AppColors.chineseGreen,
+                            activeDayNumStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold),
+                            activeDayStyle: DayStyle(
+                              decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8)),
+                                  color: AppColors.chineseGreen),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  : SizedBox(),
+
+              SizedBox(
+                height: 10,
+              ),
+              // Search bar, Filter button, Today's Diet Plan, and Add Meal button
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: Container(
+              //         decoration: BoxDecoration(
+              //             color: Color(0XFF242522),
+              //             borderRadius: BorderRadius.circular(50)),
+              //         child: TextField(
+              //           decoration: InputDecoration(
+              //             enabledBorder: InputBorder.none,
+              //             hintText: 'Search here...',
+              //             hintStyle: TextStyle(color: Color(0XFFDBDBDB)),
+              //             prefixIcon:
+              //                 Icon(Icons.search, color: Color(0XFFDBDBDB)),
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //     SizedBox(width: 10),
+              //     Icon(Icons.filter_list, color: Colors.white, size: 30),
+              //   ],
+              // ),
               SizedBox(height: 16),
 
               AddMealButton(
