@@ -1,6 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:totalhealthy/app/modules/meal_timing/controllers/meal_timing_controller.dart';
 
-class MealTimingScreen extends StatelessWidget {
+import 'meal_timing_page.dart';
+
+class MealTimingScreen extends GetView<MealTimingController> {
+  const MealTimingScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var id = Get.parameters["id"] ?? "";
+    return MealTimingPage(
+      controller: controller,
+      id: id,
+    );
+  }
+}
+
+class MealTiminWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +44,10 @@ class MealTimingScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Welcome!',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
                         ),
                         Text(
                           'Ayush Shukla',
@@ -47,13 +67,15 @@ class MealTimingScreen extends StatelessWidget {
               SizedBox(height: 20),
               Text(
                 'Set Your Daily Meal & Snack Timings',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
               ),
               Text(
                 'Choose Suitable Times For Your Meals, Snacks, And Workout Nutrition.',
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
-
               ListView(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
@@ -93,7 +115,9 @@ class MealTimingScreen extends StatelessWidget {
             subtitle: Text(
               time,
               style: TextStyle(
-                color: mealName == 'Breakfast' ? Color(0xFFCDE26D) : Color(0xFF7E7E7E),
+                color: mealName == 'Breakfast'
+                    ? Color(0xFFCDE26D)
+                    : Color(0xFF7E7E7E),
                 fontSize: 14,
               ),
             ),
@@ -103,10 +127,14 @@ class MealTimingScreen extends StatelessWidget {
                 Switch(
                   value: isEnabled,
                   onChanged: (value) {},
-                  activeColor: Color(0XFFFFFFFF), // Keep active color for breakfast
-                  inactiveThumbColor: Color(0xFFFFFFFF), // Set inactive thumb color to white
-                  inactiveTrackColor: Color(0xFF7E7E7E), // Set inactive track color
-                  activeTrackColor: Color(0XFFCDE26D), // Set active thumb color to white
+                  activeColor:
+                      Color(0XFFFFFFFF), // Keep active color for breakfast
+                  inactiveThumbColor:
+                      Color(0xFFFFFFFF), // Set inactive thumb color to white
+                  inactiveTrackColor:
+                      Color(0xFF7E7E7E), // Set inactive track color
+                  activeTrackColor:
+                      Color(0XFFCDE26D), // Set active thumb color to white
                 ),
               ],
             ),
@@ -152,7 +180,8 @@ class MealTimingScreen extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: IconButton(
-                    icon: Icon(Icons.add, color: Color(0xFF1D1B20)), // Keep icon color
+                    icon: Icon(Icons.add,
+                        color: Color(0xFF1D1B20)), // Keep icon color
                     onPressed: () {
                       // Action for adding a meal
                     },

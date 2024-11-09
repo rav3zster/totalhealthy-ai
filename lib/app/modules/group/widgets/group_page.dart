@@ -5,14 +5,10 @@ import 'package:totalhealthy/app/modules/group/controllers/group_controller.dart
 import 'package:totalhealthy/app/modules/group/views/groups_details.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 
-import '../../../core/base/apiservice/api_endpoints.dart';
-import '../../../core/base/apiservice/api_status.dart';
-import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/controllers/auth_controller.dart';
-import '../../../widgets/drawer_menu.dart';
+
 import '../../../widgets/group_card.dart';
-import '../../registration/views/registration_view.dart';
-import '../views/add_client.dart';
+
 import 'create_group.dart';
 
 class GroupListPage extends StatefulWidget {
@@ -32,14 +28,6 @@ class _GroupListPageState extends State<GroupListPage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Color(0XFF0C0C0C),
-
-        // leading: IconButton(
-        //   onPressed: () {
-        //     Get.back();
-        //   },
-        //   icon: Icon(Icons.arrow_back_ios),
-        //   color: Color(0XFFD9D9D9),
-        // ),
         title: Text(
           'Groups',
           style: TextStyle(color: Color(0XFFB3B3B3), fontSize: 24),
@@ -59,7 +47,9 @@ class _GroupListPageState extends State<GroupListPage> {
                 showDialog(
                     context: context,
                     builder: (context) {
-                      return CreateGroup();
+                      return CreateGroup(
+                        isGroup: true,
+                      );
                     });
               },
               label: const Text(

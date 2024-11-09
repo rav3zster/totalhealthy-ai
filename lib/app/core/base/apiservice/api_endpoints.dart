@@ -101,6 +101,10 @@ class _Meals {
       "${APIEndpoints.baseURL}admin/meals?groupId=$groupId&userId=$userId";
   String getadmindHistory(userId, groupId) =>
       "${APIEndpoints.baseURL}admin/meals_history_meals?groupId=$groupId&userId=$userId";
+  String postMealCategories(groupId) =>
+      "${APIEndpoints.baseURL}admin/meals-categories?groupId=$groupId";
+  String getMealCategories(groupId) =>
+      "${APIEndpoints.baseURL}meals-categories?groupId=$groupId";
 }
 
 class _Logs {

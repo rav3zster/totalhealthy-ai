@@ -1,85 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:totalhealthy/app/modules/meal_history/controllers/meal_history_controller.dart';
+import 'package:totalhealthy/app/modules/meal_timing/controllers/meal_timing_controller.dart';
+
+import '../../../core/base/constants/appcolor.dart';
 
 class MealTimingPage extends StatefulWidget {
+  const MealTimingPage({super.key, required this.id, required this.controller});
+  final MealTimingController controller;
+  final String id;
+
   @override
   _MealTimingPageState createState() => _MealTimingPageState();
 }
 
 class _MealTimingPageState extends State<MealTimingPage> {
   // List to hold meals with time and toggle status
-  List<Map<String, dynamic>> meals = [
-    {
-      "title": "Breakfast",
-      "time": TimeOfDay(hour: 10, minute: 0),
-      "enabled": true
-    },
-    {
-      "title": "Mid-Morning Snack",
-      "time": TimeOfDay(hour: 11, minute: 30),
-      "enabled": false
-    },
-    {
-      "title": "Lunch",
-      "time": TimeOfDay(hour: 14, minute: 0),
-      "enabled": false
-    },
-    {
-      "title": "Pre-Workout Meal",
-      "time": TimeOfDay(hour: 16, minute: 0),
-      "enabled": false
-    },
-    {
-      "title": "Post-Workout Meal",
-      "time": TimeOfDay(hour: 18, minute: 0),
-      "enabled": false
-    },
-    {
-      "title": "Dinner",
-      "time": TimeOfDay(hour: 21, minute: 0),
-      "enabled": false
-    },
-    {
-      "title": "Before Bed Meal",
-      "time": TimeOfDay(hour: 23, minute: 0),
-      "enabled": false
-    },
-  ];
+  List<Map<String, dynamic>> meals = [];
 
-  // Method to add new meal
-  void addMeal(String title, TimeOfDay time) {
-    setState(() {
-      meals.add({"title": title, "time": time, "enabled": false});
-    });
-  }
-
-  // Method to show the time picker and update the time
   void _selectTime(BuildContext context, int index) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: meals[index]['time'],
+      initialTime: TimeOfDay.now(),
     );
-    if (picked != null) {
-      setState(() {
-        meals[index]['time'] = picked;
-      });
-    }
+    if (picked != null) {}
   }
 
   // Method to show dialog for adding/editing meals
   void _showAddMealDialog(BuildContext context) {
-    final TextEditingController titleController = TextEditingController();
     TimeOfDay selectedTime = TimeOfDay.now();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: AppColors.cardbackground,
           title: Text("Add New Meal"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: titleController,
+                controller: widget.controller.title,
                 decoration: InputDecoration(labelText: "Meal Title"),
               ),
               SizedBox(height: 16),
@@ -91,7 +52,7 @@ class _MealTimingPageState extends State<MealTimingPage> {
                   );
                   if (picked != null) {
                     setState(() {
-                      selectedTime = picked;
+                      widget.controller.time.text = picked.format(context);
                     });
                   }
                 },
@@ -109,9 +70,9 @@ class _MealTimingPageState extends State<MealTimingPage> {
             ElevatedButton(
               child: Text("Add"),
               onPressed: () {
-                if (titleController.text.isNotEmpty) {
-                  addMeal(titleController.text, selectedTime);
-                  Navigator.of(context).pop();
+                if (widget.controller.title.text.isNotEmpty) {
+                  widget.controller.addMeal(context, widget.id);
+                  // Navigator.of(context).pop();
                 }
               },
             ),
@@ -122,9 +83,20 @@ class _MealTimingPageState extends State<MealTimingPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    widget.controller.getMeal(context, widget.id);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: Icon(Icons.arrow_back_ios)),
         title: Text("Set Your Daily Meal & Snack Timings"),
         backgroundColor: Colors.black,
       ),
@@ -137,41 +109,54 @@ class _MealTimingPageState extends State<MealTimingPage> {
               style: TextStyle(color: Colors.white54),
             ),
             SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: meals.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    color: Colors.grey[850],
-                    child: ListTile(
-                      leading: Switch(
-                        value: meals[index]['enabled'],
-                        onChanged: (value) {
-                          setState(() {
-                            meals[index]['enabled'] = value;
-                          });
-                        },
-                      ),
-                      title: Text(
-                        meals[index]['title'],
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      subtitle: Text(
-                        meals[index]['time'].format(context),
-                        style: TextStyle(color: Colors.yellowAccent),
-                      ),
-                      trailing: IconButton(
-                        icon:
-                            Icon(Icons.access_time, color: Colors.greenAccent),
-                        onPressed: () {
-                          _selectTime(context, index);
-                        },
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+            Obx(() {
+              return widget.controller.getLoading.value
+                  ? Center(
+                      child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ))
+                  : widget.controller.dataList.isEmpty
+                      ? Center(
+                          child: Text("Not Found"),
+                        )
+                      : Expanded(
+                          child: ListView.builder(
+                            itemCount: widget.controller.dataList.length,
+                            itemBuilder: (context, index) {
+                              var data = widget.controller.dataList[index];
+                              return Card(
+                                color: Colors.grey[850],
+                                child: ListTile(
+                                  leading: Switch(
+                                    value: true,
+                                    onChanged: (value) {
+                                      // setState(() {
+                                      //   meals[index]['enabled'] = value;
+                                      // });
+                                    },
+                                  ),
+                                  title: Text(
+                                    "${data['label_name']}",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  subtitle: Text(
+                                    "${data['time_range']}",
+                                    style:
+                                        TextStyle(color: Colors.yellowAccent),
+                                  ),
+                                  trailing: IconButton(
+                                    icon: Icon(Icons.access_time,
+                                        color: Colors.greenAccent),
+                                    onPressed: () {
+                                      _selectTime(context, index);
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+            }),
           ],
         ),
       ),

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:totalhealthy/app/modules/meal_timing/views/meal_timing_page.dart';
+import 'package:totalhealthy/app/modules/meal_timing/views/meal_timing_screen.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/controllers/auth_controller.dart';
+import '../../../routes/app_pages.dart';
 import '../controllers/group_controller.dart';
 import 'add_client.dart';
 
@@ -222,11 +223,8 @@ class _GroupsViewScreenState extends State<GroupsViewScreen> {
                       size: 28,
                     ),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MealTimingPage()),
-                      );
+                      Get.toNamed(
+                          '/meal-timing?id=${controller.group["group_id"]}');
                     },
                     label: const Text(
                       "Add Category",

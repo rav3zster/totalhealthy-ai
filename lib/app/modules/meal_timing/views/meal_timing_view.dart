@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/base/views/base_view.dart';
-
 import 'meal_timing_screen.dart';
 
 class MealTimingView extends BaseView {
@@ -9,16 +8,16 @@ class MealTimingView extends BaseView {
 
   @override
   Widget vBuilderTablet() {
-    return  MealTimingScreen();
+    return MealTimingScreen();
   }
 
   @override
   Widget vBuilderDesktop() {
-    return  MealTimingScreen();
+    return MealTimingScreen();
   }
 
   @override
   Widget vBuilderPhone() {
-    return  MealTimingScreen();
+    return MealTimingScreen();
   }
 }

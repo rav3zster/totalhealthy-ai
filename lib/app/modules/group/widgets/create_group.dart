@@ -5,10 +5,15 @@ import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 
+import '../../user_group_view/controllers/user_group_view_controller.dart';
+import '../controllers/group_controller.dart';
+
 class CreateGroup extends StatefulWidget {
   const CreateGroup({
     super.key,
+    this.isGroup = false,
   });
+  final bool isGroup;
 
   @override
   State<CreateGroup> createState() => _CreateGroupState();
@@ -20,7 +25,7 @@ class _CreateGroupState extends State<CreateGroup> {
   GlobalKey<FormState> key = GlobalKey<FormState>();
 
   bool isLoading = false;
-  // var controller = Get.find<UserGroupViewController>();
+
   Future<void> submitUser(context) async {
     try {
       if (key.currentState!.validate()) {
@@ -43,6 +48,9 @@ class _CreateGroupState extends State<CreateGroup> {
                 backgroundColor: Colors.green,
               ),
             );
+            widget.isGroup
+                ? Get.find<GroupController>().submitUser()
+                : Get.find<UserGroupViewController>().submitUser();
             Get.back();
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -81,7 +89,9 @@ class _CreateGroupState extends State<CreateGroup> {
               Row(
                 children: [
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.back();
+                    },
                     icon: Icon(Icons.arrow_back_ios),
                     color: Color(0XFFD9D9D9),
                   ),
