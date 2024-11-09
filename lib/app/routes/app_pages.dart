@@ -57,6 +57,7 @@ class AppPages {
         name: _Paths.HOME,
         page: () => HomeView(),
         binding: HomeBinding(),
+        transition: Transition.fadeIn,
         middlewares: [AuthCheckMiddleware()]),
     GetPage(
       name: _Paths.ONBOARDING,
@@ -86,11 +87,13 @@ class AppPages {
         name: _Paths.NUTRITION_GOAL,
         page: () => NutritionGoalView(),
         binding: NutritionGoalBinding(),
+        transition: Transition.fadeIn,
         middlewares: [AuthCheckMiddleware()]),
     GetPage(
         name: _Paths.NOTIFICATION,
         page: () => NotificationView(),
         binding: NotificationBinding(),
+        transition: Transition.fadeIn,
         middlewares: [AuthCheckMiddleware()]),
     GetPage(
         name: _Paths.GENERATE_AI,
@@ -110,12 +113,14 @@ class AppPages {
     GetPage(
         name: _Paths.MEAL_TIMING,
         page: () => MealTimingView(),
+        transition: Transition.fadeIn,
         binding: MealTimingBinding(),
         middlewares: [AuthCheckMiddleware()]),
     GetPage(
         name: _Paths.TrainerDashboard,
         page: () => TrainerDashboardView(),
         binding: TrainerDashboardBindings(),
+        transition: Transition.fadeIn,
         middlewares: [AuthCheckMiddleware()]),
     GetPage(
       name: _Paths.SWITCHROLE,
@@ -124,6 +129,7 @@ class AppPages {
     GetPage(
         name: _Paths.UserDiet,
         page: () => UserDietView(),
+        transition: Transition.fadeIn,
         binding: UserDietScreenBindings(),
         middlewares: [AuthCheckMiddleware()]),
     GetPage(

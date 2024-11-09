@@ -18,6 +18,7 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
   bool isMaleSelected = false; // Track Male selection
   bool isFemaleSelected = false;
   String slectedValue = "";
+  String role = "";
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +56,7 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
               onTap: () {
                 setState(() {
                   slectedValue = "isUser=false";
-                  Get.find<AuthController>().roleStore("admin");
+                  role = "admin";
                   isMaleSelected = true;
                   isFemaleSelected = false; // Deselect female
                 });
@@ -105,7 +106,8 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
               onTap: () {
                 setState(() {
                   slectedValue = "isUser=true";
-                  Get.find<AuthController>().roleStore("user");
+                  role = "user";
+                  // Get.find<AuthController>().roleStore("user");
                   isFemaleSelected = true;
                   isMaleSelected = false; // Deselect male
                 });
@@ -164,6 +166,9 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
                         ? null
                         : Get.offAllNamed(
                             "${Routes.USER_GROUP_VIEW}?$slectedValue");
+                    role == ""
+                        ? null
+                        : Get.find<AuthController>().roleStore(role);
                   },
                   child: const Text(
                     "Continue",

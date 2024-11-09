@@ -32,39 +32,10 @@ class _GroupListPageState extends State<GroupListPage> {
       // drawer: DrawerMenu(),
       appBar: AppBar(
         backgroundColor: Color(0XFF0C0C0C),
-
         title: Text(
           'Groups',
           style: TextStyle(color: Color(0XFFB3B3B3), fontSize: 24),
         ),
-        // actions: [
-        //   Container(
-        //     decoration: BoxDecoration(
-        //         color: Color(0XFFCDE26D),
-        //         borderRadius: BorderRadius.circular(30)),
-        //     child: ElevatedButton.icon(
-        //       icon: Icon(
-        //         Icons.add,
-        //         color: Color(0XFF242522),
-        //         size: 28,
-        //       ),
-        //       onPressed: () {
-        //         showDialog(
-        //             context: context,
-        //             builder: (context) {
-        //               return CreateGroup();
-        //             });
-        //       },
-        //       label: const Text(
-        //         "Add group",
-        //         style: TextStyle(
-        //             color: Color(0XFF242522),
-        //             fontWeight: FontWeight.bold,
-        //             fontSize: 18),
-        //       ),
-        //     ),
-        //   ),
-        // ],
         actions: [
           Container(
             decoration: BoxDecoration(
@@ -105,6 +76,7 @@ class _GroupListPageState extends State<GroupListPage> {
                   final group = controller.groupData[index];
                   return GestureDetector(
                       onTap: () {
+                        controller.getCategories(group["group_id"]);
                         widget.isUser
                             ? Get.toNamed(Routes.ClientDashboard)
                             : Get.toNamed(Routes.TrainerDashboard);

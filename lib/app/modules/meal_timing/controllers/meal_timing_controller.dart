@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
+import '../../../core/base/controllers/auth_controller.dart';
 
 class MealTimingController extends GetxController {
   @override
@@ -58,6 +60,8 @@ class MealTimingController extends GetxController {
     }
   }
 
+  var box = GetStorage();
+
   var dataList = [].obs;
   var getLoading = false.obs;
 
@@ -71,6 +75,8 @@ class MealTimingController extends GetxController {
         if (APIStatus.success(value.statusCode)) {
           // addMeal(context, id);
           dataList(value.data);
+          Get.find<AuthController>().categoriesAdd(value.data);
+          print(box.read("categories"));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

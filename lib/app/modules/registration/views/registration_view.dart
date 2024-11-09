@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:totalhealthy/app/modules/generate_ai/views/generate_ai_screen.dart';
 import 'package:totalhealthy/app/modules/manage_accounts/views/manage_accounts_views.dart';
+import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 
 import '../../generate_ai/widgets/generate_ai_page.dart';
 import '../../nutrition_goal/views/nutrition_goal_screen.dart';
@@ -11,6 +12,7 @@ class RegistrationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: MobileNavBar(),
       body: Container(
         color: Color(0xFF0C0C0C),
         child: Column(

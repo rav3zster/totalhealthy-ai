@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
@@ -18,6 +19,25 @@ class UserGroupViewController extends GetxController {
   var isLoading = false.obs;
   var groupData = [].obs;
   final context = Get.context;
+
+  Future<void> getCategories(id) async {
+    try {
+      await APIMethods.get
+          .get(
+        url: APIEndpoints.meals.getMealCategories(id),
+      )
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          Get.find<AuthController>().categoriesAdd(value.data);
+        } else {
+          print("Categories Not Found");
+        }
+      });
+      // }
+    } catch (e) {
+      print(e);
+    }
+  }
 
   Future<void> submitUser() async {
     try {

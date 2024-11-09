@@ -50,9 +50,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   @override
   void initState() {
     super.initState();
-    GetStorage().hasData("userdata")
-        ? userData = GetStorage().read("userdata")
-        : null;
+    userData = Get.find<AuthController>().userdataget();
+    categories = Get.find<AuthController>().categoriesGet();
     getMeals();
   }
 
@@ -162,7 +161,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     print(filteredRecipes);
   }
 
-  var category = "Breakfast";
+  var categories = [];
 
   var buttonName = [
     {
@@ -193,7 +192,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
             createdAt.day == selectedDate.day;
       }).toList();
     });
-    filterRecipesBySingleCategory(category);
+    filterRecipesBySingleCategory("Breakfast");
   }
 
   Map<int, bool> isCheck = {};
@@ -263,116 +262,271 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stack(
+              Column(
                 children: [
-                  Column(
-                    children: [
-                      SizedBox(
-                        height: 35,
-                      ),
-                      Container(
-                        height: 250, // Increase the height of the container
-                        decoration: BoxDecoration(
-                          color: Color(0XFFCDE26D),
-                          borderRadius: BorderRadius.circular(
-                              16), // Increase the border radius for smoother edges
+                  SizedBox(
+                    height: 35,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.chineseGreen,
+                      borderRadius: BorderRadius.circular(
+                          16), // Increase the border radius for smoother edges
+                    ),
+                    padding: EdgeInsets.all(10), // Increase padding
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Your Daily Calories Intake',
+                          style: TextStyle(
+                              color: Color(0XFF000000),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 25), // Increase font size
                         ),
-                        padding: EdgeInsets.all(10), // Increase padding
-                        child: Row(
+                        SizedBox(height: 10),
+                        // More space between the title and summary
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          // Align items to the far ends
                           children: [
-                            // Text content on the left
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Row(
                               children: [
-                                Text(
-                                  'Track \nYour Daily \nCalories',
-                                  style: TextStyle(
-                                      color: Color(0XFF000000),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 30), // Increase font size
+                                Container(
+                                  padding: EdgeInsets.all(15),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color.fromRGBO(193, 223, 59, 1),
+                                  ),
+                                  width: 80,
+                                  height: 80,
+                                  child: CircularProgressIndicator(
+                                    value: 0.60,
+                                    color: AppColors.chineseGreen,
+                                    backgroundColor: Colors.white,
+                                    strokeWidth: 10,
+                                  ),
                                 ),
-                                SizedBox(height: 10),
-                                // More space between the title and summary
-                                Row(
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Column(
-                                      children: [
-                                        Icon(
-                                          Icons.circle_outlined,
-                                          color: Color(0XFFFFFFFF),
-                                        ),
-                                        Text(
-                                          'Gain',
-                                          style: TextStyle(
-                                              color: Color(0XFF000000),
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        // Slightly bigger text
-                                        Text(
-                                          '1258 Kcal',
-                                          style: TextStyle(
-                                              color: Color(0XFF000000),
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
+                                    Text(
+                                      'Eaten',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Color(0XFF000000),
+                                          fontWeight: FontWeight.bold),
                                     ),
-                                    SizedBox(width: 24),
-                                    // More space between 'Gain' and 'Burn'
-                                    Column(
-                                      children: [
-                                        Icon(
-                                          Icons.circle_outlined,
-                                          color: Color(0XFFFFFFFF),
-                                        ),
-                                        Text(
-                                          'Burn',
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              color: Color(0XFF000000),
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          '658 Kcal',
-                                          style: TextStyle(
-                                            color: Color(0XFF000000),
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ],
+                                    Text(
+                                      '1258 Kcal',
+                                      style: TextStyle(
+                                        color: Color(0XFF000000),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                   ],
                                 ),
                               ],
                             ),
-
-                            // Image on the right
+                            Row(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(15),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color.fromRGBO(193, 223, 59, 1),
+                                  ),
+                                  width: 80,
+                                  height: 80,
+                                  child: CircularProgressIndicator(
+                                    value: 0.60,
+                                    color: AppColors.chineseGreen,
+                                    backgroundColor: Colors.white,
+                                    strokeWidth: 10,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Burn',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Color(0XFF000000),
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      '558 Kcal',
+                                      style: TextStyle(
+                                        color: Color(0XFF000000),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: ClipRRect(
-                      // Match the container's border radius
-                      child: Image.asset(
-                        "assets/clientimage.png",
-                        height: 285,
-                        fit: BoxFit
-                            .cover, // Image will cover the entire container
-                      ),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              // Align labels and values to the left
+                              children: [
+                                Row(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.baseline,
+                                  textBaseline: TextBaseline.alphabetic,
+                                  // Ensures alignment of text sizes
+                                  children: [
+                                    // Large size for the value before "/"
+                                    Text(
+                                      '60',
+                                      style: TextStyle(
+                                        color: Color(0XFFFF5122),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize:
+                                            22, // Increased font size for the value before "/"
+                                      ),
+                                    ),
+                                    // Smaller size for the value after "/"
+                                    Text(
+                                      '/150',
+                                      style: TextStyle(
+                                        color: Color(0XFF000000),
+                                        fontSize:
+                                            14, // Decreased font size for the value after "/"
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8),
+                                // Space between value and title
+                                // Title (Proteins, Carbs, Fats) below the values
+                                Text(
+                                  'Proteins',
+                                  style: TextStyle(
+                                    color: Color(0XFF000000),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            // Adjusted for Proteins
+                            _buildVerticalDivider(),
+                            // Vertical divider
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              // Align labels and values to the left
+                              children: [
+                                Row(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.baseline,
+                                  textBaseline: TextBaseline.alphabetic,
+                                  // Ensures alignment of text sizes
+                                  children: [
+                                    // Large size for the value before "/"
+                                    Text(
+                                      '120',
+                                      style: TextStyle(
+                                        color: Color(0XFF0996D2),
+
+                                        fontWeight: FontWeight.bold,
+                                        fontSize:
+                                            22, // Increased font size for the value before "/"
+                                      ),
+                                    ),
+                                    // Smaller size for the value after "/"
+                                    Text(
+                                      '/200',
+                                      style: TextStyle(
+                                        color: Color(0XFF000000),
+                                        fontSize:
+                                            14, // Decreased font size for the value after "/"
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8),
+                                // Space between value and title
+                                // Title (Proteins, Carbs, Fats) below the values
+                                Text(
+                                  'Carbs',
+                                  style: TextStyle(
+                                    color: Color(0XFF000000),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            // Adjusted for Carbs
+                            _buildVerticalDivider(),
+
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              // Align labels and values to the left
+                              children: [
+                                Row(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.baseline,
+                                  textBaseline: TextBaseline.alphabetic,
+                                  // Ensures alignment of text sizes
+                                  children: [
+                                    // Large size for the value before "/"
+                                    Text(
+                                      '35',
+                                      style: TextStyle(
+                                        color: Color(0XFF8B3BFF),
+
+                                        fontWeight: FontWeight.bold,
+                                        fontSize:
+                                            22, // Increased font size for the value before "/"
+                                      ),
+                                    ),
+                                    // Smaller size for the value after "/"
+                                    Text(
+                                      '/75',
+                                      style: TextStyle(
+                                        color: Color(0XFF000000),
+                                        fontSize:
+                                            14, // Decreased font size for the value after "/"
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8),
+                                // Space between value and title
+                                // Title (Proteins, Carbs, Fats) below the values
+                                Text(
+                                  'Fats',
+                                  style: TextStyle(
+                                    color: Color(0XFF000000),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            // Adjusted for Fats
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
 
-              SizedBox(height: 16),
-              DailySummeryCard(),
+              // SizedBox(height: 16),
+              // DailySummeryCard(),
 
               SizedBox(height: 16),
               SizedBox(
@@ -499,38 +653,39 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
               //   id: userData["_id"] ?? "",
               // ),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    height: 40,
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        var data = shedule[index];
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedIndex = index;
-                              filterRecipesBySingleCategory(
-                                  data["name"].toString());
-                            });
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: ButtonSelector(
-                              title: data["name"].toString(),
-                              icon: data["icon"] as IconData,
-                              active: index == selectedIndex,
-                            ),
-                          ),
-                        );
+              SizedBox(
+                height: 40,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    var data = categories[index];
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedIndex = index;
+                        });
+                        filterRecipesBySingleCategory(
+                            data["label_name"].toString());
                       },
-                      itemCount: shedule.length,
-                    ),
-                  ),
-                ],
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: ButtonSelector(
+                          title: data["label_name"].toString(),
+                          icon: index == 0
+                              ? Icons.breakfast_dining
+                              : index == 1
+                                  ? Icons.lunch_dining
+                                  : index == 2
+                                      ? Icons.dinner_dining
+                                      : Icons.food_bank,
+                          active: index == selectedIndex,
+                        ),
+                      ),
+                    );
+                  },
+                  itemCount: categories.length,
+                ),
               ),
               SizedBox(height: 20),
 
@@ -638,6 +793,15 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
             )
           ],
         ));
+  }
+
+  // Helper function to build the vertical divider
+  Widget _buildVerticalDivider() {
+    return Container(
+      height: 40,
+      width: 1,
+      color: Colors.grey, // Light color for the divider
+    );
   }
 }
 

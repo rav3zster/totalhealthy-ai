@@ -26,6 +26,7 @@ abstract class Routes {
   static const ONBOARDING = _Paths.ONBOARDING;
   static const USER_GROUP_VIEW = _Paths.USER_GROUP_VIEW;
   static const SETTING = _Paths.SETTING;
+  static const SWITCHROLE = _Paths.SWITCHROLE;
 }
 
 abstract class _Paths {

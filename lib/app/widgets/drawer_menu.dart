@@ -19,7 +19,7 @@ class DrawerMenu extends StatefulWidget {
 
 class _DrawerMenuState extends State<DrawerMenu> {
   bool isTrainer = false;
-
+  var userData = Get.find<AuthController>().userdataget();
   @override
   Widget build(BuildContext context) {
     return Responsive.isMobile(context)
@@ -41,7 +41,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                         const SizedBox(
                           height: 10,
                         ),
-                        const SizedBox(
+                        SizedBox(
                           width: double.infinity,
                           child: Row(
                             // crossAxisAlignment: WrapCrossAlignment.start,
@@ -64,7 +64,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                       height: 20,
                                     ),
                                     Text(
-                                      "Aysuh Shukla",
+                                      "${userData["name"] ?? ""}",
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 18,
@@ -73,7 +73,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                       ),
                                     ),
                                     Text(
-                                      "Ayush Shukla",
+                                      "${userData["name"] ?? ""}",
                                       style: TextStyle(
                                           fontFamily: "inter",
                                           fontSize: 12,
@@ -83,9 +83,9 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             ],
                           ),
                         ),
-                        // const SizedBox(
-                        //   height: 20,
-                        // ),
+                        const SizedBox(
+                          height: 10,
+                        ),
                         ListView(
                           shrinkWrap: true,
                           children: [

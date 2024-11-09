@@ -27,15 +27,6 @@ class MealHistoryPage extends StatefulWidget {
 }
 
 class _MealHistoryPageState extends State<MealHistoryPage> {
-  @override
-  void initState() {
-    super.initState();
-    getMeals();
-    // dataList = box.read(
-    //   "mealPlan",
-    // );
-  }
-
   DateTime selectedDate = DateTime.now();
   List<Map<String, dynamic>> recipesCotegory = [];
   void filterRecipesBySingleCategory(String selectedCategory) {
@@ -144,6 +135,18 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
   }
 
   bool isCalender = false;
+  var categories = [];
+  @override
+  void initState() {
+    super.initState();
+    categories = Get.find<AuthController>().categoriesGet();
+    getMeals();
+
+    // dataList = box.read(
+    //   "mealPlan",
+    // );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -183,6 +186,7 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                       return GestureDetector(
                         onTap: () {
                           setState(() {
+                            data["name"] == "Today" ? isCalender = false : null;
                             selectedIndex = index;
                             data["name"] == "Today"
                                 ? _filterRecipesByDate(selectedDate)
@@ -551,27 +555,32 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                     shrinkWrap: true,
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
-                      var data = shedule[index];
+                      var data = categories[index];
                       return GestureDetector(
                         onTap: () {
                           setState(() {
-                            selectedIndex1 = index;
-                            print("press");
+                            selectedIndex = index;
                           });
                           filterRecipesBySingleCategory(
-                              data["name"].toString());
+                              data["label_name"].toString());
                         },
                         child: Padding(
                           padding: EdgeInsets.only(left: 10),
                           child: ButtonSelector(
-                            title: data["name"].toString(),
-                            icon: data["icon"] as IconData,
-                            active: index == selectedIndex1,
+                            title: data["label_name"].toString(),
+                            icon: index == 0
+                                ? Icons.breakfast_dining
+                                : index == 1
+                                    ? Icons.lunch_dining
+                                    : index == 2
+                                        ? Icons.dinner_dining
+                                        : Icons.food_bank,
+                            active: index == selectedIndex,
                           ),
                         ),
                       );
                     },
-                    itemCount: shedule.length,
+                    itemCount: categories.length,
                   ),
                 ),
                 SizedBox(

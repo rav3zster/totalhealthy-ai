@@ -389,9 +389,9 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                 )
                               : InkWell(
                                   onTap: () {
+                                    GetStorage().write("clientData", data);
                                     Get.toNamed(
                                         "/userdiet?id=${data["user_id"]}");
-                                    GetStorage().write("userData", data);
                                   },
                                   child: ClientCard(
                                     name: "${data["user_details"]["name"]}",

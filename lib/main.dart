@@ -6,6 +6,7 @@ import 'app/core/base/constants/custom_scroll.dart';
 
 import 'app/core/base/controllers/theme_controller.dart';
 import 'app/routes/app_pages.dart';
+import 'app/widgets/phone_nav_bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,9 +37,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return GetMaterialApp(
         getPages: AppPages.routes,
-        initialRoute: Get.find<AuthController>().isAuthenticated.value
-            ? Get.find<AuthController>().handleAuthChange()
-            : AppPages.INITIAL,
+        initialRoute: Get.find<AuthController>().handleAuthChange(),
         title: 'Total Healthy',
         onReady: () {},
         scrollBehavior: MyCustomScrollBehavior(),

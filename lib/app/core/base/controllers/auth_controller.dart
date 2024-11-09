@@ -41,7 +41,7 @@ class AuthController extends GetxController {
     authToken = box.read("authToken");
 
     print("sdadada${token},${refToken}");
-    Get.to(() => SwitchRoleScreen());
+    Get.offAllNamed(Routes.SWITCHROLE);
 
     // Get.toNamed(Routes.ClientDashboard);
   }
@@ -61,22 +61,25 @@ class AuthController extends GetxController {
   handleAuthChange() {
     print("handleAuthChange  ${Get.currentRoute}");
 
-    if (isLogOut.value) {
-      return Routes.Login;
-    } else if (isAuthenticated.value) {
+    if (isAuthenticated.value) {
       print(isAuthenticated.value);
       return Get.currentRoute == '/login' ||
               Get.currentRoute == '/signup' ||
               Get.currentRoute == '/onboarding' ||
               Get.currentRoute.isEmpty
-          ? box.read("role") == "admin"
-              ? Routes.TrainerDashboard
-              : Routes.ClientDashboard
+          ? box.hasData("role")
+              ? box.read("role") == "admin"
+                  ? Routes.TrainerDashboard
+                  : Routes.ClientDashboard
+              : Routes.SWITCHROLE
           : Get.currentRoute;
     } else {
       return '/onboarding';
     }
   }
+
+  categoriesAdd(data) => box.write("categories", data);
+  categoriesGet() => box.read("categories");
 
   groupgetId() => box.read("groupId");
   userdataget() => box.read("userdata");

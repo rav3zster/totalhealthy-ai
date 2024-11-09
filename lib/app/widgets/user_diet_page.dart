@@ -29,12 +29,13 @@ class UserDietPage extends StatefulWidget {
 
 class _UserDietPageState extends State<UserDietPage> {
   var userData = {};
+
   @override
   void initState() {
     super.initState();
-    GetStorage().hasData("userData")
-        ? userData = GetStorage().read("userData")
-        : null;
+    userData = GetStorage().read("clientData");
+    categories = Get.find<AuthController>().categoriesGet();
+
     getMeals();
   }
 
@@ -46,6 +47,7 @@ class _UserDietPageState extends State<UserDietPage> {
       setState(() {
         isLoading = true;
       });
+
       await APIMethods.get
           .get(
         url: APIEndpoints.meals.getadminMeals(
@@ -80,6 +82,8 @@ class _UserDietPageState extends State<UserDietPage> {
       });
     }
   }
+
+  var categories = [];
 
   Map<String, dynamic> generateJson() {
     return {
@@ -141,20 +145,6 @@ class _UserDietPageState extends State<UserDietPage> {
 
   List<String> selectedMealIds = [];
 
-  var shedule = [
-    {
-      "name": "Breakfast",
-      "icon": Icons.breakfast_dining,
-    },
-    {
-      "name": "Lunch",
-      "icon": Icons.lunch_dining,
-    },
-    {
-      "name": "Dinner",
-      "icon": Icons.dinner_dining,
-    },
-  ];
   List<Map<String, dynamic>> filteredRecipes = [];
   void filterRecipesBySingleCategory(String selectedCategory) {
     setState(() {
@@ -235,37 +225,39 @@ class _UserDietPageState extends State<UserDietPage> {
           SizedBox(height: 20),
           AddMealButton(id: widget.id),
           SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                height: 40,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    var data = shedule[index];
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedIndex = index;
-                        });
-                        filterRecipesBySingleCategory(data["name"].toString());
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: ButtonSelector(
-                          title: data["name"].toString(),
-                          icon: data["icon"] as IconData,
-                          active: index == selectedIndex,
-                        ),
-                      ),
-                    );
+          SizedBox(
+            height: 40,
+            child: ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                var data = categories[index];
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedIndex = index;
+                    });
+                    filterRecipesBySingleCategory(
+                        data["label_name"].toString());
                   },
-                  itemCount: shedule.length,
-                ),
-              ),
-            ],
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: ButtonSelector(
+                      title: data["label_name"].toString(),
+                      icon: index == 0
+                          ? Icons.breakfast_dining
+                          : index == 1
+                              ? Icons.lunch_dining
+                              : index == 2
+                                  ? Icons.dinner_dining
+                                  : Icons.food_bank,
+                      active: index == selectedIndex,
+                    ),
+                  ),
+                );
+              },
+              itemCount: categories.length,
+            ),
           ),
           SizedBox(height: 20),
 
