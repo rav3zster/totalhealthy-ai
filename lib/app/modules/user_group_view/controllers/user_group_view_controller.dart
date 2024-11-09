@@ -6,6 +6,7 @@ import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/controllers/auth_controller.dart';
+import '../../../routes/app_pages.dart';
 
 class UserGroupViewController extends GetxController {
   //TODO: Implement UserGroupViewController
@@ -19,25 +20,6 @@ class UserGroupViewController extends GetxController {
   var isLoading = false.obs;
   var groupData = [].obs;
   final context = Get.context;
-
-  Future<void> getCategories(id) async {
-    try {
-      await APIMethods.get
-          .get(
-        url: APIEndpoints.meals.getMealCategories(id),
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          Get.find<AuthController>().categoriesAdd(value.data);
-        } else {
-          print("Categories Not Found");
-        }
-      });
-      // }
-    } catch (e) {
-      print(e);
-    }
-  }
 
   Future<void> submitUser() async {
     try {

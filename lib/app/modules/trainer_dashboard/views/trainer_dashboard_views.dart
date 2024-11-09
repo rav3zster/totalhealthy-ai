@@ -130,12 +130,33 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
 
   bool isMemberLoading = false;
   var groupMemberData = [];
+
+  Future<void> getCategories() async {
+    try {
+      await APIMethods.get
+          .get(
+        url: APIEndpoints.meals
+            .getMealCategories(Get.find<AuthController>().groupgetId()),
+      )
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          Get.find<AuthController>().categoriesAdd(value.data);
+        } else {
+          print("Categories Not Found");
+        }
+      });
+      // }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future<void> getMember() async {
     try {
       setState(() {
         isMemberLoading = true;
       });
-
+      await getCategories();
       await APIMethods.get
           .get(
         url: APIEndpoints.group

@@ -51,7 +51,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   void initState() {
     super.initState();
     userData = Get.find<AuthController>().userdataget();
-    categories = Get.find<AuthController>().categoriesGet();
+
     getMeals();
   }
 
@@ -63,6 +63,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       setState(() {
         isLoading = true;
       });
+      await getCategories();
       await APIMethods.get
           .get(
         url: APIEndpoints.meals
@@ -161,6 +162,29 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     print(filteredRecipes);
   }
 
+  Future<void> getCategories() async {
+    try {
+      await APIMethods.get
+          .get(
+        url: APIEndpoints.meals
+            .getMealCategories(Get.find<AuthController>().groupgetId()),
+      )
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          Get.find<AuthController>().categoriesAdd(value.data);
+          Future.delayed(Duration(milliseconds: 100), () {
+            categories = Get.find<AuthController>().categoriesGet();
+          });
+        } else {
+          print("Categories Not Found");
+        }
+      });
+      // }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   var categories = [];
 
   var buttonName = [
@@ -199,6 +223,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
 
   List<String> selectedMealIds = [];
   bool isCalender = false;
+
   @override
   Widget build(BuildContext context) {
     String id = Get.parameters["id"] ?? "";
@@ -282,7 +307,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                           style: TextStyle(
                               color: Color(0XFF000000),
                               fontWeight: FontWeight.bold,
-                              fontSize: 25), // Increase font size
+                              fontSize: 30), // Increase font size
                         ),
                         SizedBox(height: 10),
                         // More space between the title and summary

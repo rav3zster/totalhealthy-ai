@@ -76,12 +76,12 @@ class _GroupListPageState extends State<GroupListPage> {
                   final group = controller.groupData[index];
                   return GestureDetector(
                       onTap: () {
-                        controller.getCategories(group["group_id"]);
+                        Get.find<AuthController>()
+                            .groupIdStore(group["group_id"]);
+
                         widget.isUser
                             ? Get.toNamed(Routes.ClientDashboard)
                             : Get.toNamed(Routes.TrainerDashboard);
-                        Get.find<AuthController>()
-                            .groupIdStore(group["group_id"]);
                       },
                       child: GroupCard(group: group));
                 },
