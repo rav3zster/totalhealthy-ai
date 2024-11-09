@@ -385,7 +385,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
             // SizedBox(height: 10),
             // Client List
 
-            isGroupLoading || isLoading
+            isMemberLoading || isLoading
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
