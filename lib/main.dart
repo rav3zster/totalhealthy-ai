@@ -6,7 +6,7 @@ import 'app/core/base/constants/custom_scroll.dart';
 
 import 'app/core/base/controllers/theme_controller.dart';
 import 'app/routes/app_pages.dart';
-import 'app/widgets/phone_nav_bar.dart';
+// import 'app/widgets/phone_nav_bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

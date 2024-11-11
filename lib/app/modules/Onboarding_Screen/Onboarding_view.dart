@@ -31,14 +31,14 @@ class _OnboardingViewState extends State<OnboardingView> {
 
   void _onDotTapped(int index) {
     _pageController.animateToPage(index,
-        duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+        duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
   }
 
   void _goToNextPage() {
     if (_currentPage < 2) {
       // Assuming there are 3 pages (index 0, 1, 2)
       _pageController.animateToPage(_currentPage + 1,
-          duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
     } else {
       Get.offAllNamed(Routes.SIGNUP);
     }
@@ -68,9 +68,9 @@ class _OnboardingViewState extends State<OnboardingView> {
                               "Welcome to TotalHealthy",
                               "Your all-in-one health and fitness app.",
                             ),
-                            SizedBox(height: 3),
+                            const SizedBox(height: 3),
                             Container(
-                              child: Text(
+                              child: const Text(
                                 "Get personalized plans and track your",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
@@ -79,15 +79,13 @@ class _OnboardingViewState extends State<OnboardingView> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 3),
-                            Container(
-                              child: Text(
-                                "progress to achieve your goals.",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white54,
-                                  fontSize: 22,
-                                ),
+                            const SizedBox(height: 3),
+                            const Text(
+                              "progress to achieve your goals.",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white54,
+                                fontSize: 22,
                               ),
                             ),
                           ],
@@ -95,72 +93,60 @@ class _OnboardingViewState extends State<OnboardingView> {
                       ),
                     ],
                   ),
-                  Container(
-                    child: Column(
-                      children: [
-                        _buildPageContent(
-                          "assets/Second.png",
-                          "Personalized Diet Plans",
-                          "Receive custom diet plans tailored to",
+                  Column(
+                    children: [
+                      _buildPageContent(
+                        "assets/Second.png",
+                        "Personalized Diet Plans",
+                        "Receive custom diet plans tailored to",
+                      ),
+                      const Text(
+                        "your goals. Whether it's weight loss or",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white54,
+                          fontSize: 22,
                         ),
-                        Container(
-                          child: Text(
-                            "your goals. Whether it's weight loss or",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white54,
-                              fontSize: 22,
-                            ),
-                          ),
+                      ),
+                      const Text(
+                        "fitness, we've got you covered.",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white54,
+                          fontSize: 22,
                         ),
-                        Container(
-                          child: Text(
-                            "fitness, we've got you covered.",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white54,
-                              fontSize: 22,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  Container(
-                    child: Column(
-                      children: [
-                        _buildPageContent(
-                          "assets/Third.png",
-                          "Track Your Progress",
-                          "Monitor your daily progress and view",
+                  Column(
+                    children: [
+                      _buildPageContent(
+                        "assets/Third.png",
+                        "Track Your Progress",
+                        "Monojklitor your daily progress and view",
+                      ),
+                      const Text(
+                        "detailed results. Stay motivated and",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white54,
+                          fontSize: 22,
                         ),
-                        Container(
-                          child: Text(
-                            "detailed results. Stay motivated and",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white54,
-                              fontSize: 22,
-                            ),
-                          ),
+                      ),
+                      const Text(
+                        "reach your fitness milestones.",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white54,
+                          fontSize: 22,
                         ),
-                        Container(
-                          child: Text(
-                            "reach your fitness milestones.",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white54,
-                              fontSize: 22,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 0),
+            const SizedBox(height: 0),
             Column(
               children: [
                 Row(
@@ -172,9 +158,9 @@ class _OnboardingViewState extends State<OnboardingView> {
                     );
                   }),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Container(
-                  margin: EdgeInsets.only(left: 20, top: 0),
+                  margin: const EdgeInsets.only(left: 20, top: 0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -187,10 +173,11 @@ class _OnboardingViewState extends State<OnboardingView> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => RegistrationView(),
+                                  builder: (context) =>
+                                      const RegistrationView(),
                                 ));
                           },
-                          child: Text(
+                          child: const Text(
                             "Skip",
                             style: TextStyle(
                               color: Colors.lightGreenAccent,
@@ -201,10 +188,10 @@ class _OnboardingViewState extends State<OnboardingView> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(right: 20),
+                        margin: const EdgeInsets.only(right: 20),
                         child: GestureDetector(
                           onTap: _goToNextPage,
-                          child: Text(
+                          child: const Text(
                             "Next",
                             style: TextStyle(
                               color: Colors.lightGreenAccent,
@@ -219,7 +206,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                 ),
               ],
             ),
-            SizedBox(height: 60),
+            const SizedBox(height: 60),
           ],
         ),
       ),
@@ -230,27 +217,27 @@ class _OnboardingViewState extends State<OnboardingView> {
     return Column(
       children: [
         Container(
-          margin: EdgeInsets.only(top: 40),
+          margin: const EdgeInsets.only(top: 40),
           height: 400,
           width: 450,
           child: Image.asset(imagePath, fit: BoxFit.fitWidth),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Container(
           child: Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 32,
               color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Container(
           child: Text(
             subtitle,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.w500,
               color: Colors.white54,
               fontSize: 22,
@@ -273,7 +260,7 @@ class DotIndicator extends StatelessWidget {
     return Column(
       children: [
         Container(
-          margin: EdgeInsets.symmetric(horizontal: 5),
+          margin: const EdgeInsets.symmetric(horizontal: 5),
           height: 10,
           width: 10,
           decoration: BoxDecoration(
