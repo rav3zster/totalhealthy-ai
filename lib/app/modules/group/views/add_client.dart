@@ -317,10 +317,10 @@ class _AddClientState extends State<AddClient> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.network(
+                  child: Image.asset(
                     height: 100,
                     width: 90,
-                    "https://s3-alpha-sig.figma.com/img/4edc/c0b0/bdaf584c291418ad88b679516504a43c?Expires=1731283200&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=UdYv6gXu3HLjJOuTpuslOJFTnTwT2KQcWHHFZ40C3amr6q~lbYYeTeUazXnkhx9iDs7upBBXnrawq4I16CuHiNLRwMENc-qHsuopkkuUTq9D9RrtZOYnziambRB2JZCAvpckWeh012RWmn-ChTAPNsbz5kbXX7FFDDocPVheFsAK0w9e51bxuPMhtUyePaEpJZMR6UprF4wncShleGoLZU9NmCd7s66xHwdFaMB8ndKZqz7E8NYH7Bv2pQjLCZSiAgL7L5DcgVxxwmF82lWoo1xS-7rp4G~JGZ7zDIiuk4oHXYS4gz-mFJE6QUrzqtLcpIYgJlJVeIX2ZQSVK67K4g__",
+                    "assets/advisor.png",
                     fit: BoxFit.cover,
                   ),
                 ),

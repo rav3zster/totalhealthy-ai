@@ -312,58 +312,60 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                   ],
                 ),
               ),
-              SizedBox(
-                // height: 200, // Set height for the list
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: images.length,
-                  itemBuilder: (context, index) {
-                    return Stack(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ClipRRect(
-                            borderRadius:
-                                BorderRadius.circular(10), // Rounded corners
-                            child: Image.network(
-                              images[index],
-                              width: 180, // Set width for each image
-                              fit: BoxFit.cover, // Adjust image fit as needed
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: Colors.grey[300],
-                                  width: 150,
-                                  child: const Center(
-                                    child: Icon(Icons.broken_image,
-                                        color: Colors.red),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            // SizedBox(child: Image.asset("assets/men.jpg")),
-                            Positioned(
-                              // left: ,
-                              right: 0,
-                              child: const Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    "data",
-                                    style: TextStyle(fontSize: 10),
-                                  ),
-                                ],
+              Container(
+                child: SizedBox(
+                  height: 80,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: images.length,
+                    itemBuilder: (context, index) {
+                      return Stack(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ClipRRect(
+                              borderRadius:
+                                  BorderRadius.circular(10), // Rounded corners
+                              child: Image.network(
+                                images[index],
+                                width: 180, // Set width for each image
+                                fit: BoxFit.cover, // Adjust image fit as needed
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey[300],
+                                    width: 150,
+                                    child: const Center(
+                                      child: Icon(Icons.broken_image,
+                                          color: Colors.red),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
-                          ],
-                        ),
-                      ],
-                    );
-                  },
+                          ),
+                          Row(
+                            children: [
+                              // SizedBox(child: Image.asset("assets/men.jpg")),
+                              Positioned(
+                                // left: ,
+                                right: 0,
+                                child: const Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      "data",
+                                      style: TextStyle(fontSize: 10),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
               // CarouselSlider.builder(

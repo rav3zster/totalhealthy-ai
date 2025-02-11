@@ -15,6 +15,7 @@ import '../../../widgets/drawer_menu.dart';
 import '../../../widgets/phone_nav_bar.dart';
 import '../../../widgets/profile_card.dart';
 import '../../group/views/add_client.dart';
+import '../../notification/views/local_notification.dart';
 import '../../user_diet_screen/controllers/user_diet_screen_controllers.dart';
 
 class TrainerDashboardView extends StatefulWidget {
@@ -198,6 +199,16 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          NotificationService.showNotification(
+            999, // Unique ID
+            "Test Notification",
+            "This is a test notification at ${DateTime.now()}",
+          );
+        },
+        child: Icon(Icons.notifications),
+      ),
       bottomNavigationBar: MobileNavBar(),
       drawer: DrawerMenu(),
       backgroundColor: Color(0XFF0C0C0C),
