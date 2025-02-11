@@ -5,6 +5,7 @@ import 'package:totalhealthy/app/modules/meal_history/controllers/meal_history_c
 import 'package:totalhealthy/app/modules/meal_timing/controllers/meal_timing_controller.dart';
 
 import '../../../core/base/constants/appcolor.dart';
+import '../../notification/views/local_notification.dart';
 
 class MealTimingPage extends StatefulWidget {
   const MealTimingPage({super.key, required this.id, required this.controller});
@@ -23,37 +24,64 @@ class _MealTimingPageState extends State<MealTimingPage> {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
-        builder: (BuildContext context, Widget? child){
-          return Theme( data: ThemeData.dark().copyWith(
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.dark(
-              primary: Colors.lime, // Header and selected time color
-              onPrimary: Colors.black, // Text color on selected time
-              surface: Colors.black, // Background of the dialog
-              onSurface: Colors.black, // Text color for labels and numbers
+              primary: Colors.lime,
+              onPrimary: Colors.black,
+              surface: Colors.black,
+              onSurface: Colors.black,
             ),
-            iconTheme: IconThemeData(
-              color: Colors.white,
-            ),
-
+            iconTheme: IconThemeData(color: Colors.white),
             textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white, // Text color for Cancel and OK buttons
-              ),
+              style: TextButton.styleFrom(foregroundColor: Colors.white),
             ),
-
             timePickerTheme: TimePickerThemeData(
-              dayPeriodColor:  Colors.lime,
-              dialBackgroundColor: Colors.lime[50], // Background color of the clock face
-              dialHandColor: Colors.lime, // Color of the clock hand
-              hourMinuteTextColor: Colors.black, // Text color for hour and minute fields
-              hourMinuteColor: Colors.lime, // Background color for selected hour and minute
+              dayPeriodColor: Colors.lime,
+              dialBackgroundColor: Colors.lime[50],
+              dialHandColor: Colors.lime,
+              hourMinuteTextColor: Colors.black,
+              hourMinuteColor: Colors.lime,
             ),
-          ), child: child!)
-          ;
-        }
+          ),
+          child: child!,
+        );
+      },
     );
-    if (picked != null) {}
+
+    if (picked != null) {
+      setState(() {
+        widget.controller.dataList[index]['time_range'] =
+            picked.format(context); // Update UI
+      });
+
+      // Convert TimeOfDay to DateTime
+      DateTime now = DateTime.now();
+      DateTime scheduledTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        picked.hour,
+        picked.minute,
+      );
+
+      if (scheduledTime.isBefore(now)) {
+        scheduledTime = scheduledTime.add(Duration(days: 1)); // Set for next day
+      }
+
+      // Schedule the notification
+      await NotificationService.scheduleNotification(
+        index, // Unique ID for each meal notification
+        "Meal Reminder",
+        "Did you eat your ${widget.controller.dataList[index]['label_name']}?",
+        scheduledTime,
+      );
+
+      print("Scheduled Notification for ${picked.format(context)}");
+    }
   }
+
 
   // Method to show dialog for adding/editing meals
   void _showAddMealDialog(BuildContext context) {
@@ -268,15 +296,19 @@ class _MealTimingPageState extends State<MealTimingPage> {
                                     child: Row(
                                       children: [
                                         Switch(
-                                          // trackColor: WidgetStatePropertyAll(Color(0xffCDE26D)),
-                                          inactiveTrackColor:Color(0xff7E7E7E),
+                                          inactiveTrackColor: Color(0xff7E7E7E),
                                           activeTrackColor: Color(0xffCDE26D),
-                                          thumbColor:WidgetStatePropertyAll(Colors.white) ,
-                                          value: true,
+                                          thumbColor: WidgetStatePropertyAll(Colors.white),
+                                          value: widget.controller.dataList[index]['enabled'] ?? false, // ✅ Fix applied
                                           onChanged: (value) {
-                                            // setState(() {
-                                            //   meals[index]['enabled'] = value;
-                                            // });
+                                            setState(() {
+                                              widget.controller.dataList[index]['enabled'] = value;
+                                            });
+
+                                            if (!value) {
+                                              NotificationService.cancelNotification(index);
+                                              print("Cancelled Notification for ${widget.controller.dataList[index]['label_name']}");
+                                            }
                                           },
                                         ),
 
