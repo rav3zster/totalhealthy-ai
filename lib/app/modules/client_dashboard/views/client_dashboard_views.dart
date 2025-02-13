@@ -173,6 +173,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
           .then((value) {
         if (APIStatus.success(value.statusCode)) {
           Get.find<AuthController>().categoriesAdd(value.data);
+          Get.find<AuthController>().fetchAndScheduleNotifications(value.data);
           Future.delayed(const Duration(milliseconds: 100), () {
             categories = Get.find<AuthController>().categoriesGet();
           });

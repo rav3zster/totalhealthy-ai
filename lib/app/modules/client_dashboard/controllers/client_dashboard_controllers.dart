@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 
 class ClientDashboardControllers extends GetxController {
   //TODO: Implement HomeController
@@ -7,6 +8,7 @@ class ClientDashboardControllers extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Get.find<AuthController>().fetchAndScheduleNotifications();
   }
 
   @override

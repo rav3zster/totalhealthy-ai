@@ -80,8 +80,8 @@ class _GroupListPageState extends State<GroupListPage> {
                             .groupIdStore(group["group_id"]);
 
                         widget.isUser
-                            ? Get.toNamed(Routes.ClientDashboard)
-                            : Get.toNamed(Routes.TrainerDashboard);
+                            ? Get.offAllNamed(Routes.ClientDashboard)
+                            : Get.offAllNamed(Routes.TrainerDashboard);
                       },
                       child: GroupCard(group: group));
                 },

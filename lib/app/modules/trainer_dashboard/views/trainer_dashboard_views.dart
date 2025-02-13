@@ -12,11 +12,10 @@ import '../../../core/base/constants/appcolor.dart';
 import '../../../widgets/client_card.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/drawer_menu.dart';
+import '../../../widgets/notification_services.dart';
 import '../../../widgets/phone_nav_bar.dart';
 import '../../../widgets/profile_card.dart';
 import '../../group/views/add_client.dart';
-import '../../notification/views/local_notification.dart';
-import '../../user_diet_screen/controllers/user_diet_screen_controllers.dart';
 
 class TrainerDashboardView extends StatefulWidget {
   @override
@@ -101,13 +100,6 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                     .firstWhere((item) => item["group_name"] == groupName))
                 .toList();
           });
-
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   const SnackBar(
-          //     content: Text('User  Successful!'),
-          //     backgroundColor: Colors.green,
-          //   ),
-          // );
         } else {
           // printError("Auth Controller", "Signup", value.data);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -131,7 +123,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
 
   bool isMemberLoading = false;
   var groupMemberData = [];
-
+  NotificationService notificationService = NotificationService();
   Future<void> getCategories() async {
     try {
       await APIMethods.get
@@ -142,10 +134,12 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
           .then((value) {
         if (APIStatus.success(value.statusCode)) {
           Get.find<AuthController>().categoriesAdd(value.data);
+          Get.find<AuthController>().fetchAndScheduleNotifications(value.data);
         } else {
           print("Categories Not Found");
         }
       });
+
       // }
     } catch (e) {
       print(e);
@@ -192,6 +186,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   @override
   void initState() {
     super.initState();
+
     getMember();
   }
 
@@ -199,16 +194,13 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          NotificationService.showNotification(
-            999, // Unique ID
-            "Test Notification",
-            "This is a test notification at ${DateTime.now()}",
-          );
-        },
-        child: Icon(Icons.notifications),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     // DateTime(dateTime.year, dateTime.month, dateTime.day, 16, 30)
+
+      //   },
+      //   child: Icon(Icons.notifications),
+      // ),
       bottomNavigationBar: MobileNavBar(),
       drawer: DrawerMenu(),
       backgroundColor: Color(0XFF0C0C0C),

@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import '../../../routes/app_pages.dart';
 
-import '../../../widgets/switch_role_screen.dart';
+import '../../../widgets/notification_services.dart';
+import '../apiservice/api_endpoints.dart';
+import '../apiservice/api_status.dart';
+import '../apiservice/base_methods.dart';
 import 'theme_controller.dart';
 
 class AuthController extends GetxController {
@@ -15,6 +17,7 @@ class AuthController extends GetxController {
     return this;
   }
 
+  final NotificationService _notificationService = NotificationService();
   final _authToken = "".obs;
   RxBool isLogOut = false.obs;
   RxBool flowloader = false.obs;
@@ -57,6 +60,45 @@ class AuthController extends GetxController {
   //   await tokenVaildate();
   //   return isAuthenticated.value;
   // }
+  NotificationService notificationService = NotificationService();
+  Future<void> fetchAndScheduleNotifications(data) async {
+    try {
+      // if (response.statusCode == 200) {
+      var categories = data;
+
+      for (int index = 0; index < categories.length; index++) {
+        var category = categories[index];
+
+        String title = category['label_name'] ?? "Reminder";
+
+        String? timeRange = category['time_range'];
+        if (timeRange == null || !timeRange.contains(":")) {
+          continue;
+        }
+
+        List<String> timeParts = timeRange.split(":");
+        int hour = int.tryParse(timeParts[0]) ?? 0;
+        int minute = int.tryParse(timeParts[1]) ?? 0;
+
+        String body = "It's time for ${category['label_name'] ?? ""}";
+
+        int uniqueId = category['label_name'].hashCode.abs() % 100000;
+        await notificationService.cancelNotification(uniqueId);
+        await notificationService.scheduleNotification(
+          title: title,
+          hour: hour,
+          id: uniqueId,
+          minute: minute,
+          body: body,
+        );
+      }
+      // } else {
+      //   print("Error ${response.data}");
+      // }
+    } catch (e) {
+      print('Error fetching data: $e');
+    }
+  }
 
   handleAuthChange() {
     print("handleAuthChange  ${Get.currentRoute}");

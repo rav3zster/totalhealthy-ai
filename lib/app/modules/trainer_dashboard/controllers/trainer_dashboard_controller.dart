@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../../../core/base/controllers/auth_controller.dart';
+
 class TrainerDashboardControllers extends GetxController {
   //TODO: Implement HomeController
 
@@ -7,6 +9,7 @@ class TrainerDashboardControllers extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    
   }
 
   @override

@@ -5,6 +5,7 @@ import 'package:totalhealthy/app/modules/meal_history/controllers/meal_history_c
 import 'package:totalhealthy/app/modules/meal_timing/controllers/meal_timing_controller.dart';
 
 import '../../../core/base/constants/appcolor.dart';
+import '../../../widgets/notification_services.dart';
 import '../../notification/views/local_notification.dart';
 
 class MealTimingPage extends StatefulWidget {
@@ -71,12 +72,12 @@ class _MealTimingPageState extends State<MealTimingPage> {
       }
 
       // Schedule the notification
-      await NotificationService.scheduleNotification(
-        index, // Unique ID for each meal notification
-        "Meal Reminder",
-        "Did you eat your ${widget.controller.dataList[index]['label_name']}?",
-        scheduledTime,
-      );
+      // await NotificationService.scheduleNotification(
+      //   index, // Unique ID for each meal notification
+      //   "Meal Reminder",
+      //   "Did you eat your ${widget.controller.dataList[index]['label_name']}?",
+      //   scheduledTime,
+      // );
 
       print("Scheduled Notification for ${picked.format(context)}");
     }
@@ -306,7 +307,7 @@ class _MealTimingPageState extends State<MealTimingPage> {
                                             });
 
                                             if (!value) {
-                                              NotificationService.cancelNotification(index);
+                                              // NotificationService.cancelNotification(index);
                                               print("Cancelled Notification for ${widget.controller.dataList[index]['label_name']}");
                                             }
                                           },
