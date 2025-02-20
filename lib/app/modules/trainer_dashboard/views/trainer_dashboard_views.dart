@@ -302,6 +302,16 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                             'Pending Requests',
                             style: TextStyle(color: Colors.white, fontSize: 14),
                           ),
+                          // ElevatedButton(
+                          //     onPressed: (){
+                          //   notificationService.scheduleNotification(
+                          //   title: "title",
+                          //   hour: 12,
+                          //   id: 12312,
+                          //   minute: 59,
+                          //   body: 'body',
+                          // );
+                          //   }, child: Text("Notification Test"))
                         ],
                       ),
                     ],
