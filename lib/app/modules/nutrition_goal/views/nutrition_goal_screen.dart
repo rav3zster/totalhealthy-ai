@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:get/get_common/get_reset.dart';
-import 'package:get/get_core/src/get_main.dart';
-
 import '../../../routes/app_pages.dart';
 
 class NutritionGoalsScreen extends StatefulWidget {
@@ -14,6 +10,7 @@ class NutritionGoalsScreen extends StatefulWidget {
 class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
   int selectedIndex = -1;
   final PageController _pageController = PageController();
+  int currentPageIndex = 0;
 
   // Sample data for the screens
   final List<List<String>> goals = [
@@ -46,12 +43,28 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.arrow_back_ios),
-            color: Colors.white),
+          onPressed: () {
+            if (_pageController.page!.toInt() > 0) {
+              _pageController.previousPage(
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.easeIn);
+            } else {
+              Navigator.pop(context);
+            }
+          },
+          icon: Icon(Icons.arrow_back_ios),
+          color: Colors.white,
+        ),
         actions: [
           TextButton(
-            onPressed: () {}, // Skip action
+            onPressed: () {
+              // Skip button se bas next page pe jaana hai
+              if (currentPageIndex < goals.length - 1) {
+                _pageController.nextPage(
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.easeIn);
+              }
+            },
             child: Text('Skip',
                 style: TextStyle(color: Color(0XFFFFFFFF), fontSize: 16)),
           )
@@ -59,13 +72,18 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
       ),
       body: PageView.builder(
         controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            currentPageIndex = index;
+          });
+        },
         itemCount: goals.length,
         itemBuilder: (context, pageIndex) {
           return Column(
             children: [
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -99,7 +117,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                       },
                       child: Container(
                         margin:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         padding: EdgeInsets.all(15),
                         decoration: BoxDecoration(
                           color: selectedIndex == index
@@ -124,7 +142,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
               ),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0XFFCDE26D), // Replaces `primary`
@@ -138,7 +156,10 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                       _pageController.nextPage(
                           duration: Duration(milliseconds: 500),
                           curve: Curves.easeIn);
-                    } else {}
+                    } else {
+                      // Last page pe ho toh Home pe navigate kar do
+                      Get.toNamed(Routes.HOME);
+                    }
                   },
                   child: Text("Continue",
                       style: TextStyle(color: Color(0XFF242522), fontSize: 18)),

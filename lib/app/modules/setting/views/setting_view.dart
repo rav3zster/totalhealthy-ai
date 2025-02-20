@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
-
 import '../controllers/setting_controller.dart';
 
 class SettingView extends GetView<SettingController> {
