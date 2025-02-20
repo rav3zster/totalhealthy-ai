@@ -18,6 +18,7 @@ class SignupScreen extends StatefulWidget {
 class SignupScreenState extends State<SignupScreen> {
   bool isMaleSelected = false; // Track Male selection
   bool isFemaleSelected = false; // Track Female selection
+  bool _isObscured = true;
 
   GlobalKey<FormState> key = GlobalKey<FormState>();
 
@@ -308,14 +309,27 @@ class SignupScreenState extends State<SignupScreen> {
                     width: 390,
                     child: TextFormField(
                       controller: passwordController,
+                      obscureText: _isObscured,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Color(0XFF242522),
                         hintText: 'Enter Your Password',
                         prefixIcon:
-                            Icon(Icons.lock_outline, color: Colors.white54),
-                        suffixIcon: Icon(Icons.visibility_outlined,
-                            color: Colors.white54),
+                        Icon(Icons.lock_outline, color: Colors.white54),
+
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isObscured
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: Colors.white54,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isObscured = !_isObscured;
+                            });
+                          },
+                        ),
                         hintStyle: TextStyle(color: Colors.white54),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -333,6 +347,7 @@ class SignupScreenState extends State<SignupScreen> {
                       ),
                       style: TextStyle(color: Colors.white),
                     ),
+
                   ),
                   SizedBox(
                     height: 20,
