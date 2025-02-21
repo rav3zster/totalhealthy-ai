@@ -1,0 +1,2 @@
+N:/totalhealthy/android/app/.cxx/Debug/2c583jq1/armeabi-v7a/CMakeFiles/edit_cache.dir
+N:/totalhealthy/android/app/.cxx/Debug/2c583jq1/armeabi-v7a/CMakeFiles/rebuild_cache.dir
