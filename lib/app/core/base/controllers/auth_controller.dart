@@ -72,18 +72,23 @@ class AuthController extends GetxController {
         String title = category['label_name'] ?? "Reminder";
 
         String? timeRange = category['time_range'];
+        // print("time-range:$timeRange");
         if (timeRange == null || !timeRange.contains(":")) {
           continue;
         }
 
         List<String> timeParts = timeRange.split(":");
         int hour = int.tryParse(timeParts[0]) ?? 0;
-        int minute = int.tryParse(timeParts[1]) ?? 0;
-
+        int minute = int.tryParse(timeParts[1].split(" ")[0]) ?? 0;
+        // print("timeParts: ${timeParts[1]}");
         String body = "It's time for ${category['label_name'] ?? ""}";
 
         int uniqueId = category['label_name'].hashCode.abs() % 100000;
         await notificationService.cancelNotification(uniqueId);
+        // print("uique id: $uniqueId");
+        // print("title: $title");
+        // print("hour: $hour");
+        // print("minute: $minute");
         await notificationService.scheduleNotification(
           title: title,
           hour: hour,
