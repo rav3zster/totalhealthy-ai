@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:totalhealthy/app/modules/registration/views/registration_view.dart';
+import 'package:totalhealthy/app/widgets/baseWidget.dart';
 
 class ManageAccountScreen extends StatefulWidget {
   @override
@@ -19,35 +20,55 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text(
-          'Account & Password',
-          style: TextStyle(color: Colors.white),
-        ),
-        centerTitle: true,
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Save action - navigate to RegistrationScreen
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => RegistrationView()),
-              );
-            },
-            child: const Text(
-              'Save',
-              style: TextStyle(
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+    return BaseWidget(
+      // backgroundColor: Colors.black,
+      // appBar: AppBar(
+      //   // backgroundColor: Colors.black,
+      //   // title: const Text(
+      //   //   'Account & Password',
+      //   //   style: TextStyle(color: Colors.white),
+      //   // ),
+      //   centerTitle: true,
+      //   actions: [
+      //     TextButton(
+      //       onPressed: () {
+      //         // Save action - navigate to RegistrationScreen
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(builder: (context) => RegistrationView()),
+      //         );
+      //       },
+      //       child: const Text(
+      //         'Save',
+      //         style: TextStyle(
+      //           color: Colors.green,
+      //           fontWeight: FontWeight.bold,
+      //           fontSize: 16,
+      //         ),
+      //       ),
+      //     ),
+      //   ],
+      // ),
+      title: "Account & Password",
+      appBarAction: [
+        TextButton(
+          onPressed: () {
+            // Save action - navigate to RegistrationScreen
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RegistrationView()),
+            );
+          },
+          child: const Text(
+            'Save',
+            style: TextStyle(
+              color: Colors.green,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

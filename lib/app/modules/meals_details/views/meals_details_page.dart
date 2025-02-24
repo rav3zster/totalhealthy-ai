@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/modules/meals_details/controllers/meals_details_controller.dart';
+import 'package:totalhealthy/app/widgets/baseWidget.dart';
 
 import '../../../core/base/constants/appcolor.dart';
 
@@ -39,8 +40,8 @@ class _MealsDetailsPageState extends State<MealsDetailsPage> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.black,
+    return BaseWidget(
+      // backgroundColor: Colors.black,
       // appBar: AppBar(
       //   backgroundColor: Colors.transparent,
       //   elevation: 0,

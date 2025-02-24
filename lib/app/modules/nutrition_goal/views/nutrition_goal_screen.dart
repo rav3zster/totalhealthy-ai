@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/widgets/baseWidget.dart';
 import '../../../routes/app_pages.dart';
 
 class NutritionGoalsScreen extends StatefulWidget {
@@ -37,39 +38,54 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
+    return BaseWidget(
+      // backgroundColor: Colors.black,
+      // appBar: AppBar(
+      //   backgroundColor: Colors.transparent,
+      //   elevation: 0,
+      //   leading: IconButton(
+      //     onPressed: () {
+      //       if (_pageController.page!.toInt() > 0) {
+      //         _pageController.previousPage(
+      //             duration: Duration(milliseconds: 500),
+      //             curve: Curves.easeIn);
+      //       } else {
+      //         Navigator.pop(context);
+      //       }
+      //     },
+      //     icon: Icon(Icons.arrow_back_ios),
+      //     color: Colors.white,
+      //   ),
+      //   // actions: [
+      //   //   TextButton(
+      //   //     onPressed: () {
+      //   //       // Skip button se bas next page pe jaana hai
+      //   //       if (currentPageIndex < goals.length - 1) {
+      //   //         _pageController.nextPage(
+      //   //             duration: Duration(milliseconds: 500),
+      //   //             curve: Curves.easeIn);
+      //   //       }
+      //   //     },
+      //   //     child: Text('Skip',
+      //   //         style: TextStyle(color: Color(0XFFFFFFFF), fontSize: 16)),
+      //   //   )
+      //   // ],
+      // ),
+      backButton: true,
+      appBarAction: [
+        TextButton(
           onPressed: () {
-            if (_pageController.page!.toInt() > 0) {
-              _pageController.previousPage(
+            // Skip button se bas next page pe jaana hai
+            if (currentPageIndex < goals.length - 1) {
+              _pageController.nextPage(
                   duration: Duration(milliseconds: 500),
                   curve: Curves.easeIn);
-            } else {
-              Navigator.pop(context);
             }
           },
-          icon: Icon(Icons.arrow_back_ios),
-          color: Colors.white,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Skip button se bas next page pe jaana hai
-              if (currentPageIndex < goals.length - 1) {
-                _pageController.nextPage(
-                    duration: Duration(milliseconds: 500),
-                    curve: Curves.easeIn);
-              }
-            },
-            child: Text('Skip',
-                style: TextStyle(color: Color(0XFFFFFFFF), fontSize: 16)),
-          )
-        ],
-      ),
+          child: Text('Skip',
+              style: TextStyle(color: Color(0XFFFFFFFF), fontSize: 16)),
+        )
+      ],
       body: PageView.builder(
         controller: _pageController,
         onPageChanged: (index) {

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/utitlity/debug_print.dart';
 import 'package:totalhealthy/app/modules/meal_history/controllers/meal_history_controller.dart';
 import 'package:totalhealthy/app/modules/meal_timing/controllers/meal_timing_controller.dart';
+import 'package:totalhealthy/app/widgets/baseWidget.dart';
 
 import '../../../core/base/constants/appcolor.dart';
 import '../../../widgets/notification_services.dart';
@@ -234,16 +235,18 @@ class _MealTimingPageState extends State<MealTimingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              Get.back();
-            },
-            icon: Icon(Icons.arrow_back_ios)),
-        title: Text("Set Your Daily Meal & Snack Timings"),
-        backgroundColor: Colors.black,
-      ),
+    return BaseWidget(
+      // appBar: AppBar(
+      //   leading: IconButton(
+      //       onPressed: () {
+      //         Get.back();
+      //       },
+      //       icon: Icon(Icons.arrow_back_ios)),
+      //   title: Text("Set Your Daily Meal & Snack Timings"),
+      //   backgroundColor: Colors.black,
+      // ),
+      title: "Set Your Daily Meal & Snack Timings",
+      backButton: true,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

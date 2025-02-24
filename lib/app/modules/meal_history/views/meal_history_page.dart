@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:totalhealthy/app/modules/meal_history/controllers/meal_history_controller.dart';
+import 'package:totalhealthy/app/widgets/baseWidget.dart';
 import 'package:totalhealthy/app/widgets/button_selector.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
@@ -149,24 +150,26 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-            onPressed: () {
-              Get.back();
-            },
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Colors.white,
-            )),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: ProfileCard(
-          isDrawer: false,
-        ),
-      ),
+    return BaseWidget(
+      // backgroundColor: Colors.black,
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   leading: IconButton(
+      //       onPressed: () {
+      //         Get.back();
+      //       },
+      //       icon: Icon(
+      //         Icons.arrow_back_ios,
+      //         color: Colors.white,
+      //       )),
+      //   backgroundColor: Colors.transparent,
+      //   elevation: 0,
+      //   title: ProfileCard(
+      //     isDrawer: false,
+      //   ),
+      // ),
+      backButton: true,
+      title: "${ProfileCard(isDrawer: false,)}",
       body: ListView(
         children: [
           Padding(
