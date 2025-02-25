@@ -3,9 +3,8 @@ import 'package:get/get.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 import '../core/base/constants/appcolor.dart';
 import 'backButton.dart';
-import 'customDrawer.dart';
-
 import 'drawer_menu.dart';
+
 
 class BaseWidget extends StatefulWidget {
   BaseWidget({
@@ -17,7 +16,7 @@ class BaseWidget extends StatefulWidget {
     this.istopBar = false,
     this.isAppBar = true,
     this.isGradient = false,
-    this.titlestyle = const TextStyle(color: AppColors.grey, fontSize: 18),
+    this.titlestyle = const TextStyle(color: AppColors.white, fontSize: 18),
     this.centerTitle = false,
     this.widget,
     this.topBarHeight = 60,
@@ -59,168 +58,61 @@ class _BaseWidgetState extends State<BaseWidget> {
       floatingActionButton: widget.floatingActionButton,
       appBar: widget.isAppBar
           ? PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight),
-        child: Stack(
-          children: [
-            // Gradient layer for AppBar
-            if (widget.isGradient)
-              Positioned(
-                top: -50,
-                left: -100,
-                child: Container(
-                  width: 250,
-                  height: 250,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        Color(0xffA8E6FF),
-                        Color(0xffA8E6FF).withOpacity(0.0),
-                      ],
-                      radius: 0.5,
-                      focalRadius: 0.7,
-                    ),
-                  ),
+              preferredSize: Size.fromHeight(kToolbarHeight),
+              child: ClipRRect(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(25),
+                  bottomRight: Radius.circular(25),
+                ),
+                child: AppBar(
+                  actions: widget.appBarAction,
+                  automaticallyImplyLeading: false,
+                  elevation: 0.0,
+                  centerTitle: widget.centerTitle,
+                  leading: widget.backButton
+                      ? CustomBackButton()
+                      : widget.isDrawer
+                          ? IconButton(
+                              onPressed: () {
+                                _scaffoldKey.currentState?.openDrawer();
+                              },
+                              icon: Icon(Icons.menu))
+                          : null,
+                  backgroundColor: AppColors.cardbackground,
+                  title: widget.titleWidget ??
+                      Text(
+                        widget.title,
+                        style: widget.titlestyle,
+                      ),
                 ),
               ),
-            AppBar(
-              actions: widget.appBarAction,
-              automaticallyImplyLeading: false,
-              elevation: 0.0,
-              centerTitle: widget.centerTitle,
-              leading: widget.backButton
-                  ? CustomBackButton()
-                  : widget.isDrawer
-                  ? IconButton(
-                  onPressed: () {
-                    _scaffoldKey.currentState?.openDrawer();
-                  },
-                  icon: Icon(Icons.menu))
-                  : null,
-              backgroundColor:
-              Colors.transparent, // Make AppBar transparent
-              title: widget.titleWidget ??
-                  Text(
-                    widget.title,
-                    style: widget.titlestyle,
-                  ),
-            ),
-          ],
-        ),
-      )
+            )
           : null,
       drawer: widget.isDrawer ? DrawerMenu() : null,
       body: Column(
         children: [
-          Container(),
           if (widget.istopBar)
             Container(
               decoration: BoxDecoration(
-                  color: Color(0xff0B8FAC),
-                  borderRadius: BorderRadius.only(
-                      bottomRight: Radius.circular(40),
-                      bottomLeft: Radius.circular(40))),
+                color: Color(0xff0B8FAC),
+                borderRadius: BorderRadius.only(
+                  bottomRight: Radius.circular(40),
+                  bottomLeft: Radius.circular(40),
+                ),
+              ),
               child: widget.widget,
               height: widget.topBarHeight,
             ),
+          // No `Expanded` here, as it causes issues inside `SingleChildScrollView`
           Expanded(
-            child: Stack(
-              children: [
-                if (widget.isGradient) ...[
-                  Positioned(
-                    top: -100,
-                    left: -100,
-                    child: Container(
-                      width: 250,
-                      height: 250,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(
-                          colors: [
-                            Color(0xffA8E6FF),
-                            Color(0xffA8E6FF).withOpacity(0.0),
-                          ],
-                          radius: 0.5,
-                          focalRadius: 0.7,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: -100,
-                    right: -100,
-                    child: Container(
-                      width: 250,
-                      height: 250,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(
-                          colors: [
-                            Color(0xffA8E6FF),
-                            Color(0xffA8E6FF).withOpacity(0.0),
-                          ],
-                          radius: 0.5,
-                          focalRadius: 0.7,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: widget.body!,
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: widget.body!,
             ),
           ),
         ],
       ),
-      bottomNavigationBar:
-      // widget.isNav
-      //     ? BottomNavigationBar(
-      //   type: BottomNavigationBarType.fixed,
-      //   onTap: (value) {
-      //     if (value == 0) {
-      //       Get.toNamed(Routes.APPOINTMENT_DESHBORD);
-      //     } else if (value == 1) {
-      //       Get.toNamed(Routes.WALK_IN_APPOINTMENT);
-      //     } else if (value == 2) {
-      //       Get.toNamed(Routes.APPOINTMENT_MANAGEMENT);
-      //     } else if (value == 3) {
-      //       Get.toNamed(Routes.EMPLOYEE);
-      //     } else if (value == 4) {
-      //       Get.toNamed(Routes.PAYMENT_HISTORY);
-      //     }
-      //     setState(() {
-      //       OnTap.selectIndex = value;
-      //     });
-      //   },
-      //   currentIndex: OnTap.selectIndex,
-      //   items: [
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.schedule),
-      //       label: 'Schedule',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.directions_walk),
-      //       label: 'Walk-In',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.add_box_rounded),
-      //       label: 'Add',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.people),
-      //       label: 'Employees',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.account_balance_wallet),
-      //       label: 'Finance',
-      //     ),
-      //   ],
-      // )
-      //     : null
-      MobileNavBar(),
+      bottomNavigationBar: MobileNavBar(),
     );
   }
 }

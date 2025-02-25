@@ -48,8 +48,8 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
   var isLoading = false;
 //  {"name": "string", "amount": "string", "unit": "string"}
   submitUser(
-    context,
-  ) async {
+      context,
+      ) async {
     // DateTime now = DateTime.now();
     // int timestamp = now.millisecondsSinceEpoch;
     try {
@@ -122,7 +122,8 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
         elevation: 0,
         leading: IconButton(
             onPressed: () {
-              Get.toNamed('/userdiet?id=${widget.id}');
+              //Get.toNamed('/userdiet?id=${widget.id}');
+              Get.back();
             },
             icon: Icon(
               Icons.arrow_back_ios_sharp,
@@ -157,7 +158,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                               "Weight Gain",
                             ],
                             selectedDietaryGoal,
-                            (value) =>
+                                (value) =>
                                 setState(() => selectedDietaryGoal = value),
                           ),
                         ),
@@ -168,7 +169,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Maintenance", "Muscle Build"],
                             selectedDietaryGoal,
-                            (value) =>
+                                (value) =>
                                 setState(() => selectedDietaryGoal = value),
                           ),
                         )
@@ -269,7 +270,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Vegetarian"],
                             selectedDietType,
-                            (value) => setState(() => selectedDietType = value),
+                                (value) => setState(() => selectedDietType = value),
                           ),
                         ),
                         SizedBox(
@@ -279,7 +280,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Keto"],
                             selectedDietType,
-                            (value) => setState(() => selectedDietType = value),
+                                (value) => setState(() => selectedDietType = value),
                           ),
                         ),
                       ],
@@ -290,7 +291,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Vegan"],
                             selectedDietType,
-                            (value) => setState(() => selectedDietType = value),
+                                (value) => setState(() => selectedDietType = value),
                           ),
                         ),
                         SizedBox(
@@ -300,7 +301,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Paleo"],
                             selectedDietType,
-                            (value) => setState(() => selectedDietType = value),
+                                (value) => setState(() => selectedDietType = value),
                           ),
                         ),
                       ],
@@ -311,7 +312,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Mediterranean"],
                             selectedDietType,
-                            (value) => setState(() => selectedDietType = value),
+                                (value) => setState(() => selectedDietType = value),
                           ),
                         ),
                         SizedBox(
@@ -321,7 +322,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Not Specified"],
                             selectedDietType,
-                            (value) => setState(() => selectedDietType = value),
+                                (value) => setState(() => selectedDietType = value),
                           ),
                         ),
                       ],
@@ -342,7 +343,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildCheckboxRow(
                             ["Gluten"],
                             foodAllergies,
-                            (value) => setState(() {}),
+                                (value) => setState(() {}),
                           ),
                         ),
                         SizedBox(
@@ -352,7 +353,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildCheckboxRow(
                             ["Dairy"],
                             foodAllergies,
-                            (value) => setState(() {}),
+                                (value) => setState(() {}),
                           ),
                         ),
                       ],
@@ -363,7 +364,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildCheckboxRow(
                             ["Nuts"],
                             foodAllergies,
-                            (value) => setState(() {}),
+                                (value) => setState(() {}),
                           ),
                         ),
                         SizedBox(
@@ -373,7 +374,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildCheckboxRow(
                             ["Shellfish"],
                             foodAllergies,
-                            (value) => setState(() {}),
+                                (value) => setState(() {}),
                           ),
                         ),
                       ],
@@ -384,7 +385,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildCheckboxRow(
                             ["Meat"],
                             foodAllergies,
-                            (value) => setState(() {}),
+                                (value) => setState(() {}),
                           ),
                         ),
                         SizedBox(
@@ -394,7 +395,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildCheckboxRow(
                             ["Not Specific"],
                             foodAllergies,
-                            (value) => setState(() {}),
+                                (value) => setState(() {}),
                           ),
                         ),
                       ],
@@ -415,7 +416,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Indian"],
                             selectedCuisine,
-                            (value) => setState(() => selectedCuisine = value),
+                                (value) => setState(() => selectedCuisine = value),
                           ),
                         ),
                         SizedBox(
@@ -425,7 +426,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Italian"],
                             selectedCuisine,
-                            (value) => setState(() => selectedCuisine = value),
+                                (value) => setState(() => selectedCuisine = value),
                           ),
                         ),
                       ],
@@ -436,7 +437,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Chinese"],
                             selectedCuisine,
-                            (value) => setState(() => selectedCuisine = value),
+                                (value) => setState(() => selectedCuisine = value),
                           ),
                         ),
                         SizedBox(
@@ -446,7 +447,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Thai"],
                             selectedCuisine,
-                            (value) => setState(() => selectedCuisine = value),
+                                (value) => setState(() => selectedCuisine = value),
                           ),
                         ),
                       ],
@@ -480,8 +481,8 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                     buildIncrementDecrementRow(
                       "Number of Meals Per Day",
                       numberOfMeals,
-                      () => setState(() => numberOfMeals++),
-                      () => setState(() => numberOfMeals--),
+                          () => setState(() => numberOfMeals++),
+                          () => setState(() => numberOfMeals--),
                     ),
                     SizedBox(
                       height: 10,
@@ -505,7 +506,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                             ],
                             foodAllergies,
                             // For example purposes, adjust according to real data
-                            (value) => setState(() {}),
+                                (value) => setState(() {}),
                           ),
                         ),
                         SizedBox(
@@ -518,7 +519,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                             ],
                             foodAllergies,
                             // For example purposes, adjust according to real data
-                            (value) => setState(() {}),
+                                (value) => setState(() {}),
                           ),
                         ),
                       ],
@@ -532,7 +533,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                             ],
                             foodAllergies,
                             // For example purposes, adjust according to real data
-                            (value) => setState(() {}),
+                                (value) => setState(() {}),
                           ),
                         ),
                         SizedBox(
@@ -545,7 +546,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                             ],
                             foodAllergies,
                             // For example purposes, adjust according to real data
-                            (value) => setState(() {}),
+                                (value) => setState(() {}),
                           ),
                         ),
                       ],
@@ -559,7 +560,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                             ],
                             foodAllergies,
                             // For example purposes, adjust according to real data
-                            (value) => setState(() {}),
+                                (value) => setState(() {}),
                           ),
                         ),
                         SizedBox(
@@ -572,7 +573,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                             ],
                             foodAllergies,
                             // For example purposes, adjust according to real data
-                            (value) => setState(() {}),
+                                (value) => setState(() {}),
                           ),
                         ),
                       ],
@@ -615,7 +616,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["1-2 Days/Week"],
                             exerciseFrequency,
-                            (value) =>
+                                (value) =>
                                 setState(() => exerciseFrequency = value),
                           ),
                         ),
@@ -626,7 +627,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["3-4 Days/Week"],
                             exerciseFrequency,
-                            (value) =>
+                                (value) =>
                                 setState(() => exerciseFrequency = value),
                           ),
                         ),
@@ -638,7 +639,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["5 Days/Week"],
                             exerciseFrequency,
-                            (value) =>
+                                (value) =>
                                 setState(() => exerciseFrequency = value),
                           ),
                         ),
@@ -649,7 +650,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["5-7 Days/Week"],
                             exerciseFrequency,
-                            (value) =>
+                                (value) =>
                                 setState(() => exerciseFrequency = value),
                           ),
                         ),
@@ -672,7 +673,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Cardio"],
                             typeOfExercise,
-                            (value) => setState(() => typeOfExercise = value),
+                                (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
                         SizedBox(
@@ -682,7 +683,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Strength Training"],
                             typeOfExercise,
-                            (value) => setState(() => typeOfExercise = value),
+                                (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
                       ],
@@ -693,7 +694,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Calisthenics"],
                             typeOfExercise,
-                            (value) => setState(() => typeOfExercise = value),
+                                (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
                         SizedBox(
@@ -703,7 +704,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Zumba"],
                             typeOfExercise,
-                            (value) => setState(() => typeOfExercise = value),
+                                (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
                       ],
@@ -714,7 +715,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Powerlifting"],
                             typeOfExercise,
-                            (value) => setState(() => typeOfExercise = value),
+                                (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
                         SizedBox(
@@ -724,7 +725,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Mixed"],
                             typeOfExercise,
-                            (value) => setState(() => typeOfExercise = value),
+                                (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
                       ],
@@ -745,7 +746,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["Yes"],
                             typeOfExercise,
-                            (value) => setState(() => typeOfExercise = value),
+                                (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
                         SizedBox(
@@ -755,7 +756,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                           child: buildSelectableContainerRow(
                             ["No"],
                             typeOfExercise,
-                            (value) => setState(() => typeOfExercise = value),
+                                (value) => setState(() => typeOfExercise = value),
                           ),
                         ),
                       ],
@@ -807,7 +808,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0XFFCDE26D),
                     padding:
-                        EdgeInsets.symmetric(vertical: 16, horizontal: 130),
+                    EdgeInsets.symmetric(vertical: 16, horizontal: 130),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30)),
                   ),
@@ -818,11 +819,11 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                   },
                   child: isLoading
                       ? Center(
-                          child: CircularProgressIndicator(),
-                        )
+                    child: CircularProgressIndicator(),
+                  )
                       : Text("Generate Using AI",
-                          style: TextStyle(
-                              color: Color(0XFF242522), fontSize: 18)),
+                      style: TextStyle(
+                          color: Color(0XFF242522), fontSize: 18)),
                 ),
               ),
             ],
@@ -851,9 +852,9 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
   // Reusable accordion (collapsible section)
   Widget buildAccordion(
       {required String title,
-      required bool isExpanded,
-      required VoidCallback onToggle,
-      required Widget content}) {
+        required bool isExpanded,
+        required VoidCallback onToggle,
+        required Widget content}) {
     return Card(
       color: Colors.grey.withOpacity(0.1),
       child: ExpansionTile(
@@ -887,7 +888,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                   Expanded(
                     child: Container(
                       padding:
-                          EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                      EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                       decoration: BoxDecoration(
                         color: selectedValue == option
                             ? Color(0XFFCDE26D).withOpacity(0.2)
@@ -1033,7 +1034,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
           label: Text(option,
               style: TextStyle(
                   color:
-                      selectedValue == option ? Colors.black : Colors.white)),
+                  selectedValue == option ? Colors.black : Colors.white)),
           selected: selectedValue == option,
           selectedColor: Colors.greenAccent,
           onSelected: (selected) {
