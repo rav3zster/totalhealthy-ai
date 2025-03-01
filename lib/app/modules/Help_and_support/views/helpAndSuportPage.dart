@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:totalhealthy/app/widgets/baseWidget.dart';
+
+import '../../../core/utitlity/appvalidator.dart';
 
 class HelpPage extends StatefulWidget {
   const HelpPage({Key? key}) : super(key: key);
@@ -48,7 +51,7 @@ class _HelpPageState extends State<HelpPage> {
       length: 2, // We have two tabs
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Need Help?'),
+          title: Text('Need Help?'),
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Contact Us'),
@@ -93,6 +96,7 @@ class _HelpPageState extends State<HelpPage> {
           alignment: Alignment.center,
           child: Text(
             "Need Help?",
+
             style: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
@@ -207,7 +211,7 @@ class _HelpPageState extends State<HelpPage> {
     return Form(
       key: _formKey,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -229,38 +233,38 @@ class _HelpPageState extends State<HelpPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "First Name",
+                        'First Name',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
+                          fontSize: 16,
+                          color: Color(0XFFDBDBDB),
+                        ),
                       ),
-                      SizedBox(height: 5), // Spacing between text and field
+                      SizedBox(height: 10),
+
+                      // Email Field
                       TextFormField(
                         controller: _firstNameController,
                         decoration: InputDecoration(
-                          labelText: 'John',
+                          filled: true,
+                          fillColor: Color(0XFF242522),
+                          hintText: 'John',
+                          hintStyle: TextStyle(color: Colors.white54),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          // Custom Border Properties
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.transparent),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            // Rounded border when not focused
-                            borderSide: BorderSide(
-                                color: Colors.grey), // Normal border color
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            // Rounded border when focused
-                            borderSide: BorderSide(
-                                color: Colors.grey,
-                                width: 2), // Focused border color and width
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.transparent),
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your first name';
-                          }
-                          return null;
-                        },
+                        style: TextStyle(color: Colors.white),
+                        validator: AppValidator().validateUsername,
                       ),
                     ],
                   ),
@@ -272,38 +276,37 @@ class _HelpPageState extends State<HelpPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Last Name",
+                        'Last Name',
                         style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                          fontSize: 16,
+                          color: Color(0XFFDBDBDB),
+                        ),
                       ),
-                      SizedBox(height: 5),
+                      SizedBox(height: 10),
+
+                      // Email Field
                       TextFormField(
                         controller: _lastNameController,
                         decoration: InputDecoration(
-                          labelText: 'Doe',
+                          filled: true,
+                          fillColor: Color(0XFF242522),
+                          hintText: 'Doe',
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          // Custom Border Properties
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.transparent),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            // Rounded border when not focused
-                            borderSide: BorderSide(
-                                color: Colors.grey), // Normal border color
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                            // Rounded border when focused
-                            borderSide: BorderSide(
-                                color: Colors.grey,
-                                width: 2), // Focused border color and width
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.transparent),
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your last name';
-                          }
-                          return null;
-                        },
+                        style: TextStyle(color: Colors.white),
+                        validator: AppValidator().validateUsername,
                       ),
                     ],
                   ),
@@ -312,108 +315,111 @@ class _HelpPageState extends State<HelpPage> {
             ),
             const SizedBox(height: 16.0),
             Text(
-              "Email",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              'Email Address',
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0XFFDBDBDB),
+              ),
             ),
-            // Email
+            SizedBox(height: 10),
+
+            // Email Field
             TextFormField(
               controller: _emailController,
-              decoration: const InputDecoration(
-                labelText: 'john@example.com',
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Color(0XFF242522),
+                hintText: 'john@example.com',
+                hintStyle: TextStyle(color: Colors.white54),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                // Custom Border Properties
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  // Rounded border when not focused
-                  borderSide:
-                  BorderSide(color: Colors.grey), // Normal border color
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  // Rounded border when focused
-                  borderSide: BorderSide(
-                      color: Colors.grey,
-                      width: 2), // Focused border color and width
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
               ),
-              keyboardType: TextInputType.emailAddress,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your email';
-                }
-                // You can add more email validation here if needed
-                return null;
-              },
+              style: TextStyle(color: Colors.white),
+              validator: AppValidator().validateEmail,
             ),
             const SizedBox(height: 16.0),
             Text(
-              "Subject",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              'Subject',
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0XFFDBDBDB),
+              ),
             ),
-            // Subject
+            SizedBox(height: 10),
+
+            // Email Field
             TextFormField(
               controller: _subjectController,
-              decoration: const InputDecoration(
-                labelText: 'How can we help?',
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Color(0XFF242522),
+                hintText: 'How can we help?',
+                hintStyle: TextStyle(color: Colors.white54),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                // Custom Border Properties
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  // Rounded border when not focused
-                  borderSide:
-                  BorderSide(color: Colors.grey), // Normal border color
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  // Rounded border when focused
-                  borderSide: BorderSide(
-                      color: Colors.grey,
-                      width: 2), // Focused border color and width
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a subject';
-                }
-                return null;
-              },
+              style: TextStyle(color: Colors.white),
+              validator: AppValidator().validateEmail,
             ),
             const SizedBox(height: 16.0),
             // Message
             Text(
-              "Message",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              'Message',
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0XFFDBDBDB),
+              ),
             ),
+            SizedBox(height: 10),
+
+            // Email Field
             TextFormField(
               controller: _messageController,
-              decoration: const InputDecoration(
-                labelText: 'Tell us more about your inquiry...',
+              decoration: InputDecoration(
+
+                filled: true,
+                fillColor: Color(0XFF242522),
+                hintText: 'Tell us more about your inquiry....',
+                hintStyle: TextStyle(color: Colors.white54),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                // Custom Border Properties
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  // Rounded border when not focused
-                  borderSide:
-                  BorderSide(color: Colors.grey), // Normal border color
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  // Rounded border when focused
-                  borderSide: BorderSide(
-                      color: Colors.grey,
-                      width: 2), // Focused border color and width
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
               ),
               maxLines: 5,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your message';
-                }
-                return null;
-              },
+              style: TextStyle(color: Colors.white),
+              validator: AppValidator().validateEmail,
             ),
             const SizedBox(height: 16.0),
             // Submit Button

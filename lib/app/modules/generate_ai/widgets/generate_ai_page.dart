@@ -22,13 +22,13 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
   bool isAdditionalInfoExpanded = true;
 
   // Selections
-  String selectedDietaryGoal = "Weight Loss";
-  String selectedDietType = "Vegetarian";
-  String selectedCuisine = "Indian";
-  String exerciseFrequency = "1-2 Days/Week";
-  String typeOfExercise = "Cardio";
+  String selectedDietaryGoal = "";
+  String selectedDietType = "";
+  String selectedCuisine = "";
+  String exerciseFrequency = "";
+  String typeOfExercise = "";
   bool prePostWorkoutNutrition = true;
-  int numberOfMeals = 2;
+  int numberOfMeals = 0;
 
   // Food Allergies
   List<String> foodAllergies = [];
@@ -808,7 +808,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0XFFCDE26D),
                     padding:
-                    EdgeInsets.symmetric(vertical: 16, horizontal: 130),
+                    EdgeInsets.symmetric(vertical: 16, horizontal: 100),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30)),
                   ),
@@ -887,15 +887,14 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                 children: [
                   Expanded(
                     child: Container(
-                      padding:
-                      EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                       decoration: BoxDecoration(
-                        color: selectedValue == option
+                        color: (selectedValue == option)
                             ? Color(0XFFCDE26D).withOpacity(0.2)
                             : Color(0XFF292A27),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: selectedValue == option
+                          color: (selectedValue == option)
                               ? Color(0XFFCDE26D)
                               : Colors.transparent,
                           width: 2,
@@ -912,9 +911,7 @@ class _GenerateAiPageState extends State<GenerateAiPage> {
                   ),
                 ],
               ),
-              SizedBox(
-                height: 12,
-              ),
+              SizedBox(height: 12),
             ],
           ),
         );

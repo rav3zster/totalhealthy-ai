@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/core/utitlity/appvalidator.dart';
 import '../../../core/base/apiservice/api_endpoints.dart';
 
 import '../../../core/base/apiservice/api_status.dart';
@@ -228,7 +229,7 @@ class SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 10),
                   SizedBox(
-                    width: 390,
+                    width: 380,
                     child: TextFormField(
                       controller: nameController,
                       decoration: InputDecoration(
@@ -254,6 +255,7 @@ class SignupScreenState extends State<SignupScreen> {
                       style: TextStyle(
                         color: Colors.white,
                       ),
+                      validator: AppValidator().validateUsername,
                     ),
                   ),
                   const SizedBox(height: 25),
@@ -267,7 +269,7 @@ class SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 10),
                   SizedBox(
-                    width: 390,
+                    width: 380,
                     child: TextFormField(
                       controller: emailController,
                       decoration: InputDecoration(
@@ -293,6 +295,7 @@ class SignupScreenState extends State<SignupScreen> {
                       style: TextStyle(
                         color: Colors.white,
                       ),
+                      validator: AppValidator().validateEmail,
                     ),
                   ),
                   const SizedBox(height: 25),
@@ -306,7 +309,7 @@ class SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 10),
                   SizedBox(
-                    width: 390,
+                    width: 380,
                     child: TextFormField(
                       controller: passwordController,
                       obscureText: _isObscured,
@@ -346,6 +349,7 @@ class SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                       style: TextStyle(color: Colors.white),
+                      validator: AppValidator().validatePassword,
                     ),
 
                   ),
@@ -362,7 +366,7 @@ class SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 10),
                   SizedBox(
-                    width: 390,
+                    width: 380,
                     child: TextFormField(
                       controller: phoneNumberController,
                       decoration: InputDecoration(
@@ -385,12 +389,13 @@ class SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                       style: TextStyle(color: Colors.white),
+                      validator: AppValidator().validatePhoneNumber,
                     ),
                   ),
                   const SizedBox(height: 20),
                   // Login Button
                   SizedBox(
-                    width: 390,
+                    width: 380,
                     child: ElevatedButton(
                       onPressed: () => submitUser(),
                       style: ElevatedButton.styleFrom(

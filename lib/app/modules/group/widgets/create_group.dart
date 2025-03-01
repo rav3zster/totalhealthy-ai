@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/core/base/constants/appcolor.dart';
+import 'package:totalhealthy/app/core/utitlity/appvalidator.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
@@ -36,7 +38,6 @@ class _CreateGroupState extends State<CreateGroup> {
           "group_name": groupName.text.trim(),
           "description": description.text.trim(),
         };
-        print(data);
 
         await APIMethods.post
             .post(url: APIEndpoints.group.addGroup, map: data)
@@ -75,7 +76,7 @@ class _CreateGroupState extends State<CreateGroup> {
   Widget build(BuildContext context) {
     return Dialog(
       child: Container(
-        decoration: BoxDecoration(color: Color(0XFF0C0C0C)),
+        decoration: BoxDecoration(color: AppColors.black),
         height: 450,
         padding: EdgeInsets.all(10),
         child: Form(
@@ -83,17 +84,14 @@ class _CreateGroupState extends State<CreateGroup> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 10,
-              ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
                     onPressed: () {
                       Get.back();
                     },
-                    icon: Icon(Icons.arrow_back_ios),
-                    color: Color(0XFFD9D9D9),
+                    icon: Icon(Icons.arrow_back_ios, color: Color(0XFFD9D9D9)),
                   ),
                   Text(
                     "Create New group",
@@ -102,18 +100,17 @@ class _CreateGroupState extends State<CreateGroup> {
                       fontSize: 18,
                     ),
                   ),
+                  IconButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    icon: Icon(Icons.close, color: Color(0XFFD9D9D9)), // Close icon
+                  ),
                 ],
               ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                "Group Name",
-                style: TextStyle(color: Color(0XFFDBDBDB)),
-              ),
-              SizedBox(
-                height: 10,
-              ),
+              SizedBox(height: 20),
+              Text("Group Name", style: TextStyle(color: Color(0XFFDBDBDB))),
+              SizedBox(height: 10),
               TextFormField(
                 controller: groupName,
                 decoration: InputDecoration(
@@ -125,57 +122,29 @@ class _CreateGroupState extends State<CreateGroup> {
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
                   ),
-                  // Custom Border Properties
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.transparent),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.transparent),
-                  ),
                 ),
                 style: TextStyle(color: Colors.white),
+                validator: AppValidator().validateUsername,
               ),
-              SizedBox(
-                height: 30,
-              ),
-              Text(
-                "Description",
-                style: TextStyle(
-                  color: Color(0XFFDBDBDB),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
+              SizedBox(height: 30),
+              Text("Description", style: TextStyle(color: Color(0XFFDBDBDB))),
+              SizedBox(height: 10),
               TextFormField(
                 controller: description,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Color(0XFF242522),
                   hintText: 'Describe the recipe',
-
                   hintStyle: TextStyle(color: Colors.white54),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
                   ),
-                  // Custom Border Properties
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.transparent),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.transparent),
-                  ),
                 ),
                 style: TextStyle(color: Colors.white),
+                validator: AppValidator().validateField,
               ),
-              SizedBox(
-                height: 60,
-              ),
+              SizedBox(height: 60),
               Row(
                 children: [
                   Expanded(
@@ -192,13 +161,13 @@ class _CreateGroupState extends State<CreateGroup> {
                         ),
                         child: isLoading
                             ? const Center(
-                                child: CircularProgressIndicator(),
-                              )
+                          child: CircularProgressIndicator(),
+                        )
                             : const Text(
-                                'Save Group',
-                                style: TextStyle(
-                                    color: Color(0XFF242522), fontSize: 18),
-                              ),
+                          'Save Group',
+                          style: TextStyle(
+                              color: Color(0XFF242522), fontSize: 18),
+                        ),
                       ),
                     ),
                   ),
