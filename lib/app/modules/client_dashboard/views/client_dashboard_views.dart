@@ -313,62 +313,57 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                   ],
                 ),
               ),
-              Container(
-                child: SizedBox(
-                  height: 80,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: images.length,
-                    itemBuilder: (context, index) {
-                      return Stack(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ClipRRect(
-                              borderRadius:
-                                  BorderRadius.circular(10), // Rounded corners
-                              child: Image.network(
-                                images[index],
-                                width: 180, // Set width for each image
-                                fit: BoxFit.cover, // Adjust image fit as needed
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color: Colors.grey[300],
-                                    width: 150,
-                                    child: const Center(
-                                      child: Icon(Icons.broken_image,
-                                          color: Colors.red),
-                                    ),
-                                  );
-                                },
-                              ),
+              SizedBox(
+                height: 80,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: images.length,
+                  itemBuilder: (context, index) {
+                    return Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ClipRRect(
+                            borderRadius:
+                                BorderRadius.circular(10), // Rounded corners
+                            child: Image.network(
+                              images[index],
+                              width: 180, // Set width for each image
+                              fit: BoxFit.cover, // Adjust image fit as needed
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.grey[300],
+                                  width: 180,
+                                  height: 80,
+                                  child: const Center(
+                                    child: Icon(Icons.broken_image,
+                                        color: Colors.red),
+                                  ),
+                                );
+                              },
                             ),
                           ),
-                          Row(
-                            children: [
-                              // SizedBox(child: Image.asset("assets/men.jpg")),
-                              Positioned(
-                                // left: ,
-                                right: 0,
-                                child: const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      "data",
-                                      style: TextStyle(fontSize: 10),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                        ),
+                        Positioned(
+                          top: 5, // Adjust position
+                          right: 5,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            color: Colors
+                                .black54, // Background color for better visibility
+                            child: const Text(
+                              "data",
+                              style:
+                                  TextStyle(fontSize: 10, color: Colors.white),
+                            ),
                           ),
-                        ],
-                      );
-                    },
-                  ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-              ),
+              )
+
               // CarouselSlider.builder(
               //   itemCount: images.length,
               //   options: CarouselOptions(
@@ -383,7 +378,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
               //             fit: BoxFit.cover, width: 2000));
               //   },
               // ),
-              const SizedBox(
+              ,
+              SizedBox(
                 height: 10,
               ),
               Column(
@@ -393,13 +389,11 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                   ),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        summery(),
-                        summery(),
-                      ],
-                    ),
-                  )
+                    child: Row(children: [
+                      summery(),
+                      summery(),
+                    ]),
+                  ),
                 ],
               ),
 

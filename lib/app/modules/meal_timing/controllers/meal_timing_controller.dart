@@ -41,6 +41,8 @@ class MealTimingController extends GetxController {
             ),
           );
           getMeal(context, id);
+          title.clear();
+          time.clear();
           Get.back();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -74,7 +76,9 @@ class MealTimingController extends GetxController {
           .then((value) {
         if (APIStatus.success(value.statusCode)) {
           // addMeal(context, id);
+          Get.find<AuthController>().fetchAndScheduleNotifications(value.data);
           dataList(value.data);
+
           Get.find<AuthController>().categoriesAdd(value.data);
           print(box.read("categories"));
         } else {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:timezone/data/latest.dart';
+
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 
 import 'app/core/base/constants/custom_scroll.dart';
@@ -25,7 +25,7 @@ void main() async {
 
 initializeControllers() async {
   await _notificationService.initialize();
- 
+
   Get.putAsync<AuthController>(() async => AuthController().init(),
       permanent: true);
 }
@@ -41,6 +41,9 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+        builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+            child: child!),
         getPages: AppPages.routes,
         initialRoute: Get.find<AuthController>().handleAuthChange(),
         title: 'Total Healthy',
