@@ -76,7 +76,7 @@ class _CreateGroupState extends State<CreateGroup> {
   Widget build(BuildContext context) {
     return Dialog(
       child: Container(
-        decoration: BoxDecoration(color: AppColors.black),
+        decoration: BoxDecoration(color: Color(0XFF242522)),
         height: 450,
         padding: EdgeInsets.all(10),
         child: Form(
