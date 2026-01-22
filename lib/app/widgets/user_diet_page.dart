@@ -180,7 +180,7 @@ class _UserDietPageState extends State<UserDietPage> {
                     postHistory();
                   })
           : SizedBox(),
-      backgroundColor: Color(0XFF0C0C0C),
+      backgroundColor: AppColors.black,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,

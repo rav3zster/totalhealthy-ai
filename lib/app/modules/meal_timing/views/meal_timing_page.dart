@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:totalhealthy/app/modules/meal_timing/controllers/meal_timing_controller.dart';
+import 'package:totalhealthy/app/widgets/baseWidget.dart';
 
 import '../../../core/base/constants/appcolor.dart';
 
 class MealTimingPage extends StatefulWidget {
   const MealTimingPage({super.key, required this.id, required this.controller});
+
   final MealTimingController controller;
   final String id;
 
@@ -78,7 +80,8 @@ class _MealTimingPageState extends State<MealTimingPage> {
 
   // Method to show dialog for adding/editing meals
   void _showAddMealDialog(BuildContext context) {
-    TimeOfDay selectedTime = TimeOfDay.now();
+    TimeOfDay? startTime;
+    TimeOfDay? endTime;
 
     showDialog(
       context: context,
@@ -268,16 +271,18 @@ class _MealTimingPageState extends State<MealTimingPage> {
   TimeOfDay? time;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              Get.back();
-            },
-            icon: Icon(Icons.arrow_back_ios)),
-        title: Text("Set Your Daily Meal & Snack Timings"),
-        backgroundColor: Colors.black,
-      ),
+    return BaseWidget(
+      // appBar: AppBar(
+      //   leading: IconButton(
+      //       onPressed: () {
+      //         Get.back();
+      //       },
+      //       icon: Icon(Icons.arrow_back_ios)),
+      //   title: Text("Set Your Daily Meal & Snack Timings"),
+      //   backgroundColor: Colors.black,
+      // ),
+      title: "Set Your Daily Meal & Snack Timings",
+      backButton: true,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/widgets/baseWidget.dart';
 import '../../../routes/app_pages.dart';
 
 class NutritionGoalsScreen extends StatefulWidget {
@@ -8,7 +9,6 @@ class NutritionGoalsScreen extends StatefulWidget {
 }
 
 class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
-  int selectedIndex = -1;
   final PageController _pageController = PageController();
   int currentPageIndex = 0;
 
@@ -35,41 +35,25 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
     ],
   ];
 
+  // List to keep track of selected indexes for each page
+  List<int> selectedIndexes = List.filled(4, -1);
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
+    return BaseWidget(
+      backButton: true,
+      appBarAction: [
+        TextButton(
           onPressed: () {
-            if (_pageController.page!.toInt() > 0) {
-              _pageController.previousPage(
-                  duration: Duration(milliseconds: 500),
-                  curve: Curves.easeIn);
-            } else {
-              Navigator.pop(context);
+            if (currentPageIndex < goals.length - 1) {
+              _pageController.nextPage(
+                  duration: Duration(milliseconds: 500), curve: Curves.easeIn);
             }
           },
-          icon: Icon(Icons.arrow_back_ios),
-          color: Colors.white,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Skip button se bas next page pe jaana hai
-              if (currentPageIndex < goals.length - 1) {
-                _pageController.nextPage(
-                    duration: Duration(milliseconds: 500),
-                    curve: Curves.easeIn);
-              }
-            },
-            child: Text('Skip',
-                style: TextStyle(color: Color(0XFFFFFFFF), fontSize: 16)),
-          )
-        ],
-      ),
+          child: Text('Skip',
+              style: TextStyle(color: Color(0XFFFFFFFF), fontSize: 16)),
+        )
+      ],
       body: PageView.builder(
         controller: _pageController,
         onPageChanged: (index) {
@@ -112,20 +96,18 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                     return GestureDetector(
                       onTap: () {
                         setState(() {
-                          selectedIndex = index;
+                          selectedIndexes[pageIndex] = index;
                         });
                       },
                       child: Container(
-                        margin:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        margin: EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
                         padding: EdgeInsets.all(15),
                         decoration: BoxDecoration(
-                          color: selectedIndex == index
-                              ? Color(0XFF333333)
-                              : Color(0XFF333333),
+                          color: Color(0XFF333333),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: selectedIndex == index
+                            color: selectedIndexes[pageIndex] == index
                                 ? Color(0XFFCDE26D)
                                 : Colors.transparent,
                             width: 2,
@@ -145,7 +127,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0XFFCDE26D), // Replaces `primary`
+                    backgroundColor: Color(0XFFCDE26D),
                     minimumSize: Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30)),

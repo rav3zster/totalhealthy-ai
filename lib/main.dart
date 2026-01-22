@@ -3,14 +3,9 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
-
 import 'app/core/base/constants/custom_scroll.dart';
-
 import 'app/core/base/controllers/theme_controller.dart';
-
 import 'app/routes/app_pages.dart';
-// import 'app/widgets/phone_nav_bar.dart';
-
 import 'app/widgets/notification_services.dart';
 
 final NotificationService _notificationService = NotificationService();

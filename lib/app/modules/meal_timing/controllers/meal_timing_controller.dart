@@ -17,18 +17,27 @@ class MealTimingController extends GetxController {
 
   var isLoading = false.obs;
   var title = TextEditingController();
-  var time = TextEditingController();
-  Future<void> addMeal(context, id) async {
+  var startTime = TextEditingController();
+  var endTime = TextEditingController();
+
+  Future<void> addMeal(BuildContext context, String id) async {
+    if (title.text.trim().isEmpty || startTime.text.trim().isEmpty || endTime.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please fill in all fields."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     try {
-      // if (key.currentState!.validate()) {
-      // setState(() {
       isLoading(true);
 
       Map<String, dynamic> data = {
         "label_name": title.text.trim(),
-        "time_range": time.text.trim(),
+        "time_range": "${startTime.text.trim()} - ${endTime.text.trim()}",
       };
-      print(data);
 
       await APIMethods.post
           .post(url: APIEndpoints.meals.postMealCategories(id), map: data)
@@ -55,19 +64,17 @@ class MealTimingController extends GetxController {
       });
       // }
     } catch (e) {
-      print(e);
+      print("Error in addMeal: $e");
     } finally {
-      isLoading = false.obs;
-      // });
+      isLoading(false);
     }
   }
 
   var box = GetStorage();
-
   var dataList = [].obs;
   var getLoading = false.obs;
 
-  Future<void> getMeal(context, id) async {
+  Future<void> getMeal(BuildContext context, String id) async {
     try {
       getLoading(true);
 
@@ -92,18 +99,17 @@ class MealTimingController extends GetxController {
       });
       // }
     } catch (e) {
-      print(e);
+      print("Error in getMeal: $e");
     } finally {
       getLoading(false);
     }
   }
 
-  final count = 0.obs;
-
   @override
   void onClose() {
+    title.dispose();
+    startTime.dispose();
+    endTime.dispose();
     super.onClose();
   }
-
-  void increment() => count.value++;
 }

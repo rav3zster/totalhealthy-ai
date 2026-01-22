@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:totalhealthy/app/widgets/baseWidget.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
@@ -48,6 +49,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     },
   ];
   var userData = {};
+
   @override
   void initState() {
     super.initState();
@@ -105,6 +107,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   }
 
   var isGetLoading = false;
+
   Future<void> postHistory() async {
     try {
       setState(() {
@@ -152,6 +155,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
 
   DateTime selectedDate = DateTime.now();
   List<Map<String, dynamic>> filteredRecipes = [];
+
   void filterRecipesBySingleCategory(String selectedCategory) {
     setState(() {
       filteredRecipes = filtered.where((recipe) {
@@ -208,6 +212,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     },
   ];
   List<Map<String, dynamic>> filtered = [];
+
   void _filterRecipesByDate(DateTime selectedDate) {
     setState(() {
       filtered = dataList.where((recipe) {
@@ -234,10 +239,11 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     'https://images.unsplash.com/photo-1586951144438-26d4e072b891?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80',
     'https://images.unsplash.com/photo-1586953983027-d7508a64f4bb?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80',
   ];
+
   @override
   Widget build(BuildContext context) {
     String id = Get.parameters["id"] ?? "";
-    return Scaffold(
+    return BaseWidget(
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: selectedMealIds.isNotEmpty
           ? isGetLoading
@@ -256,41 +262,44 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                     postHistory();
                   })
           : const SizedBox(),
-      drawer: const DrawerMenu(),
-      bottomNavigationBar: const MobileNavBar(),
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        // leading: IconButton(
-        //     onPressed: () {
-        //       Get.toNamed('/userdiet?id=$id');
-        //     },
-        //     icon: Icon(
-        //       Icons.arrow_back_ios,
-        //       color: Colors.white,
-        //     )),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const ProfileCard(),
-        actions: [
-          Container(
-            decoration: const BoxDecoration(
-                color: Color(0XFF242424), shape: BoxShape.circle),
-            child: IconButton(
-              icon: const Icon(
-                Icons.notifications_none,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Get.toNamed('/notification?id=$id');
-              },
+      // drawer: const DrawerMenu(),
+      // bottomNavigationBar: const MobileNavBar(),
+      // backgroundColor: Colors.black,
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   // leading: IconButton(
+      //   //     onPressed: () {
+      //   //       Get.toNamed('/userdiet?id=$id');
+      //   //     },
+      //   //     icon: Icon(
+      //   //       Icons.arrow_back_ios,
+      //   //       color: Colors.white,
+      //   //     )),
+      //   backgroundColor: Colors.transparent,
+      //   elevation: 0,
+      //   // title: const ProfileCard(),
+      //   // actions: [
+      //   //   const SizedBox(
+      //   //     width: 10,
+      //   //   ),
+      //   // ],
+      // ),
+      title:  "${ProfileCard()}",
+      appBarAction: [
+        Container(
+          decoration: const BoxDecoration(
+              color: Color(0XFF242424), shape: BoxShape.circle),
+          child: IconButton(
+            icon: const Icon(
+              Icons.notifications_none,
+              color: Colors.white,
             ),
+            onPressed: () {
+              Get.toNamed('/notification?id=$id');
+            },
           ),
-          const SizedBox(
-            width: 10,
-          ),
-        ],
-      ),
+        ),
+      ],
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
