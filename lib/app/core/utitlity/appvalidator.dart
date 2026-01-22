@@ -3,6 +3,7 @@ class AppValidator {
     if (value!.isEmpty) {
       return 'Please enter an email';
     }
+
     RegExp emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegExp.hasMatch(value)) {
       return 'Please enter a valid email';

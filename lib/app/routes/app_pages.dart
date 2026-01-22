@@ -58,7 +58,8 @@ class AppPages {
         page: () => HomeView(),
         binding: HomeBinding(),
         transition: Transition.fadeIn,
-        middlewares: [AuthCheckMiddleware()]),
+        middlewares: [AuthCheckMiddleware()]
+    ),
     GetPage(
       name: _Paths.ONBOARDING,
       page: () => OnboardingView(),
@@ -81,6 +82,7 @@ class AppPages {
     GetPage(
       name: _Paths.Login,
       page: () => LoginView(),
+      transition: Transition.rightToLeft,
       binding: LoginBinding(),
     ),
     GetPage(
@@ -99,16 +101,19 @@ class AppPages {
         name: _Paths.GENERATE_AI,
         page: () => GenerateAiView(),
         binding: GenerateAiBinding(),
+        transition: Transition.fadeIn,
         middlewares: [AuthCheckMiddleware()]),
     GetPage(
         name: _Paths.MEAL_HISTORY,
         page: () => MealHistoryView(),
         binding: MealHistoryBinding(),
+        transition: Transition.fadeIn,
         middlewares: [AuthCheckMiddleware()]),
     GetPage(
         name: _Paths.MEALS_DETAILS,
         page: () => MealsDetailsView(),
         binding: MealsDetailsBinding(),
+        transition: Transition.fadeIn,
         middlewares: [AuthCheckMiddleware()]),
     GetPage(
         name: _Paths.MEAL_TIMING,
@@ -144,6 +149,7 @@ class AppPages {
     ),
     GetPage(
         name: _Paths.CreateMeal,
+        transition: Transition.fadeIn,
         binding: CreateMealBinding(),
         page: () => CreateMealScreen(),
         middlewares: [AuthCheckMiddleware()]),
@@ -154,6 +160,7 @@ class AppPages {
         middlewares: [AuthCheckMiddleware()]),
     GetPage(
       name: _Paths.SIGNUP,
+      transition: Transition.leftToRight,
       page: () => SignupView(),
       binding: SignupBinding(),
     ),

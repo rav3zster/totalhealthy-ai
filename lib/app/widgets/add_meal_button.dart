@@ -85,20 +85,10 @@ class _AddMealButtonState extends State<AddMealButton> {
                 context: context,
                 builder: (contex) {
                   return Container(
-                    height: 400,
+                    height: 420,
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                        gradient: RadialGradient(
-                          colors: [
-                            Color(0xFF272e23),
-                            Color.fromARGB(255, 12, 12, 12),
-                            Color.fromARGB(255, 12, 12, 12),
-                            Color(0xFF272e23),
-                          ],
-
-                          // begin: Alignment.topRight,
-                          // end: Alignment.bottomLeft,
-                        ),
+                      color: AppColors.black,
                         borderRadius: BorderRadius.horizontal()),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,

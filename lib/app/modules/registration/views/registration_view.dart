@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:totalhealthy/app/modules/generate_ai/views/generate_ai_screen.dart';
 import 'package:totalhealthy/app/modules/manage_accounts/views/manage_accounts_views.dart';
+import 'package:totalhealthy/app/widgets/baseWidget.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 
 import '../../generate_ai/widgets/generate_ai_page.dart';
@@ -11,23 +12,24 @@ import '../../nutrition_goal/views/nutrition_goal_screen.dart';
 class RegistrationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: MobileNavBar(),
+    return BaseWidget(
+      // bottomNavigationBar: MobileNavBar(),
+      title: "Profile",
       body: Container(
         color: Color(0xFF0C0C0C),
         child: Column(
           children: [
-            // App Bar
-            PreferredSize(
-              preferredSize: Size.fromHeight(100),
-              child: AppBar(
-                backgroundColor: Color(0XFF000000).withOpacity(0.1),
-                elevation: 0,
-                centerTitle: true,
-                title: Text('Profile',
-                    style: TextStyle(fontSize: 20, color: Colors.white)),
-              ),
-            ),
+            // // App Bar
+            // PreferredSize(
+            //   preferredSize: Size.fromHeight(100),
+            //   child: AppBar(
+            //     backgroundColor: Color(0XFF000000).withOpacity(0.1),
+            //     elevation: 0,
+            //     centerTitle: true,
+            //     title: Text('Profile',
+            //         style: TextStyle(fontSize: 20, color: Colors.white)),
+            //   ),
+            // ),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(

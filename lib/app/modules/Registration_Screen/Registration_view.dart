@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/widgets/baseWidget.dart';
 
 import '../../routes/app_pages.dart';
 
@@ -15,7 +16,7 @@ class _RegistrationViewState extends State<RegistrationView> {
   bool isFemaleSelected = false; // Track Female selection
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BaseWidget(
       body: Container(
         height: MediaQuery.sizeOf(context).height,
         width: MediaQuery.sizeOf(context).width,

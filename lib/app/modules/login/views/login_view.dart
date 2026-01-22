@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/core/utitlity/appvalidator.dart';
 
 import '../../../core/base/apiservice/api_endpoints.dart';
 import '../../../core/base/apiservice/api_status.dart';
@@ -51,7 +52,7 @@ class _LoginViewState extends State<LoginView> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content:
-                    Text('You must agree to the Terms & Privacy to sign up.'),
+                    Text('Authentication Error! Login Failed!'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -155,6 +156,7 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
                     style: TextStyle(color: Colors.white),
+                    validator: AppValidator().validateEmail,
                   ),
                   SizedBox(height: 25),
 
@@ -208,6 +210,7 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
                     style: TextStyle(color: Colors.white),
+                    validator: AppValidator().validatePassword,
                   ),
                   SizedBox(height: 10),
 

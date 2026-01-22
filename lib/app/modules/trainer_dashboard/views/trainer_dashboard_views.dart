@@ -9,6 +9,7 @@ import '../../../core/base/apiservice/api_status.dart';
 import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
 
+import '../../../widgets/baseWidget.dart';
 import '../../../widgets/client_card.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/drawer_menu.dart';
@@ -193,7 +194,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   String? valueDropDown;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BaseWidget(
       // floatingActionButton: FloatingActionButton(
       //   onPressed: () {
       //     // DateTime(dateTime.year, dateTime.month, dateTime.day, 16, 30)
@@ -201,16 +202,17 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
       //   },
       //   child: Icon(Icons.notifications),
       // ),
-      bottomNavigationBar: MobileNavBar(),
-      drawer: DrawerMenu(),
-      backgroundColor: Color(0XFF0C0C0C),
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: ProfileCard(),
-      ),
+      // bottomNavigationBar: MobileNavBar(),
+      // drawer: DrawerMenu(),
+      // backgroundColor: Color(0XFF0C0C0C),
+      // appBar: AppBar(
+      //   iconTheme: IconThemeData(color: Colors.white),
+      //   automaticallyImplyLeading: false,
+      //   backgroundColor: Colors.transparent,
+      //   elevation: 0,
+      //   title: ProfileCard(),
+      // ),
+      title: "${ProfileCard()}",
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
