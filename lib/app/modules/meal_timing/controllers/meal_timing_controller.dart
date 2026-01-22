@@ -39,30 +39,30 @@ class MealTimingController extends GetxController {
         "time_range": "${startTime.text.trim()} - ${endTime.text.trim()}",
       };
 
-      print("Sending Data: $data");
-
-      var response = await APIMethods.post.post(
-        url: APIEndpoints.meals.postMealCategories(id),
-        map: data,
-      );
-
-      if (APIStatus.success(response.statusCode)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("${response.data['message']}"),
-            backgroundColor: Colors.green,
-          ),
-        );
-        getMeal(context, id);
-        Get.back();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Meal category not created.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      await APIMethods.post
+          .post(url: APIEndpoints.meals.postMealCategories(id), map: data)
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("${value.data['message']}"),
+              backgroundColor: Colors.green,
+            ),
+          );
+          getMeal(context, id);
+          title.clear();
+          time.clear();
+          Get.back();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Group is not created.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
+      // }
     } catch (e) {
       print("Error in addMeal: $e");
     } finally {
@@ -78,22 +78,26 @@ class MealTimingController extends GetxController {
     try {
       getLoading(true);
 
-      var response = await APIMethods.get.get(
-        url: APIEndpoints.meals.getMealCategories(id),
-      );
+      await APIMethods.get
+          .get(url: APIEndpoints.meals.getMealCategories(id))
+          .then((value) {
+        if (APIStatus.success(value.statusCode)) {
+          // addMeal(context, id);
+          Get.find<AuthController>().fetchAndScheduleNotifications(value.data);
+          dataList(value.data);
 
-      if (APIStatus.success(response.statusCode)) {
-        dataList(response.data);
-        Get.find<AuthController>().categoriesAdd(response.data);
-        print("Stored Categories: ${box.read("categories")}");
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to retrieve meal categories.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+          Get.find<AuthController>().categoriesAdd(value.data);
+          print(box.read("categories"));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Data is not created.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
+      // }
     } catch (e) {
       print("Error in getMeal: $e");
     } finally {

@@ -1,3 +1,6 @@
+import 'dart:core';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:timezone/timezone.dart' as tz;
@@ -9,8 +12,9 @@ class NotificationService {
 
   Future<void> initialize() async {
     tz.initializeTimeZones();
+    var location = tz.getLocation("Asia/Kolkata");
 
-    tz.setLocalLocation(tz.getLocation("Asia/Kolkata"));
+    tz.setLocalLocation(location);
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -60,10 +64,10 @@ class NotificationService {
         now.day,
         hour,
         minute,
-      );
+      ).add(Duration(seconds: 30));
 
       if (scheduledDate.isBefore(now)) {
-        scheduledDate = scheduledDate.add(Duration(days: 1));
+        scheduledDate = scheduledDate.add( Duration(days: 1));
       }
       print("Scheduled Date: $scheduledDate");
 
@@ -73,18 +77,29 @@ class NotificationService {
         body,
         scheduledDate,
         notificationDetails(),
+        
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.time,
-      );
-      print("Notification Service Started");
+            
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.dateAndTime);
     } catch (e) {
       print(e);
     }
   }
 
+// void printPendingNotifications() async {
+//   List<ActiveNotification> pendingNotifications =
+//       await _notificationsPlugin.();
+
+//   for (var notification in pendingNotifications) {
+//     print("ID: ${notification.id}");
+//     print("Title: ${notification.title}");
+//     print("Body: ${notification.body}");
+//     print("Scheduled Date: ${notification.scheduledDate}"); // May be null
+//   }
+// }
   Future<void> cancelNotification(int id) async {
-    await _notificationsPlugin.cancelAll();
+    await _notificationsPlugin.cancel(id);
   }
 }
