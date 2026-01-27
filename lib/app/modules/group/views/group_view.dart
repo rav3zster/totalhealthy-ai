@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../controllers/group_controller.dart';
 import '../../../data/services/dummy_data_service.dart';
 import '../../../widgets/group_card.dart';
+import '../../../routes/app_pages.dart';
 
 class GroupView extends GetView<GroupController> {
   GroupView({super.key});
@@ -11,111 +12,118 @@ class GroupView extends GetView<GroupController> {
   Widget build(BuildContext context) {
     final groups = DummyDataService.getDummyGroups();
     
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
+    return WillPopScope(
+      onWillPop: () async {
+        Get.offNamed(Routes.ClientDashboard);
+        return false; // Block browser back
+      },
+      child: Scaffold(
         backgroundColor: Colors.black,
-        title: Text(
-          'Groups',
-          style: TextStyle(color: Colors.white),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add, color: Colors.white),
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          title: Text(
+            'Groups',
+            style: TextStyle(color: Colors.white),
+          ),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
-              _showCreateGroupDialog(context);
+              // Navigate directly to client dashboard instead of going back to splash
+              Get.offNamed(Routes.ClientDashboard);
             },
           ),
-        ],
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Search Bar
-            Container(
-              decoration: BoxDecoration(
-                color: Color(0xFF242522),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search groups...',
-                  hintStyle: TextStyle(color: Colors.white54),
-                  prefixIcon: Icon(Icons.search, color: Colors.white54),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.all(16),
-                ),
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            
-            SizedBox(height: 20),
-            
-            // Categories
-            Text(
-              'Categories',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 12),
-            
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildCategoryChip('All', true),
-                  _buildCategoryChip('Fitness', false),
-                  _buildCategoryChip('Weight Loss', false),
-                  _buildCategoryChip('Yoga', false),
-                  _buildCategoryChip('Nutrition', false),
-                  _buildCategoryChip('Running', false),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 20),
-            
-            // Groups List
-            Text(
-              'Your Groups',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 12),
-            
-            Expanded(
-              child: ListView.builder(
-                itemCount: groups.length,
-                itemBuilder: (context, index) {
-                  final group = groups[index];
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 12),
-                    child: GroupCard(
-                      group: {
-                        'group_name': group['name'],
-                        'description': group['description'],
-                        'created_at': group['createdDate'],
-                      },
-                    ),
-                  );
-                },
-              ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.add, color: Colors.white),
+              onPressed: () {
+                _showCreateGroupDialog(context);
+              },
             ),
           ],
+        ),
+        body: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Search Bar
+              Container(
+                decoration: BoxDecoration(
+                  color: Color(0xFF242522),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search groups...',
+                    hintStyle: TextStyle(color: Colors.white54),
+                    prefixIcon: Icon(Icons.search, color: Colors.white54),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(16),
+                  ),
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              
+              SizedBox(height: 20),
+              
+              // Categories
+              Text(
+                'Categories',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 12),
+              
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildCategoryChip('All', true),
+                    _buildCategoryChip('Fitness', false),
+                    _buildCategoryChip('Weight Loss', false),
+                    _buildCategoryChip('Yoga', false),
+                    _buildCategoryChip('Nutrition', false),
+                    _buildCategoryChip('Running', false),
+                  ],
+                ),
+              ),
+              
+              SizedBox(height: 20),
+              
+              // Groups List
+              Text(
+                'Your Groups',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 12),
+              
+              Expanded(
+                child: ListView.builder(
+                  itemCount: groups.length,
+                  itemBuilder: (context, index) {
+                    final group = groups[index];
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 12),
+                      child: GroupCard(
+                        group: {
+                          'group_name': group['name'],
+                          'description': group['description'],
+                          'created_at': group['createdDate'],
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,154 +1,151 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../controllers/group_controller.dart';
 import '../../../data/services/dummy_data_service.dart';
 import '../../../widgets/group_card.dart';
+import '../../../routes/app_routes.dart';
 
 class GroupScreen extends GetView<GroupController> {
   const GroupScreen({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     final groups = DummyDataService.getDummyGroups();
-    
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
+
+    return WillPopScope(
+      // 🔥 THIS IS THE REAL FIX FOR FLUTTER WEB
+      onWillPop: () async {
+        Get.offAllNamed(Routes.ClientDashboard);
+        return false; // ⛔ Block browser back
+      },
+      child: Scaffold(
         backgroundColor: Colors.black,
-        title: Text(
-          'Groups',
-          style: TextStyle(color: Colors.white),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Get.back(),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add, color: Colors.white),
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          elevation: 0,
+          title: const Text(
+            'Groups',
+            style: TextStyle(color: Colors.white),
+          ),
+
+          // 🔙 AppBar back button (same behavior)
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
-              _showCreateGroupDialog(context);
+              Get.offAllNamed(Routes.ClientDashboard);
             },
           ),
-        ],
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Search Bar
-            Container(
-              decoration: BoxDecoration(
-                color: Color(0xFF242522),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search groups...',
-                  hintStyle: TextStyle(color: Colors.white54),
-                  prefixIcon: Icon(Icons.search, color: Colors.white54),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.all(16),
-                ),
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            
-            SizedBox(height: 20),
-            
-            // Categories
-            Text(
-              'Categories',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 12),
-            
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildCategoryChip('All', true),
-                  _buildCategoryChip('Fitness', false),
-                  _buildCategoryChip('Weight Loss', false),
-                  _buildCategoryChip('Yoga', false),
-                  _buildCategoryChip('Nutrition', false),
-                  _buildCategoryChip('Running', false),
-                ],
-              ),
-            ),
-            
-            SizedBox(height: 20),
-            
-            // Groups List
-            Text(
-              'Your Groups',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 12),
-            
-            Expanded(
-              child: ListView.builder(
-                itemCount: groups.length,
-                itemBuilder: (context, index) {
-                  final group = groups[index];
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 12),
-                    child: GroupCard(
-                      group: {
-                        'group_name': group['name'],
-                        'description': group['description'],
-                        'created_at': group['createdDate'],
-                      },
-                    ),
-                  );
-                },
-              ),
+
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add, color: Colors.white),
+              onPressed: () {
+                _showCreateGroupDialog(context);
+              },
             ),
           ],
         ),
-      ),
-    );
-  }
-  
-  Widget _buildCategoryChip(String label, bool isSelected) {
-    return Container(
-      margin: EdgeInsets.only(right: 8),
-      child: FilterChip(
-        label: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.black : Colors.white,
+
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 🔍 Search Bar
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF242522),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search groups...',
+                    hintStyle: TextStyle(color: Colors.white54),
+                    prefixIcon: Icon(Icons.search, color: Colors.white54),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(16),
+                  ),
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 📂 Categories
+              const Text(
+                'Categories',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: const [
+                    _CategoryChip(label: 'All', selected: true),
+                    _CategoryChip(label: 'Fitness'),
+                    _CategoryChip(label: 'Weight Loss'),
+                    _CategoryChip(label: 'Yoga'),
+                    _CategoryChip(label: 'Nutrition'),
+                    _CategoryChip(label: 'Running'),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 👥 Groups List
+              const Text(
+                'Your Groups',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Expanded(
+                child: ListView.builder(
+                  itemCount: groups.length,
+                  itemBuilder: (context, index) {
+                    final group = groups[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: GroupCard(
+                        group: {
+                          'group_name': group['name'],
+                          'description': group['description'],
+                          'created_at': group['createdDate'],
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
-        selected: isSelected,
-        onSelected: (bool selected) {
-          // Handle category selection
-        },
-        backgroundColor: Color(0xFF242522),
-        selectedColor: Color(0xFFF5D657),
-        checkmarkColor: Colors.black,
       ),
     );
   }
-  
+
   void _showCreateGroupDialog(BuildContext context) {
     final nameController = TextEditingController();
     final descriptionController = TextEditingController();
-    
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Color(0xFF242522),
-        title: Text(
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF242522),
+        title: const Text(
           'Create New Group',
           style: TextStyle(color: Colors.white),
         ),
@@ -157,7 +154,8 @@ class GroupScreen extends GetView<GroupController> {
           children: [
             TextField(
               controller: nameController,
-              decoration: InputDecoration(
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
                 labelText: 'Group Name',
                 labelStyle: TextStyle(color: Colors.white70),
                 enabledBorder: UnderlineInputBorder(
@@ -167,12 +165,13 @@ class GroupScreen extends GetView<GroupController> {
                   borderSide: BorderSide(color: Color(0xFFF5D657)),
                 ),
               ),
-              style: TextStyle(color: Colors.white),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               controller: descriptionController,
-              decoration: InputDecoration(
+              style: const TextStyle(color: Colors.white),
+              maxLines: 3,
+              decoration: const InputDecoration(
                 labelText: 'Description',
                 labelStyle: TextStyle(color: Colors.white70),
                 enabledBorder: UnderlineInputBorder(
@@ -182,20 +181,21 @@ class GroupScreen extends GetView<GroupController> {
                   borderSide: BorderSide(color: Color(0xFFF5D657)),
                 ),
               ),
-              style: TextStyle(color: Colors.white),
-              maxLines: 3,
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text(
+            child: const Text(
               'Cancel',
               style: TextStyle(color: Colors.white70),
             ),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFF5D657),
+            ),
             onPressed: () {
               Get.back();
               Get.snackbar(
@@ -205,15 +205,42 @@ class GroupScreen extends GetView<GroupController> {
                 colorText: Colors.white,
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFF5D657),
-            ),
-            child: Text(
+            child: const Text(
               'Create',
               style: TextStyle(color: Colors.black),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CategoryChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+
+  const _CategoryChip({
+    required this.label,
+    this.selected = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      child: FilterChip(
+        label: Text(
+          label,
+          style: TextStyle(
+            color: selected ? Colors.black : Colors.white,
+          ),
+        ),
+        selected: selected,
+        onSelected: (_) {},
+        backgroundColor: const Color(0xFF242522),
+        selectedColor: const Color(0xFFF5D657),
+        checkmarkColor: Colors.black,
       ),
     );
   }
