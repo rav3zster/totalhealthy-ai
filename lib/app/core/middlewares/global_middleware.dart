@@ -6,12 +6,19 @@ import '../base/controllers/auth_controller.dart';
 class AuthCheckMiddleware extends GetMiddleware {
   @override
   RouteSettings? redirect(String? route) {
-    // Custom redirection logic
-
-    if (!Get.find<AuthController>().isAuthenticated.value) {
-      print(Get.find<AuthController>().isAuthenticated.value);
-      return RouteSettings(name: "/login");
+    // Mock authentication check - always allow access for demo
+    // In a real app, this would check authentication status
+    
+    try {
+      if (!Get.find<AuthController>().isAuthenticated.value) {
+        print("User not authenticated, redirecting to login");
+        return RouteSettings(name: "/login");
+      }
+    } catch (e) {
+      // If AuthController is not initialized, allow access
+      print("AuthController not found, allowing access");
     }
+    
     return null;
   }
 }

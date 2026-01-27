@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/widgets/custom_button.dart';
 
-import '../core/base/apiservice/api_endpoints.dart';
-import '../core/base/apiservice/api_status.dart';
-import '../core/base/apiservice/base_methods.dart';
 import '../core/base/constants/appcolor.dart';
 import '../core/base/controllers/auth_controller.dart';
 import '../routes/app_pages.dart';
+import '../data/services/mock_api_service.dart';
 
 class AddMealButton extends StatefulWidget {
   final String id;
@@ -32,31 +30,25 @@ class _AddMealButtonState extends State<AddMealButton> {
         "to_date": "2024-10-30T10:40:19.067Z"
       };
       print(data);
-      await APIMethods.post
-          .post(
-        url: APIEndpoints.createData.copyMeals,
-        map: data,
-      )
-          .then((value) {
-        print(value.data);
-        if (APIStatus.success(value.statusCode)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Existing Meals Copy Successful!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          // printError("Auth Controller", "Signup", value.data);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Meals not copy'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
-      // }
+      
+      // Use mock API instead of real API
+      final response = await MockApiService.copyMeals(data);
+      
+      if (response['statusCode'] == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Existing Meals Copy Successful!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Meals not copy'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print(e);
     } finally {
@@ -64,7 +56,6 @@ class _AddMealButtonState extends State<AddMealButton> {
         isLoading = false;
       });
     }
-    // if (_formKey.currentState!.validate()) {
   }
 
   @override

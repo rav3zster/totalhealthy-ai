@@ -6,10 +6,10 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/widgets/baseWidget.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
+import 'package:totalhealthy/app/widgets/user_profile_section.dart';
 
-import '../../../core/base/apiservice/api_endpoints.dart';
-import '../../../core/base/apiservice/api_status.dart';
-import '../../../core/base/apiservice/base_methods.dart';
+import '../../../data/services/mock_api_service.dart';
+import '../../../data/services/dummy_data_service.dart';
 import '../../../core/base/constants/appcolor.dart';
 import '../../../core/base/controllers/auth_controller.dart';
 import '../../../widgets/daily_summery_card.dart';
@@ -53,7 +53,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   @override
   void initState() {
     super.initState();
-    userData = Get.find<AuthController>().userdataget();
+    userData = Get.find<AuthController>().userdataget() ?? {};
 
     getMeals();
   }
@@ -67,29 +67,32 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
         isLoading = true;
       });
       await getCategories();
-      await APIMethods.get
-          .get(
-        url: APIEndpoints.meals
-            .getMeals(Get.find<AuthController>().groupgetId(), "user"),
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          setState(() {
-            dataList = List<Map<String, dynamic>>.from(value.data);
-          });
-          _filterRecipesByDate(selectedDate);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Group id Not Found'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
-      // }
+      
+      // Use mock API instead of real API
+      final response = await MockApiService.getMeals(
+        Get.find<AuthController>().groupgetId(), 
+        "user"
+      );
+      
+      if (response['statusCode'] == 200) {
+        setState(() {
+          dataList = List<Map<String, dynamic>>.from(response['data']);
+        });
+        _filterRecipesByDate(selectedDate);
+      } else {
+        // Load dummy data as fallback
+        setState(() {
+          dataList = DummyDataService.getDummyMeals();
+        });
+        _filterRecipesByDate(selectedDate);
+      }
     } catch (e) {
-      print(e);
+      print("Error loading meals: $e");
+      // Load dummy data as fallback
+      setState(() {
+        dataList = DummyDataService.getDummyMeals();
+      });
+      _filterRecipesByDate(selectedDate);
     } finally {
       setState(() {
         isLoading = false;
@@ -102,7 +105,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       "meal_ids": selectedMealIds,
       "userId": userData["_id"],
       "groupId": Get.find<AuthController>().groupgetId(),
-      "history_on_day": DateTime.now().toIso8601String(),
+      "history_on_day": DateTime(2024, 10, 15).toIso8601String(), // Static date
     };
   }
 
@@ -115,35 +118,31 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       });
 
       var data = generateJson();
-      await APIMethods.post
-          .post(
-        url: APIEndpoints.createData.mealHistory,
-        map: data,
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          setState(() {
-            isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
-            selectedMealIds.clear();
-          });
+      
+      // Use mock API instead of real API
+      final response = await MockApiService.createMeal(data);
+      
+      if (response['statusCode'] == 200) {
+        setState(() {
+          isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
+          selectedMealIds.clear();
+        });
 
-          Get.toNamed("/meal-history?id=${userData["_id"]}");
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Successfull!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Not Found'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
-      // }
+        Get.toNamed("/meal-history?id=${userData["_id"]}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Meal history saved successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Not Found'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print(e);
     } finally {
@@ -153,15 +152,19 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     }
   }
 
-  DateTime selectedDate = DateTime.now();
+  DateTime selectedDate = DateTime(2024, 10, 15); // Static date: October 15, 2024
   List<Map<String, dynamic>> filteredRecipes = [];
 
   void filterRecipesBySingleCategory(String selectedCategory) {
     setState(() {
       filteredRecipes = filtered.where((recipe) {
-        final categories = recipe["categorys"] as List<dynamic>;
-
-        return categories.contains(selectedCategory);
+        try {
+          final categories = recipe["categorys"] as List<dynamic>? ?? [];
+          return categories.contains(selectedCategory);
+        } catch (e) {
+          print("Error filtering by category: $e");
+          return false;
+        }
       }).toList();
     });
     print(filteredRecipes);
@@ -169,25 +172,33 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
 
   Future<void> getCategories() async {
     try {
-      await APIMethods.get
-          .get(
-        url: APIEndpoints.meals
-            .getMealCategories(Get.find<AuthController>().groupgetId()),
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          Get.find<AuthController>().categoriesAdd(value.data);
-          Get.find<AuthController>().fetchAndScheduleNotifications(value.data);
-          Future.delayed(const Duration(milliseconds: 100), () {
-            categories = Get.find<AuthController>().categoriesGet();
-          });
-        } else {
-          print("Categories Not Found");
-        }
-      });
-      // }
+      // Use mock API instead of real API
+      final response = await MockApiService.getMealCategories(
+        Get.find<AuthController>().groupgetId()
+      );
+      
+      if (response['statusCode'] == 200) {
+        Get.find<AuthController>().categoriesAdd(response['data']);
+        Get.find<AuthController>().fetchAndScheduleNotifications(response['data']);
+        Future.delayed(const Duration(milliseconds: 100), () {
+          categories = Get.find<AuthController>().categoriesGet();
+        });
+      } else {
+        print("Categories Not Found - using dummy data");
+        // Load dummy data as fallback
+        final dummyCategories = DummyDataService.getDummyMealCategories();
+        Get.find<AuthController>().categoriesAdd(dummyCategories);
+        Get.find<AuthController>().fetchAndScheduleNotifications(dummyCategories);
+        Future.delayed(const Duration(milliseconds: 100), () {
+          categories = Get.find<AuthController>().categoriesGet();
+        });
+      }
     } catch (e) {
-      print(e);
+      print("Error loading categories: $e");
+      // Load dummy data as fallback
+      final dummyCategories = DummyDataService.getDummyMealCategories();
+      Get.find<AuthController>().categoriesAdd(dummyCategories);
+      categories = dummyCategories;
     }
   }
 
@@ -216,11 +227,16 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   void _filterRecipesByDate(DateTime selectedDate) {
     setState(() {
       filtered = dataList.where((recipe) {
-        final createdAt = DateTime.parse(recipe["created_at"]);
-        // Check if the year, month, and day match
-        return createdAt.year == selectedDate.year &&
-            createdAt.month == selectedDate.month &&
-            createdAt.day == selectedDate.day;
+        try {
+          final createdAt = DateTime.parse(recipe["created_at"] ?? "2024-10-15T00:00:00Z");
+          // Check if the year, month, and day match
+          return createdAt.year == selectedDate.year &&
+              createdAt.month == selectedDate.month &&
+              createdAt.day == selectedDate.day;
+        } catch (e) {
+          print("Error parsing date: $e");
+          return false;
+        }
       }).toList();
     });
     filterRecipesBySingleCategory("Breakfast");
@@ -306,110 +322,29 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // User Profile Section with Calories Intake Card
+              const UserProfileSection(),
+              
               const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Row(
                   children: [
                     Text(
-                      "Today plan",
-                      style: TextStyle(fontSize: 15),
+                      "Today's Diet Plan",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     Spacer(),
                     Text(
-                      "View details",
-                      style: TextStyle(fontSize: 13),
-                    )
+                      "Add Meal",
+                      style: TextStyle(fontSize: 14, color: AppColors.chineseGreen),
+                    ),
+                    SizedBox(width: 4),
+                    Icon(Icons.add, color: AppColors.chineseGreen, size: 18),
                   ],
                 ),
               ),
-              SizedBox(
-                height: 80,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: images.length,
-                  itemBuilder: (context, index) {
-                    return Stack(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ClipRRect(
-                            borderRadius:
-                                BorderRadius.circular(10), // Rounded corners
-                            child: Image.network(
-                              images[index],
-                              width: 180, // Set width for each image
-                              fit: BoxFit.cover, // Adjust image fit as needed
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: Colors.grey[300],
-                                  width: 180,
-                                  height: 80,
-                                  child: const Center(
-                                    child: Icon(Icons.broken_image,
-                                        color: Colors.red),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 5, // Adjust position
-                          right: 5,
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            color: Colors
-                                .black54, // Background color for better visibility
-                            child: const Text(
-                              "data",
-                              style:
-                                  TextStyle(fontSize: 10, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              )
-
-              // CarouselSlider.builder(
-              //   itemCount: images.length,
-              //   options: CarouselOptions(
-              //     autoPlay: true,
-              //     // enlargeFactor: 0,
-              //     aspectRatio: 2.0,
-              //     // enlargeCenterPage: true,
-              //   ),
-              //   itemBuilder: (context, index, realIdx) {
-              //     return Center(
-              //         child: Image.network(images[index],
-              //             fit: BoxFit.cover, width: 2000));
-              //   },
-              // ),
-              ,
-              SizedBox(
-                height: 10,
-              ),
-              Column(
-                children: [
-                  const SizedBox(
-                    height: 35,
-                  ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(children: [
-                      summery(),
-                      summery(),
-                    ]),
-                  ),
-                ],
-              ),
-
-              // SizedBox(height: 16),
-              // DailySummeryCard(),
-
-              const SizedBox(height: 16),
+              
+              // Diet Plan Filter Buttons
               SizedBox(
                 height: 40,
                 child: ListView.builder(
@@ -453,7 +388,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                             top: 0, bottom: 15, left: 10, right: 10),
                         child: EasyDateTimeLine(
                           activeColor: AppColors.chineseGreen,
-                          initialDate: DateTime.now(),
+                          initialDate: DateTime(2024, 10, 15), // Static date
                           onDateChange: (selectedDate) {
                             print(selectedDate);
                             setState(() {
@@ -613,8 +548,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                   });
                                 },
                                 data: data,
-                                id: userData["_id"],
-                                title: "${data["name"] ?? "Not Found"}",
+                                id: userData["_id"] ?? "",
+                                title: "${data["name"] ?? "Unknown Meal"}",
                                 kcal: "${data["kcal"] ?? "0"}",
                                 weight: 80,
                                 protein: "${data["protein"] ?? "0"}",
@@ -627,59 +562,6 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Container summery() {
-    return Container(
-      width: 320,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10), // Rounded corners (optional)
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black,
-            spreadRadius: 5, // Shadow width spread
-            blurRadius: 7, // Shadow blur amount
-            offset: Offset(0, 3), // Shadow position (x, y)
-          ),
-        ],
-        color: AppColors.white.withOpacity(.1), // Replace if needed
-      ),
-      padding: const EdgeInsets.all(10), // Padding for inner content
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Your Daily Calories Intake',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-            ), // Title styling
-          ),
-          const SizedBox(height: 10), // Space after title
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildIndicatorCard('Eaten', '1258 Kcal', 0.60),
-              _buildIndicatorCard('Burn', '558 Kcal', 0.60),
-            ],
-          ),
-          const SizedBox(height: 20), // Space before the nutrient row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNutrientColumn(
-                  '35', '/75', 'Proteins', const Color(0XFFFF5122)),
-              _buildVerticalDivider(),
-              _buildNutrientColumn('120', '/200', 'Carbs', Colors.yellow),
-              _buildVerticalDivider(),
-              _buildNutrientColumn(
-                  '35', '/75', 'Fats', const Color(0XFF8B3BFF)),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -729,15 +611,6 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
             )
           ],
         ));
-  }
-
-  // Helper function to build the vertical divider
-  Widget _buildVerticalDivider() {
-    return Container(
-      height: 40,
-      width: 1,
-      color: Colors.grey, // Light color for the divider
-    );
   }
 }
 
@@ -802,85 +675,4 @@ class MealTypeSelector extends StatelessWidget {
       ],
     );
   }
-}
-
-// Helper method to create indicator card
-Widget _buildIndicatorCard(String title, String value, double progress) {
-  return Row(
-    children: [
-      Container(
-        padding: const EdgeInsets.all(15),
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          color: Color.fromRGBO(193, 223, 59, 1),
-        ),
-        width: 80,
-        height: 80,
-        child: CircularProgressIndicator(
-          value: progress,
-          color: AppColors.chineseGreen, // Replace if needed
-          backgroundColor: Colors.white,
-          strokeWidth: 10,
-        ),
-      ),
-      const SizedBox(width: 5),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    ],
-  );
-}
-
-// Helper method to create nutrient column
-Widget _buildNutrientColumn(
-    String mainValue, String subValue, String title, Color color) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      Text.rich(
-        TextSpan(
-          text: mainValue,
-          style: TextStyle(
-            color: color,
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-          ),
-          children: [
-            TextSpan(
-              text: subValue,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 5),
-      Text(
-        title,
-        style: const TextStyle(fontSize: 14),
-      ),
-    ],
-  );
-}
-
-// Helper method to create vertical divider
-Widget _buildVerticalDivider() {
-  return Container(
-    width: 1,
-    height: 40,
-    color: Colors.grey,
-  );
 }

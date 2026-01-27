@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/utitlity/appvalidator.dart';
-import '../../../core/base/apiservice/api_endpoints.dart';
 
-import '../../../core/base/apiservice/api_status.dart';
-import '../../../core/base/apiservice/base_methods.dart';
 import '../../../routes/app_pages.dart';
-
-import '../../../core/utitlity/debug_print.dart';
+import '../../../data/services/mock_api_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -38,30 +34,26 @@ class SignupScreenState extends State<SignupScreen> {
         };
         print(data);
 
-        await APIMethods.post
-            .post(url: APIEndpoints.auth.signup, map: data)
-            .then((value) {
-          if (APIStatus.success(value.statusCode)) {
-            print(value.data);
-            // clearDetails();
-            Get.toNamed(Routes.Login);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Sign Up Successful!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          } else {
-            printError("Error ", "Signup", value.data);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content:
-                    Text('You must agree to the Terms & Privacy to sign up.'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        });
+        // Use mock API instead of real API
+        final response = await MockApiService.signup(data);
+        
+        if (response['statusCode'] == 200) {
+          print(response['data']);
+          Get.toNamed(Routes.LoginView);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Sign Up Successful! You can now login with demo credentials.'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Sign up failed. Please try again.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     } catch (e) {
       print(e);

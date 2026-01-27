@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/utitlity/appvalidator.dart';
 
-import '../../../core/base/apiservice/api_endpoints.dart';
-import '../../../core/base/apiservice/api_status.dart';
-import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/controllers/auth_controller.dart';
 import '../../../routes/app_pages.dart';
+import '../../../data/services/dummy_data_service.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -22,51 +20,59 @@ class _LoginViewState extends State<LoginView> {
   bool isLoading = false;
   bool _isObscured = true;
 
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill with credentials for easy testing
+    email.text = DummyDataService.mockEmail;
+    pass.text = DummyDataService.mockPassword;
+  }
+
   Future<void> submitUser() async {
     try {
       if (key.currentState!.validate()) {
         setState(() {
           isLoading = true;
         });
-        Map<String, dynamic> data = {
-          "email": email.text.trim(),
-          "password": pass.text.trim(),
-        };
-        print(data);
-        await APIMethods.post
-            .post(url: APIEndpoints.auth.login, map: data)
-            .then((value) {
-          if (APIStatus.success(value.statusCode)) {
-            // clearDetails();
-            Get.find<AuthController>().setAuth(value.data["access_token"],
-                value.data["refresh_token"], value.data["user_details"]);
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Login Successful!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          } else {
-            // printError("Auth Controller", "Signup", value.data);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content:
-                    Text('Authentication Error! Login Failed!'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        });
+        // Simulate network delay
+        await Future.delayed(Duration(milliseconds: 1500));
+
+        // Use mock authentication
+        bool loginSuccess = await Get.find<AuthController>().mockLogin(
+          email.text.trim(),
+          pass.text.trim(),
+        );
+
+        if (loginSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login Successful!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Invalid credentials! Please check your email and password.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     } catch (e) {
-      print(e);
+      print("Login error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('An error occurred. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
     } finally {
       setState(() {
         isLoading = false;
       });
     }
-    // if (_formKey.currentState!.validate()) {
   }
 
   @override
@@ -82,9 +88,8 @@ class _LoginViewState extends State<LoginView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(
-                    height: 40,
-                  ),
+                  SizedBox(height: 40),
+
                   // Title
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -145,7 +150,6 @@ class _LoginViewState extends State<LoginView> {
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
                       ),
-                      // Custom Border Properties
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(color: Colors.transparent),
@@ -180,7 +184,6 @@ class _LoginViewState extends State<LoginView> {
                       hintText: 'Enter Your Password',
                       prefixIcon:
                           Icon(Icons.lock_outline, color: Colors.white54),
-
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isObscured
@@ -199,7 +202,6 @@ class _LoginViewState extends State<LoginView> {
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
                       ),
-                      // Custom Border Properties
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(color: Colors.transparent),
@@ -225,11 +227,9 @@ class _LoginViewState extends State<LoginView> {
                         'Forgot Password?',
                         style: TextStyle(
                           color: Color(0XFFCDE26D),
-                          decoration: TextDecoration
-                              .underline, // Adds underline to the text
-                          decorationColor:
-                              Color(0XFFCDE26D), // Same color as the text
-                          decorationThickness: 2, // Thickness of the underline
+                          decoration: TextDecoration.underline,
+                          decorationColor: Color(0XFFCDE26D),
+                          decorationThickness: 2,
                         ),
                       ),
                     ),
@@ -249,7 +249,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     child: isLoading
                         ? Center(
-                            child: CircularProgressIndicator(),
+                            child: CircularProgressIndicator(color: Color(0XFF242522)),
                           )
                         : Text(
                             'Login',
@@ -262,12 +262,10 @@ class _LoginViewState extends State<LoginView> {
                   // Dotted Line and "Or"
                   Center(
                     child: Row(
-                      mainAxisSize: MainAxisSize
-                          .min, // Ensures the row takes minimal space
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Dotted line on the left, with a smaller width
                         SizedBox(
-                          width: 50, // Adjust the width as needed
+                          width: 50,
                           child: DottedLine(),
                         ),
                         Padding(
@@ -277,9 +275,8 @@ class _LoginViewState extends State<LoginView> {
                             style: TextStyle(color: Color(0XFFB0AFAF)),
                           ),
                         ),
-                        // Dotted line on the right, with a smaller width
                         SizedBox(
-                          width: 50, // Adjust the width as needed
+                          width: 50,
                           child: DottedLine(),
                         ),
                       ],

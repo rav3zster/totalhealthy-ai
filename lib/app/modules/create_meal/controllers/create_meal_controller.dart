@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../core/base/apiservice/api_endpoints.dart';
-import '../../../core/base/apiservice/api_status.dart';
-import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/controllers/auth_controller.dart';
 import '../../../routes/app_pages.dart';
+import '../../../data/services/mock_api_service.dart';
 
 class CreateMealController extends GetxController {
   final fullNameController = TextEditingController();
@@ -33,8 +31,8 @@ class CreateMealController extends GetxController {
   var isLoading = false.obs;
 //  {"name": "string", "amount": "string", "unit": "string"}
   submitUser(context, userId) async {
-    DateTime now = DateTime.now();
-    int timestamp = now.millisecondsSinceEpoch;
+    DateTime staticDate = DateTime(2024, 10, 15); // Static date: October 15, 2024
+    int timestamp = staticDate.millisecondsSinceEpoch;
     try {
       String id = userId.toString();
       if (key.currentState!.validate()) {
@@ -59,29 +57,25 @@ class CreateMealController extends GetxController {
 
         print(data);
 
-        await APIMethods.post
-            .post(url: APIEndpoints.createData.createMeal, map: data)
-            .then((value) {
-          if (APIStatus.success(value.statusCode)) {
-            // clearDetails();
-            Get.toNamed("${Routes.UserDiet}?id=$userId");
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Create Meal Successful!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          } else {
-            // printError("Auth Controller", "Signup", value.data);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Meals not created'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        });
+        // Use mock API instead of real API
+        final response = await MockApiService.createMeal(data);
+        
+        if (response['statusCode'] == 200) {
+          Get.toNamed("${Routes.UserDiet}?id=$userId");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Create Meal Successful!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Meals not created'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     } catch (e) {
       print(e);

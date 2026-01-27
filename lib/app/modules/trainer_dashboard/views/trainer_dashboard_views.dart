@@ -4,10 +4,8 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 
-import '../../../core/base/apiservice/api_endpoints.dart';
-import '../../../core/base/apiservice/api_status.dart';
-import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
+import '../../../data/services/mock_api_service.dart';
 
 import '../../../widgets/baseWidget.dart';
 import '../../../widgets/client_card.dart';
@@ -32,20 +30,18 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
       setState(() {
         isLoading = true;
       });
-      // print(data);  String input = searchController.text.trim();
       String input = searchController.text.trim();
       var phone = int.tryParse(input);
-      await APIMethods.get
-          .get(
-        url: phone != null
-            ? APIEndpoints.createData.searchUserByPhone(input)
-            : APIEndpoints.createData.searchUserByemail(input),
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          setState(() {
-            groupMemberData = [value.data];
-          });
+      
+      // Use mock API instead of real API
+      final response = phone != null
+          ? await MockApiService.searchUserByPhone(input)
+          : await MockApiService.searchUserByEmail(input);
+      
+      if (response['statusCode'] == 200) {
+        setState(() {
+          groupMemberData = [response['data']];
+        });
 
           // ScaffoldMessenger.of(context).showSnackBar(
           //   const SnackBar(
@@ -54,16 +50,13 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
           //   ),
           // );
         } else {
-          // printError("Auth Controller", "Signup", value.data);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${value.data["detail"]}'),
+              content: Text('${response["message"]}'),
               backgroundColor: Colors.red,
             ),
           );
         }
-      });
-      // }new
     } catch (e) {
       print(e);
     } finally {
@@ -71,7 +64,6 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
         isLoading = false;
       });
     }
-    // if (_formKey.currentState!.validate()) {
   }
 
   var isGroupLoading = false;
@@ -83,35 +75,30 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
       setState(() {
         isGroupLoading = true;
       });
-      // print(data);  String input = searchController.text.trim();
-
-      await APIMethods.get
-          .get(
-        url: APIEndpoints.group.getGroup(
-            Get.find<AuthController>().roleGet() == "admin" ? "admin" : "user"),
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          setState(() {
-            dataList = value.data;
-            uniqueDataList = dataList
-                .map((item) => item["group_name"])
-                .toSet()
-                .map((groupName) => dataList
-                    .firstWhere((item) => item["group_name"] == groupName))
-                .toList();
-          });
-        } else {
-          // printError("Auth Controller", "Signup", value.data);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${value.data["detail"]}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
-      // }
+      
+      // Use mock API instead of real API
+      final response = await MockApiService.getGroups(
+        Get.find<AuthController>().roleGet() == "admin" ? "admin" : "user"
+      );
+      
+      if (response['statusCode'] == 200) {
+        setState(() {
+          dataList = response['data'];
+          uniqueDataList = dataList
+              .map((item) => item["name"])
+              .toSet()
+              .map((groupName) => dataList
+                  .firstWhere((item) => item["name"] == groupName))
+              .toList();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${response["message"]}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print(e);
     } finally {
@@ -119,29 +106,25 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
         isGroupLoading = false;
       });
     }
-    // if (_formKey.currentState!.validate()) {
   }
 
   bool isMemberLoading = false;
   var groupMemberData = [];
   NotificationService notificationService = NotificationService();
+  
   Future<void> getCategories() async {
     try {
-      await APIMethods.get
-          .get(
-        url: APIEndpoints.meals
-            .getMealCategories(Get.find<AuthController>().groupgetId()),
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          Get.find<AuthController>().categoriesAdd(value.data);
-          Get.find<AuthController>().fetchAndScheduleNotifications(value.data);
-        } else {
-          print("Categories Not Found");
-        }
-      });
-
-      // }
+      // Use mock API instead of real API
+      final response = await MockApiService.getMealCategories(
+        Get.find<AuthController>().groupgetId()
+      );
+      
+      if (response['statusCode'] == 200) {
+        Get.find<AuthController>().categoriesAdd(response['data']);
+        Get.find<AuthController>().fetchAndScheduleNotifications(response['data']);
+      } else {
+        print("Categories Not Found");
+      }
     } catch (e) {
       print(e);
     }
@@ -153,27 +136,24 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
         isMemberLoading = true;
       });
       await getCategories();
-      await APIMethods.get
-          .get(
-        url: APIEndpoints.group
-            .getGroupMember(Get.find<AuthController>().groupgetId()),
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          setState(() {
-            groupMemberData = value.data;
-          });
-        } else {
-          // printError("Auth Controller", "Signup", value.data);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${value.data["detail"]}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
-      // }
+      
+      // Use mock API instead of real API
+      final response = await MockApiService.getGroupMembers(
+        Get.find<AuthController>().groupgetId()
+      );
+      
+      if (response['statusCode'] == 200) {
+        setState(() {
+          groupMemberData = response['data'];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${response["message"]}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print(e);
     } finally {
@@ -181,7 +161,6 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
         isMemberLoading = false;
       });
     }
-    // if (_formKey.currentState!.validate()) {
   }
 
   @override

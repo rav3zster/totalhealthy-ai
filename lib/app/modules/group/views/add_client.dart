@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../core/base/apiservice/api_endpoints.dart';
-import '../../../core/base/apiservice/api_status.dart';
-import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
 import '../../../widgets/custom_button.dart';
+import '../../../data/services/mock_api_service.dart';
 import '../controllers/group_controller.dart';
 
 class AddClient extends StatefulWidget {
@@ -26,30 +24,26 @@ class _AddClientState extends State<AddClient> {
       setState(() {
         isLoading = true;
       });
-      // print(data);  String input = searchController.text.trim();
       String input = searchController.text.trim();
       var phone = int.tryParse(input);
-      await APIMethods.get
-          .get(
-        url: phone != null
-            ? APIEndpoints.createData.searchUserByPhone(input)
-            : APIEndpoints.createData.searchUserByemail(input),
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          setState(() {
-            userData = [value.data];
-          });
-        } else {
-          // printError("Auth Controller", "Signup", value.data);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${value.data["detail"]}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
+      
+      // Use mock API instead of real API
+      final response = phone != null
+          ? await MockApiService.searchUserByPhone(input)
+          : await MockApiService.searchUserByEmail(input);
+      
+      if (response['statusCode'] == 200) {
+        setState(() {
+          userData = [response['data']];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${response["message"]}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
       // }
     } catch (e) {
       print(e);
@@ -72,30 +66,24 @@ class _AddClientState extends State<AddClient> {
 
       print(data);
 
-      await APIMethods.post
-          .post(
-              url: APIEndpoints.group.addGroupMember(widget.id, userId),
-              map: data)
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          // clearDetails();
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Request Send Successfully!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          // printError("Auth Controller", "Signup", value.data);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("${value.data["detail"]}"),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
+      // Use mock API instead of real API
+      final response = await MockApiService.addGroupMember(widget.id, userId);
+      
+      if (response['statusCode'] == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Request Send Successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("${response["message"]}"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print(e);
     } finally {

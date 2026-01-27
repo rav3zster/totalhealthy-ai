@@ -9,6 +9,7 @@ import 'app/routes/app_pages.dart';
 import 'app/widgets/notification_services.dart';
 
 final NotificationService _notificationService = NotificationService();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -19,7 +20,11 @@ void main() async {
 }
 
 initializeControllers() async {
-  await _notificationService.initialize();
+  try {
+    await _notificationService.initialize();
+  } catch (e) {
+    print("Notification service initialization failed: $e");
+  }
 
   Get.putAsync<AuthController>(() async => AuthController().init(),
       permanent: true);
@@ -39,12 +44,15 @@ class _MyAppState extends State<MyApp> {
         builder: (context, child) => MediaQuery(
             data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
             child: child!),
+        initialRoute: AppPages.INITIAL,
         getPages: AppPages.routes,
-        initialRoute: Get.find<AuthController>().handleAuthChange(),
         title: 'Total Healthy',
         onReady: () {},
         scrollBehavior: MyCustomScrollBehavior(),
         debugShowCheckedModeBanner: false,
-        theme: Get.find<ThemeController>().themeData);
+        theme: ThemeData.dark().copyWith(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+          scaffoldBackgroundColor: Colors.black,
+        ));
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../core/middlewares/global_middleware.dart';
@@ -39,10 +40,10 @@ import '../modules/trainer_dashboard/bindings/trainer_dashboard_bindings.dart';
 import '../modules/trainer_dashboard/views/trainer_dashboard_views.dart';
 import '../modules/user_diet_screen/bindings/user_diet_screen_bindings.dart';
 import '../modules/user_diet_screen/views/user_diet_view.dart';
-import '../modules/user_group_view/bindings/user_group_view_binding.dart';
-import '../modules/user_group_view/views/user_group_view.dart';
 import '../modules/welcom_screen/bindings/welcome-screen-bindings.dart';
 import '../modules/welcom_screen/views/welcome-screen-views.dart';
+import '../modules/manage_accounts/views/manage_accounts_views.dart';
+import '../modules/Help_and_support/views/helpAndSuportPage.dart';
 import '../widgets/switch_role_screen.dart';
 
 part 'app_routes.dart';
@@ -165,14 +166,20 @@ class AppPages {
       binding: SignupBinding(),
     ),
     GetPage(
-      name: _Paths.USER_GROUP_VIEW,
-      page: () => const UserGroupView(),
-      binding: UserGroupViewBinding(),
-    ),
-    GetPage(
       name: _Paths.SETTING,
       page: () => const SettingView(),
       binding: SettingBinding(),
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: '/manage-accounts',
+      page: () => ManageAccountScreen(),
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: '/help-support',
+      page: () => HelpPage(),
+      middlewares: [AuthCheckMiddleware()],
     ),
   ];
 }

@@ -18,13 +18,11 @@ abstract class Routes {
   static const FORGETPASSWORD = _Paths.FORGETPASSWORD;
   static const UserDiet = _Paths.UserDiet;
   static const TrainerDashboard = _Paths.TrainerDashboard;
-
   static const ClientDashboard = _Paths.ClientDashboard;
   static const CreateMeal = _Paths.CreateMeal;
   static const SIGNUP = _Paths.SIGNUP;
   static const GROUP = _Paths.GROUP;
   static const ONBOARDING = _Paths.ONBOARDING;
-  static const USER_GROUP_VIEW = _Paths.USER_GROUP_VIEW;
   static const SETTING = _Paths.SETTING;
   static const SWITCHROLE = _Paths.SWITCHROLE;
 }
@@ -45,13 +43,11 @@ abstract class _Paths {
   static const MEAL_TIMING = '/meal-timing';
   static const UserDiet = '/userdiet';
   static const TrainerDashboard = '/trainerdashboard';
-
   static const ClientDashboard = '/clientdashboard';
   static const CreateMeal = '/createmeal';
   static const SIGNUP = '/signup';
   static const FORGETPASSWORD = '/forgot-password';
   static const GROUP = '/group';
-  static const USER_GROUP_VIEW = '/user-group-view';
   static const SETTING = '/setting';
   static const SWITCHROLE = '/switch-role';
 }

@@ -15,6 +15,8 @@ class ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userData = Get.find<AuthController>().userdataget() ?? {};
+    
     return Row(
       children: [
         Builder(
@@ -26,27 +28,25 @@ class ProfileCard extends StatelessWidget {
                 },
                 child: CircleAvatar(
                   backgroundColor: AppColors.cardbackground,
-                  maxRadius: 28,
+                  maxRadius: 20, // Smaller radius for header
                   child: Icon(
                     Icons.person,
                     color: Colors.white,
+                    size: 20, // Smaller icon
                   ),
                 ),
               ),
             );
           },
         ),
-        SizedBox(width: 10),
+        SizedBox(width: 8), // Reduced spacing
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title ?? 'Welcome!',
-                style: TextStyle(fontSize: 20, color: Color(0XFFFFFFFF))),
-            SizedBox(
-              height: 5,
-            ),
-            Text(Get.find<AuthController>().userdataget()["name"].toString(),
-                style: TextStyle(fontSize: 16, color: Color(0XFF7B7B7A))),
+                style: TextStyle(fontSize: 16, color: Color(0XFFFFFFFF), fontWeight: FontWeight.w500)), // Smaller font
+            Text(userData["username"] ?? "Ayush Shukla",
+                style: TextStyle(fontSize: 14, color: Color(0XFF7B7B7A))), // Smaller font
           ],
         ),
       ],

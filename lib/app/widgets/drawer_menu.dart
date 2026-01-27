@@ -111,16 +111,15 @@ class _DrawerMenuState extends State<DrawerMenu> {
 
                       NavRow(
                           redirect: () {
-                            Get.toNamed(Routes.USER_GROUP_VIEW);
                             Get.find<AuthController>().roleStore("admin");
+                            Get.offAllNamed(Routes.TrainerDashboard);
                           },
                           heading: "Switch as Advisor",
                           icon: Icons.supervised_user_circle_outlined),
                       NavRow(
                           redirect: () {
-                            Get.toNamed(
-                                "${Routes.USER_GROUP_VIEW}?isUser=true");
                             Get.find<AuthController>().roleStore("user");
+                            Get.offAllNamed(Routes.ClientDashboard);
                           },
                           heading: "Switch as Member",
                           icon: Icons.person),

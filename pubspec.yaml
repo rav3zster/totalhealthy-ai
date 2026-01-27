@@ -37,7 +37,6 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   get: ^4.6.6
-  dio: ^5.7.0
   flutter_launcher_icons: ^0.14.3
   get_storage: ^2.1.1
   easy_date_timeline: ^1.1.3

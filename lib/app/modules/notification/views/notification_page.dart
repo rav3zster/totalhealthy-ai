@@ -6,11 +6,9 @@ import 'package:totalhealthy/app/modules/notification/controllers/notification_c
 import 'package:totalhealthy/app/widgets/custom_button.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 
-import '../../../core/base/apiservice/api_endpoints.dart';
-import '../../../core/base/apiservice/api_status.dart';
-import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
 import '../../../core/base/controllers/auth_controller.dart';
+import '../../../data/services/mock_api_service.dart';
 
 class NotificationsPage extends StatefulWidget {
   final NotificationController controller;
@@ -34,36 +32,25 @@ class _NotificationsPageState extends State<NotificationsPage>
         isGetLoading[index] = true;
       });
 
-      var data = {};
-      await APIMethods.post
-          .post(
-        url: APIEndpoints.notification.postNotification(id, action),
-        map: data,
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          // setState(() {
-          //   isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
-          //   selectedMealIds.clear();
-          // });
-          getNotification();
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Successfull!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Not Found'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
-      // }
+      // Use mock API instead of real API
+      final response = await MockApiService.respondToNotification(id, action);
+      
+      if (response['statusCode'] == 200) {
+        getNotification();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Successful!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Not Found'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print(e);
     } finally {
@@ -78,31 +65,22 @@ class _NotificationsPageState extends State<NotificationsPage>
       setState(() {
         isLoading = true;
       });
-      await APIMethods.get
-          .get(
-        url: APIEndpoints.notification.getNotification,
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          setState(() {
-            dataList = value.data;
-          });
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //     content: Text("$".toString()),
-          //     backgroundColor: Colors.green,
-          //   ),
-          // );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("No Data Found"),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
-      // }
+      
+      // Use mock API instead of real API
+      final response = await MockApiService.getNotifications();
+      
+      if (response['statusCode'] == 200) {
+        setState(() {
+          dataList = response['data'];
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("No Data Found"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print(e);
     } finally {

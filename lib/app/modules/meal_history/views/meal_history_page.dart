@@ -8,13 +8,11 @@ import 'package:totalhealthy/app/modules/meal_history/controllers/meal_history_c
 import 'package:totalhealthy/app/widgets/baseWidget.dart';
 import 'package:totalhealthy/app/widgets/button_selector.dart';
 
-import '../../../core/base/apiservice/api_endpoints.dart';
-import '../../../core/base/apiservice/api_status.dart';
-import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/constants/appcolor.dart';
 import '../../../core/base/controllers/auth_controller.dart';
 import '../../../widgets/nutritional_history_card.dart';
 import '../../../widgets/profile_card.dart';
+import '../../../data/services/mock_api_service.dart';
 
 class MealHistoryPage extends StatefulWidget {
   final MealHistoryController controller;
@@ -28,7 +26,7 @@ class MealHistoryPage extends StatefulWidget {
 }
 
 class _MealHistoryPageState extends State<MealHistoryPage> {
-  DateTime selectedDate = DateTime.now();
+  DateTime selectedDate = DateTime(2024, 10, 15); // Static date: October 15, 2024
   List<Map<String, dynamic>> recipesCotegory = [];
   void filterRecipesBySingleCategory(String selectedCategory) {
     setState(() {
@@ -49,28 +47,25 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
       setState(() {
         isLoading = true;
       });
-      await APIMethods.get
-          .get(
-        url: APIEndpoints.meals.getuserHistory(
-          Get.find<AuthController>().groupgetId(),
-        ),
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          setState(() {
-            dataList = List<Map<String, dynamic>>.from(value.data);
-          });
-          _filterRecipesByDate(selectedDate);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Group id Not Found'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
-      // }
+      
+      // Use mock API instead of real API
+      final response = await MockApiService.getMealHistory(
+        Get.find<AuthController>().groupgetId(),
+      );
+      
+      if (response['statusCode'] == 200) {
+        setState(() {
+          dataList = List<Map<String, dynamic>>.from(response['data']);
+        });
+        _filterRecipesByDate(selectedDate);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Group id Not Found'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print(e);
     } finally {
@@ -222,7 +217,7 @@ class _MealHistoryPageState extends State<MealHistoryPage> {
                               top: 0, bottom: 15, left: 10, right: 10),
                           child: EasyDateTimeLine(
                             activeColor: AppColors.chineseGreen,
-                            initialDate: DateTime.now(),
+                            initialDate: DateTime(2024, 10, 15), // Static date
                             onDateChange: (selectedDate) {
                               print(selectedDate);
                               setState(() {

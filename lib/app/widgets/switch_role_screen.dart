@@ -162,13 +162,15 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
                     borderRadius: BorderRadius.circular(30)),
                 child: ElevatedButton(
                   onPressed: () {
-                    slectedValue == ""
-                        ? null
-                        : Get.offAllNamed(
-                            "${Routes.USER_GROUP_VIEW}?$slectedValue");
-                    role == ""
-                        ? null
-                        : Get.find<AuthController>().roleStore(role);
+                    if (slectedValue == "" || role == "") return;
+                    
+                    Get.find<AuthController>().roleStore(role);
+                    
+                    if (role == "admin") {
+                      Get.offAllNamed(Routes.TrainerDashboard);
+                    } else {
+                      Get.offAllNamed(Routes.ClientDashboard);
+                    }
                   },
                   child: const Text(
                     "Continue",

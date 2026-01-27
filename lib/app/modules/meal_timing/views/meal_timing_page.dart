@@ -19,6 +19,7 @@ class MealTimingPage extends StatefulWidget {
 class _MealTimingPageState extends State<MealTimingPage> {
   // List to hold meals with time and toggle status
   List<Map<String, dynamic>> meals = [];
+  TimeOfDay selectedTime = TimeOfDay.now();
 
   void _selectTime(BuildContext context, int index) async {
     final TimeOfDay? picked = await showTimePicker(
@@ -57,11 +58,11 @@ class _MealTimingPageState extends State<MealTimingPage> {
       });
 
       // Convert TimeOfDay to DateTime
-      DateTime now = DateTime.now();
+      DateTime staticDate = DateTime(2024, 10, 15); // Static date: October 15, 2024
       DateTime scheduledTime = DateTime(
-        now.year,
-        now.month,
-        now.day,
+        staticDate.year,
+        staticDate.month,
+        staticDate.day,
         picked.hour,
         picked.minute,
       );

@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-import '../../../core/base/apiservice/api_endpoints.dart';
-import '../../../core/base/apiservice/api_status.dart';
-import '../../../core/base/apiservice/base_methods.dart';
 import '../../../core/base/controllers/auth_controller.dart';
+import '../../../data/services/mock_api_service.dart';
+import '../../../data/services/dummy_data_service.dart';
 
 class MealTimingController extends GetxController {
   @override
@@ -17,11 +16,12 @@ class MealTimingController extends GetxController {
 
   var isLoading = false.obs;
   var title = TextEditingController();
+  var time = TextEditingController();
   var startTime = TextEditingController();
   var endTime = TextEditingController();
 
   Future<void> addMeal(BuildContext context, String id) async {
-    if (title.text.trim().isEmpty || startTime.text.trim().isEmpty || endTime.text.trim().isEmpty) {
+    if (title.text.trim().isEmpty || time.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Please fill in all fields."),
@@ -36,35 +36,39 @@ class MealTimingController extends GetxController {
 
       Map<String, dynamic> data = {
         "label_name": title.text.trim(),
-        "time_range": "${startTime.text.trim()} - ${endTime.text.trim()}",
+        "time_range": time.text.trim(),
       };
 
-      await APIMethods.post
-          .post(url: APIEndpoints.meals.postMealCategories(id), map: data)
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("${value.data['message']}"),
-              backgroundColor: Colors.green,
-            ),
-          );
-          getMeal(context, id);
-          title.clear();
-          time.clear();
-          Get.back();
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Group is not created.'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
-      // }
+      // Use mock API instead of real API
+      final response = await MockApiService.createMealCategory(id, data);
+      
+      if (response['statusCode'] == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("${response['message']}"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        getMeal(context, id);
+        title.clear();
+        time.clear();
+        Get.back();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Group is not created.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print("Error in addMeal: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('An error occurred. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
     } finally {
       isLoading(false);
     }
@@ -78,28 +82,28 @@ class MealTimingController extends GetxController {
     try {
       getLoading(true);
 
-      await APIMethods.get
-          .get(url: APIEndpoints.meals.getMealCategories(id))
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          // addMeal(context, id);
-          Get.find<AuthController>().fetchAndScheduleNotifications(value.data);
-          dataList(value.data);
-
-          Get.find<AuthController>().categoriesAdd(value.data);
-          print(box.read("categories"));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Data is not created.'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
-      // }
+      // Use mock API instead of real API
+      final response = await MockApiService.getMealCategories(id);
+      
+      if (response['statusCode'] == 200) {
+        Get.find<AuthController>().fetchAndScheduleNotifications(response['data']);
+        dataList(response['data']);
+        Get.find<AuthController>().categoriesAdd(response['data']);
+        print("Categories stored: ${box.read("categories")}");
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Data could not be loaded.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print("Error in getMeal: $e");
+      // Load dummy data as fallback
+      final dummyData = DummyDataService.getDummyMealCategories();
+      dataList(dummyData);
+      Get.find<AuthController>().categoriesAdd(dummyData);
     } finally {
       getLoading(false);
     }
@@ -108,6 +112,7 @@ class MealTimingController extends GetxController {
   @override
   void onClose() {
     title.dispose();
+    time.dispose();
     startTime.dispose();
     endTime.dispose();
     super.onClose();

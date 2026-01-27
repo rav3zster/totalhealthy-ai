@@ -6,11 +6,9 @@ import 'package:totalhealthy/app/modules/user_diet_screen/controllers/user_diet_
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 import 'package:totalhealthy/app/widgets/profile_card.dart';
-import '../core/base/apiservice/api_endpoints.dart';
-import '../core/base/apiservice/api_status.dart';
-import '../core/base/apiservice/base_methods.dart';
 import '../core/base/constants/appcolor.dart';
 import '../core/base/controllers/auth_controller.dart';
+import '../data/services/mock_api_service.dart';
 
 import '../routes/app_pages.dart';
 import 'client_card.dart';
@@ -48,32 +46,27 @@ class _UserDietPageState extends State<UserDietPage> {
         isLoading = true;
       });
 
-      await APIMethods.get
-          .get(
-        url: APIEndpoints.meals.getadminMeals(
-          Get.find<AuthController>().groupgetId(),
-          widget.id,
-        ),
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          setState(() {
-            dataList = List<Map<String, dynamic>>.from(value.data);
-          });
-          filterRecipesBySingleCategory("Breakfast");
-
-          isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
-          box.write("mealPlan", dataList);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Group id Not Found'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
-      // }
+      // Use mock API instead of real API
+      final response = await MockApiService.getMeals(
+        Get.find<AuthController>().groupgetId(),
+        "admin",
+      );
+      
+      if (response['statusCode'] == 200) {
+        setState(() {
+          dataList = List<Map<String, dynamic>>.from(response['data']);
+        });
+        filterRecipesBySingleCategory("Breakfast");
+        isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
+        box.write("mealPlan", dataList);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Group id Not Found'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print(e);
     } finally {
@@ -90,7 +83,7 @@ class _UserDietPageState extends State<UserDietPage> {
       "meal_ids": selectedMealIds,
       "userId": widget.id,
       "groupId": Get.find<AuthController>().groupgetId(),
-      "history_on_day": DateTime.now().toIso8601String(),
+      "history_on_day": DateTime(2024, 10, 15).toIso8601String(),
     };
   }
 
@@ -103,35 +96,31 @@ class _UserDietPageState extends State<UserDietPage> {
       });
 
       var data = generateJson();
-      await APIMethods.post
-          .post(
-        url: APIEndpoints.createData.mealHistory,
-        map: data,
-      )
-          .then((value) {
-        if (APIStatus.success(value.statusCode)) {
-          setState(() {
-            isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
-            selectedMealIds.clear();
-          });
+      
+      // Use mock API instead of real API
+      final response = await MockApiService.createMeal(data);
+      
+      if (response['statusCode'] == 200) {
+        setState(() {
+          isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
+          selectedMealIds.clear();
+        });
 
-          Get.toNamed("/meal-history?id=${widget.id}");
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Successfull!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Not Found'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      });
-      // }
+        Get.toNamed("/meal-history?id=${widget.id}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Successful!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Not Found'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } catch (e) {
       print(e);
     } finally {
