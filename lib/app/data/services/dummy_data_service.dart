@@ -410,7 +410,13 @@ class DummyDataService {
         "fat": "6",
         "categorys": ["Breakfast"],
         "imageUrl": "https://via.placeholder.com/200x150",
-        "ingredients": ["Oats", "Blueberries", "Strawberries", "Honey", "Milk"],
+        "ingredients": [
+          {"name": "Oats", "amount": "50"},
+          {"name": "Blueberries", "amount": "30"},
+          {"name": "Strawberries", "amount": "25"},
+          {"name": "Honey", "amount": "15"},
+          {"name": "Milk", "amount": "200"}
+        ],
         "instructions": "Cook oats with milk, add berries and honey on top",
         "created_at": staticDate.toIso8601String(),
         "prep_time": "10 minutes",
@@ -426,7 +432,12 @@ class DummyDataService {
         "fat": "8",
         "categorys": ["Breakfast"],
         "imageUrl": "https://via.placeholder.com/200x150",
-        "ingredients": ["Greek yogurt", "Granola", "Berries", "Honey"],
+        "ingredients": [
+          {"name": "Greek yogurt", "amount": "150"},
+          {"name": "Granola", "amount": "30"},
+          {"name": "Berries", "amount": "50"},
+          {"name": "Honey", "amount": "10"}
+        ],
         "instructions": "Layer yogurt, granola, and berries in a glass",
         "created_at": staticDate.toIso8601String(),
         "prep_time": "5 minutes",
@@ -442,7 +453,13 @@ class DummyDataService {
         "fat": "8",
         "categorys": ["Lunch"],
         "imageUrl": "https://via.placeholder.com/200x150",
-        "ingredients": ["Chicken breast", "Mixed greens", "Tomatoes", "Cucumber", "Olive oil"],
+        "ingredients": [
+          {"name": "Chicken breast", "amount": "120"},
+          {"name": "Mixed greens", "amount": "80"},
+          {"name": "Tomatoes", "amount": "50"},
+          {"name": "Cucumber", "amount": "40"},
+          {"name": "Olive oil", "amount": "10"}
+        ],
         "instructions": "Grill chicken, mix with fresh vegetables and dressing",
         "created_at": staticDate.toIso8601String(),
         "prep_time": "20 minutes",
@@ -458,7 +475,13 @@ class DummyDataService {
         "fat": "12",
         "categorys": ["Lunch"],
         "imageUrl": "https://via.placeholder.com/200x150",
-        "ingredients": ["Quinoa", "Chickpeas", "Avocado", "Sweet potato", "Tahini"],
+        "ingredients": [
+          {"name": "Quinoa", "amount": "75"},
+          {"name": "Chickpeas", "amount": "60"},
+          {"name": "Avocado", "amount": "80"},
+          {"name": "Sweet potato", "amount": "100"},
+          {"name": "Tahini", "amount": "20"}
+        ],
         "instructions": "Cook quinoa, roast vegetables, assemble bowl with dressing",
         "created_at": staticDate.toIso8601String(),
         "prep_time": "30 minutes",
@@ -474,7 +497,13 @@ class DummyDataService {
         "fat": "18",
         "categorys": ["Dinner"],
         "imageUrl": "https://via.placeholder.com/200x150",
-        "ingredients": ["Salmon fillet", "Quinoa", "Broccoli", "Carrots", "Lemon"],
+        "ingredients": [
+          {"name": "Salmon fillet", "amount": "150"},
+          {"name": "Quinoa", "amount": "75"},
+          {"name": "Broccoli", "amount": "100"},
+          {"name": "Carrots", "amount": "80"},
+          {"name": "Lemon", "amount": "30"}
+        ],
         "instructions": "Bake salmon, cook quinoa, steam vegetables",
         "created_at": staticDate.toIso8601String(),
         "prep_time": "25 minutes",
@@ -490,7 +519,13 @@ class DummyDataService {
         "fat": "10",
         "categorys": ["Dinner"],
         "imageUrl": "https://via.placeholder.com/200x150",
-        "ingredients": ["Mixed vegetables", "Brown rice", "Soy sauce", "Ginger", "Garlic"],
+        "ingredients": [
+          {"name": "Mixed vegetables", "amount": "200"},
+          {"name": "Brown rice", "amount": "75"},
+          {"name": "Soy sauce", "amount": "15"},
+          {"name": "Ginger", "amount": "10"},
+          {"name": "Garlic", "amount": "5"}
+        ],
         "instructions": "Stir fry vegetables, serve over brown rice",
         "created_at": staticDate.toIso8601String(),
         "prep_time": "15 minutes",
@@ -506,7 +541,10 @@ class DummyDataService {
         "fat": "8",
         "categorys": ["Mid-Morning Snack"],
         "imageUrl": "https://via.placeholder.com/200x150",
-        "ingredients": ["Apple", "Almond butter"],
+        "ingredients": [
+          {"name": "Apple", "amount": "150"},
+          {"name": "Almond butter", "amount": "20"}
+        ],
         "instructions": "Slice apple and serve with almond butter",
         "created_at": staticDate.toIso8601String(),
         "prep_time": "2 minutes",
@@ -522,7 +560,12 @@ class DummyDataService {
         "fat": "14",
         "categorys": ["Evening Snack"],
         "imageUrl": "https://via.placeholder.com/200x150",
-        "ingredients": ["Almonds", "Walnuts", "Dried cranberries", "Dark chocolate chips"],
+        "ingredients": [
+          {"name": "Almonds", "amount": "30"},
+          {"name": "Walnuts", "amount": "25"},
+          {"name": "Dried cranberries", "amount": "20"},
+          {"name": "Dark chocolate chips", "amount": "15"}
+        ],
         "instructions": "Mix all ingredients together",
         "created_at": staticDate.toIso8601String(),
         "prep_time": "1 minute",
@@ -539,7 +582,13 @@ class DummyDataService {
         "fat": "12",
         "categorys": ["Breakfast"],
         "imageUrl": "https://via.placeholder.com/200x150",
-        "ingredients": ["Whole grain bread", "Avocado", "Lemon", "Salt", "Pepper"],
+        "ingredients": [
+          {"name": "Whole grain bread", "amount": "2 slices"},
+          {"name": "Avocado", "amount": "100"},
+          {"name": "Lemon", "amount": "10"},
+          {"name": "Salt", "amount": "2"},
+          {"name": "Pepper", "amount": "1"}
+        ],
         "instructions": "Toast bread, mash avocado with seasonings, spread on toast",
         "created_at": staticDate.subtract(Duration(days: 1)).toIso8601String(),
         "prep_time": "5 minutes",
@@ -555,7 +604,13 @@ class DummyDataService {
         "fat": "10",
         "categorys": ["Lunch"],
         "imageUrl": "https://via.placeholder.com/200x150",
-        "ingredients": ["Tortilla", "Grilled chicken", "Lettuce", "Tomato", "Cucumber"],
+        "ingredients": [
+          {"name": "Tortilla", "amount": "1 large"},
+          {"name": "Grilled chicken", "amount": "100"},
+          {"name": "Lettuce", "amount": "30"},
+          {"name": "Tomato", "amount": "50"},
+          {"name": "Cucumber", "amount": "40"}
+        ],
         "instructions": "Wrap chicken and vegetables in tortilla",
         "created_at": staticDate.subtract(Duration(days: 1)).toIso8601String(),
         "prep_time": "10 minutes",

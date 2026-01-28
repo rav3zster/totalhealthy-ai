@@ -39,10 +39,10 @@ class SignupScreenState extends State<SignupScreen> {
         
         if (response['statusCode'] == 200) {
           print(response['data']);
-          Get.toNamed(Routes.LoginView);
+          Get.toNamed(Routes.SWITCHROLE);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Sign Up Successful! You can now login with demo credentials.'),
+              content: Text('Sign Up Successful! Please choose your role to continue.'),
               backgroundColor: Colors.green,
             ),
           );

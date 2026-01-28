@@ -260,451 +260,439 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     String id = Get.parameters["id"] ?? "";
-    return BaseWidget(
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: selectedMealIds.isNotEmpty
-          ? isGetLoading
-              ? const Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                  ),
-                )
-              : FloatingActionButton(
-                  backgroundColor: AppColors.chineseGreen,
-                  child: const Icon(
-                    Icons.done,
-                    color: AppColors.cardbackground,
-                  ),
-                  onPressed: () {
-                    postHistory();
-                  })
-          : const SizedBox(),
-      // drawer: const DrawerMenu(),
-      // bottomNavigationBar: const MobileNavBar(),
-      // backgroundColor: Colors.black,
-      // appBar: AppBar(
-      //   automaticallyImplyLeading: false,
-      //   // leading: IconButton(
-      //   //     onPressed: () {
-      //   //       Get.toNamed('/userdiet?id=$id');
-      //   //     },
-      //   //     icon: Icon(
-      //   //       Icons.arrow_back_ios,
-      //   //       color: Colors.white,
-      //   //     )),
-      //   backgroundColor: Colors.transparent,
-      //   elevation: 0,
-      //   // title: const ProfileCard(),
-      //   // actions: [
-      //   //   const SizedBox(
-      //   //     width: 10,
-      //   //   ),
-      //   // ],
-      // ),
-      title:  "${ProfileCard()}",
-      appBarAction: [
-        Container(
-          decoration: const BoxDecoration(
-              color: Color(0XFF242424), shape: BoxShape.circle),
-          child: IconButton(
-            icon: const Icon(
-              Icons.notifications_none,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Get.toNamed('/notification?id=$id');
-            },
-          ),
-        ),
-      ],
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // User Profile Section with Calories Intake Card
-              const UserProfileSection(),
-              
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Row(
+    final user = Get.find<AuthController>().getCurrentUser();
+    
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with Welcome message and notification
+                Row(
                   children: [
-                    Text(
-                      "Today's Diet Plan",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    CircleAvatar(
+                      radius: 25,
+                      backgroundImage: NetworkImage(user.profileImage ?? 'https://via.placeholder.com/150'),
                     ),
-                    Spacer(),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Welcome!',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            user.username ?? 'Ayush Shukla',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xFF242424),
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(Icons.notifications_none, color: Colors.white),
+                        onPressed: () {
+                          Get.toNamed('/notification?id=$id');
+                        },
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              
-              // Add Meal Button - Made functional
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                
+                SizedBox(height: 24),
+                
+                // Live Stats Card
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF2A2A2A),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Live Stats',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildStatItem('55%', 'Goal Achieved', Colors.orange),
+                          _buildStatItem('4kg', 'Fat Lost', Colors.yellow),
+                          _buildStatItem('0.8Gm', 'Muscle Gained', Colors.purple),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                
+                SizedBox(height: 24),
+                
+                // Search Bar
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF2A2A2A),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.search, color: Colors.white54),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Search here...',
+                          style: TextStyle(color: Colors.white54, fontSize: 16),
+                        ),
+                      ),
+                      Icon(Icons.tune, color: Colors.white54),
+                    ],
+                  ),
+                ),
+                
+                SizedBox(height: 24),
+                
+                // Day Progress and Add Meal Button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        // Navigate to Create Meal screen
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Day 1/55 (Weight Loss)',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '23 Oct - 17 Dec',
+                          style: TextStyle(
+                            color: Colors.white54,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {
                         Get.toNamed(Routes.CreateMeal);
                       },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppColors.chineseGreen.withOpacity(0.1),
+                      icon: Icon(Icons.add, color: Colors.black),
+                      label: Text(
+                        'Add Meal',
+                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFC2D86A),
+                        shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppColors.chineseGreen, width: 1),
                         ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Add Meal",
-                              style: TextStyle(
-                                fontSize: 14, 
-                                color: AppColors.chineseGreen,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            SizedBox(width: 4),
-                            Icon(Icons.add, color: AppColors.chineseGreen, size: 18),
-                          ],
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       ),
                     ),
                   ],
                 ),
-              ),
-              
-              // Diet Plan Filter Buttons
-              SizedBox(
-                height: 40,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    var data = buttonName[index];
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedIndex1 = index;
-                          data["name"] == "Today" ? isCalender = false : null;
-                          data["name"] == "Today"
-                              ? _filterRecipesByDate(selectedDate)
-                              : data["name"] == "Calender"
-                                  ? isCalender = true
-                                  : isCalender = false;
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: ButtonSelector(
-                          title: data["name"].toString(),
-                          icon: data["icon"] as IconData,
-                          active: index == selectedIndex1,
-                        ),
-                      ),
-                    );
-                  },
-                  itemCount: buttonName.length,
+                
+                SizedBox(height: 20),
+                
+                // Meal Type Tabs
+                Row(
+                  children: [
+                    _buildMealTab('🍳', 'Breakfast', selectedIndex == 0, () {
+                      setState(() {
+                        selectedIndex = 0;
+                        filterRecipesBySingleCategory('Breakfast');
+                      });
+                    }),
+                    SizedBox(width: 12),
+                    _buildMealTab('🥗', 'Lunch', selectedIndex == 1, () {
+                      setState(() {
+                        selectedIndex = 1;
+                        filterRecipesBySingleCategory('Lunch');
+                      });
+                    }),
+                    SizedBox(width: 12),
+                    _buildMealTab('🍽️', 'Dinner', selectedIndex == 2, () {
+                      setState(() {
+                        selectedIndex = 2;
+                        filterRecipesBySingleCategory('Dinner');
+                      });
+                    }),
+                  ],
                 ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              isCalender
-                  ? Card(
-                      color: AppColors.cardbackground,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 0, bottom: 15, left: 10, right: 10),
-                        child: EasyDateTimeLine(
-                          activeColor: AppColors.chineseGreen,
-                          initialDate: DateTime(2024, 10, 15), // Static date
-                          onDateChange: (selectedDate) {
-                            print(selectedDate);
-                            setState(() {
-                              _filterRecipesByDate(selectedDate);
-                            });
-                            //
-                          },
-                          headerProps: const EasyHeaderProps(
-                              monthPickerType: MonthPickerType.switcher,
-                              dateFormatter: DateFormatter.monthOnly(),
-                              selectedDateStyle:
-                                  TextStyle(color: Colors.white)),
-                          dayProps: const EasyDayProps(
-                            height: 70,
-
-                            dayStructure: DayStructure.dayStrDayNum,
-                            todayNumStyle: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                            inactiveDayNumStyle: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                            disabledDayStyle: DayStyle(
-                              dayNumStyle: TextStyle(color: Colors.white),
+                
+                SizedBox(height: 20),
+                
+                // Meals List
+                isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : filteredRecipes.isEmpty
+                        ? Center(
+                            child: Column(
+                              children: [
+                                Image.asset(
+                                  'assets/no_diet.png',
+                                  height: 250,
+                                  width: 250,
+                                  fit: BoxFit.cover,
+                                ),
+                              ],
                             ),
-                            // todayHighlightColor: Colors.white,
-                            borderColor: AppColors.chineseGreen,
-                            activeDayNumStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                            activeDayStyle: DayStyle(
-                              decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                  color: AppColors.chineseGreen),
-                            ),
+                          )
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: filteredRecipes.length,
+                            itemBuilder: (context, index) {
+                              var data = filteredRecipes[index];
+                              return _buildMealCard(data, index);
+                            },
                           ),
-                        ),
-                      ),
-                    )
-                  : const SizedBox(),
-
-              // Search bar, Filter button, Today's Diet Plan, and Add Meal button
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: Container(
-              //         decoration: BoxDecoration(
-              //             color: Color(0XFF242522),
-              //             borderRadius: BorderRadius.circular(50)),
-              //         child: TextField(
-              //           decoration: InputDecoration(
-              //             enabledBorder: InputBorder.none,
-              //             hintText: 'Search here...',
-              //             hintStyle: TextStyle(color: Color(0XFFDBDBDB)),
-              //             prefixIcon:
-              //                 Icon(Icons.search, color: Color(0XFFDBDBDB)),
-              //           ),
-              //         ),
-              //       ),
-              //     ),
-              //     SizedBox(width: 10),
-              //     Icon(Icons.filter_list, color: Colors.white, size: 30),
-              //   ],
-              // ),
-              Divider(
-                color: Colors.grey.shade600,
-                endIndent: 20,
-                indent: 20,
-                height: 2,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              //          Get.find<AuthController>().roleGet()   AddMealButton(
-              //   id: userData["_id"] ?? "",
-              // ),
-
-              SizedBox(
-                height: 40,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    var data = categories[index];
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedIndex = index;
-                        });
-                        filterRecipesBySingleCategory(
-                            data["label_name"].toString());
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: ButtonSelector(
-                          title: data["label_name"].toString(),
-                          icon: index == 0
-                              ? Icons.breakfast_dining
-                              : index == 1
-                                  ? Icons.lunch_dining
-                                  : index == 2
-                                      ? Icons.dinner_dining
-                                      : Icons.food_bank,
-                          active: index == selectedIndex,
-                        ),
-                      ),
-                    );
-                  },
-                  itemCount: categories.length,
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : filteredRecipes.isEmpty
-                      ? Center(
-                          child: Column(
-                            children: [
-                              // Add the image asset with black background
-                              Image.asset(
-                                'assets/no_diet.png',
-                                height: 250,
-                                width: 250,
-                                fit: BoxFit.cover,
-                              ),
-                            ],
-                          ),
-                        )
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: filteredRecipes.length,
-                          itemBuilder: (context, index) {
-                            var data = filteredRecipes[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 15),
-                              child: NutritionalCard(
-                                // role: Get.find<AuthController>().roleGet(),
-                                isChecked: isCheck[index] ?? false,
-                                onChanged: (value) {
-                                  setState(() {
-                                    isCheck[index] = value ?? false;
-
-                                    if (isCheck[index] == true) {
-                                      selectedMealIds.add(data['_id'] ?? '0');
-                                    } else {
-                                      selectedMealIds
-                                          .remove(data['_id'] ?? '0');
-                                    }
-                                    print(selectedMealIds);
-                                  });
-                                },
-                                data: data,
-                                id: userData["_id"] ?? "",
-                                title: "${data["name"] ?? "Unknown Meal"}",
-                                kcal: "${data["kcal"] ?? "0"}",
-                                weight: 80,
-                                protein: "${data["protein"] ?? "0"}",
-                                fat: "${data["fat"] ?? "0"}",
-                                carbs: "${data["carbs"] ?? "0"}",
-                              ),
-                            );
-                          },
-                        ),
-            ],
+              ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Color(0xFF1A1A1A),
+          border: Border(
+            top: BorderSide(color: Color(0xFF2A2A2A), width: 1),
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildNavItem(Icons.person, 'Member', true, () {
+                  // Already on member/dashboard screen
+                }),
+                _buildNavItem(Icons.group, 'Group', false, () {
+                  Get.toNamed(Routes.GROUP);
+                }),
+                _buildNavItem(Icons.notifications, 'Notification', false, () {
+                  Get.toNamed('/notification?id=$id');
+                }),
+                _buildNavItem(Icons.settings, 'Setting', false, () {
+                  Get.toNamed(Routes.SETTING);
+                }),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-
-  Widget _buildMealItem(
-      String title, String kcal, String nutrients, String imageUrl) {
-    return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-        child: Stack(
-          children: [
-            Image.network(
-                'https://s3-alpha-sig.figma.com/img/42a5/0ea7/5b8574861966061d01ca70419a885f64?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=TNP2-OtEW8U7dcWblP4c7AMYU6zc0888Du5vY8Djd7sIsZOlBM6mmzO1nejuXhQp~XT~qIrnwQ~NDuf13jw~VImXOMCRrA6q~on5D7piCoMGv-97~gybVs2~iR0e5q6yoBNJfDKrmZE4Pow8cTwyDk~J0y-Bn702hR6X-dI7tEDtOYt1rfo2QWbVUkRLumS1PtGYfpViAZG-9Pkvo6IiU9DcY0O4utrk2LF~Igl2ci~wU-e0f9TX-fMDUp1sRhvOZ9qbn1YWU9JcOafLjRLzFXPRrplp385UktkybQrUxxhW0CwYE-0X1VmHa1pEe8mtTV0g3Zp9W5GNIJYTLfYAFA__',
-                width: double.infinity,
-                height: 300,
-                fit: BoxFit.cover),
-            Padding(
-              padding: const EdgeInsets.only(top: 190),
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 8),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: const Color(0XFF242522).withOpacity(0.50),
-                    borderRadius: BorderRadius.circular(10)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 18)),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(kcal,
-                            style: const TextStyle(
-                                color: Color(0XFFF5D657), fontSize: 18)),
-                        const SizedBox(height: 4),
-                        Text(nutrients,
-                            style: const TextStyle(
-                                color: Color(0XFFDBDBDB), fontSize: 16)),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            )
-          ],
-        ));
+  
+  Widget _buildNavItem(IconData icon, String label, bool isActive, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: isActive ? Color(0xFFC2D86A) : Colors.white54,
+            size: 24,
+          ),
+          SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isActive ? Color(0xFFC2D86A) : Colors.white54,
+              fontSize: 12,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
   }
-}
-
-class MealTypeSelector extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  
+  Widget _buildStatItem(String value, String label, Color color) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            color: color,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 12,
+          ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildMealTab(String emoji, String label, bool isSelected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Color(0xFF2A2A2A) : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: isSelected ? Border.all(color: Color(0xFFC2D86A)) : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(emoji, style: TextStyle(fontSize: 16)),
+            SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.white54,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildMealCard(Map<String, dynamic> data, int index) {
+    return GestureDetector(
+      onTap: () {
+        // Store meal data and navigate to details page
+        final box = GetStorage();
+        box.write("mealdetails", data);
+        Get.toNamed('/meals-details?id=${Get.find<AuthController>().userdataget()["_id"] ?? ""}');
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 16),
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Color(0xFF2A2A2A),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            // Meal Image
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: Color(0xFFC2D86A),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.restaurant, color: Colors.black, size: 30),
+            ),
+            SizedBox(width: 16),
+            
+            // Meal Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    data['meal_name'] ?? data['name'] ?? 'Scrambled Eggs With Spinach',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.local_fire_department, color: Colors.orange, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        '${data['calories'] ?? data['kcal'] ?? '500'} Kcal',
+                        style: TextStyle(color: Colors.orange, fontSize: 14),
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        '• ${data['weight'] ?? '100'}g',
+                        style: TextStyle(color: Colors.white54, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  
+                  // Nutritional Info
+                  Row(
+                    children: [
+                      _buildNutrientBar('${data['protein'] ?? '20'}g', 'Protein', Colors.green),
+                      SizedBox(width: 12),
+                      _buildNutrientBar('${data['fat'] ?? '21'}g', 'Fat', Colors.blue),
+                      SizedBox(width: 12),
+                      _buildNutrientBar('${data['carbs'] ?? '30'}g', 'Carbs', Colors.red),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            
+            // More Options
+            Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Color(0xFFC2D86A),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.more_horiz, color: Colors.black, size: 20),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildNutrientBar(String value, String label, Color color) {
+    return Column(
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0XFFCDE26D)),
-            borderRadius: BorderRadius.circular(40),
-            color: const Color(0XFF242522),
-          ),
-          child: TextButton.icon(
-              icon: const Icon(
-                Icons.set_meal,
-                color: Color(0XFFDBDBDB),
-              ),
-              onPressed: () {},
-              label: const Text(
-                "Brekfast",
-                style: TextStyle(color: Color(0XFFDBDBDB)),
-              )),
+          width: 3,
+          height: 20,
+          color: color,
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(40),
-            color: const Color(0XFF242522),
-          ),
-          child: TextButton.icon(
-              icon: const Icon(
-                Icons.lunch_dining,
-                color: Color(0XFFDBDBDB),
-              ),
-              onPressed: () {},
-              label: const Text(
-                "Lunch",
-                style: TextStyle(color: Color(0XFFDBDBDB)),
-              )),
+        SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(40),
-            color: const Color(0XFF242522),
-          ),
-          child: TextButton.icon(
-              icon: const Icon(
-                Icons.dinner_dining,
-                color: Color(0XFFDBDBDB),
-              ),
-              onPressed: () {},
-              label: const Text(
-                "Dinner",
-                style: TextStyle(color: Color(0XFFDBDBDB)),
-              )),
+        Text(
+          label,
+          style: TextStyle(color: Colors.white54, fontSize: 10),
         ),
       ],
     );

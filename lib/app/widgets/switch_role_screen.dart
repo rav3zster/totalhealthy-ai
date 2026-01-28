@@ -169,7 +169,8 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
                     if (role == "admin") {
                       Get.offAllNamed(Routes.TrainerDashboard);
                     } else {
-                      Get.offAllNamed(Routes.ClientDashboard);
+                      // Navigate to nutrition goals for clients
+                      Get.offAllNamed(Routes.NUTRITION_GOAL);
                     }
                   },
                   child: const Text(

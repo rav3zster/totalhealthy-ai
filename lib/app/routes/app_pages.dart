@@ -90,8 +90,7 @@ class AppPages {
         name: _Paths.NUTRITION_GOAL,
         page: () => NutritionGoalView(),
         binding: NutritionGoalBinding(),
-        transition: Transition.fadeIn,
-        middlewares: [AuthCheckMiddleware()]),
+        transition: Transition.fadeIn),
     GetPage(
         name: _Paths.NOTIFICATION,
         page: () => NotificationView(),
