@@ -40,7 +40,8 @@ class _OnboardingViewState extends State<OnboardingView> {
       _pageController.animateToPage(_currentPage + 1,
           duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
     } else {
-      Get.offAllNamed(Routes.SIGNUP);
+      // Navigate to Welcome Screen instead of Signup
+      Get.offAllNamed(Routes.WelcomeScreen);
     }
   }
 
@@ -166,24 +167,15 @@ class _OnboardingViewState extends State<OnboardingView> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          // Implement skip functionality if needed
+                          // Skip to Welcome Screen
+                          Get.offAllNamed(Routes.WelcomeScreen);
                         },
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const RegistrationView(),
-                                ));
-                          },
-                          child: const Text(
-                            "Skip",
-                            style: TextStyle(
-                              color: Colors.lightGreenAccent,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                            ),
+                        child: const Text(
+                          "Skip",
+                          style: TextStyle(
+                            color: Colors.lightGreenAccent,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
                           ),
                         ),
                       ),

@@ -91,7 +91,9 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                               Border.all(color: Color(0XFFCDE26D), width: 1),
                           borderRadius: BorderRadius.circular(30)),
                       child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Get.toNamed('/login');
+                          },
                           child: Text(
                             "Login",
                             style: TextStyle(color: Color(0XFFCDE26D)),
@@ -106,7 +108,9 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                           color: AppColors.chineseGreen,
                           borderRadius: BorderRadius.circular(30)),
                       child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Get.toNamed('/signup');
+                          },
                           child: Text(
                             "Sign Up",
                             style: TextStyle(color: Color(0XFF242522)),
