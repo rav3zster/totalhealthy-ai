@@ -12,6 +12,7 @@ import '../../../data/services/mock_api_service.dart';
 import '../../../data/services/dummy_data_service.dart';
 import '../../../core/base/constants/appcolor.dart';
 import '../../../core/base/controllers/auth_controller.dart';
+import '../../../routes/app_pages.dart';
 import '../../../widgets/daily_summery_card.dart';
 import '../../../widgets/drawer_menu.dart';
 import '../../../widgets/button_selector.dart';
@@ -334,12 +335,45 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     Spacer(),
-                    Text(
-                      "Add Meal",
-                      style: TextStyle(fontSize: 14, color: AppColors.chineseGreen),
+                  ],
+                ),
+              ),
+              
+              // Add Meal Button - Made functional
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        // Navigate to Create Meal screen
+                        Get.toNamed(Routes.CreateMeal);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.chineseGreen.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppColors.chineseGreen, width: 1),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Add Meal",
+                              style: TextStyle(
+                                fontSize: 14, 
+                                color: AppColors.chineseGreen,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(width: 4),
+                            Icon(Icons.add, color: AppColors.chineseGreen, size: 18),
+                          ],
+                        ),
+                      ),
                     ),
-                    SizedBox(width: 4),
-                    Icon(Icons.add, color: AppColors.chineseGreen, size: 18),
                   ],
                 ),
               ),

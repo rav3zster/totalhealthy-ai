@@ -154,14 +154,23 @@ class SignupScreenState extends State<SignupScreen> {
                           ),
                           width: 110,
                           height: 110,
-                          child: const Column(
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              SizedBox(height: 70),
+                              Icon(
+                                Icons.male,
+                                size: 40,
+                                color: isMaleSelected 
+                                    ? const Color.fromARGB(255, 146, 159, 83)
+                                    : Colors.white54,
+                              ),
+                              const SizedBox(height: 8),
                               Text(
                                 "Male",
                                 style: TextStyle(
-                                  color: Colors.white30,
+                                  color: isMaleSelected 
+                                      ? Colors.white
+                                      : Colors.white30,
                                   fontWeight: FontWeight.w500,
                                   fontSize: 18,
                                 ),
@@ -191,14 +200,23 @@ class SignupScreenState extends State<SignupScreen> {
                           ),
                           width: 110,
                           height: 110,
-                          child: const Column(
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              SizedBox(height: 70),
+                              Icon(
+                                Icons.female,
+                                size: 40,
+                                color: isFemaleSelected 
+                                    ? Colors.amberAccent
+                                    : Colors.white54,
+                              ),
+                              const SizedBox(height: 8),
                               Text(
                                 "Female",
                                 style: TextStyle(
-                                  color: Colors.white30,
+                                  color: isFemaleSelected 
+                                      ? Colors.white
+                                      : Colors.white30,
                                   fontWeight: FontWeight.w500,
                                   fontSize: 18,
                                 ),
