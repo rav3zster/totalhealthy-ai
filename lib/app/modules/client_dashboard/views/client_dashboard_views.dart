@@ -68,13 +68,11 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
         isLoading = true;
       });
       await getCategories();
-      
+
       // Use mock API instead of real API
       final response = await MockApiService.getMeals(
-        Get.find<AuthController>().groupgetId(), 
-        "user"
-      );
-      
+          Get.find<AuthController>().groupgetId(), "user");
+
       if (response['statusCode'] == 200) {
         setState(() {
           dataList = List<Map<String, dynamic>>.from(response['data']);
@@ -119,10 +117,10 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       });
 
       var data = generateJson();
-      
+
       // Use mock API instead of real API
       final response = await MockApiService.createMeal(data);
-      
+
       if (response['statusCode'] == 200) {
         setState(() {
           isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
@@ -153,7 +151,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     }
   }
 
-  DateTime selectedDate = DateTime(2024, 10, 15); // Static date: October 15, 2024
+  DateTime selectedDate =
+      DateTime(2024, 10, 15); // Static date: October 15, 2024
   List<Map<String, dynamic>> filteredRecipes = [];
 
   void filterRecipesBySingleCategory(String selectedCategory) {
@@ -175,12 +174,12 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     try {
       // Use mock API instead of real API
       final response = await MockApiService.getMealCategories(
-        Get.find<AuthController>().groupgetId()
-      );
-      
+          Get.find<AuthController>().groupgetId());
+
       if (response['statusCode'] == 200) {
         Get.find<AuthController>().categoriesAdd(response['data']);
-        Get.find<AuthController>().fetchAndScheduleNotifications(response['data']);
+        Get.find<AuthController>()
+            .fetchAndScheduleNotifications(response['data']);
         Future.delayed(const Duration(milliseconds: 100), () {
           categories = Get.find<AuthController>().categoriesGet();
         });
@@ -189,7 +188,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
         // Load dummy data as fallback
         final dummyCategories = DummyDataService.getDummyMealCategories();
         Get.find<AuthController>().categoriesAdd(dummyCategories);
-        Get.find<AuthController>().fetchAndScheduleNotifications(dummyCategories);
+        Get.find<AuthController>()
+            .fetchAndScheduleNotifications(dummyCategories);
         Future.delayed(const Duration(milliseconds: 100), () {
           categories = Get.find<AuthController>().categoriesGet();
         });
@@ -229,7 +229,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     setState(() {
       filtered = dataList.where((recipe) {
         try {
-          final createdAt = DateTime.parse(recipe["created_at"] ?? "2024-10-15T00:00:00Z");
+          final createdAt =
+              DateTime.parse(recipe["created_at"] ?? "2024-10-15T00:00:00Z");
           // Check if the year, month, and day match
           return createdAt.year == selectedDate.year &&
               createdAt.month == selectedDate.month &&
@@ -261,9 +262,10 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   Widget build(BuildContext context) {
     String id = Get.parameters["id"] ?? "";
     final user = Get.find<AuthController>().getCurrentUser();
-    
+
     return Scaffold(
       backgroundColor: Colors.black,
+      drawer: DrawerMenu(),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -274,9 +276,25 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                 // Header with Welcome message and notification
                 Row(
                   children: [
+                    Builder(
+                      builder: (context) => Container(
+                        decoration: BoxDecoration(
+                          color: Color(0xFF242424),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          icon: Icon(Icons.menu, color: Colors.white),
+                          onPressed: () {
+                            Scaffold.of(context).openDrawer();
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
                     CircleAvatar(
                       radius: 25,
-                      backgroundImage: NetworkImage(user.profileImage ?? 'https://via.placeholder.com/150'),
+                      backgroundImage: NetworkImage(user.profileImage ??
+                          'https://via.placeholder.com/150'),
                     ),
                     SizedBox(width: 12),
                     Expanded(
@@ -307,7 +325,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
-                        icon: Icon(Icons.notifications_none, color: Colors.white),
+                        icon:
+                            Icon(Icons.notifications_none, color: Colors.white),
                         onPressed: () {
                           Get.toNamed('/notification?id=$id');
                         },
@@ -315,9 +334,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                     ),
                   ],
                 ),
-                
+
                 SizedBox(height: 24),
-                
+
                 // Live Stats Card
                 Container(
                   padding: EdgeInsets.all(20),
@@ -342,15 +361,16 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                         children: [
                           _buildStatItem('55%', 'Goal Achieved', Colors.orange),
                           _buildStatItem('4kg', 'Fat Lost', Colors.yellow),
-                          _buildStatItem('0.8Gm', 'Muscle Gained', Colors.purple),
+                          _buildStatItem(
+                              '0.8Gm', 'Muscle Gained', Colors.purple),
                         ],
                       ),
                     ],
                   ),
                 ),
-                
+
                 SizedBox(height: 24),
-                
+
                 // Search Bar
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -372,9 +392,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                     ],
                   ),
                 ),
-                
+
                 SizedBox(height: 24),
-                
+
                 // Day Progress and Add Meal Button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -406,21 +426,23 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                       icon: Icon(Icons.add, color: Colors.black),
                       label: Text(
                         'Add Meal',
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.w600),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFFC2D86A),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       ),
                     ),
                   ],
                 ),
-                
+
                 SizedBox(height: 20),
-                
+
                 // Meal Type Tabs
                 Row(
                   children: [
@@ -446,9 +468,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                     }),
                   ],
                 ),
-                
+
                 SizedBox(height: 20),
-                
+
                 // Meals List
                 isLoading
                     ? Center(child: CircularProgressIndicator())
@@ -511,8 +533,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       ),
     );
   }
-  
-  Widget _buildNavItem(IconData icon, String label, bool isActive, VoidCallback onTap) {
+
+  Widget _buildNavItem(
+      IconData icon, String label, bool isActive, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -536,7 +559,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       ),
     );
   }
-  
+
   Widget _buildStatItem(String value, String label, Color color) {
     return Column(
       children: [
@@ -559,8 +582,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       ],
     );
   }
-  
-  Widget _buildMealTab(String emoji, String label, bool isSelected, VoidCallback onTap) {
+
+  Widget _buildMealTab(
+      String emoji, String label, bool isSelected, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -587,14 +611,15 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       ),
     );
   }
-  
+
   Widget _buildMealCard(Map<String, dynamic> data, int index) {
     return GestureDetector(
       onTap: () {
         // Store meal data and navigate to details page
         final box = GetStorage();
         box.write("mealdetails", data);
-        Get.toNamed('/meals-details?id=${Get.find<AuthController>().userdataget()["_id"] ?? ""}');
+        Get.toNamed(
+            '/meals-details?id=${Get.find<AuthController>().userdataget()["_id"] ?? ""}');
       },
       child: Container(
         margin: EdgeInsets.only(bottom: 16),
@@ -616,14 +641,16 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
               child: Icon(Icons.restaurant, color: Colors.black, size: 30),
             ),
             SizedBox(width: 16),
-            
+
             // Meal Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    data['meal_name'] ?? data['name'] ?? 'Scrambled Eggs With Spinach',
+                    data['meal_name'] ??
+                        data['name'] ??
+                        'Scrambled Eggs With Spinach',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -633,7 +660,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                   SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.local_fire_department, color: Colors.orange, size: 16),
+                      Icon(Icons.local_fire_department,
+                          color: Colors.orange, size: 16),
                       SizedBox(width: 4),
                       Text(
                         '${data['calories'] ?? data['kcal'] ?? '500'} Kcal',
@@ -647,21 +675,24 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                     ],
                   ),
                   SizedBox(height: 8),
-                  
+
                   // Nutritional Info
                   Row(
                     children: [
-                      _buildNutrientBar('${data['protein'] ?? '20'}g', 'Protein', Colors.green),
+                      _buildNutrientBar('${data['protein'] ?? '20'}g',
+                          'Protein', Colors.green),
                       SizedBox(width: 12),
-                      _buildNutrientBar('${data['fat'] ?? '21'}g', 'Fat', Colors.blue),
+                      _buildNutrientBar(
+                          '${data['fat'] ?? '21'}g', 'Fat', Colors.blue),
                       SizedBox(width: 12),
-                      _buildNutrientBar('${data['carbs'] ?? '30'}g', 'Carbs', Colors.red),
+                      _buildNutrientBar(
+                          '${data['carbs'] ?? '30'}g', 'Carbs', Colors.red),
                     ],
                   ),
                 ],
               ),
             ),
-            
+
             // More Options
             Container(
               padding: EdgeInsets.all(8),
@@ -676,7 +707,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       ),
     );
   }
-  
+
   Widget _buildNutrientBar(String value, String label, Color color) {
     return Column(
       children: [
@@ -688,7 +719,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
         SizedBox(height: 4),
         Text(
           value,
-          style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
         ),
         Text(
           label,

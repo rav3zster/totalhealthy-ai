@@ -1,173 +1,357 @@
 import 'package:flutter/material.dart';
-import 'package:totalhealthy/app/modules/registration/views/registration_view.dart';
+import 'package:get/get.dart';
+import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:totalhealthy/app/widgets/baseWidget.dart';
 
 class ManageAccountScreen extends StatefulWidget {
+  const ManageAccountScreen({super.key});
+
   @override
-  _ManageAccountScreenState createState() => _ManageAccountScreenState();
+  State<ManageAccountScreen> createState() => _ManageAccountScreenState();
 }
 
 class _ManageAccountScreenState extends State<ManageAccountScreen> {
-  // Controllers for the fields
-  TextEditingController _usernameController = TextEditingController(text: 'ayushshukla123');
-  TextEditingController _emailController = TextEditingController(text: 'ayushshukla@gmail.com');
-  TextEditingController _contactController = TextEditingController(text: '9876543210');
-  TextEditingController _passwordController = TextEditingController(text: '...........o09');
+  final _firstNameController = TextEditingController(text: 'Ayush');
+  final _lastNameController = TextEditingController(text: 'shukla');
+  final _ageController = TextEditingController(text: '25');
+  final _experienceController = TextEditingController(text: 'No. Of Years');
+  final _activeClientsController = TextEditingController(text: '12');
+  final _emailController =
+      TextEditingController(text: 'Ayush.Trainer@Example.Com');
+  final _phoneController = TextEditingController(text: '+91 9876543210');
+  final _linkedinController =
+      TextEditingController(text: 'Linkedin.Com/In/Ayushshukla');
+  final _instagramController = TextEditingController(text: '@Ayushshukla_fit');
 
-  // Flags to toggle editing
-  bool _isUsernameEditable = false;
-  bool _isContactEditable = false;
+  String selectedGender = 'Male';
+  String selectedSpecialization = 'Weight Loss';
+  bool isTrainerInfoExpanded = true;
+  bool isContactInfoExpanded = true;
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _ageController.dispose();
+    _experienceController.dispose();
+    _activeClientsController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _linkedinController.dispose();
+    _instagramController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return BaseWidget(
-      // backgroundColor: Colors.black,
-      // appBar: AppBar(
-      //   // backgroundColor: Colors.black,
-      //   // title: const Text(
-      //   //   'Account & Password',
-      //   //   style: TextStyle(color: Colors.white),
-      //   // ),
-      //   centerTitle: true,
-      //   actions: [
-      //     TextButton(
-      //       onPressed: () {
-      //         // Save action - navigate to RegistrationScreen
-      //         Navigator.push(
-      //           context,
-      //           MaterialPageRoute(builder: (context) => RegistrationView()),
-      //         );
-      //       },
-      //       child: const Text(
-      //         'Save',
-      //         style: TextStyle(
-      //           color: Colors.green,
-      //           fontWeight: FontWeight.bold,
-      //           fontSize: 16,
-      //         ),
-      //       ),
-      //     ),
-      //   ],
-      // ),
-      title: "Account & Password",
+      title: "Profile",
       appBarAction: [
         TextButton(
           onPressed: () {
-            // Save action - navigate to RegistrationScreen
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => RegistrationView()),
+            // Save action
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Profile saved successfully!'),
+                backgroundColor: Colors.green,
+              ),
             );
+            Get.back();
           },
           child: const Text(
             'Save',
             style: TextStyle(
-              color: Colors.green,
+              color: Color(0xFFC2D86A),
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
           ),
         ),
       ],
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildEditableTextField('User name', _usernameController, _isUsernameEditable, (value) {
-              setState(() {
-                _isUsernameEditable = value;
-              });
-            }),
-            const SizedBox(height: 20),
-            _buildTextField('E-mail address', 'ayushshukla@gmail.com', readOnly: true),
-            const SizedBox(height: 20),
-            _buildEditableTextField('Contact no.', _contactController, _isContactEditable, (value) {
-              setState(() {
-                _isContactEditable = value;
-              });
-            }),
-            const SizedBox(height: 20),
-            _buildTextField('Password', '...........o09', readOnly: true, isPassword: true),
-          ],
+      body: Container(
+        color: const Color(0xFF0C0C0C),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              // Profile Picture
+              const CircleAvatar(
+                radius: 40,
+                backgroundImage:
+                    NetworkImage('https://via.placeholder.com/150'),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${_firstNameController.text} ${_lastNameController.text}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Basic Information
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextField('First Name', _firstNameController),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildTextField('Last Name', _lastNameController),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDropdownField('Age', _ageController.text,
+                        ['23', '24', '25', '26', '27'], (value) {
+                      setState(() {
+                        _ageController.text = value!;
+                      });
+                    }),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildDropdownField(
+                        'Gender', selectedGender, ['Male', 'Female', 'Other'],
+                        (value) {
+                      setState(() {
+                        selectedGender = value!;
+                      });
+                    }),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Trainer Information Section
+              _buildExpandableSection(
+                'Trainer Information',
+                isTrainerInfoExpanded,
+                () {
+                  setState(() {
+                    isTrainerInfoExpanded = !isTrainerInfoExpanded;
+                  });
+                },
+                [
+                  _buildTextField('Experience', _experienceController,
+                      hintText: 'No. Of Years'),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Specialization',
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildSpecializationChip('Weight Loss',
+                            selectedSpecialization == 'Weight Loss'),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildSpecializationChip('Weight Gain',
+                            selectedSpecialization == 'Weight Gain'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildSpecializationChip('Maintenance',
+                            selectedSpecialization == 'Maintenance'),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildSpecializationChip('Muscle Build',
+                            selectedSpecialization == 'Muscle Build'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Active Clients',
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildTextField('', _activeClientsController,
+                      showLabel: false),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Contact Information Section
+              _buildExpandableSection(
+                'Contact Information',
+                isContactInfoExpanded,
+                () {
+                  setState(() {
+                    isContactInfoExpanded = !isContactInfoExpanded;
+                  });
+                },
+                [
+                  _buildTextField('Email', _emailController),
+                  const SizedBox(height: 16),
+                  _buildTextField('Phone Number', _phoneController),
+                  const SizedBox(height: 16),
+                  _buildTextField('LinkedIn', _linkedinController),
+                  const SizedBox(height: 16),
+                  _buildTextField('Instagram', _instagramController),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTextField(String label, String value, {bool readOnly = false, bool isPassword = false}) {
+  Widget _buildTextField(String label, TextEditingController controller,
+      {String? hintText, bool showLabel = true}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white, fontSize: 16),  // Changed label color to white
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          readOnly: readOnly,
-          obscureText: isPassword,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey[900],
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.green),
-            ),
+        if (showLabel) ...[
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white, fontSize: 14),
           ),
-          style: const TextStyle(color: Colors.grey),  // Set content text color to grey
-          controller: TextEditingController(text: value),
+          const SizedBox(height: 8),
+        ],
+        TextField(
+          controller: controller,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: const TextStyle(color: Colors.grey),
+            filled: true,
+            fillColor: const Color(0xFF2A2A2A),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildEditableTextField(
-      String label,
-      TextEditingController controller,
-      bool isEditable,
-      Function(bool) toggleEditable,
-      ) {
+  Widget _buildDropdownField(String label, String value, List<String> items,
+      Function(String?) onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(color: Colors.white, fontSize: 16),  // Changed label color to white
+          style: const TextStyle(color: Colors.white, fontSize: 14),
         ),
         const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          readOnly: !isEditable,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey[900],
-            suffixIcon: IconButton(
-              icon: Icon(
-                isEditable ? Icons.check : Icons.edit,
-                color: Colors.grey,
-              ),
-              onPressed: () {
-                toggleEditable(!isEditable);
-              },
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.green),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF2A2A2A),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: value,
+              isExpanded: true,
+              dropdownColor: const Color(0xFF2A2A2A),
+              style: const TextStyle(color: Colors.white),
+              icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+              items: items.map((String item) {
+                return DropdownMenuItem<String>(
+                  value: item,
+                  child: Text(item),
+                );
+              }).toList(),
+              onChanged: onChanged,
             ),
           ),
-          style: TextStyle(color: isEditable ? Colors.white : Colors.grey),  // Change content color to white when editing
         ),
       ],
+    );
+  }
+
+  Widget _buildExpandableSection(String title, bool isExpanded,
+      VoidCallback onTap, List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: onTap,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Color(0xFFC2D86A),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Icon(
+                    isExpanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    color: const Color(0xFFC2D86A),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (isExpanded)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: children,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSpecializationChip(String label, bool isSelected) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedSpecialization = label;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFC2D86A) : const Color(0xFF2A2A2A),
+          borderRadius: BorderRadius.circular(8),
+          border:
+              isSelected ? Border.all(color: const Color(0xFFC2D86A)) : null,
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: isSelected ? Colors.black : Colors.white,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
     );
   }
 }
-

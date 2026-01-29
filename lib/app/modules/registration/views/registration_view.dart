@@ -72,7 +72,12 @@ class RegistrationView extends StatelessWidget {
                       title: 'Manage Account',
                       icon: Icons.manage_accounts,
                       onTap: () {
-                        // Placeholder for future navigation
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const ManageAccountScreen()),
+                        );
                       },
                     ),
                     _buildMenuOptionContainer(
@@ -105,7 +110,8 @@ class RegistrationView extends StatelessWidget {
                         // Show demo message instead of navigating to deleted page
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('This is a demo app. Diet preferences are simulated.'),
+                            content: Text(
+                                'This is a demo app. Diet preferences are simulated.'),
                             backgroundColor: Colors.orange,
                           ),
                         );
