@@ -14,6 +14,8 @@ import '../modules/generate_ai/bindings/generate_ai_binding.dart';
 import '../modules/generate_ai/views/generate_ai_view.dart';
 import '../modules/group/bindings/group_binding.dart';
 import '../modules/group/views/group_view.dart';
+import '../modules/group/views/create_group_screen.dart';
+import '../modules/group/views/group_details_screen.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -32,6 +34,12 @@ import '../modules/registration/bindings/registration_binding.dart';
 import '../modules/registration/views/registration_view.dart';
 import '../modules/setting/bindings/setting_binding.dart';
 import '../modules/setting/views/setting_view.dart';
+import '../modules/setting/views/general_settings_view.dart';
+import '../modules/setting/views/profile_settings_view.dart';
+import '../modules/setting/views/notification_settings_view.dart';
+import '../modules/setting/views/account_password_settings_view.dart';
+import '../modules/profile/views/profile_main_view.dart';
+import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/signup/bindings/signup_binding.dart';
 import '../modules/signup/views/signup_view.dart';
 import '../modules/swipe_screen/bindings/swipe_screen_bindings.dart';
@@ -159,6 +167,14 @@ class AppPages {
         binding: GroupBinding(),
         middlewares: [AuthCheckMiddleware()]),
     GetPage(
+        name: _Paths.CREATE_GROUP,
+        page: () => CreateGroupScreen(),
+        binding: GroupBinding()),
+    GetPage(
+        name: _Paths.GROUP_DETAILS,
+        page: () => GroupDetailsScreen(),
+        binding: GroupBinding()),
+    GetPage(
       name: _Paths.SIGNUP,
       transition: Transition.leftToRight,
       page: () => SignupView(),
@@ -168,6 +184,36 @@ class AppPages {
       name: _Paths.SETTING,
       page: () => const SettingView(),
       binding: SettingBinding(),
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.GENERAL_SETTINGS,
+      page: () => const GeneralSettingsView(),
+      binding: SettingBinding(),
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.PROFILE_SETTINGS,
+      page: () => const ProfileSettingsView(),
+      binding: SettingBinding(),
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.NOTIFICATION_SETTINGS,
+      page: () => const NotificationSettingsView(),
+      binding: SettingBinding(),
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.ACCOUNT_PASSWORD_SETTINGS,
+      page: () => const AccountPasswordSettingsView(),
+      binding: SettingBinding(),
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.PROFILE_MAIN,
+      page: () => const ProfileMainView(),
+      binding: ProfileBinding(),
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(

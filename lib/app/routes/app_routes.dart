@@ -22,8 +22,15 @@ abstract class Routes {
   static const CreateMeal = _Paths.CreateMeal;
   static const SIGNUP = _Paths.SIGNUP;
   static const GROUP = _Paths.GROUP;
+  static const CREATE_GROUP = _Paths.CREATE_GROUP;
+  static const GROUP_DETAILS = _Paths.GROUP_DETAILS;
   static const ONBOARDING = _Paths.ONBOARDING;
   static const SETTING = _Paths.SETTING;
+  static const GENERAL_SETTINGS = _Paths.GENERAL_SETTINGS;
+  static const PROFILE_SETTINGS = _Paths.PROFILE_SETTINGS;
+  static const NOTIFICATION_SETTINGS = _Paths.NOTIFICATION_SETTINGS;
+  static const ACCOUNT_PASSWORD_SETTINGS = _Paths.ACCOUNT_PASSWORD_SETTINGS;
+  static const PROFILE_MAIN = _Paths.PROFILE_MAIN;
   static const SWITCHROLE = _Paths.SWITCHROLE;
 }
 
@@ -48,6 +55,13 @@ abstract class _Paths {
   static const SIGNUP = '/signup';
   static const FORGETPASSWORD = '/forgot-password';
   static const GROUP = '/group';
+  static const CREATE_GROUP = '/create-group';
+  static const GROUP_DETAILS = '/group-details';
   static const SETTING = '/setting';
+  static const GENERAL_SETTINGS = '/general-settings';
+  static const PROFILE_SETTINGS = '/profile-settings';
+  static const NOTIFICATION_SETTINGS = '/notification-settings';
+  static const ACCOUNT_PASSWORD_SETTINGS = '/account-password-settings';
+  static const PROFILE_MAIN = '/profile-main';
   static const SWITCHROLE = '/switch-role';
 }

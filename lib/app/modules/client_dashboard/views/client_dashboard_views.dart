@@ -276,25 +276,14 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                 // Header with Welcome message and notification
                 Row(
                   children: [
-                    Builder(
-                      builder: (context) => Container(
-                        decoration: BoxDecoration(
-                          color: Color(0xFF242424),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          icon: Icon(Icons.menu, color: Colors.white),
-                          onPressed: () {
-                            Scaffold.of(context).openDrawer();
-                          },
-                        ),
+                    GestureDetector(
+                      onTap: () {
+                        Get.toNamed('/profile-settings');
+                      },
+                      child: CircleAvatar(
+                        radius: 25,
+                        backgroundImage: NetworkImage(user.profileImage ?? 'https://via.placeholder.com/150'),
                       ),
-                    ),
-                    SizedBox(width: 12),
-                    CircleAvatar(
-                      radius: 25,
-                      backgroundImage: NetworkImage(user.profileImage ??
-                          'https://via.placeholder.com/150'),
                     ),
                     SizedBox(width: 12),
                     Expanded(
@@ -523,8 +512,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                 _buildNavItem(Icons.notifications, 'Notification', false, () {
                   Get.toNamed('/notification?id=$id');
                 }),
-                _buildNavItem(Icons.settings, 'Setting', false, () {
-                  Get.toNamed(Routes.SETTING);
+                _buildNavItem(Icons.person, 'Profile', false, () {
+                  Get.toNamed(Routes.PROFILE_MAIN);
                 }),
               ],
             ),

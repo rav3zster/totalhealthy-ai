@@ -19,9 +19,9 @@ class OntapStore {
   static var index = 0;
   static List<String> routes = [
     Routes.ClientDashboard,
-    Routes.GROUP,
-    Routes.NOTIFICATION,
-    Routes.Registration,
+    Routes.GROUP, // Chat functionality can be added later
+    Routes.MEAL_HISTORY, // Meal screen
+    Routes.PROFILE_MAIN, // Profile main screen
   ];
 }
 
@@ -40,89 +40,83 @@ class _MobileNavBarState extends State<MobileNavBar> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Theme(
-        data: ThemeData(
-          navigationBarTheme: NavigationBarThemeData(
-            backgroundColor: AppColors.cardbackground,
-            indicatorColor: Colors.transparent,
-            indicatorShape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20), // Circular shape
-            ),
-            labelTextStyle: MaterialStateProperty.resolveWith<TextStyle?>(
-              (Set<MaterialState> states) {
-                if (states.contains(MaterialState.selected)) {
-                  return TextStyle(
-                    color: Color(0XFF808B4D),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  );
-                }
-                return TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                ); // Default style for unselected
-              },
-            ),
-          ),
+      height: 80,
+      decoration: BoxDecoration(
+        color: Color(0xFF1A1A1A), // Darker background to match the image
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
         ),
-        child: NavigationBar(
-          surfaceTintColor: Colors.black,
-          height: 65,
-          selectedIndex: OntapStore.index,
-          onDestinationSelected: (value) => ontapFunction(value),
-          destinations: [
-            NavigationDestination(
-              icon: Icon(
-                Icons.person_outlined,
-                color: Colors.white,
-              ),
-              selectedIcon: Icon(
-                Icons.person,
-                color: Color(0xFFCDE26D),
-              ),
-              label: Get.find<AuthController>().roleGet() == "admin"
-                  ? "Adviser"
-                  : "Member",
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildNavItem(
+            index: 0,
+            icon: Icons.home_outlined,
+            selectedIcon: Icons.home,
+            label: "Home",
+            isSelected: OntapStore.index == 0,
+          ),
+          _buildNavItem(
+            index: 1,
+            icon: Icons.timeline_outlined,
+            selectedIcon: Icons.timeline,
+            label: "Tracking",
+            isSelected: OntapStore.index == 1,
+          ),
+          _buildNavItem(
+            index: 2,
+            icon: Icons.restaurant_outlined,
+            selectedIcon: Icons.restaurant,
+            label: "Recipe",
+            isSelected: OntapStore.index == 2,
+          ),
+          _buildNavItem(
+            index: 3,
+            icon: Icons.person_outline,
+            selectedIcon: Icons.person,
+            label: "Profile",
+            isSelected: OntapStore.index == 3,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required int index,
+    required IconData icon,
+    required IconData selectedIcon,
+    required String label,
+    required bool isSelected,
+  }) {
+    return GestureDetector(
+      onTap: () => ontapFunction(index),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? selectedIcon : icon,
+              size: 24,
+              color: isSelected ? Color(0xFFC2D86A) : Colors.white54,
             ),
-            NavigationDestination(
-              icon: Icon(
-                Icons.group_outlined,
-                color: Colors.white,
+            SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                color: isSelected ? Color(0xFFC2D86A) : Colors.white54,
+                fontWeight: FontWeight.w500,
               ),
-              selectedIcon: Icon(
-                Icons.group,
-                color: Color(0xFFCDE26D),
-              ),
-              label: "Group",
-            ),
-            NavigationDestination(
-              icon: Icon(
-                Icons.notifications_outlined,
-                color: Colors.white,
-              ),
-              selectedIcon: Icon(
-                Icons.notifications,
-                color: Color(0xFFCDE26D),
-              ),
-              label: "Notification",
-            ),
-            NavigationDestination(
-              icon: Icon(
-                Icons.settings_outlined,
-                color: Colors.white,
-              ),
-              selectedIcon: Icon(
-                Icons.settings,
-                color: Color(0xFFCDE26D),
-              ),
-              label: "Setting",
             ),
           ],
         ),

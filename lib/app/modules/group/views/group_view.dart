@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/group_controller.dart';
 import '../../../data/services/dummy_data_service.dart';
-import '../../../widgets/group_card.dart';
 import '../../../routes/app_pages.dart';
 
 class GroupView extends GetView<GroupController> {
@@ -12,140 +11,150 @@ class GroupView extends GetView<GroupController> {
   Widget build(BuildContext context) {
     final groups = DummyDataService.getDummyGroups();
     
-    return WillPopScope(
-      onWillPop: () async {
-        Get.offNamed(Routes.ClientDashboard);
-        return false; // Block browser back
-      },
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          title: Text(
-            'Groups',
-            style: TextStyle(color: Colors.white),
-          ),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              // Navigate directly to client dashboard instead of going back to splash
-              Get.offNamed(Routes.ClientDashboard);
-            },
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.add, color: Colors.white),
-              onPressed: () {
-                _showCreateGroupDialog(context);
-              },
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+                    onPressed: () {
+                      Get.offNamed(Routes.ClientDashboard);
+                    },
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'Groups',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Spacer(),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      _showCreateGroupDialog(context);
+                    },
+                    icon: Icon(Icons.add, color: Colors.black, size: 20),
+                    label: Text(
+                      'Add Group',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFC2D86A),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Groups List
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                itemCount: groups.length,
+                itemBuilder: (context, index) {
+                  final group = groups[index];
+                  return _buildGroupCard(group);
+                },
+              ),
             ),
           ],
-        ),
-        body: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Search Bar
-              Container(
-                decoration: BoxDecoration(
-                  color: Color(0xFF242522),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search groups...',
-                    hintStyle: TextStyle(color: Colors.white54),
-                    prefixIcon: Icon(Icons.search, color: Colors.white54),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(16),
-                  ),
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              
-              SizedBox(height: 20),
-              
-              // Categories
-              Text(
-                'Categories',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 12),
-              
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildCategoryChip('All', true),
-                    _buildCategoryChip('Fitness', false),
-                    _buildCategoryChip('Weight Loss', false),
-                    _buildCategoryChip('Yoga', false),
-                    _buildCategoryChip('Nutrition', false),
-                    _buildCategoryChip('Running', false),
-                  ],
-                ),
-              ),
-              
-              SizedBox(height: 20),
-              
-              // Groups List
-              Text(
-                'Your Groups',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 12),
-              
-              Expanded(
-                child: ListView.builder(
-                  itemCount: groups.length,
-                  itemBuilder: (context, index) {
-                    final group = groups[index];
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: 12),
-                      child: GroupCard(
-                        group: {
-                          'group_name': group['name'],
-                          'description': group['description'],
-                          'created_at': group['createdDate'],
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
   }
   
-  Widget _buildCategoryChip(String label, bool isSelected) {
-    return Container(
-      margin: EdgeInsets.only(right: 8),
-      child: FilterChip(
-        label: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.black : Colors.white,
-          ),
+  Widget _buildGroupCard(Map<String, dynamic> group) {
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(Routes.GROUP_DETAILS, arguments: group);
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 16),
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Color(0xFF2A2A2A),
+          borderRadius: BorderRadius.circular(12),
         ),
-        selected: isSelected,
-        onSelected: (bool selected) {
-          // Handle category selection
-        },
-        backgroundColor: Color(0xFF242522),
-        selectedColor: Color(0xFFF5D657),
-        checkmarkColor: Colors.black,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Group Name
+            Text(
+              group['name'] ?? 'Group Name',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
+            
+            // Description
+            Text(
+              group['description'] ?? 'Group description',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+                height: 1.4,
+              ),
+            ),
+            SizedBox(height: 16),
+            
+            // Created Date
+            Row(
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  color: Color(0xFFC2D86A),
+                  size: 16,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Created On: ${group['createdDate'] ?? 'Unknown'}',
+                  style: TextStyle(
+                    color: Colors.white54,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            
+            // Total Members
+            Row(
+              children: [
+                Icon(
+                  Icons.people,
+                  color: Color(0xFFC2D86A),
+                  size: 16,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Total Members: ${group['memberCount'] ?? 0} Members',
+                  style: TextStyle(
+                    color: Colors.white54,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -157,7 +166,7 @@ class GroupView extends GetView<GroupController> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Color(0xFF242522),
+        backgroundColor: Color(0xFF2A2A2A),
         title: Text(
           'Create New Group',
           style: TextStyle(color: Colors.white),
@@ -174,7 +183,7 @@ class GroupView extends GetView<GroupController> {
                   borderSide: BorderSide(color: Colors.white54),
                 ),
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFF5D657)),
+                  borderSide: BorderSide(color: Color(0xFFC2D86A)),
                 ),
               ),
               style: TextStyle(color: Colors.white),
@@ -189,7 +198,7 @@ class GroupView extends GetView<GroupController> {
                   borderSide: BorderSide(color: Colors.white54),
                 ),
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFF5D657)),
+                  borderSide: BorderSide(color: Color(0xFFC2D86A)),
                 ),
               ),
               style: TextStyle(color: Colors.white),
@@ -216,7 +225,7 @@ class GroupView extends GetView<GroupController> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFF5D657),
+              backgroundColor: Color(0xFFC2D86A),
             ),
             child: Text(
               'Create',
