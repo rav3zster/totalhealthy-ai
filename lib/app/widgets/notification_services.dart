@@ -1,40 +1,18 @@
 import 'dart:core';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest_all.dart' as tz;
+// import 'package:timezone/timezone.dart' as tz;
+// import 'package:timezone/data/latest_all.dart' as tz;
 
 class NotificationService {
-  static final FlutterLocalNotificationsPlugin _notificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  // static final FlutterLocalNotificationsPlugin _notificationsPlugin =
+  //     FlutterLocalNotificationsPlugin();
 
   Future<void> initialize() async {
-    tz.initializeTimeZones();
-    var location = tz.getLocation("Asia/Kolkata");
-
-    tz.setLocalLocation(location);
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    const InitializationSettings settings = InitializationSettings(
-      android: androidSettings,
-    );
-
-    await _notificationsPlugin.initialize(settings);
-
-    print("Notification Service Initialized");
-  }
-
-  NotificationDetails notificationDetails() {
-    return NotificationDetails(
-        android: AndroidNotificationDetails(
-      'category_channel',
-      'Category Notifications',
-      importance: Importance.max,
-      priority: Priority.high,
-    ));
+    // Temporarily disabled for compatibility
+    print("Notification Service Initialized (disabled for compatibility)");
   }
 
   showNotification({
@@ -43,10 +21,10 @@ class NotificationService {
     String? body,
     String? payload,
   }) async {
-    return _notificationsPlugin.show(id, title, body, notificationDetails());
+    // Temporarily disabled
+    print("Show notification called: $title - $body");
   }
 
-  //Use for show notification
   Future<void> scheduleNotification({
     required int id,
     required String title,
@@ -54,52 +32,12 @@ class NotificationService {
     required int hour,
     required int minute,
   }) async {
-    try {
-      var now = tz.TZDateTime.now(tz.local);
-
-      var scheduledDate = tz.TZDateTime(
-        tz.local,
-        now.year,
-        now.month,
-        now.day,
-        hour,
-        minute,
-      ).add(Duration(seconds: 30));
-
-      if (scheduledDate.isBefore(now)) {
-        scheduledDate = scheduledDate.add( Duration(days: 1));
-      }
-      print("Scheduled Date: $scheduledDate");
-
-      await _notificationsPlugin.zonedSchedule(
-        id,
-        title,
-        body,
-        scheduledDate,
-        notificationDetails(),
-        
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-            
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.dateAndTime);
-    } catch (e) {
-      print(e);
-    }
+    // Temporarily disabled
+    print("Schedule notification called: $title at $hour:$minute");
   }
 
-// void printPendingNotifications() async {
-//   List<ActiveNotification> pendingNotifications =
-//       await _notificationsPlugin.();
-
-//   for (var notification in pendingNotifications) {
-//     print("ID: ${notification.id}");
-//     print("Title: ${notification.title}");
-//     print("Body: ${notification.body}");
-//     print("Scheduled Date: ${notification.scheduledDate}"); // May be null
-//   }
-// }
   Future<void> cancelNotification(int id) async {
-    await _notificationsPlugin.cancel(id);
+    // Temporarily disabled
+    print("Cancel notification called for id: $id");
   }
 }

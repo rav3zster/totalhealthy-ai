@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../controllers/group_controller.dart';
 import '../../../data/services/dummy_data_service.dart';
 import '../../../widgets/group_card.dart';
-import '../../../routes/app_routes.dart';
+import '../../../routes/app_pages.dart';
 
 class GroupScreen extends GetView<GroupController> {
   const GroupScreen({super.key});

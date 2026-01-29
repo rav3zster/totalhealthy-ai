@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 import '../controllers/setting_controller.dart';
 
 class SettingView extends GetView<SettingController> {
@@ -8,77 +7,90 @@ class SettingView extends GetView<SettingController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: MobileNavBar(),
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading:
-            Icon(Icons.arrow_back_ios_new_outlined, color: Color(0XFFDBDBDB)),
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: Icon(Icons.arrow_back_ios_new_outlined, color: Colors.white),
+        ),
         actions: [
           IconButton(
-              onPressed: () {
-                Get.back();
-              },
-              icon: Icon(
-                Icons.search,
-                size: 35,
-                color: Colors.white,
-              ))
-        ],
-        title: SizedBox(
-          width: double.infinity,
-          child: Padding(
-            padding: EdgeInsets.only(right: 35),
-            // Adjust this value to control the left shift
-            child: Text(
-              'Settings',
-              style: TextStyle(
-                  color: Color(0XFFFFFFFF),
-                  fontFamily: 'inter',
-                  fontSize: 24,
-                  fontWeight: FontWeight.w400),
+            onPressed: () {},
+            icon: Icon(
+              Icons.search,
+              size: 24,
+              color: Colors.white,
             ),
+          )
+        ],
+        title: Text(
+          'Settings',
+          style: TextStyle(
+            color: Colors.white,
+            fontFamily: 'inter',
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
           ),
         ),
+        centerTitle: true,
       ),
-      body: SingleChildScrollView(
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: Column(
           children: [
-            Option(
-              value: "General Setting",
+            SettingOption(
+              title: "General Settings",
+              onTap: () {
+                Get.toNamed('/general-settings');
+              },
             ),
-            Option(
-              value: "Notification",
+            SizedBox(height: 20),
+            SettingOption(
+              title: "Notifications",
+              onTap: () {
+                Get.toNamed('/notification-settings');
+              },
             ),
-            Option(
-              value: "Account & Password",
+            SizedBox(height: 20),
+            SettingOption(
+              title: "Account And Password",
+              onTap: () {
+                Get.toNamed('/account-password-settings');
+              },
             ),
-
-            // log out button
+            SizedBox(height: 40),
+            // Log out button
             InkWell(
+              onTap: () {
+                // Handle logout
+              },
+              borderRadius: BorderRadius.circular(10),
               child: Container(
-                padding: EdgeInsets.fromLTRB(20, 10, 10, 10),
+                padding: EdgeInsets.symmetric(vertical: 15),
                 width: double.infinity,
                 child: Row(
                   children: [
                     Icon(
                       Icons.logout,
-                      size: 30,
-                      color: Color(0xffA67473),
+                      size: 24,
+                      color: Color(0xffFF6B6B),
                     ),
-                    SizedBox(
-                      width: 10,
-                    ),
+                    SizedBox(width: 15),
                     Text(
                       "Log Out",
-                      style: TextStyle(fontSize: 20, color: Color(0xffA67473)),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xffFF6B6B),
+                        fontWeight: FontWeight.w500,
+                      ),
                     )
                   ],
                 ),
               ),
-              borderRadius: BorderRadius.circular(10),
-              onTap: () {},
             )
           ],
         ),
@@ -87,25 +99,43 @@ class SettingView extends GetView<SettingController> {
   }
 }
 
-class Option extends StatelessWidget {
-  Option({required this.value});
+class SettingOption extends StatelessWidget {
+  final String title;
+  final VoidCallback onTap;
 
-  String value;
+  const SettingOption({
+    Key? key,
+    required this.title,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
       child: Container(
         width: double.infinity,
-        //  color: Colors.greenAccent,
-        padding: EdgeInsets.fromLTRB(20, 10, 10, 10),
-        child: Text(
-          "${value}",
-          style: TextStyle(fontSize: 20, color: Colors.white60),
+        padding: EdgeInsets.symmetric(vertical: 15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Colors.white54,
+            ),
+          ],
         ),
       ),
-      borderRadius: BorderRadius.circular(10),
-      onTap: () {},
     );
   }
 }

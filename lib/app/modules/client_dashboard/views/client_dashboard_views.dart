@@ -274,9 +274,14 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                 // Header with Welcome message and notification
                 Row(
                   children: [
-                    CircleAvatar(
-                      radius: 25,
-                      backgroundImage: NetworkImage(user.profileImage ?? 'https://via.placeholder.com/150'),
+                    GestureDetector(
+                      onTap: () {
+                        Get.toNamed('/profile-settings');
+                      },
+                      child: CircleAvatar(
+                        radius: 25,
+                        backgroundImage: NetworkImage(user.profileImage ?? 'https://via.placeholder.com/150'),
+                      ),
                     ),
                     SizedBox(width: 12),
                     Expanded(
@@ -501,8 +506,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                 _buildNavItem(Icons.notifications, 'Notification', false, () {
                   Get.toNamed('/notification?id=$id');
                 }),
-                _buildNavItem(Icons.settings, 'Setting', false, () {
-                  Get.toNamed(Routes.SETTING);
+                _buildNavItem(Icons.person, 'Profile', false, () {
+                  Get.toNamed(Routes.PROFILE_MAIN);
                 }),
               ],
             ),

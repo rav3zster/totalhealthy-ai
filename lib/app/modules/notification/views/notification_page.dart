@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/modules/notification/controllers/notification_controller.dart';
 import 'package:totalhealthy/app/widgets/custom_button.dart';
-import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 
 import '../../../core/base/constants/appcolor.dart';
 import '../../../core/base/controllers/auth_controller.dart';
@@ -20,313 +19,278 @@ class NotificationsPage extends StatefulWidget {
   _NotificationsPageState createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  var dataList = [];
-  var isLoading = false;
-  var isGetLoading = {};
-  Future<void> postnotification(id, action, index) async {
-    try {
-      setState(() {
-        isGetLoading[index] = true;
-      });
-
-      // Use mock API instead of real API
-      final response = await MockApiService.respondToNotification(id, action);
-      
-      if (response['statusCode'] == 200) {
-        getNotification();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Successful!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Not Found'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      print(e);
-    } finally {
-      setState(() {
-        isGetLoading[index] = false;
-      });
-    }
-  }
-
-  Future<void> getNotification() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-      
-      // Use mock API instead of real API
-      final response = await MockApiService.getNotifications();
-      
-      if (response['statusCode'] == 200) {
-        setState(() {
-          dataList = response['data'];
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("No Data Found"),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      print(e);
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  // Example JSON data
-
-  List<dynamic> notifications = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    // Parsing JSON data
-
-    getNotification();
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+class _NotificationsPageState extends State<NotificationsPage> {
+  bool showAllNotifications = true;
+  
+  // Mock notification data
+  final List<Map<String, dynamic>> todayNotifications = [
+    {
+      'type': 'New Recipe',
+      'title': 'New Recipe',
+      'message': 'Try our delicious Quinoa Salad Bowl recipe, packed with protein and fresh veggies for a nutritious meal option.',
+      'time': '2 Minutes Ago',
+      'icon': Icons.receipt_long,
+      'iconColor': Color(0xFFC2D86A),
+      'isRead': false,
+    },
+    {
+      'type': 'Meal Reminder',
+      'title': 'Meal Reminder',
+      'message': 'It\'s lunchtime! Don\'t forget to fuel your body with a balanced meal to keep your energy levels up.',
+      'time': '4 Minutes Ago',
+      'icon': Icons.access_time,
+      'iconColor': Colors.white,
+      'isRead': false,
+    },
+  ];
+  
+  final List<Map<String, dynamic>> yesterdayNotifications = [
+    {
+      'type': 'Recommended Recipe',
+      'title': 'Recommended Recipe',
+      'message': 'Based on your preferences, we suggest trying our Avocado Toast with Poached Egg for a satisfying breakfast option.',
+      'time': '9:00 AM',
+      'icon': Icons.recommend,
+      'iconColor': Color(0xFF9C27B0),
+      'isRead': true,
+    },
+    {
+      'type': 'Meal Reminder',
+      'title': 'Meal Reminder',
+      'message': 'It\'s lunchtime! Don\'t forget to fuel your body with a balanced meal to keep your energy levels up.',
+      'time': '9:00 AM',
+      'icon': Icons.access_time,
+      'iconColor': Colors.white,
+      'isRead': true,
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-      bottomNavigationBar: MobileNavBar(),
       backgroundColor: Colors.black,
       appBar: AppBar(
-      automaticallyImplyLeading: false,
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        // leading: IconButton(
-        //     onPressed: () {
-        //       Get.back();
-        //       // Get.toNamed("/userdiet?=id${widget.id}");
-        //     },
-        //     icon: Icon(Icons.arrow_back_ios_new_outlined),
-        //     color: Color(0XFFDBDBDB)),
-        title: SizedBox(
-          width: double.infinity,
-          child: Padding(
-            padding: EdgeInsets.only(
-                right: 35), // Adjust this value to control the left shift
-            child: Center(
-              child: Text(
-                'Notifications',
-                style: TextStyle(color: Color(0XFFFFFFFF)),
-              ),
-            ),
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: Icon(Icons.arrow_back_ios_new_outlined, color: Colors.white),
+        ),
+        title: Text(
+          'Notifications',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(70), // Adjust height if needed
-          child: Material(
-            elevation: 0, // Remove any elevation that might cause a shadow line
-            color: Colors.black, // TabBar background color
-            child: TabBar(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              controller: _tabController,
-              tabs: [
-                Tab(text: 'All'),
-                Tab(text: 'Unread'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 20),
+            
+            // Toggle buttons
+            Row(
+              children: [
+                _buildToggleButton('All', showAllNotifications, () {
+                  setState(() {
+                    showAllNotifications = true;
+                  });
+                }),
+                SizedBox(width: 20),
+                _buildToggleButton('Unread', !showAllNotifications, () {
+                  setState(() {
+                    showAllNotifications = false;
+                  });
+                }),
               ],
-              labelColor: Colors.black,
-              unselectedLabelColor: Colors.white,
-              dividerColor: Color(0XFF0C0C0C),
-              indicator: BoxDecoration(
-                color: Color(0XFFCDE26D), // Background color of selected tab
-                borderRadius: BorderRadius.circular(50), // Rounded indicator
-              ),
-              indicatorSize: TabBarIndicatorSize
-                  .tab, // Make the indicator cover the entire tab width
-              // Remove the line by ensuring no other indicators are present
             ),
-          ),
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          isLoading
-              ? Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                  ),
-                )
-              : dataList.isEmpty
-                  ? Center(
-                      child: Text(
-                        "Notificaion Not Found",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: dataList.length,
-                      itemBuilder: (context, index) {
-                        var data = dataList[index];
-                        return buildNotificationCard(
-                            title: "Join Request",
-                            message: " ${data["message"]}",
-                            id: "${data["notification_id"]}",
-                            icon: Icons.person);
-                      },
-                    ),
-        ],
-      ),
-    );
-  }
-
-// Function to build notification cards
-  Widget buildNotificationCard({
-    String? title,
-    String? id,
-    String? content,
-    String? time,
-    IconData? icon,
-    Color? iconColor,
-    Color? titleColor,
-    Color? timeColor,
-    String? message,
-  }) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      padding: EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Color(0XFF12110D),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                backgroundColor: iconColor, // Use provided icon color
-                child: Icon(icon, color: Colors.black),
-              ),
-              SizedBox(width: 10),
-              Expanded(
+            
+            SizedBox(height: 30),
+            
+            Expanded(
+              child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title ?? '',
-                      style: TextStyle(
-                          color: titleColor, // Use provided title color
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      content ?? "",
-                      style: TextStyle(
-                          color: Color(
-                              0xFFFFFFFF), // Set content text color to #FFFFFF
-                          fontSize: 14),
-                    ),
-                    SizedBox(height: 5),
-                    // Text(
-                    //   time??"Not Found",
-                    //   style: TextStyle(
-                    //       color: timeColor, // Use provided time color
-                    //       fontSize: 12),
-                    // ),
+                    // Today Section
+                    if (_shouldShowTodaySection()) ...[
+                      Text(
+                        'Today',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      
+                      ...todayNotifications
+                          .where((notification) => showAllNotifications || !notification['isRead'])
+                          .map((notification) => _buildNotificationCard(notification))
+                          .toList(),
+                      
+                      SizedBox(height: 30),
+                    ],
+                    
+                    // Yesterday Section
+                    if (_shouldShowYesterdaySection()) ...[
+                      Text(
+                        'Yesterday',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      
+                      ...yesterdayNotifications
+                          .where((notification) => showAllNotifications || !notification['isRead'])
+                          .map((notification) => _buildNotificationCard(notification))
+                          .toList(),
+                    ],
+                    
+                    // No notifications message
+                    if (!_shouldShowTodaySection() && !_shouldShowYesterdaySection()) ...[
+                      Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 100),
+                          child: Text(
+                            'No unread notifications',
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
-              IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.more_vert, color: Color(0XFFECEBE7)),
-              ),
-            ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  bool _shouldShowTodaySection() {
+    if (showAllNotifications) return todayNotifications.isNotEmpty;
+    return todayNotifications.any((notification) => !notification['isRead']);
+  }
+  
+  bool _shouldShowYesterdaySection() {
+    if (showAllNotifications) return yesterdayNotifications.isNotEmpty;
+    return yesterdayNotifications.any((notification) => !notification['isRead']);
+  }
+  
+  Widget _buildToggleButton(String text, bool isSelected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? Color(0xFFC2D86A) : Colors.transparent,
+          borderRadius: BorderRadius.circular(25),
+          border: isSelected ? null : Border.all(color: Colors.white54),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: isSelected ? Colors.black : Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
           ),
-          Text(
-            message ?? 'Not Found',
-            style: TextStyle(
-                color: titleColor, // Use provided title color
-                fontWeight: FontWeight.bold,
-                fontSize: 14),
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildNotificationCard(Map<String, dynamic> notification) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Icon
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: notification['iconColor'],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              notification['icon'],
+              color: notification['iconColor'] == Colors.white ? Colors.black : Colors.black,
+              size: 20,
+            ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              CustomButton(
-                  child: isGetLoading[1] == true
-                      ? Center(child: CircularProgressIndicator())
-                      : Text(
-                          "Reject",
-                          style: TextStyle(color: Colors.black),
-                        ),
-                  color: AppColors.mandarin,
-                  onPressed: () {
-                    postnotification(id, "decline", 1);
-                  },
-                  size: ButtonSize.medium,
-                  type: ButtonType.elevated),
-              CustomButton(
-                  child: isGetLoading[2] == true
-                      ? Center(child: CircularProgressIndicator())
-                      : Text(
-                          "Accept",
-                          style: TextStyle(color: Colors.black),
-                        ),
-                  color: AppColors.chineseGreen,
-                  onPressed: () {
-                    postnotification(id, "accept", 2);
-                  },
-                  size: ButtonSize.medium,
-                  type: ButtonType.elevated)
-            ],
+          
+          SizedBox(width: 12),
+          
+          // Content
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      notification['title'],
+                      style: TextStyle(
+                        color: Color(0xFFC2D86A),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Icon(
+                      Icons.more_vert,
+                      color: Colors.white54,
+                      size: 20,
+                    ),
+                  ],
+                ),
+                
+                SizedBox(height: 8),
+                
+                Text(
+                  notification['message'],
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    height: 1.4,
+                  ),
+                ),
+                
+                SizedBox(height: 8),
+                
+                Text(
+                  notification['time'],
+                  style: TextStyle(
+                    color: Color(0xFFC2D86A),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
-  }
-
-  // Function to map icon name from JSON to IconData
-  IconData getIcon(String iconName) {
-    switch (iconName) {
-      case 'receipt_long':
-        return Icons.receipt_long;
-      case 'notifications':
-        return Icons.notifications;
-      default:
-        return Icons.notification_important;
-    }
-  }
-
-  // Function to map color name from JSON to Color
-  Color getColor(String colorName) {
-    switch (colorName) {
-      case 'yellow':
-        return Colors.yellow;
-      case 'grey':
-        return Colors.grey;
-      case 'purpleAccent':
-        return Colors.purpleAccent;
-      default:
-        return Colors.grey;
-    }
   }
 }
