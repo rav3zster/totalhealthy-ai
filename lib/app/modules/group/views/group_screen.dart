@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../controllers/group_controller.dart';
 import '../../../data/services/dummy_data_service.dart';
 import '../../../widgets/group_card.dart';
-import '../../../routes/app_routes.dart';
+import '../../../routes/app_pages.dart';
 
 class GroupScreen extends GetView<GroupController> {
   const GroupScreen({super.key});
@@ -13,12 +13,14 @@ class GroupScreen extends GetView<GroupController> {
   Widget build(BuildContext context) {
     final groups = DummyDataService.getDummyGroups();
 
-    return WillPopScope(
+    return PopScope(
       // 🔥 THIS IS THE REAL FIX FOR FLUTTER WEB
-      onWillPop: () async {
-        Get.offAllNamed(Routes.ClientDashboard);
-        return false; // ⛔ Block browser back
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          Get.offAllNamed(Routes.ClientDashboard);
+        }
       },
+      canPop: false,
       child: Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
@@ -84,10 +86,10 @@ class GroupScreen extends GetView<GroupController> {
 
               const SizedBox(height: 12),
 
-              SingleChildScrollView(
+              const SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: const [
+                  children: [
                     _CategoryChip(label: 'All', selected: true),
                     _CategoryChip(label: 'Fitness'),
                     _CategoryChip(label: 'Weight Loss'),
@@ -215,6 +217,86 @@ class GroupScreen extends GetView<GroupController> {
     );
   }
 }
+  
+
+  void _showCreateGroupDialog(BuildContext context) {
+    final nameController = TextEditingController();
+    final descriptionController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF242522),
+        title: const Text(
+          'Create New Group',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelText: 'Group Name',
+                labelStyle: TextStyle(color: Colors.white70),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white54),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFFF5D657)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: descriptionController,
+              style: const TextStyle(color: Colors.white),
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Description',
+                labelStyle: TextStyle(color: Colors.white70),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white54),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFFF5D657)),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white70),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFF5D657),
+            ),
+            onPressed: () {
+              Get.back();
+              Get.snackbar(
+                'Success',
+                'Group "${nameController.text}" created successfully!',
+                backgroundColor: Colors.green,
+                colorText: Colors.white,
+              );
+            },
+            child: const Text(
+              'Create',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
 class _CategoryChip extends StatelessWidget {
   final String label;
