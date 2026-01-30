@@ -20,6 +20,7 @@ class ProfileMainView extends StatelessWidget {
           ),
         ),
         centerTitle: true,
+        
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
