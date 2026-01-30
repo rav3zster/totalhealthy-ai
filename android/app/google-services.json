@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "106792957965",
+    "project_id": "totalhealthy-fd278",
+    "storage_bucket": "totalhealthy-fd278.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:106792957965:android:8baa342400ba84807ebd44",
+        "android_client_info": {
+          "package_name": "com.example.totalhealthy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3_huye73q1ye4vCRHuFNn0KqStnOWAf8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

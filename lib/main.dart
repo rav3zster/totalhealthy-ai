@@ -7,6 +7,8 @@ import 'app/core/base/constants/custom_scroll.dart';
 import 'app/core/base/controllers/theme_controller.dart';
 import 'app/routes/app_pages.dart';
 import 'app/widgets/notification_services.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 final NotificationService _notificationService = NotificationService();
 
@@ -15,6 +17,9 @@ void main() async {
 
   await GetStorage.init();
   await initializeControllers();
+    await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(const MyApp());
 }
