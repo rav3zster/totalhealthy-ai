@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
+import 'package:totalhealthy/app/data/models/user_model.dart';
+import 'package:totalhealthy/app/data/services/users_firestore_service.dart';
 import 'package:totalhealthy/app/widgets/baseWidget.dart';
 
 class ManageAccountScreen extends StatefulWidget {
@@ -11,22 +13,44 @@ class ManageAccountScreen extends StatefulWidget {
 }
 
 class _ManageAccountScreenState extends State<ManageAccountScreen> {
-  final _firstNameController = TextEditingController(text: 'Ayush');
-  final _lastNameController = TextEditingController(text: 'shukla');
-  final _ageController = TextEditingController(text: '25');
-  final _experienceController = TextEditingController(text: 'No. Of Years');
-  final _activeClientsController = TextEditingController(text: '12');
-  final _emailController =
-      TextEditingController(text: 'Ayush.Trainer@Example.Com');
-  final _phoneController = TextEditingController(text: '+91 9876543210');
-  final _linkedinController =
-      TextEditingController(text: 'Linkedin.Com/In/Ayushshukla');
-  final _instagramController = TextEditingController(text: '@Ayushshukla_fit');
+  final authController = Get.find<AuthController>();
+  final usersService = UsersFirestoreService();
+
+  late TextEditingController _firstNameController;
+  late TextEditingController _lastNameController;
+  late TextEditingController _ageController;
+  late TextEditingController _experienceController;
+  late TextEditingController _activeClientsController;
+  late TextEditingController _emailController;
+  late TextEditingController _phoneController;
+  late TextEditingController _linkedinController;
+  late TextEditingController _instagramController;
+  late TextEditingController _weightController;
+  late TextEditingController _heightController;
 
   String selectedGender = 'Male';
   String selectedSpecialization = 'Weight Loss';
   bool isTrainerInfoExpanded = true;
   bool isContactInfoExpanded = true;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = authController.getCurrentUser();
+    _firstNameController = TextEditingController(text: user.firstName);
+    _lastNameController = TextEditingController(text: user.lastName);
+    _ageController = TextEditingController(text: user.age.toString());
+    _emailController = TextEditingController(text: user.email);
+    _phoneController = TextEditingController(text: user.phone);
+    _weightController = TextEditingController(text: user.weight.toString());
+    _heightController = TextEditingController(text: user.height.toString());
+
+    // Dummy values for others as they are not in UserModel yet
+    _experienceController = TextEditingController(text: 'No. Of Years');
+    _activeClientsController = TextEditingController(text: '12');
+    _linkedinController = TextEditingController(text: '');
+    _instagramController = TextEditingController(text: '');
+  }
 
   @override
   void dispose() {
@@ -39,7 +63,51 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
     _phoneController.dispose();
     _linkedinController.dispose();
     _instagramController.dispose();
+    _weightController.dispose();
+    _heightController.dispose();
     super.dispose();
+  }
+
+  Future<void> _saveProfile() async {
+    try {
+      final currentUser = authController.getCurrentUser();
+      final updatedUser = UserModel(
+        id: currentUser.id,
+        email: _emailController.text,
+        username: currentUser.username,
+        phone: _phoneController.text,
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text,
+        profileImage: currentUser.profileImage,
+        age: int.tryParse(_ageController.text) ?? 0,
+        weight: double.tryParse(_weightController.text) ?? 0.0,
+        height: int.tryParse(_heightController.text) ?? 0,
+        activityLevel: currentUser.activityLevel,
+        goals: currentUser.goals,
+        joinDate: currentUser.joinDate,
+        planName: currentUser.planName,
+        planDuration: currentUser.planDuration,
+        progressPercentage: currentUser.progressPercentage,
+      );
+
+      await usersService.updateUserProfile(updatedUser);
+      await authController.userdataStore(updatedUser.toJson());
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Profile saved successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Get.back();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error saving profile: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -48,16 +116,7 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
       title: "Profile",
       appBarAction: [
         TextButton(
-          onPressed: () {
-            // Save action
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Profile saved successfully!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            Get.back();
-          },
+          onPressed: _saveProfile,
           child: const Text(
             'Save',
             style: TextStyle(
@@ -77,8 +136,9 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
               // Profile Picture
               const CircleAvatar(
                 radius: 40,
-                backgroundImage:
-                    NetworkImage('https://via.placeholder.com/150'),
+                backgroundImage: NetworkImage(
+                  'https://via.placeholder.com/150',
+                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -107,23 +167,31 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
 
               Row(
                 children: [
-                  Expanded(
-                    child: _buildDropdownField('Age', _ageController.text,
-                        ['23', '24', '25', '26', '27'], (value) {
-                      setState(() {
-                        _ageController.text = value!;
-                      });
-                    }),
-                  ),
+                  Expanded(child: _buildTextField('Age', _ageController)),
                   const SizedBox(width: 16),
                   Expanded(
                     child: _buildDropdownField(
-                        'Gender', selectedGender, ['Male', 'Female', 'Other'],
-                        (value) {
-                      setState(() {
-                        selectedGender = value!;
-                      });
-                    }),
+                      'Gender',
+                      selectedGender,
+                      ['Male', 'Female', 'Other'],
+                      (value) {
+                        setState(() {
+                          selectedGender = value!;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTextField('Weight (kg)', _weightController),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildTextField('Height (cm)', _heightController),
                   ),
                 ],
               ),
@@ -139,8 +207,11 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
                   });
                 },
                 [
-                  _buildTextField('Experience', _experienceController,
-                      hintText: 'No. Of Years'),
+                  _buildTextField(
+                    'Experience',
+                    _experienceController,
+                    hintText: 'No. Of Years',
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'Specialization',
@@ -150,13 +221,17 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildSpecializationChip('Weight Loss',
-                            selectedSpecialization == 'Weight Loss'),
+                        child: _buildSpecializationChip(
+                          'Weight Loss',
+                          selectedSpecialization == 'Weight Loss',
+                        ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: _buildSpecializationChip('Weight Gain',
-                            selectedSpecialization == 'Weight Gain'),
+                        child: _buildSpecializationChip(
+                          'Weight Gain',
+                          selectedSpecialization == 'Weight Gain',
+                        ),
                       ),
                     ],
                   ),
@@ -164,13 +239,17 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildSpecializationChip('Maintenance',
-                            selectedSpecialization == 'Maintenance'),
+                        child: _buildSpecializationChip(
+                          'Maintenance',
+                          selectedSpecialization == 'Maintenance',
+                        ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: _buildSpecializationChip('Muscle Build',
-                            selectedSpecialization == 'Muscle Build'),
+                        child: _buildSpecializationChip(
+                          'Muscle Build',
+                          selectedSpecialization == 'Muscle Build',
+                        ),
                       ),
                     ],
                   ),
@@ -180,8 +259,11 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
                     style: TextStyle(color: Colors.white, fontSize: 14),
                   ),
                   const SizedBox(height: 8),
-                  _buildTextField('', _activeClientsController,
-                      showLabel: false),
+                  _buildTextField(
+                    '',
+                    _activeClientsController,
+                    showLabel: false,
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -212,8 +294,12 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller,
-      {String? hintText, bool showLabel = true}) {
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller, {
+    String? hintText,
+    bool showLabel = true,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -236,23 +322,26 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
             ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildDropdownField(String label, String value, List<String> items,
-      Function(String?) onChanged) {
+  Widget _buildDropdownField(
+    String label,
+    String value,
+    List<String> items,
+    Function(String?) onChanged,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white, fontSize: 14),
-        ),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -268,10 +357,7 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
               style: const TextStyle(color: Colors.white),
               icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
               items: items.map((String item) {
-                return DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                );
+                return DropdownMenuItem<String>(value: item, child: Text(item));
               }).toList(),
               onChanged: onChanged,
             ),
@@ -281,8 +367,12 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
     );
   }
 
-  Widget _buildExpandableSection(String title, bool isExpanded,
-      VoidCallback onTap, List<Widget> children) {
+  Widget _buildExpandableSection(
+    String title,
+    bool isExpanded,
+    VoidCallback onTap,
+    List<Widget> children,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A1A),
@@ -340,8 +430,9 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
         decoration: BoxDecoration(
           color: isSelected ? const Color(0xFFC2D86A) : const Color(0xFF2A2A2A),
           borderRadius: BorderRadius.circular(8),
-          border:
-              isSelected ? Border.all(color: const Color(0xFFC2D86A)) : null,
+          border: isSelected
+              ? Border.all(color: const Color(0xFFC2D86A))
+              : null,
         ),
         child: Text(
           label,

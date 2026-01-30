@@ -4,12 +4,12 @@ import '../models/user_model.dart';
 
 class UsersFirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String _collection = 'users';
+  final String _collection = 'user';
 
   /// Stream of all users
   Stream<List<UserModel>> getUsersStream() {
     print(
-      "DEBUG: UsersFirestoreService - Fetching users from 'users' collection",
+      "DEBUG: UsersFirestoreService - Fetching users from 'user' collection",
     );
     return _firestore.collection(_collection).snapshots().map((snapshot) {
       print(
@@ -42,6 +42,22 @@ class UsersFirestoreService {
   /// Create a user profile in Firestore
   Future<void> createUserProfile(UserModel user) async {
     await _firestore.collection(_collection).doc(user.id).set(user.toJson());
+  }
+
+  /// Fetch a user profile by UID
+  Future<UserModel?> getUserProfile(String uid) async {
+    final doc = await _firestore.collection(_collection).doc(uid).get();
+    if (doc.exists && doc.data() != null) {
+      final data = Map<String, dynamic>.from(doc.data()!);
+      data['id'] = doc.id;
+      return UserModel.fromJson(data);
+    }
+    return null;
+  }
+
+  /// Update a user profile
+  Future<void> updateUserProfile(UserModel user) async {
+    await _firestore.collection(_collection).doc(user.id).update(user.toJson());
   }
 
   /// Fetch total users count once

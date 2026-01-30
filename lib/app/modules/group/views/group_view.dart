@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../controllers/group_controller.dart';
 import '../../../data/models/group_model.dart';
+import '../../../data/models/user_model.dart';
 import '../../../routes/app_pages.dart';
 
 class GroupView extends GetView<GroupController> {
@@ -10,99 +11,151 @@ class GroupView extends GetView<GroupController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                    onPressed: () {
-                      Get.offNamed(Routes.ClientDashboard);
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Groups',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      _showCreateGroupDialog(context);
-                    },
-                    icon: const Icon(Icons.add, color: Colors.black, size: 20),
-                    label: const Text(
-                      'Add Group',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFC2D86A),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Groups List
-            Expanded(
-              child: Obx(() {
-                if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (controller.groupData.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Row(
                       children: [
-                        const Icon(
-                          Icons.group_off,
-                          size: 64,
-                          color: Colors.white24,
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Get.offNamed(Routes.ClientDashboard);
+                          },
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(width: 8),
                         const Text(
-                          "No groups found.\nCreate one to get started!",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white54, fontSize: 16),
+                          'Community',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            _showCreateGroupDialog(context);
+                          },
+                          icon: const Icon(
+                            Icons.add,
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                          label: const Text(
+                            'Add Group',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFC2D86A),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                  );
-                }
+                    const SizedBox(height: 16),
+                    const TabBar(
+                      indicatorColor: Color(0xFFC2D86A),
+                      labelColor: Color(0xFFC2D86A),
+                      unselectedLabelColor: Colors.white54,
+                      indicatorSize: TabBarIndicatorSize.label,
+                      tabs: [
+                        Tab(text: 'Groups'),
+                        Tab(text: 'Members'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
 
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: controller.groupData.length,
-                  itemBuilder: (context, index) {
-                    final group = controller.groupData[index];
-                    return _buildGroupCard(group);
-                  },
-                );
-              }),
-            ),
-          ],
+              // Content
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    // Groups Tab
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      if (controller.groupData.isEmpty) {
+                        return _buildEmptyState(
+                          Icons.group_off,
+                          "No groups found.\nCreate one to get started!",
+                        );
+                      }
+
+                      return ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: controller.groupData.length,
+                        itemBuilder: (context, index) {
+                          final group = controller.groupData[index];
+                          return _buildGroupCard(group);
+                        },
+                      );
+                    }),
+
+                    // Members Tab
+                    Obx(() {
+                      if (controller.users.isEmpty) {
+                        return _buildEmptyState(
+                          Icons.people_outline,
+                          "No platform members found.",
+                        );
+                      }
+
+                      return ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: controller.users.length,
+                        itemBuilder: (context, index) {
+                          final user = controller.users[index];
+                          return _buildUserCard(user);
+                        },
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(IconData icon, String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 64, color: Colors.white24),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.white54, fontSize: 16),
+          ),
+        ],
       ),
     );
   }
@@ -256,6 +309,64 @@ class GroupView extends GetView<GroupController> {
               backgroundColor: const Color(0xFFC2D86A),
             ),
             child: const Text('Create', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUserCard(UserModel user) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 25,
+            backgroundImage: NetworkImage(
+              user.profileImage.isNotEmpty
+                  ? user.profileImage
+                  : 'https://via.placeholder.com/150',
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user.username,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'Plan: ${user.planName}',
+                  style: const TextStyle(color: Colors.white54, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.chat_bubble_outline,
+              color: Color(0xFFC2D86A),
+              size: 20,
+            ),
+            onPressed: () {
+              Get.snackbar(
+                "Chat",
+                "Direct messaging coming soon!",
+                backgroundColor: Colors.blue,
+                colorText: Colors.white,
+              );
+            },
           ),
         ],
       ),

@@ -56,11 +56,46 @@ class AuthController extends GetxController {
   Future<bool> login(String email, String password) async {
     try {
       flowloader.value = true;
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      UserCredential credential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      // Determine role - default to user if not found/set
-      if (!box.hasData("role")) {
-        roleStore("user");
+      if (credential.user != null) {
+        final usersService = UsersFirestoreService();
+        UserModel? profile = await usersService.getUserProfile(
+          credential.user!.uid,
+        );
+
+        if (profile == null) {
+          // Create missing profile for legacy users
+          profile = UserModel(
+            id: credential.user!.uid,
+            email: email,
+            username: email.split('@')[0],
+            phone: "",
+            firstName: "",
+            lastName: "",
+            profileImage: "",
+            age: 0,
+            weight: 0.0,
+            height: 0,
+            activityLevel: "Moderate",
+            goals: [],
+            joinDate: DateTime.now().toIso8601String(),
+          );
+          await usersService.createUserProfile(profile);
+        }
+
+        // Sync with local storage
+        await userdataStore(profile.toJson());
+
+        // Check if role is admin
+        if (email == "admin@gmail.com") {
+          roleStore("admin");
+        } else {
+          roleStore("user");
+        }
       }
       return true;
     } on FirebaseAuthException catch (e) {

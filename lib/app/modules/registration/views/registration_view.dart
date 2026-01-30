@@ -38,32 +38,38 @@ class RegistrationView extends StatelessWidget {
                       child: CircleAvatar(
                         radius: 50,
                         backgroundImage: NetworkImage(
-                            'https://example.com/profile-picture.jpg'),
+                          'https://example.com/profile-picture.jpg',
+                        ),
                       ),
                     ),
 
                     // Name
-                    Text(
-                      Get.find<AuthController>()
-                          .userdataget()["name"]
-                          .toString(),
-                      style: TextStyle(
+                    Obx(() {
+                      final user = Get.find<AuthController>().getCurrentUser();
+                      return Text(
+                        "${user.firstName} ${user.lastName}",
+                        style: const TextStyle(
                           fontSize: 22,
                           color: Color(0XFFB2B2B2),
-                          fontWeight: FontWeight.bold),
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }),
 
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
                     // Weight, Age, Height in rounded corner boxes
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildInfoCard('Weight', '56 kg'),
-                        _buildInfoCard('Age', '23 Year'),
-                        _buildInfoCard('Height', '164 cm'),
-                      ],
-                    ),
+                    Obx(() {
+                      final user = Get.find<AuthController>().getCurrentUser();
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildInfoCard('Weight', '${user.weight} kg'),
+                          _buildInfoCard('Age', '${user.age} Year'),
+                          _buildInfoCard('Height', '${user.height} cm'),
+                        ],
+                      );
+                    }),
 
                     SizedBox(height: 20),
 
@@ -75,8 +81,8 @@ class RegistrationView extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  const ManageAccountScreen()),
+                            builder: (context) => const ManageAccountScreen(),
+                          ),
                         );
                       },
                     ),
@@ -88,7 +94,8 @@ class RegistrationView extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => NutritionGoalsScreen()),
+                            builder: (context) => NutritionGoalsScreen(),
+                          ),
                         );
                       },
                     ),
@@ -99,7 +106,8 @@ class RegistrationView extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ManageAccountScreen()),
+                            builder: (context) => ManageAccountScreen(),
+                          ),
                         );
                       },
                     ),
@@ -111,7 +119,8 @@ class RegistrationView extends StatelessWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text(
-                                'This is a demo app. Diet preferences are simulated.'),
+                              'This is a demo app. Diet preferences are simulated.',
+                            ),
                             backgroundColor: Colors.orange,
                           ),
                         );
@@ -137,15 +146,9 @@ class RegistrationView extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
-            title,
-            style: TextStyle(color: Colors.white, fontSize: 16),
-          ),
+          Text(title, style: TextStyle(color: Colors.white, fontSize: 16)),
           SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          ),
+          Text(value, style: TextStyle(color: Colors.white, fontSize: 18)),
         ],
       ),
     );
