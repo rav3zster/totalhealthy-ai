@@ -26,6 +26,22 @@ class NotificationsFirestoreService {
     await _firestore.collection(_collection).add(notification.toJson());
   }
 
+  /// Stream of notifications sent by a user (for tracking pending invitations)
+  Stream<List<AppNotification>> getSentInvitationsStream(String senderId) {
+    return _firestore
+        .collection(_collection)
+        .where('senderId', isEqualTo: senderId)
+        .where('status', isEqualTo: 'pending')
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            final data = Map<String, dynamic>.from(doc.data());
+            data['id'] = doc.id;
+            return AppNotification.fromJson(data);
+          }).toList();
+        });
+  }
+
   /// Update notification status (accept/reject)
   Future<void> updateNotificationStatus(
     String notificationId,

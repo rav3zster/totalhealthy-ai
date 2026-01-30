@@ -266,32 +266,42 @@ class GroupDetailsScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Align(
             alignment: Alignment.centerLeft,
-            child: ElevatedButton(
-              onPressed: () {
-                controller.inviteUser(
-                  member,
-                  groupId: group['id'],
-                  groupName: group['name'],
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFC2D86A),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+            child: Obx(() {
+              final isPending = controller.sentInvitations.any(
+                (n) => n.recipientId == member.id && n.groupId == group['id'],
+              );
+
+              return ElevatedButton(
+                onPressed: isPending
+                    ? null
+                    : () {
+                        controller.inviteUser(
+                          member,
+                          groupId: group['id'],
+                          groupName: group['name'],
+                        );
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isPending
+                      ? Colors.grey
+                      : const Color(0xFFC2D86A),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+                child: Text(
+                  isPending ? 'Pending' : 'Add Client',
+                  style: TextStyle(
+                    color: isPending ? Colors.white70 : Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              child: const Text(
-                'Add Client',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+              );
+            }),
           ),
         ],
       ),

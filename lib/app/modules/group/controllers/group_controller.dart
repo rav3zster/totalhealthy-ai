@@ -17,6 +17,8 @@ class GroupController extends GetxController {
 
   final groupData = <GroupModel>[].obs;
   final users = <UserModel>[].obs; // Real user list
+  final sentInvitations =
+      <AppNotification>[].obs; // Invitations sent by current user
   final isLoading = true.obs;
   final totalUsers = 0.obs;
 
@@ -30,6 +32,14 @@ class GroupController extends GetxController {
   void _initUsers() {
     totalUsers.bindStream(_usersService.getTotalUsersCountStream());
     users.bindStream(_usersService.getUsersStream());
+
+    final authController = Get.find<AuthController>();
+    final currentUser = authController.firebaseUser.value;
+    if (currentUser != null) {
+      sentInvitations.bindStream(
+        _notificationsService.getSentInvitationsStream(currentUser.uid),
+      );
+    }
   }
 
   void _initGroups() {
@@ -97,6 +107,16 @@ class GroupController extends GetxController {
     String? groupName,
   }) async {
     try {
+      // Prevent duplicate pending invitations
+      final isAlreadyPending = sentInvitations.any(
+        (n) => n.recipientId == user.id && n.groupId == groupId,
+      );
+
+      if (isAlreadyPending) {
+        Get.snackbar("Info", "Invitation is already pending.");
+        return;
+      }
+
       final authController = Get.find<AuthController>();
       final sender = authController.getCurrentUser();
 

@@ -36,4 +36,12 @@ class GroupsFirestoreService {
         .map((doc) => GroupModel.fromJson(doc.data(), docId: doc.id))
         .toList();
   }
+
+  /// Add a user to a group
+  Future<void> addMemberToGroup(String groupId, String userId) async {
+    await _firestore.collection(_collection).doc(groupId).update({
+      'members_list': FieldValue.arrayUnion([userId]),
+      'member_count': FieldValue.increment(1),
+    });
+  }
 }

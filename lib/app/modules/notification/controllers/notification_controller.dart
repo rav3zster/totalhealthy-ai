@@ -3,10 +3,12 @@ import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:totalhealthy/app/data/models/notification_model.dart';
 import 'package:totalhealthy/app/data/services/notifications_firestore_service.dart';
+import 'package:totalhealthy/app/data/services/groups_firestore_service.dart';
 
 class NotificationController extends GetxController {
   final NotificationsFirestoreService _notificationsService =
       NotificationsFirestoreService();
+  final GroupsFirestoreService _groupsService = GroupsFirestoreService();
 
   final notifications = <AppNotification>[].obs;
   final isLoading = true.obs;
@@ -34,11 +36,10 @@ class NotificationController extends GetxController {
   Future<void> acceptInvitation(AppNotification notification) async {
     try {
       if (notification.groupId != null) {
-        // Here you would add the user to the group in Firestore
-        // For now, we'll just mark it as accepted
-        await _notificationsService.updateNotificationStatus(
-          notification.id,
-          NotificationStatus.accepted,
+        // Add the user to the group in Firestore
+        await _groupsService.addMemberToGroup(
+          notification.groupId!,
+          notification.recipientId,
         );
 
         Get.snackbar(
@@ -48,6 +49,9 @@ class NotificationController extends GetxController {
           colorText: Colors.white,
         );
       }
+
+      // Clear the notification after accepting
+      await deleteNotification(notification.id);
     } catch (e) {
       Get.snackbar(
         "Error",
@@ -60,10 +64,9 @@ class NotificationController extends GetxController {
 
   Future<void> rejectInvitation(AppNotification notification) async {
     try {
-      await _notificationsService.updateNotificationStatus(
-        notification.id,
-        NotificationStatus.rejected,
-      );
+      // Clear the notification after rejecting
+      await deleteNotification(notification.id);
+
       Get.snackbar(
         "Information",
         "Invitation rejected",
