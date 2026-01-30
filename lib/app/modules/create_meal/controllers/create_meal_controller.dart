@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/base/controllers/auth_controller.dart';
-import '../../../routes/app_pages.dart';
-import '../../../data/services/mock_api_service.dart';
+import '../../../data/models/meal_model.dart';
+import '../../../data/services/meals_firestore_service.dart';
 
 class CreateMealController extends GetxController {
+  final MealsFirestoreService _mealsService = MealsFirestoreService();
   final fullNameController = TextEditingController();
   final descriptionController = TextEditingController();
   final kcalController = TextEditingController();
@@ -29,66 +30,114 @@ class CreateMealController extends GetxController {
   GlobalKey<FormState> key = GlobalKey<FormState>();
 
   var isLoading = false.obs;
-//  {"name": "string", "amount": "string", "unit": "string"}
+  //  {"name": "string", "amount": "string", "unit": "string"}
   submitUser(context, userId) async {
-    DateTime staticDate = DateTime(2024, 10, 15); // Static date: October 15, 2024
-    int timestamp = staticDate.millisecondsSinceEpoch;
     try {
-      String id = userId.toString();
       if (key.currentState!.validate()) {
         isLoading.value = true;
 
-        Map<String, dynamic> data = {
-          "groupId": Get.find<AuthController>().groupgetId(),
-          "userId": id,
-          "from_date": "2024-10-29T10:08:30.384Z",
-          "to_date": "2024-10-29T10:08:30.384Z",
-          "imageUrl": "https://example.com/",
-          "categorys": selectedCategories,
-          "name": fullNameController.text.trim(),
-          "description": descriptionController.text.trim(),
-          "ingredients": ingredientControllers,
-          "created_at": "$timestamp",
-          "kcal": kcalController.text.trim(),
-          "carbs": carbsController.text.trim(),
-          "protein": proteinController.text.trim(),
-          "fat": fatsController.text.trim(),
-        };
+        final authController = Get.find<AuthController>();
+        final groupId = authController.groupgetId();
+        final finalUserId = (userId == null || userId.toString().isEmpty)
+            ? (authController.firebaseUser.value?.uid ?? "unknown_user")
+            : userId.toString();
 
-        print(data);
+        // Clean ingredients: Extract text from controllers and convert to plain list
+        final List<IngredientModel> cleanIngredients = ingredientControllers
+            .map((item) {
+              return IngredientModel(
+                name: item["name"] is TextEditingController
+                    ? (item["name"] as TextEditingController).text
+                    : item["name"].toString(),
+                amount: item["amount"] is TextEditingController
+                    ? (item["amount"] as TextEditingController).text
+                    : item["amount"].toString(),
+                unit: item["unit"] is TextEditingController
+                    ? (item["unit"] as TextEditingController).text
+                    : (item["unit"]?.toString() ?? ""),
+              );
+            })
+            .toList();
 
-        // Use mock API instead of real API
-        final response = await MockApiService.createMeal(data);
-        
-        if (response['statusCode'] == 200) {
-          Get.toNamed("${Routes.UserDiet}?id=$userId");
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Create Meal Successful!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Meals not created'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+        final meal = MealModel(
+          userId: finalUserId,
+          groupId: groupId,
+          name: fullNameController.text.trim(),
+          description: descriptionController.text.trim(),
+          kcal: kcalController.text.trim().isEmpty
+              ? "0"
+              : kcalController.text.trim(),
+          carbs: carbsController.text.trim().isEmpty
+              ? "0"
+              : carbsController.text.trim(),
+          protein: proteinController.text.trim().isEmpty
+              ? "0"
+              : proteinController.text.trim(),
+          fat: fatsController.text.trim().isEmpty
+              ? "0"
+              : fatsController.text.trim(),
+          categories: selectedCategories.toList(),
+          imageUrl:
+              "https://example.com/meal_placeholder.png", // Default placeholder
+          ingredients: cleanIngredients,
+          instructions: "No instructions provided", // Default or empty
+          createdAt: DateTime.now(),
+          prepTime: "15 min", // Default value
+          difficulty: "Easy", // Default value
+        );
+
+        print("Submitting Meal to Firestore: ${meal.toJson()}");
+
+        await _mealsService.addMeal(meal);
+
+        Get.back(); // Go back to the previous screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Meal Created Successfully in Firestore!'),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
     } catch (e) {
-      print(e);
+      print("Error in submitUser: $e");
+      String errorMessage = 'Error creating meal: $e';
+
+      if (e.toString().contains('permission-denied')) {
+        errorMessage =
+            'Permission Denied: Please check your Firestore Security Rules in the Firebase Console and ensure you have write access to the "meals" collection.';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+          action: SnackBarAction(
+            label: 'HELP',
+            textColor: Colors.white,
+            onPressed: () {
+              Get.defaultDialog(
+                title: "Permission Error",
+                middleText:
+                    "This error usually means your Firebase Firestore rules are blocking the save operation. Please ensure authenticated users have write access to the 'meals' collection.",
+                textConfirm: "OK",
+                confirmTextColor: Colors.white,
+                onConfirm: () => Get.back(),
+              );
+            },
+          ),
+        ),
+      );
     } finally {
       isLoading.value = false;
     }
-    // if (_formKey.currentState!.validate()) {
   }
 
   void addIngredientRow() {
     ingredientControllers.add({
       'name': TextEditingController(),
       'amount': TextEditingController(),
+      'unit': TextEditingController(),
     });
   }
 
@@ -171,7 +220,8 @@ class CreateMealController extends GetxController {
     print(ingredientControllers);
     for (var controller in ingredientControllers) {
       print(
-          "Name: ${controller['name']!.text}, Amount: ${controller['amount']!.text}");
+        "Name: ${controller['name']!.text}, Amount: ${controller['amount']!.text}",
+      );
     }
     if (calculateAutomatically.value) {
       print("Nutritional Info: Calculated Automatically");

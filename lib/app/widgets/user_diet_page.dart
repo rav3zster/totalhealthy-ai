@@ -26,12 +26,11 @@ class UserDietPage extends StatefulWidget {
 }
 
 class _UserDietPageState extends State<UserDietPage> {
-  var userData = {};
-
+  Map userData = {};
   @override
   void initState() {
     super.initState();
-    userData = GetStorage().read("clientData");
+    userData = GetStorage().read("clientData") ?? {};
     categories = Get.find<AuthController>().categoriesGet();
 
     getMeals();
@@ -51,7 +50,7 @@ class _UserDietPageState extends State<UserDietPage> {
         Get.find<AuthController>().groupgetId(),
         "admin",
       );
-      
+
       if (response['statusCode'] == 200) {
         setState(() {
           dataList = List<Map<String, dynamic>>.from(response['data']);
@@ -96,10 +95,10 @@ class _UserDietPageState extends State<UserDietPage> {
       });
 
       var data = generateJson();
-      
+
       // Use mock API instead of real API
       final response = await MockApiService.createMeal(data);
-      
+
       if (response['statusCode'] == 200) {
         setState(() {
           isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
@@ -138,9 +137,8 @@ class _UserDietPageState extends State<UserDietPage> {
   void filterRecipesBySingleCategory(String selectedCategory) {
     setState(() {
       filteredRecipes = dataList.where((recipe) {
-        final categories = recipe["categorys"] as List<dynamic>;
-
-        return categories.contains(selectedCategory);
+        final categoriesList = recipe["categorys"] as List<dynamic>? ?? [];
+        return categoriesList.contains(selectedCategory);
       }).toList();
     });
     print(filteredRecipes);
@@ -150,24 +148,19 @@ class _UserDietPageState extends State<UserDietPage> {
   var userController = Get.find<UserDietScreenController>();
   @override
   Widget build(BuildContext context) {
+    final currentUser = Get.find<AuthController>().userdataget();
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: selectedMealIds.isNotEmpty
           ? isGetLoading
-              ? Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                  ),
-                )
-              : FloatingActionButton(
-                  backgroundColor: AppColors.chineseGreen,
-                  child: Icon(
-                    Icons.done,
-                    color: AppColors.cardbackground,
-                  ),
-                  onPressed: () {
-                    postHistory();
-                  })
+                ? Center(child: CircularProgressIndicator(color: Colors.white))
+                : FloatingActionButton(
+                    backgroundColor: AppColors.chineseGreen,
+                    child: Icon(Icons.done, color: AppColors.cardbackground),
+                    onPressed: () {
+                      postHistory();
+                    },
+                  )
           : SizedBox(),
       backgroundColor: AppColors.black,
       appBar: AppBar(
@@ -177,25 +170,22 @@ class _UserDietPageState extends State<UserDietPage> {
         title: Row(
           children: [
             IconButton(
-                onPressed: () {
-                  Get.toNamed(Routes.TrainerDashboard);
-                },
-                icon: Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.white,
-                )),
+              onPressed: () {
+                Get.toNamed(Routes.TrainerDashboard);
+              },
+              icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+            ),
             ProfileCard(),
           ],
         ),
         actions: [
           Container(
-            decoration:
-                BoxDecoration(color: Color(0XFF242424), shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: Color(0XFF242424),
+              shape: BoxShape.circle,
+            ),
             child: IconButton(
-              icon: Icon(
-                Icons.notifications_none,
-                color: Colors.white,
-              ),
+              icon: Icon(Icons.notifications_none, color: Colors.white),
               onPressed: () {
                 Get.toNamed('/notification?id=${widget.id}');
               },
@@ -208,8 +198,10 @@ class _UserDietPageState extends State<UserDietPage> {
         children: [
           ClientCard(
             progress: 56,
-            email: "${userData["user_details"]["email"]}",
-            name: "${userData["user_details"]["name"]}",
+            email:
+                "${userData["user_details"] != null ? userData["user_details"]["email"] : (currentUser != null ? currentUser["email"] : "")}",
+            name:
+                "${userData["user_details"] != null ? userData["user_details"]["name"] : (currentUser != null ? currentUser["username"] : "")}",
           ),
           SizedBox(height: 20),
           AddMealButton(id: widget.id),
@@ -227,7 +219,8 @@ class _UserDietPageState extends State<UserDietPage> {
                       selectedIndex = index;
                     });
                     filterRecipesBySingleCategory(
-                        data["label_name"].toString());
+                      data["label_name"].toString(),
+                    );
                   },
                   child: Padding(
                     padding: EdgeInsets.only(left: 10),
@@ -236,10 +229,10 @@ class _UserDietPageState extends State<UserDietPage> {
                       icon: index == 0
                           ? Icons.breakfast_dining
                           : index == 1
-                              ? Icons.lunch_dining
-                              : index == 2
-                                  ? Icons.dinner_dining
-                                  : Icons.food_bank,
+                          ? Icons.lunch_dining
+                          : index == 2
+                          ? Icons.dinner_dining
+                          : Icons.food_bank,
                       active: index == selectedIndex,
                     ),
                   ),
@@ -251,59 +244,57 @@ class _UserDietPageState extends State<UserDietPage> {
           SizedBox(height: 20),
 
           isLoading
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
+              ? Center(child: CircularProgressIndicator())
               : filteredRecipes.isEmpty
-                  ? Center(
-                      child: Column(
-                        children: [
-                          // Add the image asset with black background
-                          Image.asset(
-                            'assets/no_diet.png',
-                            height: 250,
-                            width: 250,
-                            fit: BoxFit.cover,
-                          ),
-                        ],
+              ? Center(
+                  child: Column(
+                    children: [
+                      // Add the image asset with black background
+                      Image.asset(
+                        'assets/no_diet.png',
+                        height: 250,
+                        width: 250,
+                        fit: BoxFit.cover,
                       ),
-                    )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: filteredRecipes.length,
-                      itemBuilder: (context, index) {
-                        var data = filteredRecipes[index];
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: filteredRecipes.length,
+                  itemBuilder: (context, index) {
+                    var data = filteredRecipes[index];
 
-                        return Padding(
-                          padding: EdgeInsets.only(bottom: 15),
-                          child: NutritionalCard(
-                            role: Get.find<AuthController>().roleGet(),
-                            isChecked: isCheck[index] ?? false,
-                            onChanged: (value) {
-                              setState(() {
-                                isCheck[index] = value ?? false;
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 15),
+                      child: NutritionalCard(
+                        role: Get.find<AuthController>().roleGet(),
+                        isChecked: isCheck[index] ?? false,
+                        onChanged: (value) {
+                          setState(() {
+                            isCheck[index] = value ?? false;
 
-                                if (isCheck[index] == true) {
-                                  selectedMealIds.add(data['_id'] ?? '0');
-                                } else {
-                                  selectedMealIds.remove(data['_id'] ?? '0');
-                                }
-                                print(selectedMealIds);
-                              });
-                            },
-                            data: data,
-                            id: widget.id,
-                            title: "${data["name"] ?? "Not Found"}",
-                            kcal: "${data["kcal"] ?? "0"}",
-                            weight: 80,
-                            protein: "${data["protein"] ?? "0"}",
-                            fat: "${data["fat"] ?? "0"}",
-                            carbs: "${data["carbs"] ?? "0"}",
-                          ),
-                        );
-                      },
-                    ),
+                            if (isCheck[index] == true) {
+                              selectedMealIds.add(data['_id'] ?? '0');
+                            } else {
+                              selectedMealIds.remove(data['_id'] ?? '0');
+                            }
+                            print(selectedMealIds);
+                          });
+                        },
+                        data: data,
+                        id: widget.id,
+                        title: "${data["name"] ?? "Not Found"}",
+                        kcal: "${data["kcal"] ?? "0"}",
+                        weight: 80,
+                        protein: "${data["protein"] ?? "0"}",
+                        fat: "${data["fat"] ?? "0"}",
+                        carbs: "${data["carbs"] ?? "0"}",
+                      ),
+                    );
+                  },
+                ),
 
           // SizedBox(height: 15,),
           // NutritionalCard(
@@ -342,9 +333,7 @@ class _UserDietPageState extends State<UserDietPage> {
           //   carbs: 80,
           // ),
           // SizedBox(height: 15,)
-          SizedBox(
-            height: 50,
-          ),
+          SizedBox(height: 50),
         ],
       ),
     );

@@ -16,43 +16,58 @@ class IngredientInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin:
-          EdgeInsets.only(bottom: 10), // Add margin at the bottom for spacing
+      margin: EdgeInsets.only(
+        bottom: 10,
+      ), // Add margin at the bottom for spacing
       child: Row(
         children: [
           Expanded(
             child: TextField(
+              controller:
+                  controller.ingredientControllers[index]["name"]
+                      is TextEditingController
+                  ? controller.ingredientControllers[index]["name"]
+                        as TextEditingController
+                  : null,
               onChanged: (value) {
-                controller.ingredientControllers[index]["name"] = value;
+                if (controller.ingredientControllers[index]["name"]
+                    is! TextEditingController) {
+                  controller.ingredientControllers[index]["name"] = value;
+                }
               },
               maxLines: 1,
               decoration: InputDecoration(
-                labelText: "Describe the Meal",
+                labelText: "Name",
                 labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
                 filled: true,
                 fillColor: Color(0XFF242522),
                 border: InputBorder.none,
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  borderSide: BorderSide(
-                      color: Colors
-                          .transparent), // Transparent border when focused
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  borderSide: BorderSide(
-                      color: Colors
-                          .transparent), // Transparent border when enabled
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
               ),
             ),
           ),
           SizedBox(width: 10),
           Container(
-            width: 80, // Set width for the quantity field to make it smaller
+            width: 80,
             child: TextField(
+              controller:
+                  controller.ingredientControllers[index]["amount"]
+                      is TextEditingController
+                  ? controller.ingredientControllers[index]["amount"]
+                        as TextEditingController
+                  : null,
               onChanged: (value) {
-                controller.ingredientControllers[index]["amount"] = value;
+                if (controller.ingredientControllers[index]["amount"]
+                    is! TextEditingController) {
+                  controller.ingredientControllers[index]["amount"] = value;
+                }
               },
               maxLines: 1,
               decoration: InputDecoration(
@@ -62,45 +77,46 @@ class IngredientInput extends StatelessWidget {
                 fillColor: Color(0XFF242522),
                 border: InputBorder.none,
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  borderSide: BorderSide(
-                      color: Colors
-                          .transparent), // Transparent border when focused
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  borderSide: BorderSide(
-                      color: Colors
-                          .transparent), // Transparent border when enabled
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
               ),
             ),
           ),
-          SizedBox(width: 10), // Space between the two fields
+          SizedBox(width: 10),
           Container(
-            width: 80, // Set width for the quantity field to make it smaller
+            width: 80,
             child: TextField(
+              controller:
+                  controller.ingredientControllers[index]["unit"]
+                      is TextEditingController
+                  ? controller.ingredientControllers[index]["unit"]
+                        as TextEditingController
+                  : null,
               onChanged: (value) {
-                controller.ingredientControllers[index]["unit"] = value;
+                if (controller.ingredientControllers[index]["unit"]
+                    is! TextEditingController) {
+                  controller.ingredientControllers[index]["unit"] = value;
+                }
               },
               maxLines: 1,
               decoration: InputDecoration(
-                labelText: "Q-Ty",
+                labelText: "Unit",
                 labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
                 filled: true,
                 fillColor: Color(0XFF242522),
                 border: InputBorder.none,
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  borderSide: BorderSide(
-                      color: Colors
-                          .transparent), // Transparent border when focused
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  borderSide: BorderSide(
-                      color: Colors
-                          .transparent), // Transparent border when enabled
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.transparent),
                 ),
               ),
             ),

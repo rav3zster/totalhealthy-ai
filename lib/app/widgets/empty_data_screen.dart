@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
+import '../routes/app_pages.dart';
 import '../core/base/constants/appcolor.dart';
 import 'profile_card.dart';
 
@@ -107,13 +108,6 @@ class EmptyDataScreen extends StatelessWidget {
               // No Data Illustration
               Column(
                 children: [
-                  // Placeholder for illustration - using Icon or Text for now as I don't have the asset path
-                  Icon(
-                    Icons.question_mark_rounded,
-                    size: 80,
-                    color: Colors.lightGreenAccent.withOpacity(0.5),
-                  ),
-                  const SizedBox(height: 20),
                   Text(
                     "No Diet Plan\nFound!",
                     textAlign: TextAlign.center,
@@ -133,21 +127,29 @@ class EmptyDataScreen extends StatelessWidget {
                 "Create Manually",
                 "Create",
                 Icons.edit_note,
-                () {},
+                () {
+                  Get.toNamed(
+                    "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
+                  );
+                },
               ),
               const SizedBox(height: 15),
               _buildActionButtonRow(
                 "Generate Using AI",
                 "Generate",
                 Icons.auto_awesome,
-                () {},
+                () {
+                  Get.toNamed(Routes.GENERATE_AI);
+                },
               ),
               const SizedBox(height: 15),
               _buildActionButtonRow(
                 "Copy From Existing",
                 "Copy",
                 Icons.copy,
-                () {},
+                () {
+                  // TODO: Implement Copy From Existing logic if route exists
+                },
               ),
               const SizedBox(height: 20),
             ],

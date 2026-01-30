@@ -17,9 +17,19 @@ class CreateMealPage extends StatefulWidget {
   State<CreateMealPage> createState() => _CreateMealPageState();
 }
 
-List<int> ingredients = [];
-
 class _CreateMealPageState extends State<CreateMealPage> {
+  List<int> ingredients = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize ingredients list based on existing controllers in case of rebuilds
+    ingredients = List.generate(
+      widget.controller.ingredientControllers.length,
+      (index) => index,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +49,8 @@ class _CreateMealPageState extends State<CreateMealPage> {
               MainAxisAlignment.spaceBetween, // Distribute space evenly
           children: [
             SizedBox(
-                width: 20), // Adjust width to create space from the back icon
+              width: 20,
+            ), // Adjust width to create space from the back icon
             Expanded(
               child: Text(
                 'Creating A Meal',
@@ -48,7 +59,8 @@ class _CreateMealPageState extends State<CreateMealPage> {
               ),
             ),
             SizedBox(
-                width: 50), // Adjust width to create space on the right side
+              width: 50,
+            ), // Adjust width to create space on the right side
           ],
         ),
       ),
@@ -78,8 +90,9 @@ class _CreateMealPageState extends State<CreateMealPage> {
                     Container(
                       width: double.infinity, // Full width
                       height: 150, // Fixed height to match the image
-                      color: Colors.black
-                          .withOpacity(0.3), // Semi-transparent black overlay
+                      color: Colors.black.withOpacity(
+                        0.3,
+                      ), // Semi-transparent black overlay
                     ),
 
                     Positioned(
@@ -91,8 +104,9 @@ class _CreateMealPageState extends State<CreateMealPage> {
                           color: Colors.white, // Circle color
                           shape: BoxShape.circle, // Make it circular
                           border: Border.all(
-                              color: Colors.white,
-                              width: 3), // White outline (thicker)
+                            color: Colors.white,
+                            width: 3,
+                          ), // White outline (thicker)
                         ),
                         child: Center(
                           child: Icon(
@@ -107,13 +121,8 @@ class _CreateMealPageState extends State<CreateMealPage> {
                 ),
               ),
               SizedBox(height: 16),
-              Text(
-                "Full Name",
-                style: TextStyle(color: Color(0XFFDBDBDB)),
-              ),
-              SizedBox(
-                height: 10,
-              ),
+              Text("Full Name", style: TextStyle(color: Color(0XFFDBDBDB))),
+              SizedBox(height: 10),
               TextField(
                 controller: widget.controller.fullNameController,
                 decoration: InputDecoration(
@@ -125,25 +134,20 @@ class _CreateMealPageState extends State<CreateMealPage> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8), // Rounded corners
                     borderSide: BorderSide(
-                        color: Colors
-                            .transparent), // Transparent border when focused
+                      color: Colors.transparent,
+                    ), // Transparent border when focused
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8), // Rounded corners
                     borderSide: BorderSide(
-                        color: Colors
-                            .transparent), // Transparent border when enabled
+                      color: Colors.transparent,
+                    ), // Transparent border when enabled
                   ),
                 ),
               ),
               SizedBox(height: 16),
-              Text(
-                "Category",
-                style: TextStyle(color: Color(0XFFDBDBDB)),
-              ),
-              SizedBox(
-                height: 10,
-              ),
+              Text("Category", style: TextStyle(color: Color(0XFFDBDBDB))),
+              SizedBox(height: 10),
               Container(
                 decoration: BoxDecoration(
                   color: Color(0XFF242522), // Background color for the box
@@ -167,17 +171,21 @@ class _CreateMealPageState extends State<CreateMealPage> {
                       children: widget.controller.categories.map((category) {
                         return Obx(() {
                           return CheckboxListTile(
-                            title: Text(category,
-                                style: TextStyle(color: Colors.white)),
+                            title: Text(
+                              category,
+                              style: TextStyle(color: Colors.white),
+                            ),
                             value: widget.controller.selectedCategories
                                 .contains(category),
                             onChanged: (selected) {
                               if (selected == true) {
-                                widget.controller.selectedCategories
-                                    .add(category);
+                                widget.controller.selectedCategories.add(
+                                  category,
+                                );
                               } else {
-                                widget.controller.selectedCategories
-                                    .remove(category);
+                                widget.controller.selectedCategories.remove(
+                                  category,
+                                );
                               }
                             },
                             controlAffinity: ListTileControlAffinity.leading,
@@ -190,10 +198,7 @@ class _CreateMealPageState extends State<CreateMealPage> {
                 ),
               ),
               SizedBox(height: 16),
-              Text(
-                "Description",
-                style: TextStyle(color: Color(0XFFDBDBDB)),
-              ),
+              Text("Description", style: TextStyle(color: Color(0XFFDBDBDB))),
               SizedBox(height: 10),
               TextField(
                 controller: widget.controller.descriptionController,
@@ -207,41 +212,41 @@ class _CreateMealPageState extends State<CreateMealPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8), // Rounded corners
                     borderSide: BorderSide(
-                        color: Colors.transparent), // Transparent border
+                      color: Colors.transparent,
+                    ), // Transparent border
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8), // Rounded corners
                     borderSide: BorderSide(
-                        color: Colors.transparent), // Transparent border
+                      color: Colors.transparent,
+                    ), // Transparent border
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8), // Rounded corners
                     borderSide: BorderSide(
-                        color: Colors.transparent), // Transparent border
+                      color: Colors.transparent,
+                    ), // Transparent border
                   ),
                 ),
               ),
               SizedBox(height: 16),
-              Text('Ingredients',
-                  style: TextStyle(
-                    color: Color(0XFFDBDBDB),
-                  )),
-              SizedBox(
-                height: 10,
-              ),
+              Text('Ingredients', style: TextStyle(color: Color(0XFFDBDBDB))),
+              SizedBox(height: 10),
               ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemCount: ingredients.length,
                 itemBuilder: (context, index) {
                   return IngredientInput(
-                      index: index,
-                      controller: widget.controller,
-                      onRemove: () {
-                        setState(() {
-                          ingredients.removeAt(index);
-                        });
+                    index: index,
+                    controller: widget.controller,
+                    onRemove: () {
+                      setState(() {
+                        ingredients.removeAt(index);
                       });
+                      widget.controller.removeIngredientRow(index);
+                    },
+                  );
                 },
               ),
               SizedBox(height: 12),
@@ -253,8 +258,7 @@ class _CreateMealPageState extends State<CreateMealPage> {
                           ? ingredients.insert(0, 0)
                           : ingredients.add(ingredients.length - 1 + 1);
                     });
-                    widget.controller.ingredientControllers
-                        .add({"name": "", "amount": "", "unit": ""});
+                    widget.controller.addIngredientRow();
                   },
                   icon: Icon(Icons.add),
                   label: Text("Add ingredient"),
@@ -268,8 +272,10 @@ class _CreateMealPageState extends State<CreateMealPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Calculate Automatically",
-                      style: TextStyle(color: Color(0XFFDBDBDB))),
+                  Text(
+                    "Calculate Automatically",
+                    style: TextStyle(color: Color(0XFFDBDBDB)),
+                  ),
                   Obx(() {
                     return Switch(
                       value: widget.controller.calculateAutomatically.value,
@@ -279,11 +285,12 @@ class _CreateMealPageState extends State<CreateMealPage> {
                       activeColor:
                           Colors.greenAccent, // Color when the switch is on
                       inactiveTrackColor: Color(
-                          0XFF7E7E7E), // Track color when the switch is off
+                        0XFF7E7E7E,
+                      ), // Track color when the switch is off
                       inactiveThumbColor:
                           Colors.white, // Thumb color when the switch is off
                     );
-                  })
+                  }),
                 ],
               ),
               SizedBox(height: 10),
@@ -298,8 +305,9 @@ class _CreateMealPageState extends State<CreateMealPage> {
                             child: ReusableTextField(
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
-                                FilteringTextInputFormatter.allow(RegExp(
-                                    r'^[0-9]+$')), // Restricts input to digits
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'^[0-9]+$'),
+                                ), // Restricts input to digits
                               ],
                               controller: widget.controller.kcalController,
 
@@ -315,8 +323,9 @@ class _CreateMealPageState extends State<CreateMealPage> {
                             child: ReusableTextField(
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
-                                FilteringTextInputFormatter.allow(RegExp(
-                                    r'^[0-9]+$')), // Restricts input to digits
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'^[0-9]+$'),
+                                ), // Restricts input to digits
                               ],
                               labelText: "Carbs",
                               controller: widget.controller.carbsController,
@@ -334,8 +343,9 @@ class _CreateMealPageState extends State<CreateMealPage> {
                             child: ReusableTextField(
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
-                                FilteringTextInputFormatter.allow(RegExp(
-                                    r'^[0-9]+$')), // Restricts input to digits
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'^[0-9]+$'),
+                                ), // Restricts input to digits
                               ],
                               controller: widget.controller.proteinController,
 
@@ -348,8 +358,9 @@ class _CreateMealPageState extends State<CreateMealPage> {
                             child: ReusableTextField(
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
-                                FilteringTextInputFormatter.allow(RegExp(
-                                    r'^[0-9]+$')), // Restricts input to digits// Restricts input to digits
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'^[0-9]+$'),
+                                ), // Restricts input to digits// Restricts input to digits
                               ],
                               controller: widget.controller.fatsController,
                               // decoration: InputDecoration(
@@ -385,9 +396,7 @@ class _CreateMealPageState extends State<CreateMealPage> {
                             // print(widget.controller.ingredientControllers);
                           },
                           child: widget.controller.isLoading.value
-                              ? Center(
-                                  child: CircularProgressIndicator(),
-                                )
+                              ? Center(child: CircularProgressIndicator())
                               : Text(
                                   "Create Meal",
                                   style: TextStyle(fontSize: 17),
@@ -396,7 +405,9 @@ class _CreateMealPageState extends State<CreateMealPage> {
                             foregroundColor: Color(0XFF242522),
                             backgroundColor: Color(0XFFCDE26D),
                             padding: EdgeInsets.symmetric(
-                                horizontal: 50, vertical: 15),
+                              horizontal: 50,
+                              vertical: 15,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25),
                             ),
