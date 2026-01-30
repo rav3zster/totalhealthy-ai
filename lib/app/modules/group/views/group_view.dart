@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../controllers/group_controller.dart';
-import '../../../data/services/dummy_data_service.dart';
+import '../../../data/models/group_model.dart';
 import '../../../routes/app_pages.dart';
 
 class GroupView extends GetView<GroupController> {
-  GroupView({super.key});
+  const GroupView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final groups = DummyDataService.getDummyGroups();
-    
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -18,17 +17,17 @@ class GroupView extends GetView<GroupController> {
           children: [
             // Header
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+                    icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                     onPressed: () {
                       Get.offNamed(Routes.ClientDashboard);
                     },
                   ),
-                  SizedBox(width: 8),
-                  Text(
+                  const SizedBox(width: 8),
+                  const Text(
                     'Groups',
                     style: TextStyle(
                       color: Colors.white,
@@ -36,13 +35,13 @@ class GroupView extends GetView<GroupController> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   ElevatedButton.icon(
                     onPressed: () {
                       _showCreateGroupDialog(context);
                     },
-                    icon: Icon(Icons.add, color: Colors.black, size: 20),
-                    label: Text(
+                    icon: const Icon(Icons.add, color: Colors.black, size: 20),
+                    label: const Text(
                       'Add Group',
                       style: TextStyle(
                         color: Colors.black,
@@ -50,44 +49,74 @@ class GroupView extends GetView<GroupController> {
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFC2D86A),
+                      backgroundColor: const Color(0xFFC2D86A),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             // Groups List
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                itemCount: groups.length,
-                itemBuilder: (context, index) {
-                  final group = groups[index];
-                  return _buildGroupCard(group);
-                },
-              ),
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (controller.groupData.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.group_off,
+                          size: 64,
+                          color: Colors.white24,
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          "No groups found.\nCreate one to get started!",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white54, fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: controller.groupData.length,
+                  itemBuilder: (context, index) {
+                    final group = controller.groupData[index];
+                    return _buildGroupCard(group);
+                  },
+                );
+              }),
             ),
           ],
         ),
       ),
     );
   }
-  
-  Widget _buildGroupCard(Map<String, dynamic> group) {
+
+  Widget _buildGroupCard(GroupModel group) {
     return GestureDetector(
       onTap: () {
-        Get.toNamed(Routes.GROUP_DETAILS, arguments: group);
+        Get.toNamed(Routes.GROUP_DETAILS, arguments: group.toJson());
       },
       child: Container(
-        margin: EdgeInsets.only(bottom: 16),
-        padding: EdgeInsets.all(20),
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Color(0xFF2A2A2A),
+          color: const Color(0xFF2A2A2A),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -95,61 +124,51 @@ class GroupView extends GetView<GroupController> {
           children: [
             // Group Name
             Text(
-              group['name'] ?? 'Group Name',
-              style: TextStyle(
+              group.name,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 8),
-            
+            const SizedBox(height: 8),
+
             // Description
             Text(
-              group['description'] ?? 'Group description',
-              style: TextStyle(
+              group.description,
+              style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 14,
                 height: 1.4,
               ),
             ),
-            SizedBox(height: 16),
-            
+            const SizedBox(height: 16),
+
             // Created Date
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.calendar_today,
                   color: Color(0xFFC2D86A),
                   size: 16,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
-                  'Created On: ${group['createdDate'] ?? 'Unknown'}',
-                  style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 12,
-                  ),
+                  'Created On: ${DateFormat('MMM dd, yyyy').format(group.createdAt)}',
+                  style: const TextStyle(color: Colors.white54, fontSize: 12),
                 ),
               ],
             ),
-            SizedBox(height: 8),
-            
+            const SizedBox(height: 8),
+
             // Total Members
             Row(
               children: [
-                Icon(
-                  Icons.people,
-                  color: Color(0xFFC2D86A),
-                  size: 16,
-                ),
-                SizedBox(width: 8),
+                const Icon(Icons.people, color: Color(0xFFC2D86A), size: 16),
+                const SizedBox(width: 8),
                 Text(
-                  'Total Members: ${group['memberCount'] ?? 0} Members',
-                  style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 12,
-                  ),
+                  'Total Members: ${group.memberCount} Members',
+                  style: const TextStyle(color: Colors.white54, fontSize: 12),
                 ),
               ],
             ),
@@ -158,16 +177,16 @@ class GroupView extends GetView<GroupController> {
       ),
     );
   }
-  
+
   void _showCreateGroupDialog(BuildContext context) {
     final nameController = TextEditingController();
     final descriptionController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Color(0xFF2A2A2A),
-        title: Text(
+        backgroundColor: const Color(0xFF2A2A2A),
+        title: const Text(
           'Create New Group',
           style: TextStyle(color: Colors.white),
         ),
@@ -176,7 +195,7 @@ class GroupView extends GetView<GroupController> {
           children: [
             TextField(
               controller: nameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Group Name',
                 labelStyle: TextStyle(color: Colors.white70),
                 enabledBorder: UnderlineInputBorder(
@@ -186,12 +205,12 @@ class GroupView extends GetView<GroupController> {
                   borderSide: BorderSide(color: Color(0xFFC2D86A)),
                 ),
               ),
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               controller: descriptionController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Description',
                 labelStyle: TextStyle(color: Colors.white70),
                 enabledBorder: UnderlineInputBorder(
@@ -201,7 +220,7 @@ class GroupView extends GetView<GroupController> {
                   borderSide: BorderSide(color: Color(0xFFC2D86A)),
                 ),
               ),
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
               maxLines: 3,
             ),
           ],
@@ -209,28 +228,32 @@ class GroupView extends GetView<GroupController> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(
+            child: const Text(
               'Cancel',
               style: TextStyle(color: Colors.white70),
             ),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop();
-              Get.snackbar(
-                'Success',
-                'Group "${nameController.text}" created successfully!',
-                backgroundColor: Colors.green,
-                colorText: Colors.white,
-              );
+              final name = nameController.text.trim();
+              final desc = descriptionController.text.trim();
+
+              if (name.isNotEmpty) {
+                controller.createGroup(name, desc);
+                Navigator.of(context).pop();
+              } else {
+                Get.snackbar(
+                  "Error",
+                  "Group name is required",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFC2D86A),
+              backgroundColor: const Color(0xFFC2D86A),
             ),
-            child: Text(
-              'Create',
-              style: TextStyle(color: Colors.black),
-            ),
+            child: const Text('Create', style: TextStyle(color: Colors.black)),
           ),
         ],
       ),
