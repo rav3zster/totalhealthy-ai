@@ -137,7 +137,7 @@ class GroupDetailsScreen extends StatelessWidget {
                   itemCount: controller.users.length,
                   itemBuilder: (context, index) {
                     final member = controller.users[index];
-                    return _buildMemberCard(member);
+                    return _buildMemberCard(member, controller, group);
                   },
                 );
               }),
@@ -148,7 +148,11 @@ class GroupDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMemberCard(UserModel member) {
+  Widget _buildMemberCard(
+    UserModel member,
+    GroupController controller,
+    Map<String, dynamic> group,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -264,11 +268,10 @@ class GroupDetailsScreen extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: ElevatedButton(
               onPressed: () {
-                Get.snackbar(
-                  'Info',
-                  'Add Client functionality coming soon!',
-                  backgroundColor: Colors.blue,
-                  colorText: Colors.white,
+                controller.inviteUser(
+                  member,
+                  groupId: group['id'],
+                  groupName: group['name'],
                 );
               },
               style: ElevatedButton.styleFrom(

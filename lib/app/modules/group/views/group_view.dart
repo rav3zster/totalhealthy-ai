@@ -355,17 +355,12 @@ class GroupView extends GetView<GroupController> {
           ),
           IconButton(
             icon: const Icon(
-              Icons.chat_bubble_outline,
+              Icons.person_add_outlined,
               color: Color(0xFFC2D86A),
-              size: 20,
+              size: 24,
             ),
             onPressed: () {
-              Get.snackbar(
-                "Chat",
-                "Direct messaging coming soon!",
-                backgroundColor: Colors.blue,
-                colorText: Colors.white,
-              );
+              controller.inviteUser(user);
             },
           ),
         ],
