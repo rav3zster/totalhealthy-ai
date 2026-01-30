@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
+import 'package:totalhealthy/app/data/models/user_model.dart';
 import 'package:totalhealthy/app/data/models/group_model.dart';
 import 'package:totalhealthy/app/data/services/groups_firestore_service.dart';
 
+import 'package:totalhealthy/app/data/services/users_firestore_service.dart';
+
 class GroupController extends GetxController {
   final GroupsFirestoreService _groupsService = GroupsFirestoreService();
+  final UsersFirestoreService _usersService = UsersFirestoreService();
 
   final groupData = <GroupModel>[].obs;
+  final users = <UserModel>[].obs; // Real user list
   final isLoading = true.obs;
+  final totalUsers = 0.obs;
 
   @override
   void onInit() {
     super.onInit();
     _initGroups();
+    _initUsers();
+  }
+
+  void _initUsers() {
+    totalUsers.bindStream(_usersService.getTotalUsersCountStream());
+    users.bindStream(_usersService.getUsersStream());
   }
 
   void _initGroups() {

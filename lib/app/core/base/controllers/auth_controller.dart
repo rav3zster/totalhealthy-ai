@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../routes/app_pages.dart';
 import '../../../data/services/dummy_data_service.dart';
+import '../../../data/services/users_firestore_service.dart';
 import '../../../data/models/user_model.dart';
 import '../../../widgets/notification_services.dart';
 
@@ -87,13 +88,46 @@ class AuthController extends GetxController {
   }
 
   // Register
-  Future<bool> register(String email, String password) async {
+  Future<bool> register(
+    String email,
+    String password, {
+    String? name,
+    String? phone,
+  }) async {
     try {
       flowloader.value = true;
-      await _auth.createUserWithEmailAndPassword(
+      UserCredential credential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      if (credential.user != null) {
+        // Create user profile in Firestore
+        final newUser = UserModel(
+          id: credential.user!.uid,
+          email: email,
+          username: name ?? email.split('@')[0],
+          phone: phone ?? "",
+          firstName: name?.split(' ').first ?? "",
+          lastName: (name != null && name.contains(' '))
+              ? name.split(' ').last
+              : "",
+          profileImage: "",
+          age: 0,
+          weight: 0.0,
+          height: 0,
+          activityLevel: "Moderate",
+          goals: [],
+          joinDate: DateTime.now().toIso8601String(),
+        );
+
+        final usersService = UsersFirestoreService();
+        await usersService.createUserProfile(newUser);
+
+        // Save locally
+        await userdataStore(newUser.toJson());
+      }
+
       roleStore("user"); // Default role
       return true;
     } on FirebaseAuthException catch (e) {

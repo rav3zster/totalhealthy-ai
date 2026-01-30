@@ -166,9 +166,11 @@ class GroupView extends GetView<GroupController> {
               children: [
                 const Icon(Icons.people, color: Color(0xFFC2D86A), size: 16),
                 const SizedBox(width: 8),
-                Text(
-                  'Total Members: ${group.memberCount} Members',
-                  style: const TextStyle(color: Colors.white54, fontSize: 12),
+                Obx(
+                  () => Text(
+                    'Total Members: ${controller.totalUsers.value} Members',
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
                 ),
               ],
             ),

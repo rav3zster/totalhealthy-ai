@@ -39,6 +39,8 @@ class SignupScreenState extends State<SignupScreen> {
         bool success = await authController.register(
           emailController.text.trim(),
           passwordController.text.trim(),
+          name: nameController.text.trim(),
+          phone: phoneNumberController.text.trim(),
         );
 
         if (success) {

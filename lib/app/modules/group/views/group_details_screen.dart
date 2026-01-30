@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../data/services/dummy_data_service.dart';
+import '../../../data/models/user_model.dart';
+import '../controllers/group_controller.dart';
 
 class GroupDetailsScreen extends StatelessWidget {
   const GroupDetailsScreen({super.key});
@@ -9,7 +10,7 @@ class GroupDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Get group data from arguments
     final Map<String, dynamic> group = Get.arguments ?? {};
-    final List<Map<String, dynamic>> members = _getDummyMembers();
+    final controller = Get.find<GroupController>();
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -18,17 +19,17 @@ class GroupDetailsScreen extends StatelessWidget {
           children: [
             // Header
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+                    icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                     onPressed: () {
                       Get.back();
                     },
                   ),
-                  SizedBox(width: 8),
-                  Text(
+                  const SizedBox(width: 8),
+                  const Text(
                     'Groups Details',
                     style: TextStyle(
                       color: Colors.white,
@@ -39,13 +40,13 @@ class GroupDetailsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Group Info Card
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 16),
-              padding: EdgeInsets.all(20),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Color(0xFF2A2A2A),
+                color: const Color(0xFF2A2A2A),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -54,59 +55,62 @@ class GroupDetailsScreen extends StatelessWidget {
                   // Group Name
                   Text(
                     group['name'] ?? 'Weekly Meal Planning Group',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
-                  
+                  const SizedBox(height: 8),
+
                   // Description
                   Text(
-                    group['description'] ?? 'A support group for planning and tracking weekly meal prep, ideal for maintaining a balanced diet.',
-                    style: TextStyle(
+                    group['description'] ??
+                        'A support group for planning and tracking weekly meal prep, ideal for maintaining a balanced diet.',
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
                       height: 1.4,
                     ),
                   ),
-                  SizedBox(height: 16),
-                  
+                  const SizedBox(height: 16),
+
                   // Created Date
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.calendar_today,
                         color: Color(0xFFC2D86A),
                         size: 16,
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         'Created On: ${group['createdDate'] ?? 'August 1, 2024'}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white54,
                           fontSize: 12,
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 8),
-                  
+                  const SizedBox(height: 8),
+
                   // Total Members
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.people,
                         color: Color(0xFFC2D86A),
                         size: 16,
                       ),
-                      SizedBox(width: 8),
-                      Text(
-                        'Total Members: ${group['memberCount'] ?? members.length} Members',
-                        style: TextStyle(
-                          color: Colors.white54,
-                          fontSize: 12,
+                      const SizedBox(width: 8),
+                      Obx(
+                        () => Text(
+                          'Total Members: ${controller.totalUsers.value} Members',
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ],
@@ -114,32 +118,42 @@ class GroupDetailsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
-            SizedBox(height: 20),
-            
+
+            const SizedBox(height: 20),
+
             // Members List
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                itemCount: members.length,
-                itemBuilder: (context, index) {
-                  final member = members[index];
-                  return _buildMemberCard(member);
-                },
-              ),
+              child: Obx(() {
+                if (controller.users.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "No members signed up yet.",
+                      style: TextStyle(color: Colors.white54),
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: controller.users.length,
+                  itemBuilder: (context, index) {
+                    final member = controller.users[index];
+                    return _buildMemberCard(member);
+                  },
+                );
+              }),
             ),
           ],
         ),
       ),
     );
   }
-  
-  Widget _buildMemberCard(Map<String, dynamic> member) {
+
+  Widget _buildMemberCard(UserModel member) {
     return Container(
-      margin: EdgeInsets.only(bottom: 16),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF2A2A2A),
+        color: const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -149,43 +163,47 @@ class GroupDetailsScreen extends StatelessWidget {
               // Profile Image
               CircleAvatar(
                 radius: 30,
-                backgroundImage: NetworkImage(member['profileImage'] ?? 'https://via.placeholder.com/150'),
+                backgroundImage: NetworkImage(
+                  member.profileImage.isNotEmpty
+                      ? member.profileImage
+                      : 'https://via.placeholder.com/150',
+                ),
               ),
-              SizedBox(width: 16),
-              
+              const SizedBox(width: 16),
+
               // Member Info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'User Name: ${member['name']}',
-                      style: TextStyle(
+                      'User Name: ${member.username}',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      'Plan Name: ${member['planName']}',
-                      style: TextStyle(
+                      'Plan Name: ${member.planName}',
+                      style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      'Plan Duration: ${member['planDuration']}',
-                      style: TextStyle(
+                      'Plan Duration: ${member.planDuration}',
+                      style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      'Email: ${member['email']}',
-                      style: TextStyle(
+                      'Email: ${member.email}',
+                      style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
                       ),
@@ -193,43 +211,55 @@ class GroupDetailsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               // Action Buttons
               Column(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
                       color: Color(0xFFC2D86A),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.phone, color: Colors.black, size: 20),
+                    child: const Icon(
+                      Icons.phone,
+                      color: Colors.black,
+                      size: 20,
+                    ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
                       color: Color(0xFFC2D86A),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.email, color: Colors.black, size: 20),
+                    child: const Icon(
+                      Icons.email,
+                      color: Colors.black,
+                      size: 20,
+                    ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
                       color: Color(0xFFC2D86A),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.chat, color: Colors.black, size: 20),
+                    child: const Icon(
+                      Icons.chat,
+                      color: Colors.black,
+                      size: 20,
+                    ),
                   ),
                 ],
               ),
             ],
           ),
-          
+
           // Add Client Button
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Align(
             alignment: Alignment.centerLeft,
             child: ElevatedButton(
@@ -242,13 +272,16 @@ class GroupDetailsScreen extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFC2D86A),
+                backgroundColor: const Color(0xFFC2D86A),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
               ),
-              child: Text(
+              child: const Text(
                 'Add Client',
                 style: TextStyle(
                   color: Colors.black,
@@ -260,38 +293,5 @@ class GroupDetailsScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-  
-  List<Map<String, dynamic>> _getDummyMembers() {
-    return [
-      {
-        'name': 'Ayush Shukla',
-        'planName': 'Keto Plan',
-        'planDuration': 'Oct 1 - Nov 1',
-        'email': 'ayush@gmail.com',
-        'profileImage': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-      },
-      {
-        'name': 'Rahul Sharma',
-        'planName': 'Vegan Balanced Diet',
-        'planDuration': 'Oct 1 - Nov 1',
-        'email': 'rahul@gmail.com',
-        'profileImage': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-      },
-      {
-        'name': 'Pankaj Singh',
-        'planName': 'High Protein Diet',
-        'planDuration': 'Oct 1 - Nov 1',
-        'email': 'pankaj@gmail.com',
-        'profileImage': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-      },
-      {
-        'name': 'Manoj Tiwari',
-        'planName': 'Mediterranean Plan',
-        'planDuration': 'Oct 1 - Nov 1',
-        'email': 'manoj@gmail.com',
-        'profileImage': 'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=150&h=150&fit=crop&crop=face',
-      },
-    ];
   }
 }
