@@ -263,222 +263,384 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     final user = Get.find<AuthController>().getCurrentUser();
     
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black,
+              Color(0xFF1A1A1A),
+              Colors.black,
+            ],
+            stops: [0.0, 0.3, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with Welcome message and notification
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Get.toNamed('/profile-settings');
-                      },
-                      child: CircleAvatar(
-                        radius: 25,
-                        backgroundImage: NetworkImage(user.profileImage ?? 'https://via.placeholder.com/150'),
-                      ),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Welcome!',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            user.username ?? 'Ayush Shukla',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Color(0xFF242424),
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        icon: Icon(Icons.notifications_none, color: Colors.white),
-                        onPressed: () {
-                          Get.toNamed('/notification?id=$id');
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                
-                SizedBox(height: 24),
-                
-                // Live Stats Card
+                // Header with gradient background
                 Container(
-                  padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Color(0xFF2A2A2A),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Live Stats',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildStatItem('55%', 'Goal Achieved', Colors.orange),
-                          _buildStatItem('4kg', 'Fat Lost', Colors.yellow),
-                          _buildStatItem('0.8Gm', 'Muscle Gained', Colors.purple),
-                        ],
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF2A2A2A),
+                        Color(0xFF1A1A1A),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(25),
+                      bottomRight: Radius.circular(25),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
                       ),
                     ],
                   ),
-                ),
-                
-                SizedBox(height: 24),
-                
-                // Search Bar
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Color(0xFF2A2A2A),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search, color: Colors.white54),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Search here...',
-                          style: TextStyle(color: Colors.white54, fontSize: 16),
-                        ),
-                      ),
-                      Icon(Icons.tune, color: Colors.white54),
-                    ],
-                  ),
-                ),
-                
-                SizedBox(height: 24),
-                
-                // Day Progress and Add Meal Button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
                       children: [
-                        Text(
-                          'Day 1/55 (Weight Loss)',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        // Header with Welcome message and notification
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Get.toNamed('/profile-settings');
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color(0xFFC2D86A).withOpacity(0.3),
+                                      Color(0xFFC2D86A).withOpacity(0.1),
+                                    ],
+                                  ),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xFFC2D86A).withOpacity(0.3),
+                                      blurRadius: 15,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                padding: EdgeInsets.all(3),
+                                child: CircleAvatar(
+                                  radius: 25,
+                                  backgroundImage: NetworkImage(user.profileImage ?? 'https://via.placeholder.com/150'),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Welcome!',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    user.username ?? 'Ayush Shukla',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Color(0xFFC2D86A).withOpacity(0.2),
+                                    Color(0xFFC2D86A).withOpacity(0.1),
+                                  ],
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                              child: IconButton(
+                                icon: Icon(Icons.notifications_none, color: Colors.white),
+                                onPressed: () {
+                                  Get.toNamed('/notification?id=$id');
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          '23 Oct - 17 Dec',
-                          style: TextStyle(
-                            color: Colors.white54,
-                            fontSize: 14,
+                        
+                        SizedBox(height: 24),
+                        
+                        // Live Stats Card
+                        Container(
+                          padding: EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xFF2D2D2D),
+                                Color(0xFF1D1D1D),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Color(0xFFC2D86A).withOpacity(0.2),
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.3),
+                                blurRadius: 15,
+                                offset: Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 4,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color(0xFFC2D86A),
+                                          Color(0xFFB8CC5A),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  ),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    'Live Stats',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  _buildModernStatItem('55%', 'Goal Achieved', Colors.orange),
+                                  _buildModernStatItem('4kg', 'Fat Lost', Colors.yellow),
+                                  _buildModernStatItem('0.8Gm', 'Muscle Gained', Colors.purple),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Get.toNamed(Routes.CreateMeal);
-                      },
-                      icon: Icon(Icons.add, color: Colors.black),
-                      label: Text(
-                        'Add Meal',
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFC2D86A),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                
+                SizedBox(height: 24),
+                
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Search Bar
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFF2A2A2A),
+                              Color(0xFF1A1A1A),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Color(0xFFC2D86A).withOpacity(0.2),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
                         ),
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Row(
+                          children: [
+                            Icon(Icons.search, color: Colors.white54),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Search here...',
+                                style: TextStyle(color: Colors.white54, fontSize: 16),
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Color(0xFFC2D86A).withOpacity(0.2),
+                                    Color(0xFFC2D86A).withOpacity(0.1),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(Icons.tune, color: Color(0xFFC2D86A), size: 20),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                
-                SizedBox(height: 20),
-                
-                // Meal Type Tabs
-                Row(
-                  children: [
-                    _buildMealTab('🍳', 'Breakfast', selectedIndex == 0, () {
-                      setState(() {
-                        selectedIndex = 0;
-                        filterRecipesBySingleCategory('Breakfast');
-                      });
-                    }),
-                    SizedBox(width: 12),
-                    _buildMealTab('🥗', 'Lunch', selectedIndex == 1, () {
-                      setState(() {
-                        selectedIndex = 1;
-                        filterRecipesBySingleCategory('Lunch');
-                      });
-                    }),
-                    SizedBox(width: 12),
-                    _buildMealTab('🍽️', 'Dinner', selectedIndex == 2, () {
-                      setState(() {
-                        selectedIndex = 2;
-                        filterRecipesBySingleCategory('Dinner');
-                      });
-                    }),
-                  ],
-                ),
-                
-                SizedBox(height: 20),
-                
-                // Meals List
-                isLoading
-                    ? Center(child: CircularProgressIndicator())
-                    : filteredRecipes.isEmpty
-                        ? Center(
-                            child: Column(
-                              children: [
-                                Image.asset(
-                                  'assets/no_diet.png',
-                                  height: 250,
-                                  width: 250,
-                                  fit: BoxFit.cover,
+                      
+                      SizedBox(height: 24),
+                      
+                      // Day Progress and Add Meal Button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Day 1/55 (Weight Loss)',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '23 Oct - 17 Dec',
+                                style: TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Color(0xFFC2D86A),
+                                  Color(0xFFB8CC5A),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(25),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xFFC2D86A).withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
                                 ),
                               ],
                             ),
-                          )
-                        : ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: filteredRecipes.length,
-                            itemBuilder: (context, index) {
-                              var data = filteredRecipes[index];
-                              return _buildMealCard(data, index);
-                            },
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Get.toNamed(Routes.CreateMeal);
+                              },
+                              icon: Icon(Icons.add, color: Colors.black),
+                              label: Text(
+                                'Add Meal',
+                                style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              ),
+                            ),
                           ),
+                        ],
+                      ),
+                      
+                      SizedBox(height: 20),
+                      
+                      // Meal Type Tabs
+                      Row(
+                        children: [
+                          _buildModernMealTab('🍳', 'Breakfast', selectedIndex == 0, () {
+                            setState(() {
+                              selectedIndex = 0;
+                              filterRecipesBySingleCategory('Breakfast');
+                            });
+                          }),
+                          SizedBox(width: 12),
+                          _buildModernMealTab('🥗', 'Lunch', selectedIndex == 1, () {
+                            setState(() {
+                              selectedIndex = 1;
+                              filterRecipesBySingleCategory('Lunch');
+                            });
+                          }),
+                          SizedBox(width: 12),
+                          _buildModernMealTab('🍽️', 'Dinner', selectedIndex == 2, () {
+                            setState(() {
+                              selectedIndex = 2;
+                              filterRecipesBySingleCategory('Dinner');
+                            });
+                          }),
+                        ],
+                      ),
+                      
+                      SizedBox(height: 20),
+                      
+                      // Meals List
+                      isLoading
+                          ? Center(child: CircularProgressIndicator())
+                          : filteredRecipes.isEmpty
+                              ? Center(
+                                  child: Column(
+                                    children: [
+                                      Image.asset(
+                                        'assets/no_diet.png',
+                                        height: 250,
+                                        width: 250,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: filteredRecipes.length,
+                                  itemBuilder: (context, index) {
+                                    var data = filteredRecipes[index];
+                                    return _buildModernMealCard(data, index);
+                                  },
+                                ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -486,9 +648,16 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Color(0xFF1A1A1A),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF2A2A2A),
+              Color(0xFF1A1A1A),
+            ],
+          ),
           border: Border(
-            top: BorderSide(color: Color(0xFF2A2A2A), width: 1),
+            top: BorderSide(color: Color(0xFFC2D86A).withOpacity(0.2), width: 1),
           ),
         ),
         child: SafeArea(
@@ -542,38 +711,70 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     );
   }
   
-  Widget _buildStatItem(String value, String label, Color color) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            color: color,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+  Widget _buildModernStatItem(String value, String label, Color color) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.05),
+            Colors.white.withOpacity(0.02),
+          ],
         ),
-        SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
-          ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.1),
+          width: 1,
         ),
-      ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
     );
   }
   
-  Widget _buildMealTab(String emoji, String label, bool isSelected, VoidCallback onTap) {
+  Widget _buildModernMealTab(String emoji, String label, bool isSelected, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? Color(0xFF2A2A2A) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: isSelected ? Border.all(color: Color(0xFFC2D86A)) : null,
+          gradient: isSelected ? LinearGradient(
+            colors: [
+              Color(0xFFC2D86A).withOpacity(0.3),
+              Color(0xFFC2D86A).withOpacity(0.1),
+            ],
+          ) : null,
+          color: isSelected ? null : Colors.transparent,
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(
+            color: isSelected ? Color(0xFFC2D86A) : Colors.white.withOpacity(0.2),
+            width: 1,
+          ),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: Color(0xFFC2D86A).withOpacity(0.3),
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ] : null,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -593,7 +794,16 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     );
   }
   
-  Widget _buildMealCard(Map<String, dynamic> data, int index) {
+  Widget _buildModernMealCard(Map<String, dynamic> data, int index) {
+    // Different gradient combinations for variety
+    List<List<Color>> gradients = [
+      [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+      [Color(0xFF2D2D2D), Color(0xFF1D1D1D)],
+      [Color(0xFF252525), Color(0xFF151515)],
+    ];
+    
+    List<Color> cardGradient = gradients[index % gradients.length];
+    
     return GestureDetector(
       onTap: () {
         // Store meal data and navigate to details page
@@ -602,79 +812,155 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
         Get.toNamed('/meals-details?id=${Get.find<AuthController>().userdataget()["_id"] ?? ""}');
       },
       child: Container(
-        margin: EdgeInsets.only(bottom: 16),
-        padding: EdgeInsets.all(16),
+        margin: EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: Color(0xFF2A2A2A),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            // Meal Image
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: Color(0xFFC2D86A),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(Icons.restaurant, color: Colors.black, size: 30),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: cardGradient,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Color(0xFFC2D86A).withOpacity(0.2),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 15,
+              offset: Offset(0, 8),
             ),
-            SizedBox(width: 16),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Subtle pattern overlay
+            Positioned(
+              top: -30,
+              right: -30,
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [
+                      Color(0xFFC2D86A).withOpacity(0.1),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
             
-            // Meal Info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Row(
                 children: [
-                  Text(
-                    data['meal_name'] ?? data['name'] ?? 'Scrambled Eggs With Spinach',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  // Meal Image
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFC2D86A),
+                          Color(0xFFB8CC5A),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xFFC2D86A).withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Icon(Icons.restaurant, color: Colors.black, size: 35),
+                  ),
+                  SizedBox(width: 20),
+                  
+                  // Meal Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          data['meal_name'] ?? data['name'] ?? 'Scrambled Eggs With Spinach',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.orange.withOpacity(0.2),
+                                    Colors.orange.withOpacity(0.1),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Icon(Icons.local_fire_department, color: Colors.orange, size: 16),
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              '${data['calories'] ?? data['kcal'] ?? '500'} Kcal',
+                              style: TextStyle(color: Colors.orange, fontSize: 14, fontWeight: FontWeight.w600),
+                            ),
+                            SizedBox(width: 12),
+                            Text(
+                              '• ${data['weight'] ?? '100'}g',
+                              style: TextStyle(color: Colors.white54, fontSize: 14),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12),
+                        
+                        // Nutritional Info
+                        Row(
+                          children: [
+                            _buildModernNutrientBar('${data['protein'] ?? '20'}g', 'Protein', Colors.green),
+                            SizedBox(width: 12),
+                            _buildModernNutrientBar('${data['fat'] ?? '21'}g', 'Fat', Colors.blue),
+                            SizedBox(width: 12),
+                            _buildModernNutrientBar('${data['carbs'] ?? '30'}g', 'Carbs', Colors.red),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(Icons.local_fire_department, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text(
-                        '${data['calories'] ?? data['kcal'] ?? '500'} Kcal',
-                        style: TextStyle(color: Colors.orange, fontSize: 14),
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        '• ${data['weight'] ?? '100'}g',
-                        style: TextStyle(color: Colors.white54, fontSize: 14),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
                   
-                  // Nutritional Info
-                  Row(
-                    children: [
-                      _buildNutrientBar('${data['protein'] ?? '20'}g', 'Protein', Colors.green),
-                      SizedBox(width: 12),
-                      _buildNutrientBar('${data['fat'] ?? '21'}g', 'Fat', Colors.blue),
-                      SizedBox(width: 12),
-                      _buildNutrientBar('${data['carbs'] ?? '30'}g', 'Carbs', Colors.red),
-                    ],
+                  // More Options
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFC2D86A),
+                          Color(0xFFB8CC5A),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xFFC2D86A).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Icon(Icons.more_horiz, color: Colors.black, size: 20),
                   ),
                 ],
               ),
-            ),
-            
-            // More Options
-            Container(
-              padding: EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Color(0xFFC2D86A),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.more_horiz, color: Colors.black, size: 20),
             ),
           ],
         ),
@@ -682,24 +968,30 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     );
   }
   
-  Widget _buildNutrientBar(String value, String label, Color color) {
-    return Column(
-      children: [
-        Container(
-          width: 3,
-          height: 20,
-          color: color,
+  Widget _buildModernNutrientBar(String value, String label, Color color) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            color.withOpacity(0.2),
+            color.withOpacity(0.1),
+          ],
         ),
-        SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          label,
-          style: TextStyle(color: Colors.white54, fontSize: 10),
-        ),
-      ],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            label,
+            style: TextStyle(color: Colors.white54, fontSize: 10),
+          ),
+        ],
+      ),
     );
   }
 }

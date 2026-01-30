@@ -16,6 +16,7 @@ import '../modules/group/bindings/group_binding.dart';
 import '../modules/group/views/group_view.dart';
 import '../modules/group/views/create_group_screen.dart';
 import '../modules/group/views/group_details_screen.dart';
+import '../modules/group/views/client_list_screen.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -173,6 +174,10 @@ class AppPages {
     GetPage(
         name: _Paths.GROUP_DETAILS,
         page: () => GroupDetailsScreen(),
+        binding: GroupBinding()),
+    GetPage(
+        name: _Paths.CLIENT_LIST,
+        page: () => ClientListScreen(),
         binding: GroupBinding()),
     GetPage(
       name: _Paths.SIGNUP,

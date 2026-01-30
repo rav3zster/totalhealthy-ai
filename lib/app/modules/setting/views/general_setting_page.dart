@@ -20,7 +20,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: const Icon(Icons.arrow_back_ios_new_outlined,
-            color: Color(0XFFDBDBDB)),
+            color: Colors.white),
         actions: [
           IconButton(
               onPressed: () {

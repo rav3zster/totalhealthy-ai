@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../routes/app_pages.dart';
 import '../../../data/services/dummy_data_service.dart';
 
 class GroupDetailsScreen extends StatelessWidget {
@@ -234,12 +235,7 @@ class GroupDetailsScreen extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: ElevatedButton(
               onPressed: () {
-                Get.snackbar(
-                  'Info',
-                  'Add Client functionality coming soon!',
-                  backgroundColor: Colors.blue,
-                  colorText: Colors.white,
-                );
+                Get.toNamed(Routes.CLIENT_LIST);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFC2D86A),

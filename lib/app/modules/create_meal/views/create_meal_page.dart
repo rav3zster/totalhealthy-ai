@@ -28,7 +28,7 @@ class _CreateMealPageState extends State<CreateMealPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: Color(0XFFDBDBDB)),
+          icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () {
             Get.back();
             // Get.toNamed('/userdiet?id=${widget.id}');
