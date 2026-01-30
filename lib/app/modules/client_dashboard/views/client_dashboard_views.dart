@@ -199,7 +199,13 @@ class ClientDashboardScreen extends GetView<ClientDashboardControllers> {
                         ],
                       ),
                       ElevatedButton.icon(
-                        onPressed: () => Get.toNamed(Routes.CreateMeal),
+                        onPressed: () {
+                          final userData = Get.find<AuthController>()
+                              .userdataget();
+                          Get.toNamed(
+                            "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
+                          );
+                        },
                         icon: const Icon(Icons.add, color: Colors.black),
                         label: const Text(
                           'Add Meal',
