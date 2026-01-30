@@ -15,11 +15,10 @@ final NotificationService _notificationService = NotificationService();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   await GetStorage.init();
   await initializeControllers();
-    await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
   runApp(const MyApp());
 }
@@ -31,8 +30,10 @@ initializeControllers() async {
     print("Notification service initialization failed: $e");
   }
 
-  Get.putAsync<AuthController>(() async => AuthController().init(),
-      permanent: true);
+  await Get.putAsync<AuthController>(
+    () async => AuthController().init(),
+    permanent: true,
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -46,18 +47,20 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-        builder: (context, child) => MediaQuery(
-            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-            child: child!),
-        initialRoute: AppPages.INITIAL,
-        getPages: AppPages.routes,
-        title: 'Total Healthy',
-        onReady: () {},
-        scrollBehavior: MyCustomScrollBehavior(),
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData.dark().copyWith(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-          scaffoldBackgroundColor: Colors.black,
-        ));
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
+      initialRoute: AppPages.INITIAL,
+      getPages: AppPages.routes,
+      title: 'Total Healthy',
+      onReady: () {},
+      scrollBehavior: MyCustomScrollBehavior(),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark().copyWith(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        scaffoldBackgroundColor: Colors.black,
+      ),
+    );
   }
 }

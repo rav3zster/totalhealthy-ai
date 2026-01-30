@@ -38,8 +38,8 @@ class _LoginViewState extends State<LoginView> {
         // Simulate network delay
         await Future.delayed(Duration(milliseconds: 1500));
 
-        // Use mock authentication
-        bool loginSuccess = await Get.find<AuthController>().mockLogin(
+        // Use real authentication
+        bool loginSuccess = await Get.find<AuthController>().login(
           email.text.trim(),
           pass.text.trim(),
         );
@@ -54,7 +54,9 @@ class _LoginViewState extends State<LoginView> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Invalid credentials! Please check your email and password.'),
+              content: Text(
+                'Invalid credentials! Please check your email and password.',
+              ),
               backgroundColor: Colors.red,
             ),
           );
@@ -129,10 +131,7 @@ class _LoginViewState extends State<LoginView> {
                   // Email Label
                   Text(
                     'Email Address',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0XFFDBDBDB),
-                    ),
+                    style: TextStyle(fontSize: 16, color: Color(0XFFDBDBDB)),
                   ),
                   SizedBox(height: 10),
 
@@ -143,8 +142,10 @@ class _LoginViewState extends State<LoginView> {
                       filled: true,
                       fillColor: Color(0XFF242522),
                       hintText: 'Enter your email address',
-                      prefixIcon:
-                          Icon(Icons.email_outlined, color: Colors.white54),
+                      prefixIcon: Icon(
+                        Icons.email_outlined,
+                        color: Colors.white54,
+                      ),
                       hintStyle: TextStyle(color: Colors.white54),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -167,10 +168,7 @@ class _LoginViewState extends State<LoginView> {
                   // Password Label
                   Text(
                     'Password',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0XFFDBDBDB),
-                    ),
+                    style: TextStyle(fontSize: 16, color: Color(0XFFDBDBDB)),
                   ),
                   SizedBox(height: 5),
 
@@ -182,8 +180,10 @@ class _LoginViewState extends State<LoginView> {
                       filled: true,
                       fillColor: Color(0XFF242522),
                       hintText: 'Enter Your Password',
-                      prefixIcon:
-                          Icon(Icons.lock_outline, color: Colors.white54),
+                      prefixIcon: Icon(
+                        Icons.lock_outline,
+                        color: Colors.white54,
+                      ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isObscured
@@ -249,12 +249,16 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     child: isLoading
                         ? Center(
-                            child: CircularProgressIndicator(color: Color(0XFF242522)),
+                            child: CircularProgressIndicator(
+                              color: Color(0XFF242522),
+                            ),
                           )
                         : Text(
                             'Login',
                             style: TextStyle(
-                                color: Color(0XFF242522), fontSize: 18),
+                              color: Color(0XFF242522),
+                              fontSize: 18,
+                            ),
                           ),
                   ),
                   SizedBox(height: 50),
@@ -264,10 +268,7 @@ class _LoginViewState extends State<LoginView> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(
-                          width: 50,
-                          child: DottedLine(),
-                        ),
+                        SizedBox(width: 50, child: DottedLine()),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: Text(
@@ -275,10 +276,7 @@ class _LoginViewState extends State<LoginView> {
                             style: TextStyle(color: Color(0XFFB0AFAF)),
                           ),
                         ),
-                        SizedBox(
-                          width: 50,
-                          child: DottedLine(),
-                        ),
+                        SizedBox(width: 50, child: DottedLine()),
                       ],
                     ),
                   ),

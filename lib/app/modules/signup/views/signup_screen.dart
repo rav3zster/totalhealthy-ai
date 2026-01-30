@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/utitlity/appvalidator.dart';
 
+import '../../../core/base/controllers/auth_controller.dart';
 import '../../../routes/app_pages.dart';
-import '../../../data/services/mock_api_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -30,19 +30,27 @@ class SignupScreenState extends State<SignupScreen> {
           "name": nameController.text.trim(),
           "email": emailController.text.trim(),
           "password": passwordController.text.trim(),
-          "phone_number": phoneNumberController.text.trim()
+          "phone_number": phoneNumberController.text.trim(),
         };
         print(data);
 
-        // Use mock API instead of real API
-        final response = await MockApiService.signup(data);
-        
-        if (response['statusCode'] == 200) {
-          print(response['data']);
+        // Use real authentication
+        final authController = Get.find<AuthController>();
+        bool success = await authController.register(
+          emailController.text.trim(),
+          passwordController.text.trim(),
+        );
+
+        if (success) {
+          // You might want to save other user details (name, phone) to Firestore here
+          print("User registered: ${emailController.text}");
+
           Get.toNamed(Routes.SWITCHROLE);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Sign Up Successful! Please choose your role to continue.'),
+              content: Text(
+                'Sign Up Successful! Please choose your role to continue.',
+              ),
               backgroundColor: Colors.green,
             ),
           );
@@ -101,9 +109,10 @@ class SignupScreenState extends State<SignupScreen> {
                         Text(
                           "Please Provide",
                           style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
+                            fontSize: 24,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
                         ),
                         SizedBox(width: 6),
                         Text(
@@ -121,12 +130,16 @@ class SignupScreenState extends State<SignupScreen> {
                   const Text(
                     "Kindly Share The Required Information To",
                     style: TextStyle(
-                        color: Colors.white54, fontWeight: FontWeight.w500),
+                      color: Colors.white54,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const Text(
                     "Proceed Further.",
                     style: TextStyle(
-                        color: Colors.white54, fontWeight: FontWeight.w500),
+                      color: Colors.white54,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(height: 50),
                   // Gender Selection Boxes
@@ -160,7 +173,7 @@ class SignupScreenState extends State<SignupScreen> {
                               Icon(
                                 Icons.male,
                                 size: 40,
-                                color: isMaleSelected 
+                                color: isMaleSelected
                                     ? const Color.fromARGB(255, 146, 159, 83)
                                     : Colors.white54,
                               ),
@@ -168,7 +181,7 @@ class SignupScreenState extends State<SignupScreen> {
                               Text(
                                 "Male",
                                 style: TextStyle(
-                                  color: isMaleSelected 
+                                  color: isMaleSelected
                                       ? Colors.white
                                       : Colors.white30,
                                   fontWeight: FontWeight.w500,
@@ -206,7 +219,7 @@ class SignupScreenState extends State<SignupScreen> {
                               Icon(
                                 Icons.female,
                                 size: 40,
-                                color: isFemaleSelected 
+                                color: isFemaleSelected
                                     ? Colors.amberAccent
                                     : Colors.white54,
                               ),
@@ -214,7 +227,7 @@ class SignupScreenState extends State<SignupScreen> {
                               Text(
                                 "Female",
                                 style: TextStyle(
-                                  color: isFemaleSelected 
+                                  color: isFemaleSelected
                                       ? Colors.white
                                       : Colors.white30,
                                   fontWeight: FontWeight.w500,
@@ -234,7 +247,9 @@ class SignupScreenState extends State<SignupScreen> {
                     child: const Text(
                       "Full Name",
                       style: TextStyle(
-                          color: Colors.white70, fontWeight: FontWeight.w500),
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -243,8 +258,10 @@ class SignupScreenState extends State<SignupScreen> {
                     child: TextFormField(
                       controller: nameController,
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.person_2_outlined,
-                            color: Colors.white54),
+                        prefixIcon: const Icon(
+                          Icons.person_2_outlined,
+                          color: Colors.white54,
+                        ),
                         hintText: "enter your full name",
                         hintStyle: const TextStyle(color: Colors.white30),
                         fillColor: const Color.fromARGB(255, 36, 36, 36),
@@ -262,9 +279,7 @@ class SignupScreenState extends State<SignupScreen> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
+                      style: TextStyle(color: Colors.white),
                       validator: AppValidator().validateUsername,
                     ),
                   ),
@@ -274,7 +289,9 @@ class SignupScreenState extends State<SignupScreen> {
                     child: const Text(
                       "Email Address",
                       style: TextStyle(
-                          color: Colors.white70, fontWeight: FontWeight.w500),
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -283,8 +300,10 @@ class SignupScreenState extends State<SignupScreen> {
                     child: TextFormField(
                       controller: emailController,
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.mail_outline_rounded,
-                            color: Colors.white54),
+                        prefixIcon: const Icon(
+                          Icons.mail_outline_rounded,
+                          color: Colors.white54,
+                        ),
                         hintText: "enter your email address",
                         hintStyle: const TextStyle(color: Colors.white30),
                         fillColor: const Color.fromARGB(255, 36, 36, 36),
@@ -302,9 +321,7 @@ class SignupScreenState extends State<SignupScreen> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
+                      style: TextStyle(color: Colors.white),
                       validator: AppValidator().validateEmail,
                     ),
                   ),
@@ -314,7 +331,9 @@ class SignupScreenState extends State<SignupScreen> {
                     child: const Text(
                       "Password",
                       style: TextStyle(
-                          color: Colors.white70, fontWeight: FontWeight.w500),
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -327,8 +346,10 @@ class SignupScreenState extends State<SignupScreen> {
                         filled: true,
                         fillColor: Color(0XFF242522),
                         hintText: 'Enter Your Password',
-                        prefixIcon:
-                        Icon(Icons.lock_outline, color: Colors.white54),
+                        prefixIcon: Icon(
+                          Icons.lock_outline,
+                          color: Colors.white54,
+                        ),
 
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -361,17 +382,16 @@ class SignupScreenState extends State<SignupScreen> {
                       style: TextStyle(color: Colors.white),
                       validator: AppValidator().validatePassword,
                     ),
-
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  SizedBox(height: 20),
                   Container(
                     margin: const EdgeInsets.only(right: 290),
                     child: const Text(
                       "Phone Number",
                       style: TextStyle(
-                          color: Colors.white70, fontWeight: FontWeight.w500),
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -416,13 +436,13 @@ class SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                       child: isLoading
-                          ? Center(
-                              child: CircularProgressIndicator(),
-                            )
+                          ? Center(child: CircularProgressIndicator())
                           : Text(
                               'Sign Up',
                               style: TextStyle(
-                                  color: Color(0XFF242522), fontSize: 18),
+                                color: Color(0XFF242522),
+                                fontSize: 18,
+                              ),
                             ),
                     ),
                   ),
@@ -434,9 +454,10 @@ class SignupScreenState extends State<SignupScreen> {
                           child: const Text(
                             "----------",
                             style: TextStyle(
-                                color: Colors.white30,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500),
+                              color: Colors.white30,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                         Container(
@@ -444,20 +465,23 @@ class SignupScreenState extends State<SignupScreen> {
                           child: const Text(
                             "Or",
                             style: TextStyle(
-                                color: Colors.white30,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500),
+                              color: Colors.white30,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                         Container(
-                            margin: const EdgeInsets.only(left: 5, top: 20),
-                            child: const Text(
-                              "----------",
-                              style: TextStyle(
-                                  color: Colors.white30,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500),
-                            )),
+                          margin: const EdgeInsets.only(left: 5, top: 20),
+                          child: const Text(
+                            "----------",
+                            style: TextStyle(
+                              color: Colors.white30,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -469,8 +493,9 @@ class SignupScreenState extends State<SignupScreen> {
                         child: const Text(
                           "Already have an account?",
                           style: TextStyle(
-                              color: Colors.white54,
-                              fontWeight: FontWeight.w500),
+                            color: Colors.white54,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 3),
@@ -481,15 +506,14 @@ class SignupScreenState extends State<SignupScreen> {
                         child: const Text(
                           "Sign in",
                           style: TextStyle(
-                              color: Color.fromARGB(255, 194, 216, 106),
-                              fontWeight: FontWeight.w500),
+                            color: Color.fromARGB(255, 194, 216, 106),
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: 20,
-                  )
+                  SizedBox(height: 20),
                 ],
               ),
             ),

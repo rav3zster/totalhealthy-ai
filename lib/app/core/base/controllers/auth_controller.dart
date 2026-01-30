@@ -1,81 +1,145 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../routes/app_pages.dart';
 import '../../../data/services/dummy_data_service.dart';
 import '../../../data/models/user_model.dart';
 import '../../../widgets/notification_services.dart';
-import '../../../modules/login/views/login_view.dart';
+
 import 'theme_controller.dart';
 
 class AuthController extends GetxController {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final box = GetStorage();
+
+  // Observables
+  Rx<User?> firebaseUser = Rx<User?>(null);
+  RxBool isAuthenticated = false.obs;
+  RxBool flowloader = false.obs;
+
+  @override
+  void onReady() {
+    super.onReady();
+    firebaseUser.bindStream(_auth.authStateChanges());
+    ever(firebaseUser, _setInitialScreen);
+  }
+
   Future<AuthController> init() async {
     Get.putAsync<ThemeController>(() async => ThemeController());
-    tokenValidate();
+    // Trigger initial check
+    firebaseUser.value = _auth.currentUser;
     return this;
   }
 
-  final NotificationService _notificationService = NotificationService();
-  final _authToken = "".obs;
-  RxBool isLogOut = false.obs;
-  RxBool flowloader = false.obs;
-  final _deviceToken = "".obs;
-  String get authToken => _authToken.value;
-  String get deviceToken => _deviceToken.value;
-  RxBool isAuthenticated = false.obs;
-  set authToken(value) => _authToken.value = value;
-  set deviceToken(value) => _deviceToken.value = value;
-  final box = GetStorage();
+  _setInitialScreen(User? user) {
+    if (user == null) {
+      print("User is currently signed out!");
+      isAuthenticated.value = false;
+      Get.offAllNamed(Routes.Login);
+    } else {
+      print("User is signed in!");
+      isAuthenticated.value = true;
+      box.write('authToken', user.uid);
 
-  void refreshAuth() {
-    isAuthenticated.refresh();
+      // Determine dashboard based on role
+      if (box.hasData("role") && box.read("role") == "admin") {
+        Get.offAllNamed(Routes.TrainerDashboard);
+      } else {
+        Get.offAllNamed(Routes.ClientDashboard);
+      }
+    }
   }
 
+  // Login
+  Future<bool> login(String email, String password) async {
+    try {
+      flowloader.value = true;
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+
+      // Determine role - default to user if not found/set
+      if (!box.hasData("role")) {
+        roleStore("user");
+      }
+      return true;
+    } on FirebaseAuthException catch (e) {
+      Get.snackbar(
+        "Login Failed",
+        e.message ?? "Unknown error occurred",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.colorScheme.error,
+        colorText: Get.theme.colorScheme.onError,
+      );
+      return false;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.colorScheme.error,
+        colorText: Get.theme.colorScheme.onError,
+      );
+      print("Login error: $e");
+      return false;
+    } finally {
+      flowloader.value = false;
+    }
+  }
+
+  // Register
+  Future<bool> register(String email, String password) async {
+    try {
+      flowloader.value = true;
+      await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      roleStore("user"); // Default role
+      return true;
+    } on FirebaseAuthException catch (e) {
+      Get.snackbar(
+        "Registration Failed",
+        e.message ?? "Unknown error occurred",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.colorScheme.error,
+        colorText: Get.theme.colorScheme.onError,
+      );
+      return false;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.colorScheme.error,
+        colorText: Get.theme.colorScheme.onError,
+      );
+      return false;
+    } finally {
+      flowloader.value = false;
+    }
+  }
+
+  // Logout
+  Future<void> logOut() async {
+    await clearAuth();
+  }
+
+  // Clear Auth
+  Future<void> clearAuth() async {
+    await _auth.signOut();
+    box.erase();
+    isAuthenticated.value = false;
+    Get.offAllNamed(Routes.Login);
+  }
+
+  // Role Management
   roleStore(String role) => box.write("role", role);
   String roleGet() => box.read("role") ?? "user";
 
-  // Mock authentication - no API calls
-  setAuth(String token, String refToken, Map<String, dynamic> userData) async {
-    isAuthenticated.value = true;
+  // Notification Service
+  final NotificationService _notificationService = NotificationService();
+  NotificationService get notificationService => _notificationService;
 
-    await box.write('authToken', token);
-    await box.write('refreshToken', refToken);
-    await userdataStore(userData);
-    authToken = box.read("authToken");
-
-    print("Auth set: ${token}, ${refToken}");
-    
-    // Set default role if not exists
-    if (!box.hasData("role")) {
-      roleStore("user");
-    }
-    
-    // Navigate based on role
-    String role = roleGet();
-    if (role == "admin") {
-      Get.offAllNamed(Routes.TrainerDashboard);
-    } else {
-      Get.offAllNamed(Routes.ClientDashboard);
-    }
-  }
-
-  // Mock login method
-  Future<bool> mockLogin(String email, String password) async {
-    if (DummyDataService.validateLogin(email, password)) {
-      final userData = DummyDataService.getDummyUser();
-      await setAuth(
-        "token_${DateTime(2024, 10, 15).millisecondsSinceEpoch}",
-        "refresh_${DateTime(2024, 10, 15).millisecondsSinceEpoch}",
-        userData.toJson(),
-      );
-      return true;
-    }
-    return false;
-  }
-
-  NotificationService notificationService = NotificationService();
-  
-  // Mock notification scheduling with dummy data
   Future<void> fetchAndScheduleNotifications(data) async {
     try {
       var categories = data ?? DummyDataService.getDummyMealCategories();
@@ -85,7 +149,7 @@ class AuthController extends GetxController {
 
         String title = category['label_name'] ?? "Reminder";
         String? timeRange = category['time_range'];
-        
+
         if (timeRange == null || !timeRange.contains(":")) {
           continue;
         }
@@ -93,10 +157,10 @@ class AuthController extends GetxController {
         List<String> timeParts = timeRange.split(":");
         int hour = int.tryParse(timeParts[0]) ?? 0;
         int minute = int.tryParse(timeParts[1].split(" ")[0]) ?? 0;
-        
+
         String body = "It's time for ${category['label_name'] ?? ""}";
         int uniqueId = category['label_name'].hashCode.abs() % 100000;
-        
+
         await notificationService.cancelNotification(uniqueId);
         await notificationService.scheduleNotification(
           title: title,
@@ -111,74 +175,73 @@ class AuthController extends GetxController {
     }
   }
 
+  // Navigation Helper
   handleAuthChange() {
-    print("handleAuthChange ${Get.currentRoute}");
-
     if (isAuthenticated.value) {
-      print("User is authenticated: ${isAuthenticated.value}");
-      
-      // Check current route and redirect accordingly
       if (Get.currentRoute == '/login' ||
           Get.currentRoute == '/signup' ||
           Get.currentRoute == '/onboarding' ||
           Get.currentRoute.isEmpty) {
-        
         if (box.hasData("role")) {
           String role = box.read("role");
-          return role == "admin" ? Routes.TrainerDashboard : Routes.ClientDashboard;
+          return role == "admin"
+              ? Routes.TrainerDashboard
+              : Routes.ClientDashboard;
         } else {
           return Routes.SWITCHROLE;
         }
       }
       return Get.currentRoute;
     } else {
-      return '/onboarding';
+      return '/login';
     }
   }
 
+  // Data Helpers
   categoriesAdd(data) => box.write("categories", data);
-  categoriesGet() => box.read("categories") ?? DummyDataService.getDummyMealCategories();
+  categoriesGet() =>
+      box.read("categories") ?? DummyDataService.getDummyMealCategories();
 
   groupgetId() => box.read("groupId") ?? "group_123";
-  userdataget() => box.read("userdata") ?? DummyDataService.getDummyUser().toJson();
-  
+  userdataget() =>
+      box.read("userdata") ?? DummyDataService.getDummyUser().toJson();
+
   groupIdStore(String id) async {
     await box.write("groupId", id);
-    print("Group ID stored: ${box.read("groupId")}");
   }
 
   userdataStore(userData) async {
     await box.write("userdata", userData);
   }
 
-  tokenValidate() {
-    if (box.hasData("authToken")) {
-      isAuthenticated.value = true;
-      authToken = box.read("authToken");
-      var refreshToken = box.read("refreshToken");
-      print("Token validated: $authToken");
-    } else {
-      isAuthenticated.value = false;
-    }
-  }
-
-  void clearAuth() {
-    authToken = "";
-    isAuthenticated.value = false;
-    box.erase();
-    Get.offAll(() => LoginView());
-  }
-
-  // Mock user data getter
+  // Data Getters for UI
   UserModel getCurrentUser() {
+    // In a real app, parse from Firestore or use basic User info
     var userData = userdataget();
     if (userData is Map<String, dynamic>) {
       return UserModel.fromJson(userData);
     }
+    // Fallback if not found locally, maybe create from Firebase User
+    if (_auth.currentUser != null) {
+      return UserModel(
+        username: _auth.currentUser!.displayName ?? "User",
+        email: _auth.currentUser!.email ?? "",
+        id: _auth.currentUser!.uid,
+        phone: _auth.currentUser!.phoneNumber ?? "",
+        firstName: "User",
+        lastName: "",
+        profileImage: _auth.currentUser!.photoURL ?? "",
+        age: 0,
+        weight: 0.0,
+        height: 0,
+        activityLevel: "Moderate",
+        goals: [],
+        joinDate: DateTime.now().toIso8601String(),
+      );
+    }
     return DummyDataService.getDummyUser();
   }
 
-  // Mock role switching
   void switchRole(String role) {
     roleStore(role);
     if (role == "admin") {
