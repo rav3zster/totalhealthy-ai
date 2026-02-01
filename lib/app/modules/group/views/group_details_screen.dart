@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/models/user_model.dart';
 import '../controllers/group_controller.dart';
+import '../../../core/base/controllers/auth_controller.dart';
 
 class GroupDetailsScreen extends StatelessWidget {
   const GroupDetailsScreen({super.key});
@@ -124,7 +125,14 @@ class GroupDetailsScreen extends StatelessWidget {
             // Members List
             Expanded(
               child: Obx(() {
-                if (controller.users.isEmpty) {
+                final authController = Get.find<AuthController>();
+                final currentUserId = authController.firebaseUser.value?.uid;
+
+                final otherUsers = controller.users
+                    .where((u) => u.id != currentUserId)
+                    .toList();
+
+                if (otherUsers.isEmpty) {
                   return const Center(
                     child: Text(
                       "No members signed up yet.",
@@ -134,9 +142,9 @@ class GroupDetailsScreen extends StatelessWidget {
                 }
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: controller.users.length,
+                  itemCount: otherUsers.length,
                   itemBuilder: (context, index) {
-                    final member = controller.users[index];
+                    final member = otherUsers[index];
                     return _buildMemberCard(member, controller, group);
                   },
                 );
