@@ -26,12 +26,11 @@ class NotificationsFirestoreService {
     await _firestore.collection(_collection).add(notification.toJson());
   }
 
-  /// Stream of notifications sent by a user (for tracking pending invitations)
+  /// Stream of notifications sent by a user (for tracking pending/accepted/rejected invitations)
   Stream<List<AppNotification>> getSentInvitationsStream(String senderId) {
     return _firestore
         .collection(_collection)
         .where('senderId', isEqualTo: senderId)
-        .where('status', isEqualTo: 'pending')
         .snapshots()
         .map((snapshot) {
           return snapshot.docs.map((doc) {

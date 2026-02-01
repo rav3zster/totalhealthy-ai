@@ -50,8 +50,11 @@ class NotificationController extends GetxController {
         );
       }
 
-      // Clear the notification after accepting
-      await deleteNotification(notification.id);
+      // Update status to accepted instead of deleting
+      await _notificationsService.updateNotificationStatus(
+        notification.id,
+        NotificationStatus.accepted,
+      );
     } catch (e) {
       Get.snackbar(
         "Error",
@@ -64,8 +67,11 @@ class NotificationController extends GetxController {
 
   Future<void> rejectInvitation(AppNotification notification) async {
     try {
-      // Clear the notification after rejecting
-      await deleteNotification(notification.id);
+      // Update status to rejected instead of deleting
+      await _notificationsService.updateNotificationStatus(
+        notification.id,
+        NotificationStatus.rejected,
+      );
 
       Get.snackbar(
         "Information",

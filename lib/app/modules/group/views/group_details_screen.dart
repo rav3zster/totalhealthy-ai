@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/models/user_model.dart';
+import '../../../data/models/notification_model.dart';
 import '../controllers/group_controller.dart';
 import '../../../core/base/controllers/auth_controller.dart';
 
@@ -272,27 +273,79 @@ class GroupDetailsScreen extends StatelessWidget {
 
           // Add Client Button
           const SizedBox(height: 16),
+          // Add Client Button
+          const SizedBox(height: 16),
           Align(
             alignment: Alignment.centerLeft,
             child: Obx(() {
-              final isPending = controller.sentInvitations.any(
+              // Check if user is already a member in the group data itself
+              final List membersList = group['members_list'] ?? [];
+              final isAlreadyMember = membersList.contains(member.id);
+
+              if (isAlreadyMember) {
+                return ElevatedButton(
+                  onPressed: null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    disabledBackgroundColor: Colors.green,
+                  ),
+                  child: const Text(
+                    'Member',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+              }
+
+              // Check invitation status
+              final invitation = controller.sentInvitations.firstWhereOrNull(
                 (n) => n.recipientId == member.id && n.groupId == group['id'],
               );
 
+              final status = invitation?.status;
+
+              String buttonText = 'Add Client';
+              Color buttonColor = const Color(0xFFC2D86A);
+              Color textColor = Colors.black;
+              VoidCallback? onPressed = () {
+                controller.inviteUser(
+                  member,
+                  groupId: group['id'],
+                  groupName: group['name'],
+                );
+              };
+
+              if (status == NotificationStatus.pending) {
+                buttonText = 'Pending';
+                buttonColor = Colors.grey;
+                textColor = Colors.white70;
+                onPressed = null;
+              } else if (status == NotificationStatus.accepted) {
+                buttonText = 'Accepted';
+                buttonColor = Colors.green;
+                textColor = Colors.white;
+                onPressed = null;
+              } else if (status == NotificationStatus.rejected) {
+                buttonText = 'Rejected';
+                buttonColor = Colors.redAccent;
+                textColor = Colors.white;
+                onPressed = null;
+              }
+
               return ElevatedButton(
-                onPressed: isPending
-                    ? null
-                    : () {
-                        controller.inviteUser(
-                          member,
-                          groupId: group['id'],
-                          groupName: group['name'],
-                        );
-                      },
+                onPressed: onPressed,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isPending
-                      ? Colors.grey
-                      : const Color(0xFFC2D86A),
+                  backgroundColor: buttonColor,
+                  disabledBackgroundColor: buttonColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -302,9 +355,9 @@ class GroupDetailsScreen extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  isPending ? 'Pending' : 'Add Client',
+                  buttonText,
                   style: TextStyle(
-                    color: isPending ? Colors.white70 : Colors.black,
+                    color: textColor,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
