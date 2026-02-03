@@ -1,13 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/modules/notification/controllers/notification_controller.dart';
-import 'package:totalhealthy/app/widgets/custom_button.dart';
-
-import '../../../core/base/constants/appcolor.dart';
-import '../../../core/base/controllers/auth_controller.dart';
-import '../../../data/services/mock_api_service.dart';
 import 'package:intl/intl.dart';
 import 'package:totalhealthy/app/data/models/notification_model.dart';
 

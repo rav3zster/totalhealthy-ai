@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../core/middlewares/global_middleware.dart';
@@ -53,6 +52,7 @@ import '../modules/welcom_screen/views/welcome-screen-views.dart';
 import '../modules/manage_accounts/views/manage_accounts_views.dart';
 import '../modules/Help_and_support/views/helpAndSuportPage.dart';
 import '../widgets/switch_role_screen.dart';
+import '../widgets/base_screen_wrapper.dart';
 
 part 'app_routes.dart';
 
@@ -63,16 +63,13 @@ class AppPages {
 
   static final routes = [
     GetPage(
-        name: _Paths.HOME,
-        page: () => HomeView(),
-        binding: HomeBinding(),
-        transition: Transition.fadeIn,
-        middlewares: [AuthCheckMiddleware()]
+      name: _Paths.HOME,
+      page: () => HomeView(),
+      binding: HomeBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [AuthCheckMiddleware()],
     ),
-    GetPage(
-      name: _Paths.ONBOARDING,
-      page: () => OnboardingView(),
-    ),
+    GetPage(name: _Paths.ONBOARDING, page: () => OnboardingView()),
     GetPage(
       name: _Paths.SwipeScreen,
       page: () => SwipeScreenView(),
@@ -95,85 +92,95 @@ class AppPages {
       binding: LoginBinding(),
     ),
     GetPage(
-        name: _Paths.NUTRITION_GOAL,
-        page: () => NutritionGoalView(),
-        binding: NutritionGoalBinding(),
-        transition: Transition.fadeIn),
-    GetPage(
-        name: _Paths.NOTIFICATION,
-        page: () => NotificationView(),
-        binding: NotificationBinding(),
-        transition: Transition.fadeIn,
-        middlewares: [AuthCheckMiddleware()]),
-    GetPage(
-        name: _Paths.GENERATE_AI,
-        page: () => GenerateAiView(),
-        binding: GenerateAiBinding(),
-        transition: Transition.fadeIn,
-        middlewares: [AuthCheckMiddleware()]),
-    GetPage(
-        name: _Paths.MEAL_HISTORY,
-        page: () => MealHistoryView(),
-        binding: MealHistoryBinding(),
-        transition: Transition.fadeIn,
-        middlewares: [AuthCheckMiddleware()]),
-    GetPage(
-        name: _Paths.MEALS_DETAILS,
-        page: () => MealsDetailsView(),
-        binding: MealsDetailsBinding(),
-        transition: Transition.fadeIn,
-        middlewares: [AuthCheckMiddleware()]),
-    GetPage(
-        name: _Paths.MEAL_TIMING,
-        page: () => MealTimingView(),
-        transition: Transition.fadeIn,
-        binding: MealTimingBinding(),
-        middlewares: [AuthCheckMiddleware()]),
-    GetPage(
-        name: _Paths.TrainerDashboard,
-        page: () => TrainerDashboardView(),
-        binding: TrainerDashboardBindings(),
-        transition: Transition.fadeIn,
-        middlewares: [AuthCheckMiddleware()]),
-    GetPage(
-      name: _Paths.SWITCHROLE,
-      page: () => SwitchRoleScreen(),
+      name: _Paths.NUTRITION_GOAL,
+      page: () => NutritionGoalView(),
+      binding: NutritionGoalBinding(),
+      transition: Transition.fadeIn,
     ),
     GetPage(
-        name: _Paths.UserDiet,
-        page: () => UserDietView(),
-        transition: Transition.fadeIn,
-        binding: UserDietScreenBindings(),
-        middlewares: [AuthCheckMiddleware()]),
+      name: _Paths.NOTIFICATION,
+      page: () => NotificationView(),
+      binding: NotificationBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [AuthCheckMiddleware()],
+    ),
     GetPage(
-        name: _Paths.ClientDashboard,
-        page: () => ClientDashboardScreen(),
-        binding: ClientDashboardBindings(),
-        middlewares: <GetMiddleware>[AuthCheckMiddleware()]),
+      name: _Paths.GENERATE_AI,
+      page: () => GenerateAiView(),
+      binding: GenerateAiBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.MEAL_HISTORY,
+      page: () => MealHistoryView(),
+      binding: MealHistoryBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.MEALS_DETAILS,
+      page: () => MealsDetailsView(),
+      binding: MealsDetailsBinding(),
+      transition: Transition.fadeIn,
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.MEAL_TIMING,
+      page: () => MealTimingView(),
+      transition: Transition.fadeIn,
+      binding: MealTimingBinding(),
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.TrainerDashboard,
+      page: () => TrainerDashboardView(),
+      binding: TrainerDashboardBindings(),
+      transition: Transition.fadeIn,
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(name: _Paths.SWITCHROLE, page: () => SwitchRoleScreen()),
+    GetPage(
+      name: _Paths.UserDiet,
+      page: () => UserDietView(),
+      transition: Transition.fadeIn,
+      binding: UserDietScreenBindings(),
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.ClientDashboard,
+      page: () => ClientDashboardScreen(),
+      binding: ClientDashboardBindings(),
+      middlewares: <GetMiddleware>[AuthCheckMiddleware()],
+    ),
     GetPage(
       name: _Paths.FORGETPASSWORD,
       binding: ForgetPasswordScreenBindings(),
       page: () => ForgetPasswordScreenViews(),
     ),
     GetPage(
-        name: _Paths.CreateMeal,
-        transition: Transition.fadeIn,
-        binding: CreateMealBinding(),
-        page: () => CreateMealScreen(),
-        middlewares: [AuthCheckMiddleware()]),
+      name: _Paths.CreateMeal,
+      transition: Transition.fadeIn,
+      binding: CreateMealBinding(),
+      page: () => CreateMealScreen(),
+      middlewares: [AuthCheckMiddleware()],
+    ),
     GetPage(
-        name: _Paths.GROUP,
-        page: () => GroupView(),
-        binding: GroupBinding(),
-        middlewares: [AuthCheckMiddleware()]),
+      name: _Paths.GROUP,
+      page: () => GroupView(),
+      binding: GroupBinding(),
+      middlewares: [AuthCheckMiddleware()],
+    ),
     GetPage(
-        name: _Paths.CREATE_GROUP,
-        page: () => CreateGroupScreen(),
-        binding: GroupBinding()),
+      name: _Paths.CREATE_GROUP,
+      page: () => CreateGroupScreen(),
+      binding: GroupBinding(),
+    ),
     GetPage(
-        name: _Paths.GROUP_DETAILS,
-        page: () => GroupDetailsScreen(),
-        binding: GroupBinding()),
+      name: _Paths.GROUP_DETAILS,
+      page: () => GroupDetailsScreen(),
+      binding: GroupBinding(),
+    ),
     GetPage(
       name: _Paths.SIGNUP,
       transition: Transition.leftToRight,

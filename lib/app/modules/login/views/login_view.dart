@@ -45,35 +45,43 @@ class _LoginViewState extends State<LoginView> {
         );
 
         if (loginSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Login Successful!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Invalid credentials! Please check your email and password.',
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Login Successful!'),
+                backgroundColor: Colors.green,
               ),
-              backgroundColor: Colors.red,
-            ),
-          );
+            );
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Invalid credentials! Please check your email and password.',
+                ),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         }
       }
     } catch (e) {
       print("Login error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('An error occurred. Please try again.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('An error occurred. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -161,7 +169,7 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
                     style: TextStyle(color: Colors.white),
-                    validator: AppValidator().validateEmail,
+                    validator: AppValidator.validateEmail,
                   ),
                   SizedBox(height: 25),
 
@@ -212,7 +220,7 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
                     style: TextStyle(color: Colors.white),
-                    validator: AppValidator().validatePassword,
+                    validator: AppValidator.validatePassword,
                   ),
                   SizedBox(height: 10),
 

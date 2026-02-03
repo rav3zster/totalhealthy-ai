@@ -7,52 +7,133 @@ class MealsFirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _collection = 'meals';
 
-  /// Stream of meals filtered by group
-  Stream<List<MealModel>> getMealsStream(String groupId) {
-    print("DEBUG: MealsFirestoreService - getMealsStream for $groupId");
+  /// User-specific meals stream filtered by userId
+  Stream<List<MealModel>> getUserMealsStream(String userId) {
     return _firestore
         .collection(_collection)
-        .where('groupId', isEqualTo: groupId)
-        // Temporarily comment out orderBy to check if it's an indexing issue
-        // .orderBy('created_at', descending: true)
+        .where('userId', isEqualTo: userId)
         .snapshots()
         .map((snapshot) {
-          print(
-            "DEBUG: MealsFirestoreService - Stream emitted ${snapshot.docs.length} docs",
-          );
           return snapshot.docs
               .map((doc) => MealModel.fromJson(doc.data(), docId: doc.id))
-              .toList();
+              .toList()
+            ..sort(
+              (a, b) => b.createdAt.compareTo(a.createdAt),
+            ); // Sort in memory instead of using orderBy
+        })
+        .handleError((error) {
+          print('Error fetching user meals for $userId: $error');
+          return <MealModel>[];
         });
   }
 
-  /// Fetch all meals once
-  Future<List<MealModel>> getMeals() async {
-    final querySnapshot = await _firestore
+  /// Stream of meals filtered by group (existing method enhanced)
+  Stream<List<MealModel>> getMealsStream(String groupId) {
+    return _firestore
         .collection(_collection)
+        .where('groupId', isEqualTo: groupId)
         .orderBy('created_at', descending: true)
-        .get();
-    return querySnapshot.docs
-        .map((doc) => MealModel.fromJson(doc.data(), docId: doc.id))
-        .toList();
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs
+              .map((doc) => MealModel.fromJson(doc.data(), docId: doc.id))
+              .toList();
+        })
+        .handleError((error) {
+          print('Error fetching group meals for $groupId: $error');
+          return <MealModel>[];
+        });
+  }
+
+  /// Search meals by name for a specific user
+  Stream<List<MealModel>> searchUserMeals(String userId, String searchQuery) {
+    return _firestore
+        .collection(_collection)
+        .where('userId', isEqualTo: userId)
+        .orderBy('name')
+        .startAt([searchQuery])
+        .endAt([searchQuery + '\uf8ff'])
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs
+              .map((doc) => MealModel.fromJson(doc.data(), docId: doc.id))
+              .toList();
+        })
+        .handleError((error) {
+          print(
+            'Error searching meals for $userId with query "$searchQuery": $error',
+          );
+          return <MealModel>[];
+        });
+  }
+
+  /// Fetch all meals once (fallback method)
+  Future<List<MealModel>> getMeals() async {
+    try {
+      final querySnapshot = await _firestore.collection(_collection).get();
+      return querySnapshot.docs
+          .map((doc) => MealModel.fromJson(doc.data(), docId: doc.id))
+          .toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Sort in memory
+    } catch (e) {
+      print('Error fetching all meals: $e');
+      return <MealModel>[];
+    }
   }
 
   /// Add a new meal to Firestore
   Future<void> addMeal(MealModel meal) async {
-    final user = FirebaseAuth.instance.currentUser;
-    print('AUTH USER: ${user?.uid}');
-    await _firestore.collection(_collection).add(meal.toJson());
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('User not authenticated');
+
+      await _firestore.collection(_collection).add(meal.toJson());
+    } catch (e) {
+      print('Error adding meal: $e');
+      rethrow;
+    }
   }
 
   /// Upload multiple meals (for seeding)
   Future<void> uploadBulkMeals(List<MealModel> meals) async {
-    final user = FirebaseAuth.instance.currentUser;
-    print('AUTH USER: ${user?.uid}');
-    final batch = _firestore.batch();
-    for (var meal in meals) {
-      final docRef = _firestore.collection(_collection).doc();
-      batch.set(docRef, meal.toJson());
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('User not authenticated');
+
+      final batch = _firestore.batch();
+      for (var meal in meals) {
+        final docRef = _firestore.collection(_collection).doc();
+        batch.set(docRef, meal.toJson());
+      }
+      await batch.commit();
+    } catch (e) {
+      print('Error uploading bulk meals: $e');
+      rethrow;
     }
-    await batch.commit();
+  }
+
+  /// Delete a meal by ID
+  Future<void> deleteMeal(String mealId) async {
+    try {
+      await _firestore.collection(_collection).doc(mealId).delete();
+    } catch (e) {
+      print('Error deleting meal $mealId: $e');
+      rethrow;
+    }
+  }
+
+  /// Update a meal
+  Future<void> updateMeal(MealModel meal) async {
+    try {
+      if (meal.id == null) throw Exception('Meal ID is required for update');
+
+      await _firestore
+          .collection(_collection)
+          .doc(meal.id)
+          .update(meal.toJson());
+    } catch (e) {
+      print('Error updating meal ${meal.id}: $e');
+      rethrow;
+    }
   }
 }

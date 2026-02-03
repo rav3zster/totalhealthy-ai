@@ -29,7 +29,7 @@ class DummyDataService {
       height: 175,
       activityLevel: "Moderate",
       goals: ["Weight Loss", "Muscle Gain"],
-      joinDate: "2024-01-15",
+      joinDate: DateTime.parse("2024-01-15"),
       planName: "Keto Plan",
       planDuration: "Oct 1 - Nov 1",
       progressPercentage: 85,

@@ -47,7 +47,9 @@ class AppNotification {
         (e) => e.toString().split('.').last == (json['status'] ?? 'pending'),
         orElse: () => NotificationStatus.pending,
       ),
-      timestamp: (json['timestamp'] as Timestamp).toDate(),
+      timestamp: json['timestamp'] != null
+          ? (json['timestamp'] as Timestamp).toDate()
+          : DateTime.now(),
       groupId: json['groupId'],
       groupName: json['groupName'],
     );

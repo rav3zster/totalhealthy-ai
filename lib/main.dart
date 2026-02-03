@@ -4,9 +4,9 @@ import 'package:get_storage/get_storage.dart';
 
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'app/core/base/constants/custom_scroll.dart';
-import 'app/core/base/controllers/theme_controller.dart';
 import 'app/routes/app_pages.dart';
 import 'app/widgets/notification_services.dart';
+import 'app/bindings/app_bindings.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -23,12 +23,15 @@ void main() async {
   runApp(const MyApp());
 }
 
-initializeControllers() async {
+Future<void> initializeControllers() async {
   try {
     await _notificationService.initialize();
   } catch (e) {
     print("Notification service initialization failed: $e");
   }
+
+  // Initialize core bindings first
+  InitialBindings().dependencies();
 
   await Get.putAsync<AuthController>(
     () async => AuthController().init(),
@@ -53,6 +56,7 @@ class _MyAppState extends State<MyApp> {
       ),
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
+      initialBinding: AppBindings(), // Add our app bindings
       title: 'Total Healthy',
       onReady: () {},
       scrollBehavior: MyCustomScrollBehavior(),

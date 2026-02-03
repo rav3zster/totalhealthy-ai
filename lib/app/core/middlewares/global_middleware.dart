@@ -9,7 +9,10 @@ class AuthCheckMiddleware extends GetMiddleware {
     // Check authentication status
     try {
       final authController = Get.find<AuthController>();
-      if (!authController.isAuthenticated.value) {
+      // Use direct access to the boolean value without reactive subscription
+      // since middleware doesn't need reactive updates
+      final isAuth = authController.isAuthenticated.value;
+      if (!isAuth) {
         print("User not authenticated, redirecting to login");
         return const RouteSettings(name: "/login");
       }

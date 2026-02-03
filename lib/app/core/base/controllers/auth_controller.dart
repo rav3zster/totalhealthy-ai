@@ -82,7 +82,7 @@ class AuthController extends GetxController {
             height: 0,
             activityLevel: "Moderate",
             goals: [],
-            joinDate: DateTime.now().toIso8601String(),
+            joinDate: DateTime.now(),
           );
           await usersService.createUserProfile(profile);
         }
@@ -153,7 +153,7 @@ class AuthController extends GetxController {
           height: 0,
           activityLevel: "Moderate",
           goals: [],
-          joinDate: DateTime.now().toIso8601String(),
+          joinDate: DateTime.now(),
         );
 
         final usersService = UsersFirestoreService();
@@ -305,7 +305,7 @@ class AuthController extends GetxController {
         height: 0,
         activityLevel: "Moderate",
         goals: [],
-        joinDate: DateTime.now().toIso8601String(),
+        joinDate: DateTime.now(),
       );
     }
     return DummyDataService.getDummyUser();

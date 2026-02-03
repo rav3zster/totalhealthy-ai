@@ -10,14 +10,17 @@ class NotificationsFirestoreService {
     return _firestore
         .collection(_collection)
         .where('recipientId', isEqualTo: recipientId)
-        .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs.map((doc) {
+          final notifications = snapshot.docs.map((doc) {
             final data = Map<String, dynamic>.from(doc.data());
             data['id'] = doc.id;
             return AppNotification.fromJson(data);
           }).toList();
+
+          // Sort by timestamp in memory instead of using Firestore orderBy
+          notifications.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          return notifications;
         });
   }
 

@@ -24,10 +24,25 @@ class NotificationController extends GetxController {
     final currentUser = authController.firebaseUser.value;
 
     if (currentUser != null) {
-      notifications.bindStream(
-        _notificationsService.getNotificationsStream(currentUser.uid),
-      );
-      ever(notifications, (_) => isLoading.value = false);
+      try {
+        notifications.bindStream(
+          _notificationsService.getNotificationsStream(currentUser.uid),
+        );
+        ever(notifications, (_) => isLoading.value = false);
+
+        // Safety timeout for loading
+        Future.delayed(const Duration(seconds: 10), () {
+          if (isLoading.value) {
+            print("DEBUG: NotificationController - Loading timeout reached");
+            isLoading.value = false;
+          }
+        });
+      } catch (e) {
+        print(
+          "DEBUG: NotificationController - Error initializing notifications: $e",
+        );
+        isLoading.value = false;
+      }
     } else {
       isLoading.value = false;
     }
