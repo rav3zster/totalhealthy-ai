@@ -1,7 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/modules/create_meal/controllers/create_meal_controller.dart';
 
@@ -146,57 +144,103 @@ class _CreateMealPageState extends State<CreateMealPage> {
                 ),
               ),
               SizedBox(height: 16),
-              Text("Category", style: TextStyle(color: Color(0XFFDBDBDB))),
+              Row(
+                children: [
+                  Text("Category", style: TextStyle(color: Color(0XFFDBDBDB))),
+                  Text(" *", style: TextStyle(color: Colors.red, fontSize: 16)),
+                ],
+              ),
               SizedBox(height: 10),
-              Container(
-                decoration: BoxDecoration(
-                  color: Color(0XFF242522), // Background color for the box
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black54, // Shadow color
-                      blurRadius: 4, // Shadow blur
-                      offset: Offset(0, 2), // Shadow position
+              Obx(
+                () => Container(
+                  decoration: BoxDecoration(
+                    color: Color(0XFF242522), // Background color for the box
+                    borderRadius: BorderRadius.circular(8), // Rounded corners
+                    border: Border.all(
+                      color: widget.controller.categoryError.value.isNotEmpty
+                          ? Colors.red
+                          : Colors.transparent,
+                      width: 1,
                     ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    // Title of the ExpansionTile
-                    ExpansionTile(
-                      title: Text(
-                        "Breakfast",
-                        style: TextStyle(color: Color(0XFF7E7E7E)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black54, // Shadow color
+                        blurRadius: 4, // Shadow blur
+                        offset: Offset(0, 2), // Shadow position
                       ),
-                      children: widget.controller.categories.map((category) {
-                        return Obx(() {
-                          return CheckboxListTile(
-                            title: Text(
-                              category,
-                              style: TextStyle(color: Colors.white),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      // Title of the ExpansionTile
+                      ExpansionTile(
+                        title: Obx(
+                          () => Text(
+                            widget.controller.selectedCategories.isEmpty
+                                ? "Select Categories"
+                                : widget.controller.selectedCategories.length ==
+                                      1
+                                ? widget.controller.selectedCategories.first
+                                : "${widget.controller.selectedCategories.length} categories selected",
+                            style: TextStyle(
+                              color:
+                                  widget
+                                      .controller
+                                      .categoryError
+                                      .value
+                                      .isNotEmpty
+                                  ? Colors.red
+                                  : Color(0XFF7E7E7E),
                             ),
-                            value: widget.controller.selectedCategories
-                                .contains(category),
-                            onChanged: (selected) {
-                              if (selected == true) {
-                                widget.controller.selectedCategories.add(
+                          ),
+                        ),
+                        children: widget.controller.categories.map((category) {
+                          return Obx(() {
+                            return CheckboxListTile(
+                              title: Text(
+                                category,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              value: widget.controller.selectedCategories
+                                  .contains(category),
+                              onChanged: (selected) {
+                                widget.controller.onCategoryChanged(
                                   category,
+                                  selected ?? false,
                                 );
-                              } else {
-                                widget.controller.selectedCategories.remove(
-                                  category,
-                                );
-                              }
-                            },
-                            controlAffinity: ListTileControlAffinity.leading,
-                            activeColor: Colors.greenAccent,
-                          );
-                        });
-                      }).toList(),
-                    ),
-                  ],
+                              },
+                              controlAffinity: ListTileControlAffinity.leading,
+                              checkColor: Colors.white,
+                              fillColor:
+                                  WidgetStateProperty.resolveWith<Color?>((
+                                    Set<WidgetState> states,
+                                  ) {
+                                    if (states.contains(WidgetState.selected)) {
+                                      return Colors.greenAccent;
+                                    }
+                                    return null;
+                                  }),
+                            );
+                          });
+                        }).toList(),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+              // Error message for categories
+              Obx(() {
+                if (widget.controller.categoryError.value.isNotEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0, left: 12.0),
+                    child: Text(
+                      widget.controller.categoryError.value,
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  );
+                }
+                return SizedBox.shrink();
+              }),
               SizedBox(height: 16),
               Text("Description", style: TextStyle(color: Color(0XFFDBDBDB))),
               SizedBox(height: 10),

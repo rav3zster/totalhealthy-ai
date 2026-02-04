@@ -17,6 +17,7 @@ class CreateMealController extends GetxController {
   var ingredientControllers = <Map<String, dynamic>>[].obs;
   var selectedCategories = <String>[].obs;
   var calculateAutomatically = false.obs;
+  var categoryError = ''.obs; // Add category error tracking
 
   final List<String> categories = [
     "Breakfast",
@@ -30,10 +31,39 @@ class CreateMealController extends GetxController {
   GlobalKey<FormState> key = GlobalKey<FormState>();
 
   var isLoading = false.obs;
+
+  // Validate categories selection
+  bool validateCategories() {
+    if (selectedCategories.isEmpty) {
+      categoryError.value = 'Please select at least one category';
+      return false;
+    }
+    categoryError.value = '';
+    return true;
+  }
+
+  // Clear category error when user selects a category
+  void onCategoryChanged(String category, bool selected) {
+    if (selected == true) {
+      selectedCategories.add(category);
+    } else {
+      selectedCategories.remove(category);
+    }
+
+    // Clear error when user makes a selection
+    if (selectedCategories.isNotEmpty && categoryError.value.isNotEmpty) {
+      categoryError.value = '';
+    }
+  }
+
   //  {"name": "string", "amount": "string", "unit": "string"}
   submitUser(context, userId) async {
     try {
-      if (key.currentState!.validate()) {
+      // Validate form and categories
+      bool isFormValid = key.currentState!.validate();
+      bool areCategoriesValid = validateCategories();
+
+      if (isFormValid && areCategoriesValid) {
         isLoading.value = true;
 
         final authController = Get.find<AuthController>();

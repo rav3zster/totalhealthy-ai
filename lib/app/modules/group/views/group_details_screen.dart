@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/models/user_model.dart';
-import '../../../data/models/notification_model.dart';
 import '../controllers/group_controller.dart';
-import '../../../core/base/controllers/auth_controller.dart';
+import '../../../core/theme/app_theme.dart';
 
 class GroupDetailsScreen extends StatelessWidget {
   const GroupDetailsScreen({super.key});
@@ -15,141 +14,177 @@ class GroupDetailsScreen extends StatelessWidget {
     final controller = Get.find<GroupController>();
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.backgroundDark,
       body: SafeArea(
         child: Column(
           children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                    onPressed: () {
-                      Get.back();
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Groups Details',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+            // Header with gradient
+            Container(
+              decoration: const BoxDecoration(
+                gradient: AppTheme.headerGradient,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(AppTheme.spacingM),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back_ios,
+                        color: AppTheme.textPrimary,
+                      ),
+                      onPressed: () {
+                        Get.back();
+                      },
                     ),
-                  ),
-                ],
+                    const SizedBox(width: AppTheme.spacingS),
+                    Text('Groups Details', style: AppTheme.headingMedium),
+                  ],
+                ),
               ),
             ),
 
             // Group Info Card
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2A2A2A),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Group Name
-                  Text(
-                    group['name'] ?? 'Weekly Meal Planning Group',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+              margin: const EdgeInsets.symmetric(horizontal: AppTheme.spacingM),
+              decoration: AppTheme.highlightCardDecoration,
+              child: Padding(
+                padding: const EdgeInsets.all(AppTheme.spacingL),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Group Name
+                    Text(
+                      group['name'] ?? 'Weekly Meal Planning Group',
+                      style: AppTheme.headingSmall,
                     ),
-                  ),
-                  const SizedBox(height: 8),
+                    const SizedBox(height: AppTheme.spacingS),
 
-                  // Description
-                  Text(
-                    group['description'] ??
-                        'A support group for planning and tracking weekly meal prep, ideal for maintaining a balanced diet.',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                      height: 1.4,
+                    // Description
+                    Text(
+                      group['description'] ??
+                          'A support group for planning and tracking weekly meal prep, ideal for maintaining a balanced diet.',
+                      style: AppTheme.bodyMedium,
                     ),
-                  ),
-                  const SizedBox(height: 16),
+                    const SizedBox(height: AppTheme.spacingM),
 
-                  // Created Date
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.calendar_today,
-                        color: Color(0xFFC2D86A),
-                        size: 16,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Created On: ${group['createdDate'] ?? 'August 1, 2024'}',
-                        style: const TextStyle(
-                          color: Colors.white54,
-                          fontSize: 12,
+                    // Created Date
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today,
+                          color: AppTheme.primaryLight,
+                          size: 16,
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
+                        const SizedBox(width: AppTheme.spacingS),
+                        Text(
+                          'Created On: ${group['createdDate'] ?? 'August 1, 2024'}',
+                          style: AppTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppTheme.spacingS),
 
-                  // Total Members
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.people,
-                        color: Color(0xFFC2D86A),
-                        size: 16,
+                    // Total Members
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.people,
+                          color: AppTheme.primaryLight,
+                          size: 16,
+                        ),
+                        const SizedBox(width: AppTheme.spacingS),
+                        FutureBuilder<List<UserModel>>(
+                          future: controller.getGroupMembers(group['id'] ?? ''),
+                          builder: (context, snapshot) {
+                            final memberCount = snapshot.data?.length ?? 0;
+                            return Text(
+                              'Total Members: $memberCount Members',
+                              style: AppTheme.bodySmall,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: AppTheme.spacingM),
+
+                    // Manage Members Button
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: AppTheme.primaryGradient,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusM),
                       ),
-                      const SizedBox(width: 8),
-                      Obx(
-                        () => Text(
-                          'Total Members: ${controller.totalUsers.value} Members',
-                          style: const TextStyle(
-                            color: Colors.white54,
-                            fontSize: 12,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Get.toNamed('/member-management', arguments: group);
+                        },
+                        icon: const Icon(
+                          Icons.group_add,
+                          color: AppTheme.textPrimary,
+                        ),
+                        label: Text(
+                          'Manage Members',
+                          style: AppTheme.bodyLarge.copyWith(
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
+                        style: AppTheme.primaryButtonStyle.copyWith(
+                          backgroundColor: WidgetStateProperty.all(
+                            Colors.transparent,
+                          ),
+                          elevation: WidgetStateProperty.all(0),
+                        ),
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: AppTheme.spacingL),
 
             // Members List
             Expanded(
-              child: Obx(() {
-                final authController = Get.find<AuthController>();
-                final currentUserId = authController.firebaseUser.value?.uid;
+              child: FutureBuilder<List<UserModel>>(
+                future: controller.getGroupMembers(group['id'] ?? ''),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: AppTheme.primaryBase,
+                      ),
+                    );
+                  }
 
-                final otherUsers = controller.users
-                    .where((u) => u.id != currentUserId)
-                    .toList();
+                  final members = snapshot.data ?? [];
 
-                if (otherUsers.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      "No members signed up yet.",
-                      style: TextStyle(color: Colors.white54),
+                  if (members.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "No members in this group yet.",
+                        style: AppTheme.bodyMedium,
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.spacingM,
                     ),
+                    itemCount: members.length,
+                    itemBuilder: (context, index) {
+                      final member = members[index];
+                      final isAdmin = group['created_by'] == member.id;
+                      return _buildMemberCard(
+                        member,
+                        controller,
+                        group,
+                        isAdmin,
+                      );
+                    },
                   );
-                }
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: otherUsers.length,
-                  itemBuilder: (context, index) {
-                    final member = otherUsers[index];
-                    return _buildMemberCard(member, controller, group);
-                  },
-                );
-              }),
+                },
+              ),
             ),
           ],
         ),
@@ -161,210 +196,146 @@ class GroupDetailsScreen extends StatelessWidget {
     UserModel member,
     GroupController controller,
     Map<String, dynamic> group,
+    bool isAdmin,
   ) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              // Profile Image
-              CircleAvatar(
-                radius: 30,
-                backgroundImage: NetworkImage(
-                  member.profileImage.isNotEmpty
-                      ? member.profileImage
-                      : 'https://via.placeholder.com/150',
+      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
+      decoration: isAdmin
+          ? AppTheme.highlightCardDecoration
+          : AppTheme.cardDecoration,
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingM),
+        child: Row(
+          children: [
+            // Profile Image with admin indicator
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundImage: NetworkImage(
+                    member.profileImage.isNotEmpty
+                        ? member.profileImage
+                        : 'https://via.placeholder.com/150',
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
+                if (isAdmin)
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        gradient: AppTheme.primaryGradient,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.star,
+                        color: AppTheme.textPrimary,
+                        size: 12,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(width: AppTheme.spacingM),
 
-              // Member Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'User Name: ${member.username}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Plan Name: ${member.planName}',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Plan Duration: ${member.planDuration}',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Email: ${member.email}',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
+            // Member Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(member.username, style: AppTheme.bodyLarge),
+                      if (isAdmin) ...[
+                        const SizedBox(width: AppTheme.spacingS),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppTheme.spacingS,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: AppTheme.primaryGradient,
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusM,
+                            ),
+                          ),
+                          child: Text(
+                            'Group Admin',
+                            style: AppTheme.caption.copyWith(
+                              color: AppTheme.textPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text('Plan: ${member.planName}', style: AppTheme.bodyMedium),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Duration: ${member.planDuration}',
+                    style: AppTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 4),
+                  Text('Email: ${member.email}', style: AppTheme.bodyMedium),
+                ],
               ),
+            ),
 
-              // Action Buttons
+            // Action Buttons (only for non-admin members)
+            if (!isAdmin)
               Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFC2D86A),
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.primaryGradient,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Icons.phone,
-                      color: Colors.black,
-                      size: 20,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.phone,
+                        color: AppTheme.textPrimary,
+                        size: 20,
+                      ),
+                      onPressed: () {},
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppTheme.spacingS),
                   Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFC2D86A),
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.primaryGradient,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Icons.email,
-                      color: Colors.black,
-                      size: 20,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.email,
+                        color: AppTheme.textPrimary,
+                        size: 20,
+                      ),
+                      onPressed: () {},
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppTheme.spacingS),
                   Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFC2D86A),
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.primaryGradient,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Icons.chat,
-                      color: Colors.black,
-                      size: 20,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.chat,
+                        color: AppTheme.textPrimary,
+                        size: 20,
+                      ),
+                      onPressed: () {},
                     ),
                   ),
                 ],
               ),
-            ],
-          ),
-
-          // Add Client Button
-          const SizedBox(height: 16),
-          // Add Client Button
-          const SizedBox(height: 16),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Obx(() {
-              // Check if user is already a member in the group data itself
-              final List membersList = group['members_list'] ?? [];
-              final isAlreadyMember = membersList.contains(member.id);
-
-              if (isAlreadyMember) {
-                return ElevatedButton(
-                  onPressed: null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    disabledBackgroundColor: Colors.green,
-                  ),
-                  child: const Text(
-                    'Member',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                );
-              }
-
-              // Check invitation status
-              final invitation = controller.sentInvitations.firstWhereOrNull(
-                (n) => n.recipientId == member.id && n.groupId == group['id'],
-              );
-
-              final status = invitation?.status;
-
-              String buttonText = 'Add Client';
-              Color buttonColor = const Color(0xFFC2D86A);
-              Color textColor = Colors.black;
-              VoidCallback? onPressed = () {
-                controller.inviteUser(
-                  member,
-                  groupId: group['id'],
-                  groupName: group['name'],
-                );
-              };
-
-              if (status == NotificationStatus.pending) {
-                buttonText = 'Pending';
-                buttonColor = Colors.grey;
-                textColor = Colors.white70;
-                onPressed = null;
-              } else if (status == NotificationStatus.accepted) {
-                buttonText = 'Accepted';
-                buttonColor = Colors.green;
-                textColor = Colors.white;
-                onPressed = null;
-              } else if (status == NotificationStatus.rejected) {
-                buttonText = 'Rejected';
-                buttonColor = Colors.redAccent;
-                textColor = Colors.white;
-                onPressed = null;
-              }
-
-              return ElevatedButton(
-                onPressed: onPressed,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: buttonColor,
-                  disabledBackgroundColor: buttonColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                ),
-                child: Text(
-                  buttonText,
-                  style: TextStyle(
-                    color: textColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              );
-            }),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../data/models/user_model.dart';
@@ -30,11 +31,66 @@ class UserController extends GetxController {
   final RxString _error = ''.obs;
   final RxBool _isInitialized = false.obs;
 
-  // Public getters with caching fallback
+  // Public getters with caching fallback - Make these reactive
   UserModel? get currentUser => _currentUser.value ?? _getCachedUser();
   bool get isLoading => _isLoading.value;
   String get error => _error.value;
   bool get isInitialized => _isInitialized.value;
+
+  // Computed properties for UI with caching fallback - Make these reactive
+  String get fullName =>
+      _currentUser.value?.fullName ?? _getCachedUser()?.fullName ?? 'User';
+  String get profileImage =>
+      _currentUser.value?.profileImage ?? _getCachedUser()?.profileImage ?? '';
+  String get email =>
+      _currentUser.value?.email ?? _getCachedUser()?.email ?? '';
+  int get currentDay =>
+      _currentUser.value?.currentDay ?? _getCachedUser()?.currentDay ?? 1;
+  double get goalProgress =>
+      _currentUser.value?.goalAchievedPercentage ??
+      _getCachedUser()?.goalAchievedPercentage ??
+      0.0;
+  String get primaryGoal =>
+      _currentUser.value?.primaryGoal ??
+      _getCachedUser()?.primaryGoal ??
+      'General Fitness';
+
+  // Live stats calculations - Make these reactive
+  String get fatLost =>
+      _currentUser.value?.fatLostDisplay ??
+      _getCachedUser()?.fatLostDisplay ??
+      '0kg';
+  String get muscleGained =>
+      _currentUser.value?.muscleGainedDisplay ??
+      _getCachedUser()?.muscleGainedDisplay ??
+      '0g';
+  String get goalAchievedPercent =>
+      _currentUser.value?.goalProgressDisplay ??
+      _getCachedUser()?.goalProgressDisplay ??
+      '0%';
+  String get dayCountDisplay =>
+      _currentUser.value?.dayCountDisplay ??
+      _getCachedUser()?.dayCountDisplay ??
+      'Day 1/55';
+  String get planDateRange =>
+      _currentUser.value?.planDateRange ??
+      _getCachedUser()?.planDateRange ??
+      '';
+
+  // User stats for profile display - Make these reactive
+  String get weightDisplay => _currentUser.value != null
+      ? '${_currentUser.value!.weight.toInt()}'
+      : (_getCachedUser() != null
+            ? '${_getCachedUser()!.weight.toInt()}'
+            : '0');
+  String get ageDisplay =>
+      _currentUser.value?.age.toString() ??
+      _getCachedUser()?.age.toString() ??
+      '0';
+  String get heightDisplay =>
+      _currentUser.value?.height.toString() ??
+      _getCachedUser()?.height.toString() ??
+      '0';
 
   // Stream subscriptions for cleanup
   StreamSubscription<User?>? _authSubscription;
@@ -44,9 +100,11 @@ class UserController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    print("UserController: onInit called");
     _loadCachedData();
-    // Delay initialization to allow AuthController to be ready
-    Future.delayed(Duration.zero, () {
+
+    // Initialize immediately after the frame is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeAuthListener();
     });
   }
@@ -57,27 +115,6 @@ class UserController extends GetxController {
     _userSubscription?.cancel();
     super.onClose();
   }
-
-  // Computed properties for UI with caching fallback
-  String get fullName => currentUser?.fullName ?? 'User';
-  String get profileImage => currentUser?.profileImage ?? '';
-  String get email => currentUser?.email ?? '';
-  int get currentDay => currentUser?.currentDay ?? 1;
-  double get goalProgress => currentUser?.goalAchievedPercentage ?? 0.0;
-  String get primaryGoal => currentUser?.primaryGoal ?? 'General Fitness';
-
-  // Live stats calculations
-  String get fatLost => currentUser?.fatLostDisplay ?? '0kg';
-  String get muscleGained => currentUser?.muscleGainedDisplay ?? '0g';
-  String get goalAchievedPercent => currentUser?.goalProgressDisplay ?? '0%';
-  String get dayCountDisplay => currentUser?.dayCountDisplay ?? 'Day 1/55';
-  String get planDateRange => currentUser?.planDateRange ?? '';
-
-  // User stats for profile display
-  String get weightDisplay =>
-      currentUser != null ? '${currentUser!.weight.toInt()}' : '0';
-  String get ageDisplay => currentUser?.age.toString() ?? '0';
-  String get heightDisplay => currentUser?.height.toString() ?? '0';
 
   // Cache management methods
   void _loadCachedData() {
@@ -133,13 +170,19 @@ class UserController extends GetxController {
   }
 
   void _initializeAuthListener() {
+    print("UserController: Initializing auth listener");
+
     // Check if AuthController is available
     final authController = _authController;
     if (authController == null) {
+      print(
+        "UserController: AuthController not available, using direct Firebase Auth",
+      );
       // Fallback to direct Firebase Auth if AuthController is not ready
       _authSubscription = FirebaseAuth.instance.authStateChanges().listen((
         user,
       ) {
+        print("UserController: Auth state changed - User: ${user?.uid}");
         if (user != null && user.uid != _currentUserId) {
           _currentUserId = user.uid;
           _subscribeToUserData(user.uid);
@@ -150,8 +193,12 @@ class UserController extends GetxController {
       return;
     }
 
+    print("UserController: Using AuthController for auth state");
     // Listen to AuthController's authentication state
     _authSubscription = authController.firebaseUser.listen((user) {
+      print(
+        "UserController: AuthController state changed - User: ${user?.uid}",
+      );
       if (user != null && user.uid != _currentUserId) {
         _currentUserId = user.uid;
         _subscribeToUserData(user.uid);
@@ -162,9 +209,16 @@ class UserController extends GetxController {
   }
 
   void _subscribeToUserData(String uid) {
+    print("UserController: Subscribing to user data for UID: $uid");
+
     // Don't show loading if we have cached data
     if (_currentUser.value == null) {
+      print("UserController: No cached data, showing loading");
       _isLoading.value = true;
+    } else {
+      print(
+        "UserController: Using cached data for user: ${_currentUser.value?.fullName}",
+      );
     }
     _error.value = '';
 
@@ -176,6 +230,7 @@ class UserController extends GetxController {
         .timeout(const Duration(seconds: 8))
         .listen(
           (userData) {
+            print("UserController: Received user data: ${userData?.fullName}");
             if (userData != null) {
               _currentUser.value = userData;
               _cacheUserData(userData);
@@ -190,6 +245,7 @@ class UserController extends GetxController {
             _isLoading.value = false;
             _error.value = '';
             _isInitialized.value = true;
+            print("UserController: User data loading completed");
           },
           onError: (err) {
             print('UserController stream error: $err');
@@ -205,6 +261,7 @@ class UserController extends GetxController {
     // Safety timeout to ensure loading state is cleared
     Future.delayed(const Duration(seconds: 10), () {
       if (_isLoading.value) {
+        print("UserController: Timeout reached, clearing loading state");
         _isLoading.value = false;
         _isInitialized.value = true;
         if (_currentUser.value == null) {

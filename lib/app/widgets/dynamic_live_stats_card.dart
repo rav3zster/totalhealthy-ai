@@ -1,60 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/user_controller.dart';
+import '../core/theme/app_theme.dart';
 
 class DynamicLiveStatsCard extends StatelessWidget {
   const DynamicLiveStatsCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<UserController>(
-      init: Get.find<UserController>(),
-      builder: (controller) {
-        if (controller.isLoading) {
-          return _buildLoadingCard();
-        }
+    return Obx(() {
+      final controller = Get.find<UserController>();
 
-        if (controller.error.isNotEmpty) {
-          return _buildErrorCard(controller);
-        }
+      if (controller.isLoading && controller.currentUser == null) {
+        return _buildLoadingCard();
+      }
 
-        return _buildStatsCard(controller);
-      },
-    );
+      if (controller.error.isNotEmpty && controller.currentUser == null) {
+        return _buildErrorCard(controller);
+      }
+
+      return _buildStatsCard(controller);
+    });
   }
 
   Widget _buildStatsCard(UserController controller) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      padding: const EdgeInsets.all(AppTheme.spacingL),
+      decoration: AppTheme.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Live Stats',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
+          Text('Live Stats', style: AppTheme.headingSmall),
+          const SizedBox(height: AppTheme.spacingM),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildStatItem(
                 controller.goalAchievedPercent,
                 'Goal Achieved',
-                Colors.orange,
+                AppTheme.warning,
               ),
-              _buildStatItem(controller.fatLost, 'Fat Lost', Colors.yellow),
+              _buildStatItem(
+                controller.fatLost,
+                'Fat Lost',
+                AppTheme.primaryLight,
+              ),
               _buildStatItem(
                 controller.muscleGained,
                 'Muscle Gained',
-                Colors.purple,
+                AppTheme.success,
               ),
             ],
           ),
@@ -65,23 +59,13 @@ class DynamicLiveStatsCard extends StatelessWidget {
 
   Widget _buildLoadingCard() {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      padding: const EdgeInsets.all(AppTheme.spacingL),
+      decoration: AppTheme.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Live Stats',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
+          Text('Live Stats', style: AppTheme.headingSmall),
+          const SizedBox(height: AppTheme.spacingM),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -97,44 +81,34 @@ class DynamicLiveStatsCard extends StatelessWidget {
 
   Widget _buildErrorCard(UserController controller) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      padding: const EdgeInsets.all(AppTheme.spacingL),
+      decoration: AppTheme.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Text(
-                'Live Stats',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text('Live Stats', style: AppTheme.headingSmall),
               const Spacer(),
               GestureDetector(
                 onTap: () => controller.refreshUserData(),
                 child: const Icon(
                   Icons.refresh,
-                  color: Color(0xFFC2D86A),
+                  color: AppTheme.primaryBase,
                   size: 20,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.spacingM),
           const Center(
             child: Column(
               children: [
-                Icon(Icons.error_outline, color: Colors.red, size: 32),
+                Icon(Icons.error_outline, color: AppTheme.error, size: 32),
                 SizedBox(height: 8),
                 Text(
                   'Failed to load stats',
-                  style: TextStyle(color: Colors.red, fontSize: 14),
+                  style: TextStyle(color: AppTheme.error, fontSize: 14),
                 ),
               ],
             ),
@@ -159,7 +133,7 @@ class DynamicLiveStatsCard extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(color: Colors.white70, fontSize: 12),
+          style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
           textAlign: TextAlign.center,
         ),
       ],
@@ -173,8 +147,8 @@ class DynamicLiveStatsCard extends StatelessWidget {
           width: 40,
           height: 20,
           decoration: BoxDecoration(
-            color: const Color(0xFF3A3A3A),
-            borderRadius: BorderRadius.circular(4),
+            color: AppTheme.surfaceLight,
+            borderRadius: BorderRadius.circular(AppTheme.radiusS),
           ),
           child: const Center(
             child: SizedBox(
@@ -182,7 +156,7 @@ class DynamicLiveStatsCard extends StatelessWidget {
               height: 12,
               child: CircularProgressIndicator(
                 strokeWidth: 1.5,
-                color: Color(0xFFC2D86A),
+                color: AppTheme.primaryBase,
               ),
             ),
           ),
@@ -190,7 +164,7 @@ class DynamicLiveStatsCard extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(color: Colors.white70, fontSize: 12),
+          style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
           textAlign: TextAlign.center,
         ),
       ],

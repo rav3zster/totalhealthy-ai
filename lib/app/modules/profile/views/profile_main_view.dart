@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/user_controller.dart';
 import '../../../widgets/base_screen_wrapper.dart';
+import '../../../core/theme/app_theme.dart';
 import 'profile_edit_view.dart';
 
 class ProfileMainView extends StatelessWidget {
@@ -12,31 +13,40 @@ class ProfileMainView extends StatelessWidget {
     return BaseScreenWrapper(
       title: 'Profile',
       actions: [
-        IconButton(
-          icon: const Icon(Icons.edit, color: Colors.white),
-          onPressed: () => Get.to(() => const ProfileEditView()),
+        Container(
+          decoration: BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.edit, color: AppTheme.textPrimary),
+            onPressed: () => Get.to(() => const ProfileEditView()),
+          ),
         ),
       ],
       child: GetBuilder<UserController>(
         builder: (userController) {
           return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.spacingL,
+              vertical: AppTheme.spacingL,
+            ),
             child: Column(
               children: [
                 // Profile Image and Name
                 _buildProfileHeader(userController),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: AppTheme.spacingXL),
 
                 // Stats Cards
                 _buildStatsCards(userController),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: AppTheme.spacingXXL),
 
                 // Menu Options
                 _buildMenuOptions(),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: AppTheme.spacingXXL),
 
                 // Additional Profile Stats
                 _buildProgressSection(userController),
@@ -56,25 +66,15 @@ class ProfileMainView extends StatelessWidget {
           backgroundImage: userController.profileImage.isNotEmpty
               ? NetworkImage(userController.profileImage)
               : const AssetImage('assets/user_avatar.png') as ImageProvider,
-          onBackgroundImageError: (_, __) {
+          onBackgroundImageError: (_, _) {
             // Handle image loading error silently
           },
         ),
-        const SizedBox(height: 16),
-        Text(
-          userController.fullName,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        const SizedBox(height: AppTheme.spacingM),
+        Text(userController.fullName, style: AppTheme.headingSmall),
         if (userController.email.isNotEmpty) ...[
           const SizedBox(height: 4),
-          Text(
-            userController.email,
-            style: const TextStyle(color: Colors.white54, fontSize: 14),
-          ),
+          Text(userController.email, style: AppTheme.bodyMedium),
         ],
       ],
     );
@@ -86,11 +86,11 @@ class ProfileMainView extends StatelessWidget {
         Expanded(
           child: _buildStatCard('Weight', userController.weightDisplay, 'kg'),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppTheme.spacingM),
         Expanded(
           child: _buildStatCard('Age', userController.ageDisplay, 'Year'),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppTheme.spacingM),
         Expanded(
           child: _buildStatCard('Height', userController.heightDisplay, 'cm'),
         ),
@@ -108,7 +108,7 @@ class ProfileMainView extends StatelessWidget {
             Get.toNamed('/profile-settings');
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppTheme.spacingM),
         _buildMenuOption(
           icon: Icons.track_changes_outlined,
           title: 'Goal Setting',
@@ -116,7 +116,7 @@ class ProfileMainView extends StatelessWidget {
             Get.toNamed('/nutrition-goal');
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppTheme.spacingM),
         _buildMenuOption(
           icon: Icons.settings_outlined,
           title: 'Setting',
@@ -124,7 +124,7 @@ class ProfileMainView extends StatelessWidget {
             Get.toNamed('/setting');
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppTheme.spacingM),
         _buildMenuOption(
           icon: Icons.help_outline,
           title: 'Help & Support',
@@ -138,55 +138,47 @@ class ProfileMainView extends StatelessWidget {
 
   Widget _buildProgressSection(UserController userController) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Progress Overview',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+      decoration: AppTheme.highlightCardDecoration,
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingL),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Progress Overview', style: AppTheme.headingSmall),
+            const SizedBox(height: AppTheme.spacingM),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildProgressItem(
+                    'Current Day',
+                    userController.currentDay.toString(),
+                    AppTheme.info,
+                  ),
+                ),
+                const SizedBox(width: AppTheme.spacingM),
+                Expanded(
+                  child: _buildProgressItem(
+                    'Goal Progress',
+                    userController.goalAchievedPercent,
+                    AppTheme.success,
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildProgressItem(
-                  'Current Day',
-                  userController.currentDay.toString(),
-                  Colors.blue,
+            const SizedBox(height: AppTheme.spacingM),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildProgressItem(
+                    'Primary Goal',
+                    userController.primaryGoal,
+                    AppTheme.warning,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildProgressItem(
-                  'Goal Progress',
-                  userController.goalAchievedPercent,
-                  Colors.green,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildProgressItem(
-                  'Primary Goal',
-                  userController.primaryGoal,
-                  Colors.orange,
-                ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -195,20 +187,12 @@ class ProfileMainView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white54,
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
+        Text(label, style: AppTheme.bodySmall),
         const SizedBox(height: 4),
         Text(
           value,
-          style: TextStyle(
+          style: AppTheme.bodyLarge.copyWith(
             color: color,
-            fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -218,46 +202,33 @@ class ProfileMainView extends StatelessWidget {
 
   Widget _buildStatCard(String label, String value, String unit) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF3A3A3A)),
-      ),
-      child: Column(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white54,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(height: 8),
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: value,
-                  style: const TextStyle(
-                    color: Color(0xFFC2D86A),
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+      decoration: AppTheme.cardDecoration,
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingM),
+        child: Column(
+          children: [
+            Text(label, style: AppTheme.bodySmall),
+            const SizedBox(height: AppTheme.spacingS),
+            RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: value,
+                    style: AppTheme.headingSmall.copyWith(
+                      color: AppTheme.primaryLight,
+                    ),
                   ),
-                ),
-                TextSpan(
-                  text: ' $unit',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
+                  TextSpan(
+                    text: ' $unit',
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -270,31 +241,31 @@ class ProfileMainView extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF2A2A2A),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.white, size: 24),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+        decoration: AppTheme.cardDecoration,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.spacingL,
+            vertical: AppTheme.spacingM,
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppTheme.spacingS),
+                decoration: BoxDecoration(
+                  gradient: AppTheme.primaryGradient,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusS),
                 ),
+                child: Icon(icon, color: AppTheme.textPrimary, size: 20),
               ),
-            ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white54,
-              size: 16,
-            ),
-          ],
+              const SizedBox(width: AppTheme.spacingM),
+              Expanded(child: Text(title, style: AppTheme.bodyLarge)),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: AppTheme.textTertiary,
+                size: 16,
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../../data/models/meal_model.dart';
@@ -31,16 +32,25 @@ class ClientDashboardControllers extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    print("ClientDashboardControllers: onInit called");
     _loadCachedMeals();
-    _initData();
+
+    // Initialize immediately, don't wait for navigation
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initData();
+    });
 
     // Safety mechanism: Force clear loading state after 15 seconds
     Future.delayed(const Duration(seconds: 15), () {
       if (isLoading.value) {
+        print(
+          "ClientDashboardControllers: Timeout reached, clearing loading state",
+        );
         isLoading.value = false;
         if (meals.isEmpty && error.value.isEmpty) {
           error.value = 'Loading timeout - please refresh';
         }
+        update(); // Force UI update
       }
     });
   }
@@ -85,12 +95,22 @@ class ClientDashboardControllers extends GetxController {
   }
 
   Future<void> _initData() async {
-    if (_isInitialized) return;
+    if (_isInitialized) {
+      print("ClientDashboardControllers: Already initialized, skipping");
+      return;
+    }
+
+    print("ClientDashboardControllers: Starting data initialization");
 
     try {
       // Only show loading if we don't have cached data
       if (meals.isEmpty) {
+        print("ClientDashboardControllers: No cached data, showing loading");
         isLoading.value = true;
+      } else {
+        print(
+          "ClientDashboardControllers: Using cached data (${meals.length} meals)",
+        );
       }
       error.value = '';
 
@@ -100,6 +120,7 @@ class ClientDashboardControllers extends GetxController {
         throw Exception('User not authenticated');
       }
 
+      print("ClientDashboardControllers: User authenticated: ${user.uid}");
       _currentUserId = user.uid;
 
       // Seed dummy data in background (don't wait for it)
@@ -109,7 +130,11 @@ class ClientDashboardControllers extends GetxController {
       await _tryFallbackQuery(user.uid);
 
       _isInitialized = true;
+      print(
+        "ClientDashboardControllers: Initialization completed successfully",
+      );
     } catch (e) {
+      print("ClientDashboardControllers: Initialization failed: $e");
       error.value = 'Failed to initialize: ${e.toString()}';
       isLoading.value = false;
       isRefreshing.value = false;
@@ -122,8 +147,13 @@ class ClientDashboardControllers extends GetxController {
 
   Future<void> _tryFallbackQuery(String userId) async {
     try {
+      print("ClientDashboardControllers: Fetching meals for user: $userId");
+
       // Fallback: Get all meals and filter locally
       final allMeals = await _mealsService.getMeals();
+      print(
+        "ClientDashboardControllers: Retrieved ${allMeals.length} total meals from Firebase",
+      );
 
       // Validate userId filtering
       if (userId.isEmpty) {
@@ -134,6 +164,10 @@ class ClientDashboardControllers extends GetxController {
         return meal.userId == userId;
       }).toList();
 
+      print(
+        "ClientDashboardControllers: Filtered to ${userMeals.length} meals for user",
+      );
+
       meals.value = userMeals;
       _cacheMeals(userMeals);
 
@@ -142,9 +176,13 @@ class ClientDashboardControllers extends GetxController {
       isRefreshing.value = false;
       error.value = '';
 
+      print("ClientDashboardControllers: Data loading completed successfully");
+
       // CRITICAL: Force UI update for GetBuilder
       update();
     } catch (e) {
+      print("ClientDashboardControllers: Fallback query failed: $e");
+
       // CRITICAL: Always clear loading state even on error
       isLoading.value = false;
       isRefreshing.value = false;
@@ -286,6 +324,49 @@ class ClientDashboardControllers extends GetxController {
     }
     _isInitialized = false;
     await refreshMeals();
+  }
+
+  // Delete a meal from Firebase and update local state
+  Future<bool> deleteMeal(MealModel meal) async {
+    try {
+      if (meal.id == null) {
+        error.value = 'Cannot delete meal: Invalid meal ID';
+        return false;
+      }
+
+      // Show loading state
+      isLoading.value = true;
+      error.value = '';
+
+      // Delete from Firebase
+      await _mealsService.deleteMeal(meal.id!);
+
+      // Remove from local state immediately for better UX
+      final updatedMeals = List<MealModel>.from(meals);
+      updatedMeals.removeWhere((m) => m.id == meal.id);
+      meals.value = updatedMeals;
+
+      // Update cache
+      _cacheMeals(updatedMeals);
+
+      // Clear loading state
+      isLoading.value = false;
+
+      print(
+        "ClientDashboardControllers: Meal '${meal.name}' deleted successfully",
+      );
+
+      // Force UI update
+      update();
+
+      return true;
+    } catch (e) {
+      print("ClientDashboardControllers: Failed to delete meal: $e");
+      error.value = 'Failed to delete meal: ${e.toString()}';
+      isLoading.value = false;
+      update();
+      return false;
+    }
   }
 
   // Get meal count for current category

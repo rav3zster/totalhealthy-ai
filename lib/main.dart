@@ -4,6 +4,7 @@ import 'package:get_storage/get_storage.dart';
 
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'app/core/base/constants/custom_scroll.dart';
+import 'app/core/theme/app_theme.dart';
 import 'app/routes/app_pages.dart';
 import 'app/widgets/notification_services.dart';
 import 'app/bindings/app_bindings.dart';
@@ -61,10 +62,7 @@ class _MyAppState extends State<MyApp> {
       onReady: () {},
       scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        scaffoldBackgroundColor: Colors.black,
-      ),
+      theme: AppTheme.themeData,
     );
   }
 }

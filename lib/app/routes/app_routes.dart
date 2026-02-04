@@ -24,6 +24,7 @@ abstract class Routes {
   static const GROUP = _Paths.GROUP;
   static const CREATE_GROUP = _Paths.CREATE_GROUP;
   static const GROUP_DETAILS = _Paths.GROUP_DETAILS;
+  static const MEMBER_MANAGEMENT = _Paths.MEMBER_MANAGEMENT;
   static const ONBOARDING = _Paths.ONBOARDING;
   static const SETTING = _Paths.SETTING;
   static const GENERAL_SETTINGS = _Paths.GENERAL_SETTINGS;
@@ -57,6 +58,7 @@ abstract class _Paths {
   static const GROUP = '/group';
   static const CREATE_GROUP = '/create-group';
   static const GROUP_DETAILS = '/group-details';
+  static const MEMBER_MANAGEMENT = '/member-management';
   static const SETTING = '/setting';
   static const GENERAL_SETTINGS = '/general-settings';
   static const PROFILE_SETTINGS = '/profile-settings';
