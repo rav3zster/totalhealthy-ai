@@ -16,6 +16,7 @@ import '../modules/group/views/group_view.dart';
 import '../modules/group/views/create_group_screen.dart';
 import '../modules/group/views/group_details_screen.dart';
 import '../modules/group/views/member_management_screen.dart';
+import '../modules/group/views/client_list_screen.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -186,6 +187,12 @@ class AppPages {
       name: _Paths.MEMBER_MANAGEMENT,
       page: () => MemberManagementScreen(),
       binding: GroupBinding(),
+    ),
+    GetPage(
+      name: _Paths.CLIENT_LIST,
+      page: () => ClientListScreen(),
+      binding: GroupBinding(),
+      middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.SIGNUP,
