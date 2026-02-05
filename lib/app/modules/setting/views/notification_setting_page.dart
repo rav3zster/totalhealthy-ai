@@ -29,7 +29,7 @@ class _SettingsScreenState extends State<notification_SettingsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: const Icon(
-            Icons.arrow_back_ios_new_outlined, color: Color(0XFFDBDBDB)),
+            Icons.arrow_back_ios_new_outlined, color: Colors.white),
         actions: [
           IconButton(onPressed: () {
             Get.back();

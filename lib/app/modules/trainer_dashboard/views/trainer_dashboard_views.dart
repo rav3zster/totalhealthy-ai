@@ -6,6 +6,7 @@ import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 
 import '../../../core/base/constants/appcolor.dart';
 import '../../../data/services/mock_api_service.dart';
+import '../../../routes/app_pages.dart';
 
 import '../../../widgets/baseWidget.dart';
 import '../../../widgets/client_card.dart';
@@ -364,12 +365,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AddClient(
-                              id: Get.find<AuthController>().groupgetId())),
-                    );
+                    Get.toNamed(Routes.CLIENT_LIST);
                   },
                   label: Text('Add Client',
                       style: TextStyle(color: Color(0XFF242522))),

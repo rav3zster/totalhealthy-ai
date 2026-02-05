@@ -110,7 +110,7 @@ class _AddClientState extends State<AddClient> {
             Get.back();
           },
           icon: Icon(Icons.arrow_back_ios),
-          color: Color(0XFFD9D9D9),
+          color: Colors.white,
         ),
         title: Text(
           'Groups',
