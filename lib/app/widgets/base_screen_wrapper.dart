@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/user_controller.dart';
-import '../core/theme/app_theme.dart';
 import 'error_state_widget.dart';
 
 class BaseScreenWrapper extends StatelessWidget {
@@ -35,7 +34,7 @@ class BaseScreenWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor ?? AppTheme.backgroundDark,
+      backgroundColor: backgroundColor ?? const Color(0xFF1A1A1A),
       extendBodyBehindAppBar: extendBodyBehindAppBar,
       appBar: appBar ?? (title != null ? _buildDefaultAppBar() : null),
       drawer: drawer,
@@ -50,12 +49,25 @@ class BaseScreenWrapper extends StatelessWidget {
       backgroundColor: Colors.transparent,
       elevation: 0,
       flexibleSpace: Container(
-        decoration: const BoxDecoration(gradient: AppTheme.headerGradient),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+          ),
+        ),
       ),
-      title: Text(title!, style: AppTheme.headingSmall),
+      title: Text(
+        title!,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
       centerTitle: true,
       actions: actions,
-      iconTheme: const IconThemeData(color: AppTheme.textPrimary),
+      iconTheme: const IconThemeData(color: Colors.white),
     );
   }
 
@@ -103,7 +115,7 @@ class BaseScreenWrapper extends StatelessWidget {
                   child: const Center(
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        AppTheme.primaryBase,
+                        Color(0xFFC2D86A),
                       ),
                     ),
                   ),

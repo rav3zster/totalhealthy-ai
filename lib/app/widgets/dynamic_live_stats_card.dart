@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/user_controller.dart';
-import '../core/theme/app_theme.dart';
 
 class DynamicLiveStatsCard extends StatelessWidget {
   const DynamicLiveStatsCard({super.key});
@@ -25,30 +24,36 @@ class DynamicLiveStatsCard extends StatelessWidget {
 
   Widget _buildStatsCard(UserController controller) {
     return Container(
-      padding: const EdgeInsets.all(AppTheme.spacingL),
-      decoration: AppTheme.cardDecoration,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Live Stats', style: AppTheme.headingSmall),
-          const SizedBox(height: AppTheme.spacingM),
+          const Text(
+            'Live Stats',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildStatItem(
                 controller.goalAchievedPercent,
                 'Goal Achieved',
-                AppTheme.warning,
+                Colors.orange,
               ),
-              _buildStatItem(
-                controller.fatLost,
-                'Fat Lost',
-                AppTheme.primaryLight,
-              ),
+              _buildStatItem(controller.fatLost, 'Fat Lost', Colors.yellow),
               _buildStatItem(
                 controller.muscleGained,
                 'Muscle Gained',
-                AppTheme.success,
+                Colors.purple,
               ),
             ],
           ),
@@ -59,13 +64,23 @@ class DynamicLiveStatsCard extends StatelessWidget {
 
   Widget _buildLoadingCard() {
     return Container(
-      padding: const EdgeInsets.all(AppTheme.spacingL),
-      decoration: AppTheme.cardDecoration,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Live Stats', style: AppTheme.headingSmall),
-          const SizedBox(height: AppTheme.spacingM),
+          const Text(
+            'Live Stats',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -81,34 +96,44 @@ class DynamicLiveStatsCard extends StatelessWidget {
 
   Widget _buildErrorCard(UserController controller) {
     return Container(
-      padding: const EdgeInsets.all(AppTheme.spacingL),
-      decoration: AppTheme.cardDecoration,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text('Live Stats', style: AppTheme.headingSmall),
+              const Text(
+                'Live Stats',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const Spacer(),
               GestureDetector(
                 onTap: () => controller.refreshUserData(),
                 child: const Icon(
                   Icons.refresh,
-                  color: AppTheme.primaryBase,
+                  color: Color(0xFFC2D86A),
                   size: 20,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppTheme.spacingM),
+          const SizedBox(height: 16),
           const Center(
             child: Column(
               children: [
-                Icon(Icons.error_outline, color: AppTheme.error, size: 32),
+                Icon(Icons.error_outline, color: Colors.red, size: 32),
                 SizedBox(height: 8),
                 Text(
                   'Failed to load stats',
-                  style: TextStyle(color: AppTheme.error, fontSize: 14),
+                  style: TextStyle(color: Colors.red, fontSize: 14),
                 ),
               ],
             ),
@@ -133,7 +158,7 @@ class DynamicLiveStatsCard extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
           textAlign: TextAlign.center,
         ),
       ],
@@ -147,8 +172,8 @@ class DynamicLiveStatsCard extends StatelessWidget {
           width: 40,
           height: 20,
           decoration: BoxDecoration(
-            color: AppTheme.surfaceLight,
-            borderRadius: BorderRadius.circular(AppTheme.radiusS),
+            color: const Color(0xFF3A3A3A),
+            borderRadius: BorderRadius.circular(4),
           ),
           child: const Center(
             child: SizedBox(
@@ -156,7 +181,7 @@ class DynamicLiveStatsCard extends StatelessWidget {
               height: 12,
               child: CircularProgressIndicator(
                 strokeWidth: 1.5,
-                color: AppTheme.primaryBase,
+                color: Color(0xFFC2D86A),
               ),
             ),
           ),
@@ -164,7 +189,7 @@ class DynamicLiveStatsCard extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
           textAlign: TextAlign.center,
         ),
       ],

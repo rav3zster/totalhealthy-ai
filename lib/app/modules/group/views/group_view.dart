@@ -5,7 +5,6 @@ import '../controllers/group_controller.dart';
 import '../../../data/models/group_model.dart';
 import '../../../data/models/user_model.dart';
 import '../../../routes/app_pages.dart';
-import '../../../core/theme/app_theme.dart';
 
 class GroupView extends GetView<GroupController> {
   const GroupView({super.key});
@@ -15,17 +14,21 @@ class GroupView extends GetView<GroupController> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: AppTheme.backgroundDark,
+        backgroundColor: const Color(0xFF1A1A1A),
         body: SafeArea(
           child: Column(
             children: [
               // Header with gradient background
               Container(
                 decoration: const BoxDecoration(
-                  gradient: AppTheme.headerGradient,
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+                  ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(AppTheme.spacingM),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
                       Row(
@@ -33,55 +36,63 @@ class GroupView extends GetView<GroupController> {
                           IconButton(
                             icon: const Icon(
                               Icons.arrow_back_ios,
-                              color: AppTheme.textPrimary,
+                              color: Colors.white,
                             ),
                             onPressed: () {
                               Get.offNamed(Routes.ClientDashboard);
                             },
                           ),
-                          const SizedBox(width: AppTheme.spacingS),
-                          Text('Groups', style: AppTheme.headingMedium),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Groups',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           const Spacer(),
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: AppTheme.primaryGradient,
-                              borderRadius: BorderRadius.circular(
-                                AppTheme.radiusXL,
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              _showCreateGroupDialog(context);
+                            },
+                            icon: const Icon(
+                              Icons.add,
+                              color: Colors.black,
+                              size: 20,
+                            ),
+                            label: const Text(
+                              'Add Group',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                _showCreateGroupDialog(context);
-                              },
-                              icon: const Icon(
-                                Icons.add,
-                                color: AppTheme.textPrimary,
-                                size: 20,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFC2D86A),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
                               ),
-                              label: Text(
-                                'Add Group',
-                                style: AppTheme.bodyLarge.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              style: AppTheme.primaryButtonStyle.copyWith(
-                                backgroundColor: WidgetStateProperty.all(
-                                  Colors.transparent,
-                                ),
-                                elevation: WidgetStateProperty.all(0),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 16,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: AppTheme.spacingM),
+                      const SizedBox(height: 16),
                       TabBar(
-                        indicatorColor: AppTheme.primaryLight,
-                        labelColor: AppTheme.textPrimary,
-                        unselectedLabelColor: AppTheme.textTertiary,
+                        indicatorColor: const Color(0xFFC2D86A),
+                        labelColor: Colors.white,
+                        unselectedLabelColor: Colors.white54,
                         indicatorSize: TabBarIndicatorSize.label,
-                        labelStyle: AppTheme.bodyLarge,
-                        unselectedLabelStyle: AppTheme.bodyMedium,
+                        labelStyle: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        unselectedLabelStyle: const TextStyle(fontSize: 14),
                         tabs: const [
                           Tab(text: 'Groups'),
                           Tab(text: 'Members'),
@@ -101,7 +112,7 @@ class GroupView extends GetView<GroupController> {
                       if (controller.isLoading.value) {
                         return const Center(
                           child: CircularProgressIndicator(
-                            color: AppTheme.primaryBase,
+                            color: Color(0xFFC2D86A),
                           ),
                         );
                       }
@@ -114,9 +125,7 @@ class GroupView extends GetView<GroupController> {
                       }
 
                       return ListView.builder(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppTheme.spacingM,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: controller.groupData.length,
                         itemBuilder: (context, index) {
                           final group = controller.groupData[index];
@@ -135,9 +144,7 @@ class GroupView extends GetView<GroupController> {
                       }
 
                       return ListView.builder(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppTheme.spacingM,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: controller.users.length,
                         itemBuilder: (context, index) {
                           final user = controller.users[index];
@@ -160,12 +167,12 @@ class GroupView extends GetView<GroupController> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 64, color: AppTheme.textTertiary),
-          const SizedBox(height: AppTheme.spacingM),
+          Icon(icon, size: 64, color: Colors.white54),
+          const SizedBox(height: 16),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: AppTheme.bodyMedium,
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
         ],
       ),
@@ -178,47 +185,63 @@ class GroupView extends GetView<GroupController> {
         Get.toNamed(Routes.GROUP_DETAILS, arguments: group.toJson());
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
-        decoration: AppTheme.cardDecoration,
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2A2A2A),
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Padding(
-          padding: const EdgeInsets.all(AppTheme.spacingL),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Group Name
-              Text(group.name, style: AppTheme.headingSmall),
-              const SizedBox(height: AppTheme.spacingS),
+              Text(
+                group.name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
 
               // Description
-              Text(group.description, style: AppTheme.bodyMedium),
-              const SizedBox(height: AppTheme.spacingM),
+              Text(
+                group.description,
+                style: const TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+              const SizedBox(height: 16),
 
               // Created Date
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.calendar_today,
-                    color: AppTheme.primaryLight,
+                    color: Color(0xFFC2D86A),
                     size: 16,
                   ),
-                  const SizedBox(width: AppTheme.spacingS),
+                  const SizedBox(width: 8),
                   Text(
                     'Created On: ${DateFormat('MMM dd, yyyy').format(group.createdAt)}',
-                    style: AppTheme.bodySmall,
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
                   ),
                 ],
               ),
-              const SizedBox(height: AppTheme.spacingS),
+              const SizedBox(height: 8),
 
               // Total Members
               Row(
                 children: [
-                  Icon(Icons.people, color: AppTheme.primaryLight, size: 16),
-                  const SizedBox(width: AppTheme.spacingS),
+                  const Icon(Icons.people, color: Color(0xFFC2D86A), size: 16),
+                  const SizedBox(width: 8),
                   Obx(
                     () => Text(
                       'Total Members: ${controller.totalUsers.value} Members',
-                      style: AppTheme.bodySmall,
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ],
@@ -237,24 +260,69 @@ class GroupView extends GetView<GroupController> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surfaceDark,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusM),
+        backgroundColor: const Color(0xFF2A2A2A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text(
+          'Create New Group',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        title: Text('Create New Group', style: AppTheme.headingSmall),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameController,
-              decoration: AppTheme.getInputDecoration('Group Name'),
-              style: AppTheme.bodyLarge,
+              decoration: InputDecoration(
+                labelText: 'Group Name',
+                labelStyle: const TextStyle(color: Colors.white70),
+                filled: true,
+                fillColor: const Color(0xFF1E252D),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFC2D86A),
+                    width: 2,
+                  ),
+                ),
+              ),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            const SizedBox(height: AppTheme.spacingM),
+            const SizedBox(height: 16),
             TextField(
               controller: descriptionController,
-              decoration: AppTheme.getInputDecoration('Description'),
-              style: AppTheme.bodyLarge,
+              decoration: InputDecoration(
+                labelText: 'Description',
+                labelStyle: const TextStyle(color: Colors.white70),
+                filled: true,
+                fillColor: const Color(0xFF1E252D),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFC2D86A),
+                    width: 2,
+                  ),
+                ),
+              ),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
               maxLines: 3,
             ),
           ],
@@ -262,35 +330,41 @@ class GroupView extends GetView<GroupController> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel', style: AppTheme.bodyMedium),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              gradient: AppTheme.primaryGradient,
-              borderRadius: BorderRadius.circular(AppTheme.radiusM),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
-            child: ElevatedButton(
-              onPressed: () {
-                final name = nameController.text.trim();
-                final desc = descriptionController.text.trim();
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final name = nameController.text.trim();
+              final desc = descriptionController.text.trim();
 
-                if (name.isNotEmpty) {
-                  controller.createGroup(name, desc);
-                  Navigator.of(context).pop();
-                } else {
-                  Get.snackbar(
-                    "Error",
-                    "Group name is required",
-                    backgroundColor: AppTheme.error,
-                    colorText: AppTheme.textPrimary,
-                  );
-                }
-              },
-              style: AppTheme.primaryButtonStyle.copyWith(
-                backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                elevation: WidgetStateProperty.all(0),
+              if (name.isNotEmpty) {
+                controller.createGroup(name, desc);
+                Navigator.of(context).pop();
+              } else {
+                Get.snackbar(
+                  "Error",
+                  "Group name is required",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFC2D86A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Text('Create', style: AppTheme.bodyLarge),
+            ),
+            child: const Text(
+              'Create',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -300,10 +374,13 @@ class GroupView extends GetView<GroupController> {
 
   Widget _buildUserCard(UserModel user) {
     return Container(
-      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
-      decoration: AppTheme.cardDecoration,
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacingM),
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             CircleAvatar(
@@ -314,25 +391,35 @@ class GroupView extends GetView<GroupController> {
                     : 'https://via.placeholder.com/150',
               ),
             ),
-            const SizedBox(width: AppTheme.spacingM),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(user.username, style: AppTheme.bodyLarge),
-                  Text('Plan: ${user.planName}', style: AppTheme.bodySmall),
+                  Text(
+                    user.username,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    'Plan: ${user.planName}',
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
                 ],
               ),
             ),
             Container(
-              decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient,
+              decoration: const BoxDecoration(
+                color: Color(0xFFC2D86A),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
                 icon: const Icon(
                   Icons.person_add_outlined,
-                  color: AppTheme.textPrimary,
+                  color: Colors.black,
                   size: 24,
                 ),
                 onPressed: () {

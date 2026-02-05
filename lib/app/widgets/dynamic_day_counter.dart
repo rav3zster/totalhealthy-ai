@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/user_controller.dart';
-import '../core/theme/app_theme.dart';
 
 class DynamicDayCounter extends StatelessWidget {
   final VoidCallback? onAddMealTap;
@@ -35,38 +34,37 @@ class DynamicDayCounter extends StatelessWidget {
             children: [
               Text(
                 '${controller.dayCountDisplay} (${controller.primaryGoal})',
-                style: AppTheme.headingSmall,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 controller.planDateRange,
-                style: AppTheme.bodyMedium.copyWith(
-                  color: AppTheme.textTertiary,
-                ),
+                style: const TextStyle(color: Colors.white54, fontSize: 14),
               ),
             ],
           ),
         ),
         if (onAddMealTap != null)
-          Container(
-            decoration: BoxDecoration(
-              gradient: AppTheme.primaryGradient,
-              borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+          ElevatedButton.icon(
+            onPressed: onAddMealTap,
+            icon: const Icon(Icons.add, color: Colors.black),
+            label: const Text(
+              'Add Meal',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            child: ElevatedButton.icon(
-              onPressed: onAddMealTap,
-              icon: const Icon(Icons.add, color: AppTheme.textPrimary),
-              label: Text(
-                'Add Meal',
-                style: AppTheme.bodyMedium.copyWith(
-                  color: AppTheme.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFC2D86A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
               ),
-              style: AppTheme.primaryButtonStyle.copyWith(
-                backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                elevation: WidgetStateProperty.all(0),
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
           ),
       ],
@@ -86,8 +84,8 @@ class DynamicDayCounter extends StatelessWidget {
                 width: 200,
                 height: 18,
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceDark,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusS),
+                  color: const Color(0xFF2A2A2A),
+                  borderRadius: BorderRadius.circular(4),
                 ),
               ),
               const SizedBox(height: 8),
@@ -96,33 +94,30 @@ class DynamicDayCounter extends StatelessWidget {
                 width: 120,
                 height: 14,
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceDark,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusS),
+                  color: const Color(0xFF2A2A2A),
+                  borderRadius: BorderRadius.circular(4),
                 ),
               ),
             ],
           ),
         ),
         if (onAddMealTap != null)
-          Container(
-            decoration: BoxDecoration(
-              gradient: AppTheme.primaryGradient,
-              borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+          ElevatedButton.icon(
+            onPressed: onAddMealTap,
+            icon: const Icon(Icons.add, color: Colors.black),
+            label: const Text(
+              'Add Meal',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            child: ElevatedButton.icon(
-              onPressed: onAddMealTap,
-              icon: const Icon(Icons.add, color: AppTheme.textPrimary),
-              label: Text(
-                'Add Meal',
-                style: AppTheme.bodyMedium.copyWith(
-                  color: AppTheme.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFC2D86A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
               ),
-              style: AppTheme.primaryButtonStyle.copyWith(
-                backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                elevation: WidgetStateProperty.all(0),
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
           ),
       ],
@@ -139,32 +134,33 @@ class DynamicDayCounter extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(
-                    Icons.error_outline,
-                    color: AppTheme.error,
-                    size: 16,
-                  ),
+                  const Icon(Icons.error_outline, color: Colors.red, size: 16),
                   const SizedBox(width: 4),
-                  Text(
+                  const Text(
                     'Day 1/55 (General Fitness)',
-                    style: AppTheme.headingSmall,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Text(
+                  const Text(
                     'Failed to load dates',
-                    style: AppTheme.bodySmall.copyWith(color: AppTheme.error),
+                    style: TextStyle(color: Colors.red, fontSize: 14),
                   ),
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () => controller.refreshUserData(),
-                    child: Text(
+                    child: const Text(
                       'Retry',
-                      style: AppTheme.bodySmall.copyWith(
-                        color: AppTheme.primaryBase,
+                      style: TextStyle(
+                        color: Color(0xFFC2D86A),
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -175,25 +171,22 @@ class DynamicDayCounter extends StatelessWidget {
           ),
         ),
         if (onAddMealTap != null)
-          Container(
-            decoration: BoxDecoration(
-              gradient: AppTheme.primaryGradient,
-              borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+          ElevatedButton.icon(
+            onPressed: onAddMealTap,
+            icon: const Icon(Icons.add, color: Colors.black),
+            label: const Text(
+              'Add Meal',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            child: ElevatedButton.icon(
-              onPressed: onAddMealTap,
-              icon: const Icon(Icons.add, color: AppTheme.textPrimary),
-              label: Text(
-                'Add Meal',
-                style: AppTheme.bodyMedium.copyWith(
-                  color: AppTheme.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFC2D86A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
               ),
-              style: AppTheme.primaryButtonStyle.copyWith(
-                backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                elevation: WidgetStateProperty.all(0),
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
           ),
       ],

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/models/user_model.dart';
 import '../controllers/group_controller.dart';
-import '../../../core/theme/app_theme.dart';
 
 class GroupDetailsScreen extends StatelessWidget {
   const GroupDetailsScreen({super.key});
@@ -14,30 +13,41 @@ class GroupDetailsScreen extends StatelessWidget {
     final controller = Get.find<GroupController>();
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: const Color(0xFF1A1A1A),
       body: SafeArea(
         child: Column(
           children: [
             // Header with gradient
             Container(
               decoration: const BoxDecoration(
-                gradient: AppTheme.headerGradient,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+                ),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(AppTheme.spacingM),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     IconButton(
                       icon: const Icon(
                         Icons.arrow_back_ios,
-                        color: AppTheme.textPrimary,
+                        color: Colors.white,
                       ),
                       onPressed: () {
                         Get.back();
                       },
                     ),
-                    const SizedBox(width: AppTheme.spacingS),
-                    Text('Groups Details', style: AppTheme.headingMedium),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Groups Details',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -45,94 +55,110 @@ class GroupDetailsScreen extends StatelessWidget {
 
             // Group Info Card
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: AppTheme.spacingM),
-              decoration: AppTheme.highlightCardDecoration,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2A2A2A),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                  width: 1,
+                ),
+              ),
               child: Padding(
-                padding: const EdgeInsets.all(AppTheme.spacingL),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Group Name
                     Text(
                       group['name'] ?? 'Weekly Meal Planning Group',
-                      style: AppTheme.headingSmall,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    const SizedBox(height: AppTheme.spacingS),
+                    const SizedBox(height: 8),
 
                     // Description
                     Text(
                       group['description'] ??
                           'A support group for planning and tracking weekly meal prep, ideal for maintaining a balanced diet.',
-                      style: AppTheme.bodyMedium,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
                     ),
-                    const SizedBox(height: AppTheme.spacingM),
+                    const SizedBox(height: 16),
 
                     // Created Date
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.calendar_today,
-                          color: AppTheme.primaryLight,
+                          color: Color(0xFFC2D86A),
                           size: 16,
                         ),
-                        const SizedBox(width: AppTheme.spacingS),
+                        const SizedBox(width: 8),
                         Text(
                           'Created On: ${group['createdDate'] ?? 'August 1, 2024'}',
-                          style: AppTheme.bodySmall,
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: AppTheme.spacingS),
+                    const SizedBox(height: 8),
 
                     // Total Members
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.people,
-                          color: AppTheme.primaryLight,
+                          color: Color(0xFFC2D86A),
                           size: 16,
                         ),
-                        const SizedBox(width: AppTheme.spacingS),
+                        const SizedBox(width: 8),
                         FutureBuilder<List<UserModel>>(
                           future: controller.getGroupMembers(group['id'] ?? ''),
                           builder: (context, snapshot) {
                             final memberCount = snapshot.data?.length ?? 0;
                             return Text(
                               'Total Members: $memberCount Members',
-                              style: AppTheme.bodySmall,
+                              style: const TextStyle(
+                                color: Colors.white54,
+                                fontSize: 12,
+                              ),
                             );
                           },
                         ),
                       ],
                     ),
 
-                    const SizedBox(height: AppTheme.spacingM),
+                    const SizedBox(height: 16),
 
                     // Manage Members Button
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: AppTheme.primaryGradient,
-                        borderRadius: BorderRadius.circular(AppTheme.radiusM),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Get.toNamed('/member-management', arguments: group);
+                      },
+                      icon: const Icon(Icons.group_add, color: Colors.black),
+                      label: const Text(
+                        'Manage Members',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Get.toNamed('/member-management', arguments: group);
-                        },
-                        icon: const Icon(
-                          Icons.group_add,
-                          color: AppTheme.textPrimary,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC2D86A),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        label: Text(
-                          'Manage Members',
-                          style: AppTheme.bodyLarge.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        style: AppTheme.primaryButtonStyle.copyWith(
-                          backgroundColor: WidgetStateProperty.all(
-                            Colors.transparent,
-                          ),
-                          elevation: WidgetStateProperty.all(0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 16,
                         ),
                       ),
                     ),
@@ -141,7 +167,7 @@ class GroupDetailsScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: AppTheme.spacingL),
+            const SizedBox(height: 24),
 
             // Members List
             Expanded(
@@ -151,7 +177,7 @@ class GroupDetailsScreen extends StatelessWidget {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(
-                        color: AppTheme.primaryBase,
+                        color: Color(0xFFC2D86A),
                       ),
                     );
                   }
@@ -159,18 +185,16 @@ class GroupDetailsScreen extends StatelessWidget {
                   final members = snapshot.data ?? [];
 
                   if (members.isEmpty) {
-                    return Center(
+                    return const Center(
                       child: Text(
                         "No members in this group yet.",
-                        style: AppTheme.bodyMedium,
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
                       ),
                     );
                   }
 
                   return ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTheme.spacingM,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: members.length,
                     itemBuilder: (context, index) {
                       final member = members[index];
@@ -199,12 +223,19 @@ class GroupDetailsScreen extends StatelessWidget {
     bool isAdmin,
   ) {
     return Container(
-      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
-      decoration: isAdmin
-          ? AppTheme.highlightCardDecoration
-          : AppTheme.cardDecoration,
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(12),
+        border: isAdmin
+            ? Border.all(
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                width: 1,
+              )
+            : null,
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacingM),
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             // Profile Image with admin indicator
@@ -224,20 +255,20 @@ class GroupDetailsScreen extends StatelessWidget {
                     right: 0,
                     child: Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        gradient: AppTheme.primaryGradient,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFC2D86A),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.star,
-                        color: AppTheme.textPrimary,
+                        color: Colors.black,
                         size: 12,
                       ),
                     ),
                   ),
               ],
             ),
-            const SizedBox(width: AppTheme.spacingM),
+            const SizedBox(width: 16),
 
             // Member Info
             Expanded(
@@ -246,24 +277,30 @@ class GroupDetailsScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(member.username, style: AppTheme.bodyLarge),
+                      Text(
+                        member.username,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       if (isAdmin) ...[
-                        const SizedBox(width: AppTheme.spacingS),
+                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: AppTheme.spacingS,
+                            horizontal: 8,
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            gradient: AppTheme.primaryGradient,
-                            borderRadius: BorderRadius.circular(
-                              AppTheme.radiusM,
-                            ),
+                            color: const Color(0xFFC2D86A),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Group Admin',
-                            style: AppTheme.caption.copyWith(
-                              color: AppTheme.textPrimary,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 10,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -272,14 +309,20 @@ class GroupDetailsScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text('Plan: ${member.planName}', style: AppTheme.bodyMedium),
+                  Text(
+                    'Plan: ${member.planName}',
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     'Duration: ${member.planDuration}',
-                    style: AppTheme.bodyMedium,
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   const SizedBox(height: 4),
-                  Text('Email: ${member.email}', style: AppTheme.bodyMedium),
+                  Text(
+                    'Email: ${member.email}',
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
                 ],
               ),
             ),
@@ -289,44 +332,44 @@ class GroupDetailsScreen extends StatelessWidget {
               Column(
                 children: [
                   Container(
-                    decoration: BoxDecoration(
-                      gradient: AppTheme.primaryGradient,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFC2D86A),
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
                       icon: const Icon(
                         Icons.phone,
-                        color: AppTheme.textPrimary,
+                        color: Colors.black,
                         size: 20,
                       ),
                       onPressed: () {},
                     ),
                   ),
-                  const SizedBox(height: AppTheme.spacingS),
+                  const SizedBox(height: 8),
                   Container(
-                    decoration: BoxDecoration(
-                      gradient: AppTheme.primaryGradient,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFC2D86A),
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
                       icon: const Icon(
                         Icons.email,
-                        color: AppTheme.textPrimary,
+                        color: Colors.black,
                         size: 20,
                       ),
                       onPressed: () {},
                     ),
                   ),
-                  const SizedBox(height: AppTheme.spacingS),
+                  const SizedBox(height: 8),
                   Container(
-                    decoration: BoxDecoration(
-                      gradient: AppTheme.primaryGradient,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFC2D86A),
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
                       icon: const Icon(
                         Icons.chat,
-                        color: AppTheme.textPrimary,
+                        color: Colors.black,
                         size: 20,
                       ),
                       onPressed: () {},

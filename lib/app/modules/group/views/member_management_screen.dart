@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/models/user_model.dart';
 import '../controllers/group_controller.dart';
-import '../../../core/theme/app_theme.dart';
 
 class MemberManagementScreen extends StatelessWidget {
   const MemberManagementScreen({super.key});
@@ -19,31 +18,39 @@ class MemberManagementScreen extends StatelessWidget {
     });
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: const Color(0xFF1A1A1A),
       body: SafeArea(
         child: Column(
           children: [
             // Header with gradient
             Container(
               decoration: const BoxDecoration(
-                gradient: AppTheme.headerGradient,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+                ),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(AppTheme.spacingM),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     IconButton(
                       icon: const Icon(
                         Icons.arrow_back_ios,
-                        color: AppTheme.textPrimary,
+                        color: Colors.white,
                       ),
                       onPressed: () => Get.back(),
                     ),
-                    const SizedBox(width: AppTheme.spacingS),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'Manage Members - ${group['name'] ?? 'Group'}',
-                        style: AppTheme.headingSmall,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -53,28 +60,32 @@ class MemberManagementScreen extends StatelessWidget {
 
             // Tab Bar
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: AppTheme.spacingM),
-              decoration: AppTheme.cardDecoration,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2A2A2A),
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: DefaultTabController(
                 length: 2,
                 child: Column(
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        gradient: AppTheme.subtleGradient,
-                        borderRadius: BorderRadius.circular(AppTheme.radiusM),
+                        color: const Color(0xFF242B33),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: TabBar(
                         indicator: BoxDecoration(
-                          gradient: AppTheme.primaryGradient,
-                          borderRadius: BorderRadius.circular(AppTheme.radiusM),
+                          color: const Color(0xFFC2D86A),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        labelColor: AppTheme.textPrimary,
-                        unselectedLabelColor: AppTheme.textSecondary,
-                        labelStyle: AppTheme.bodyLarge.copyWith(
+                        labelColor: Colors.black,
+                        unselectedLabelColor: Colors.white70,
+                        labelStyle: const TextStyle(
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
-                        unselectedLabelStyle: AppTheme.bodyMedium,
+                        unselectedLabelStyle: const TextStyle(fontSize: 14),
                         tabs: const [
                           Tab(text: 'Current Members'),
                           Tab(text: 'Invite Users'),
@@ -110,9 +121,12 @@ class MemberManagementScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(color: AppTheme.primaryBase),
-              SizedBox(height: AppTheme.spacingM),
-              Text('Loading members...', style: AppTheme.bodyMedium),
+              CircularProgressIndicator(color: Color(0xFFC2D86A)),
+              SizedBox(height: 16),
+              Text(
+                'Loading members...',
+                style: TextStyle(color: Colors.white70, fontSize: 14),
+              ),
             ],
           ),
         );
@@ -126,20 +140,19 @@ class MemberManagementScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.people_outline,
-                size: 64,
-                color: AppTheme.textTertiary,
+              Icon(Icons.people_outline, size: 64, color: Colors.white54),
+              SizedBox(height: 16),
+              Text(
+                'No members in this group yet',
+                style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
-              SizedBox(height: AppTheme.spacingM),
-              Text('No members in this group yet', style: AppTheme.bodyMedium),
             ],
           ),
         );
       }
 
       return ListView.builder(
-        padding: const EdgeInsets.all(AppTheme.spacingM),
+        padding: const EdgeInsets.all(16),
         itemCount: members.length,
         itemBuilder: (context, index) {
           final member = members[index];
@@ -160,9 +173,12 @@ class MemberManagementScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(color: AppTheme.primaryBase),
-              SizedBox(height: AppTheme.spacingM),
-              Text('Loading available users...', style: AppTheme.bodyMedium),
+              CircularProgressIndicator(color: Color(0xFFC2D86A)),
+              SizedBox(height: 16),
+              Text(
+                'Loading available users...',
+                style: TextStyle(color: Colors.white70, fontSize: 14),
+              ),
             ],
           ),
         );
@@ -175,17 +191,16 @@ class MemberManagementScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.person_add_disabled,
-                size: 64,
-                color: AppTheme.textTertiary,
+              Icon(Icons.person_add_disabled, size: 64, color: Colors.white54),
+              SizedBox(height: 16),
+              Text(
+                'No users available to invite',
+                style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
-              SizedBox(height: AppTheme.spacingM),
-              Text('No users available to invite', style: AppTheme.bodyMedium),
-              SizedBox(height: AppTheme.spacingS),
+              SizedBox(height: 8),
               Text(
                 'All users are either already members or have pending invitations',
-                style: AppTheme.bodySmall,
+                style: TextStyle(color: Colors.white54, fontSize: 12),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -194,7 +209,7 @@ class MemberManagementScreen extends StatelessWidget {
       }
 
       return ListView.builder(
-        padding: const EdgeInsets.all(AppTheme.spacingM),
+        padding: const EdgeInsets.all(16),
         itemCount: availableUsers.length,
         itemBuilder: (context, index) {
           final user = availableUsers[index];
@@ -211,12 +226,19 @@ class MemberManagementScreen extends StatelessWidget {
     bool isAdmin,
   ) {
     return Container(
-      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
-      decoration: isAdmin
-          ? AppTheme.highlightCardDecoration
-          : AppTheme.cardDecoration,
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(12),
+        border: isAdmin
+            ? Border.all(
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                width: 1,
+              )
+            : null,
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacingM),
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             // Profile Image with admin indicator
@@ -236,20 +258,20 @@ class MemberManagementScreen extends StatelessWidget {
                     right: 0,
                     child: Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        gradient: AppTheme.primaryGradient,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFC2D86A),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.star,
-                        color: AppTheme.textPrimary,
+                        color: Colors.black,
                         size: 10,
                       ),
                     ),
                   ),
               ],
             ),
-            const SizedBox(width: AppTheme.spacingM),
+            const SizedBox(width: 16),
 
             // Member Info
             Expanded(
@@ -258,22 +280,30 @@ class MemberManagementScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(member.username, style: AppTheme.bodyLarge),
+                      Text(
+                        member.username,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       if (isAdmin) ...[
-                        const SizedBox(width: AppTheme.spacingS),
+                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            gradient: AppTheme.primaryGradient,
+                            color: const Color(0xFFC2D86A),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Admin',
-                            style: AppTheme.caption.copyWith(
-                              color: AppTheme.textPrimary,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 10,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -282,7 +312,10 @@ class MemberManagementScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(member.email, style: AppTheme.bodyMedium),
+                  Text(
+                    member.email,
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
                 ],
               ),
             ),
@@ -294,7 +327,7 @@ class MemberManagementScreen extends StatelessWidget {
                     _showRemoveMemberDialog(member, controller, group),
                 icon: const Icon(
                   Icons.remove_circle_outline,
-                  color: AppTheme.error,
+                  color: Colors.red,
                   size: 24,
                 ),
               ),
@@ -310,10 +343,13 @@ class MemberManagementScreen extends StatelessWidget {
     Map<String, dynamic> group,
   ) {
     return Container(
-      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
-      decoration: AppTheme.cardDecoration,
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacingM),
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             // Profile Image
@@ -325,18 +361,31 @@ class MemberManagementScreen extends StatelessWidget {
                     : 'https://via.placeholder.com/150',
               ),
             ),
-            const SizedBox(width: AppTheme.spacingM),
+            const SizedBox(width: 16),
 
             // User Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(user.username, style: AppTheme.bodyLarge),
+                  Text(
+                    user.username,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(user.email, style: AppTheme.bodyMedium),
+                  Text(
+                    user.email,
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
                   const SizedBox(height: 4),
-                  Text('Plan: ${user.planName}', style: AppTheme.bodySmall),
+                  Text(
+                    'Plan: ${user.planName}',
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
                 ],
               ),
             ),
@@ -350,33 +399,33 @@ class MemberManagementScreen extends StatelessWidget {
 
               final isPending = invitation != null;
 
-              return Container(
-                decoration: BoxDecoration(
-                  gradient: isPending ? null : AppTheme.primaryGradient,
-                  color: isPending ? AppTheme.textTertiary : null,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+              return ElevatedButton.icon(
+                onPressed: isPending
+                    ? null
+                    : () => _inviteUser(user, controller, group),
+                icon: Icon(
+                  isPending ? Icons.schedule : Icons.person_add,
+                  size: 16,
+                  color: isPending ? Colors.white54 : Colors.black,
                 ),
-                child: ElevatedButton.icon(
-                  onPressed: isPending
-                      ? null
-                      : () => _inviteUser(user, controller, group),
-                  icon: Icon(
-                    isPending ? Icons.schedule : Icons.person_add,
-                    size: 16,
-                    color: AppTheme.textPrimary,
+                label: Text(
+                  isPending ? 'Pending' : 'Invite',
+                  style: TextStyle(
+                    color: isPending ? Colors.white54 : Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                   ),
-                  label: Text(
-                    isPending ? 'Pending' : 'Invite',
-                    style: AppTheme.bodyMedium.copyWith(
-                      color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isPending
+                      ? Colors.grey
+                      : const Color(0xFFC2D86A),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  style: AppTheme.primaryButtonStyle.copyWith(
-                    backgroundColor: WidgetStateProperty.all(
-                      Colors.transparent,
-                    ),
-                    elevation: WidgetStateProperty.all(0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
                   ),
                 ),
               );
@@ -394,37 +443,45 @@ class MemberManagementScreen extends StatelessWidget {
   ) {
     Get.dialog(
       AlertDialog(
-        backgroundColor: AppTheme.surfaceDark,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusM),
+        backgroundColor: const Color(0xFF2A2A2A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text(
+          'Remove Member',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        title: Text('Remove Member', style: AppTheme.headingSmall),
         content: Text(
           'Are you sure you want to remove ${member.username} from this group?',
-          style: AppTheme.bodyMedium,
+          style: const TextStyle(color: Colors.white70, fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('Cancel', style: AppTheme.bodyMedium),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: AppTheme.error,
-              borderRadius: BorderRadius.circular(AppTheme.radiusM),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
-            child: ElevatedButton(
-              onPressed: () {
-                Get.back();
-                controller.removeMember(group['id'], member.id);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              controller.removeMember(group['id'], member.id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
-                'Remove',
-                style: AppTheme.bodyLarge.copyWith(color: AppTheme.textPrimary),
+            ),
+            child: const Text(
+              'Remove',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/user_controller.dart';
-import '../core/theme/app_theme.dart';
 
 class DynamicProfileHeader extends StatelessWidget {
   final VoidCallback? onProfileTap;
@@ -45,32 +44,34 @@ class DynamicProfileHeader extends StatelessWidget {
             },
           ),
         ),
-        const SizedBox(width: AppTheme.spacingM),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Welcome!', style: AppTheme.headingMedium),
+              const Text(
+                'Welcome!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               Text(
                 controller.fullName,
-                style: AppTheme.bodyLarge.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
+                style: const TextStyle(color: Colors.white70, fontSize: 16),
               ),
             ],
           ),
         ),
         if (onNotificationTap != null)
           Container(
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceDark,
+            decoration: const BoxDecoration(
+              color: Color(0xFF242424),
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              icon: const Icon(
-                Icons.notifications_none,
-                color: AppTheme.textPrimary,
-              ),
+              icon: const Icon(Icons.notifications_none, color: Colors.white),
               onPressed: onNotificationTap,
             ),
           ),
@@ -85,8 +86,8 @@ class DynamicProfileHeader extends StatelessWidget {
         Container(
           width: 50,
           height: 50,
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceDark,
+          decoration: const BoxDecoration(
+            color: Color(0xFF2A2A2A),
             shape: BoxShape.circle,
           ),
           child: const Center(
@@ -95,24 +96,31 @@ class DynamicProfileHeader extends StatelessWidget {
               height: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: AppTheme.primaryBase,
+                color: Color(0xFFC2D86A),
               ),
             ),
           ),
         ),
-        const SizedBox(width: AppTheme.spacingM),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Welcome!', style: AppTheme.headingMedium),
+              const Text(
+                'Welcome!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               // Skeleton text
               Container(
                 width: 120,
                 height: 16,
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceDark,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusS),
+                  color: const Color(0xFF2A2A2A),
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
             ],
@@ -120,15 +128,12 @@ class DynamicProfileHeader extends StatelessWidget {
         ),
         if (onNotificationTap != null)
           Container(
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceDark,
+            decoration: const BoxDecoration(
+              color: Color(0xFF242424),
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              icon: const Icon(
-                Icons.notifications_none,
-                color: AppTheme.textPrimary,
-              ),
+              icon: const Icon(Icons.notifications_none, color: Colors.white),
               onPressed: onNotificationTap,
             ),
           ),
@@ -141,38 +146,38 @@ class DynamicProfileHeader extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 25,
-          backgroundColor: AppTheme.surfaceDark,
-          child: const Icon(
-            Icons.person,
-            color: AppTheme.textTertiary,
-            size: 30,
-          ),
+          backgroundColor: const Color(0xFF2A2A2A),
+          child: const Icon(Icons.person, color: Colors.white54, size: 30),
         ),
-        const SizedBox(width: AppTheme.spacingM),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Welcome!', style: AppTheme.headingMedium),
+              const Text(
+                'Welcome!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               Row(
                 children: [
-                  const Icon(
-                    Icons.error_outline,
-                    color: AppTheme.error,
-                    size: 16,
-                  ),
+                  const Icon(Icons.error_outline, color: Colors.red, size: 16),
                   const SizedBox(width: 4),
-                  Text(
+                  const Text(
                     'Failed to load profile',
-                    style: AppTheme.bodySmall.copyWith(color: AppTheme.error),
+                    style: TextStyle(color: Colors.red, fontSize: 14),
                   ),
                   const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () => controller.refreshUserData(),
-                    child: Text(
+                    child: const Text(
                       'Retry',
-                      style: AppTheme.bodySmall.copyWith(
-                        color: AppTheme.primaryBase,
+                      style: TextStyle(
+                        color: Color(0xFFC2D86A),
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -184,15 +189,12 @@ class DynamicProfileHeader extends StatelessWidget {
         ),
         if (onNotificationTap != null)
           Container(
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceDark,
+            decoration: const BoxDecoration(
+              color: Color(0xFF242424),
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              icon: const Icon(
-                Icons.notifications_none,
-                color: AppTheme.textPrimary,
-              ),
+              icon: const Icon(Icons.notifications_none, color: Colors.white),
               onPressed: onNotificationTap,
             ),
           ),

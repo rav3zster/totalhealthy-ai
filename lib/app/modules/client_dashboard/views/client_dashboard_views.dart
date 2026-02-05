@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import '../../../core/base/controllers/auth_controller.dart';
-import '../../../core/theme/app_theme.dart';
 import '../../../routes/app_pages.dart';
 import '../../../widgets/drawer_menu.dart';
 import '../../../widgets/dynamic_profile_header.dart';
@@ -31,13 +30,13 @@ class ClientDashboardScreen extends StatelessWidget {
           final controller = Get.find<ClientDashboardControllers>();
           await controller.refreshMeals();
         },
-        color: AppTheme.primaryBase,
-        backgroundColor: AppTheme.surfaceDark,
+        color: Colors.green,
+        backgroundColor: Color(0xFF2A2A2A),
         child: SafeArea(
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Padding(
-              padding: const EdgeInsets.all(AppTheme.spacingM),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -48,12 +47,12 @@ class ClientDashboardScreen extends StatelessWidget {
                         Get.toNamed('/notification?id=$id'),
                   ),
 
-                  const SizedBox(height: AppTheme.spacingL),
+                  const SizedBox(height: 24),
 
                   // Dynamic Live Stats Card
                   const DynamicLiveStatsCard(),
 
-                  const SizedBox(height: AppTheme.spacingL),
+                  const SizedBox(height: 24),
 
                   // Real-time Search Bar
                   SimpleRealTimeSearchBar(
@@ -62,7 +61,7 @@ class ClientDashboardScreen extends StatelessWidget {
                     hintText: 'Search meals...',
                   ),
 
-                  const SizedBox(height: AppTheme.spacingL),
+                  const SizedBox(height: 24),
 
                   // Dynamic Day Counter with Add Meal Button
                   DynamicDayCounter(
@@ -74,7 +73,7 @@ class ClientDashboardScreen extends StatelessWidget {
                     },
                   ),
 
-                  const SizedBox(height: AppTheme.spacingL),
+                  const SizedBox(height: 24),
 
                   // Meal Type Tabs
                   Obx(
@@ -86,14 +85,14 @@ class ClientDashboardScreen extends StatelessWidget {
                           controller.selectedCategory.value == 'Breakfast',
                           () => controller.changeCategory('Breakfast'),
                         ),
-                        const SizedBox(width: AppTheme.spacingM),
+                        const SizedBox(width: 16),
                         _buildMealTab(
                           '🥗',
                           'Lunch',
                           controller.selectedCategory.value == 'Lunch',
                           () => controller.changeCategory('Lunch'),
                         ),
-                        const SizedBox(width: AppTheme.spacingM),
+                        const SizedBox(width: 16),
                         _buildMealTab(
                           '🍽️',
                           'Dinner',
@@ -104,7 +103,7 @@ class ClientDashboardScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: AppTheme.spacingL),
+                  const SizedBox(height: 24),
 
                   // Meals List - Simplified for now
                   GetBuilder<ClientDashboardControllers>(
@@ -112,7 +111,7 @@ class ClientDashboardScreen extends StatelessWidget {
                       if (controller.shouldShowLoading) {
                         return const Center(
                           child: CircularProgressIndicator(
-                            color: AppTheme.primaryBase,
+                            color: Color(0xFFC2D86A),
                           ),
                         );
                       }
@@ -149,29 +148,38 @@ class ClientDashboardScreen extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final meal = meals[index];
                           return Container(
-                            margin: const EdgeInsets.only(
-                              bottom: AppTheme.spacingM,
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2A2A2A),
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            decoration: AppTheme.cardDecoration,
                             child: ListTile(
                               leading: Container(
                                 width: 60,
                                 height: 60,
                                 decoration: BoxDecoration(
-                                  gradient: AppTheme.primaryGradient,
-                                  borderRadius: BorderRadius.circular(
-                                    AppTheme.radiusM,
-                                  ),
+                                  color: const Color(0xFFC2D86A),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: const Icon(
                                   Icons.restaurant,
-                                  color: AppTheme.textPrimary,
+                                  color: Colors.black,
                                 ),
                               ),
-                              title: Text(meal.name, style: AppTheme.bodyLarge),
+                              title: Text(
+                                meal.name,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                               subtitle: Text(
                                 '${meal.kcal} Kcal',
-                                style: AppTheme.bodyMedium,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
                               ),
                               onTap: () {
                                 final box = GetStorage();
@@ -202,21 +210,13 @@ class ClientDashboardScreen extends StatelessWidget {
 
   Widget _buildBottomNavigationBar(String id) {
     return Container(
-      decoration: BoxDecoration(
-        gradient: AppTheme.subtleGradient,
-        border: Border(
-          top: BorderSide(
-            color: AppTheme.primaryBase.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
+      decoration: const BoxDecoration(
+        color: Color(0xFF2A2A2A),
+        border: Border(top: BorderSide(color: Color(0xFF3A3A3A), width: 1)),
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacingM,
-            vertical: AppTheme.spacingS,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -258,24 +258,25 @@ class ClientDashboardScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(AppTheme.spacingS),
+            padding: const EdgeInsets.all(8),
             decoration: isActive
                 ? BoxDecoration(
-                    gradient: AppTheme.primaryGradient,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusS),
+                    color: const Color(0xFFC2D86A),
+                    borderRadius: BorderRadius.circular(8),
                   )
                 : null,
             child: Icon(
               icon,
-              color: isActive ? AppTheme.textPrimary : AppTheme.textTertiary,
+              color: isActive ? Colors.black : Colors.white54,
               size: 24,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: AppTheme.caption.copyWith(
-              color: isActive ? AppTheme.primaryLight : AppTheme.textTertiary,
+            style: TextStyle(
+              color: isActive ? const Color(0xFFC2D86A) : Colors.white54,
+              fontSize: 10,
               fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -293,17 +294,13 @@ class ClientDashboardScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppTheme.spacingM,
-          vertical: AppTheme.spacingS,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          gradient: isSelected ? AppTheme.primaryGradient : null,
-          color: isSelected ? null : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+          color: isSelected ? const Color(0xFFC2D86A) : Colors.transparent,
+          borderRadius: BorderRadius.circular(24),
           border: isSelected
               ? null
-              : Border.all(color: AppTheme.textTertiary.withValues(alpha: 0.3)),
+              : Border.all(color: Colors.white54.withValues(alpha: 0.3)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -312,10 +309,9 @@ class ClientDashboardScreen extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               label,
-              style: AppTheme.bodyMedium.copyWith(
-                color: isSelected
-                    ? AppTheme.textPrimary
-                    : AppTheme.textSecondary,
+              style: TextStyle(
+                color: isSelected ? Colors.black : Colors.white70,
+                fontSize: 14,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
@@ -334,34 +330,34 @@ class ClientDashboardScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: AppTheme.surfaceDark,
+          backgroundColor: const Color(0xFF2A2A2A),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusM),
+            borderRadius: BorderRadius.circular(12),
           ),
-          title: Text('Delete Meal', style: AppTheme.headingSmall),
+          title: const Text(
+            'Delete Meal',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           content: Text(
             'Are you sure you want to delete "${meal.name}"? This action cannot be undone.',
-            style: AppTheme.bodyMedium,
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(
+              child: const Text(
                 'Cancel',
-                style: AppTheme.bodyMedium.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
+                style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
             ),
             Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppTheme.error.withValues(alpha: 0.8),
-                    AppTheme.error,
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(AppTheme.radiusS),
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(8),
               ),
               child: TextButton(
                 onPressed: () async {
@@ -371,21 +367,24 @@ class ClientDashboardScreen extends StatelessWidget {
                   Get.dialog(
                     Center(
                       child: Container(
-                        padding: const EdgeInsets.all(AppTheme.spacingL),
+                        padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: AppTheme.surfaceDark,
-                          borderRadius: BorderRadius.circular(AppTheme.radiusM),
+                          color: const Color(0xFF2A2A2A),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const CircularProgressIndicator(
-                              color: AppTheme.primaryBase,
+                              color: Color(0xFFC2D86A),
                             ),
-                            const SizedBox(height: AppTheme.spacingM),
-                            Text(
+                            const SizedBox(height: 16),
+                            const Text(
                               'Deleting meal...',
-                              style: AppTheme.bodyMedium,
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
                             ),
                           ],
                         ),
@@ -405,30 +404,31 @@ class ClientDashboardScreen extends StatelessWidget {
                     Get.snackbar(
                       'Success',
                       'Meal deleted successfully',
-                      backgroundColor: AppTheme.success.withValues(alpha: 0.9),
-                      colorText: AppTheme.textPrimary,
+                      backgroundColor: Colors.green.withValues(alpha: 0.9),
+                      colorText: Colors.white,
                       snackPosition: SnackPosition.BOTTOM,
-                      margin: const EdgeInsets.all(AppTheme.spacingM),
-                      borderRadius: AppTheme.radiusM,
+                      margin: const EdgeInsets.all(16),
+                      borderRadius: 12,
                       duration: const Duration(seconds: 2),
                     );
                   } else {
                     Get.snackbar(
                       'Error',
                       'Failed to delete meal. Please try again.',
-                      backgroundColor: AppTheme.error.withValues(alpha: 0.9),
-                      colorText: AppTheme.textPrimary,
+                      backgroundColor: Colors.red.withValues(alpha: 0.9),
+                      colorText: Colors.white,
                       snackPosition: SnackPosition.BOTTOM,
-                      margin: const EdgeInsets.all(AppTheme.spacingM),
-                      borderRadius: AppTheme.radiusM,
+                      margin: const EdgeInsets.all(16),
+                      borderRadius: 12,
                       duration: const Duration(seconds: 3),
                     );
                   }
                 },
-                child: Text(
+                child: const Text(
                   'Delete',
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: AppTheme.textPrimary,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
