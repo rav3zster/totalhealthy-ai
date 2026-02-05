@@ -26,8 +26,10 @@ class ClientDashboardControllers extends GetxController {
 
   // Stream subscription for cleanup
   StreamSubscription<List<MealModel>>? _mealsSubscription;
+  StreamSubscription<User?>? _authSubscription;
   String? _currentUserId;
   bool _isInitialized = false;
+  bool _isWaitingForAuth = true;
 
   @override
   void onInit() {
@@ -35,9 +37,9 @@ class ClientDashboardControllers extends GetxController {
     print("ClientDashboardControllers: onInit called");
     _loadCachedMeals();
 
-    // Initialize immediately, don't wait for navigation
+    // CRITICAL: Wait for auth state before loading data
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initData();
+      _listenToAuthState();
     });
 
     // Safety mechanism: Force clear loading state after 15 seconds
@@ -47,6 +49,7 @@ class ClientDashboardControllers extends GetxController {
           "ClientDashboardControllers: Timeout reached, clearing loading state",
         );
         isLoading.value = false;
+        _isWaitingForAuth = false;
         if (meals.isEmpty && error.value.isEmpty) {
           error.value = 'Loading timeout - please refresh';
         }
@@ -58,6 +61,7 @@ class ClientDashboardControllers extends GetxController {
   @override
   void onClose() {
     _mealsSubscription?.cancel();
+    _authSubscription?.cancel();
     super.onClose();
   }
 
@@ -94,6 +98,41 @@ class ClientDashboardControllers extends GetxController {
     }
   }
 
+  void _listenToAuthState() {
+    print("ClientDashboardControllers: Setting up auth state listener");
+
+    // Listen to Firebase Auth state changes
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
+      print(
+        "ClientDashboardControllers: Auth state changed - User: ${user?.uid}",
+      );
+
+      if (user != null) {
+        // User is authenticated, initialize data
+        _isWaitingForAuth = false;
+        if (user.uid != _currentUserId) {
+          _currentUserId = user.uid;
+          _initData();
+        }
+      } else {
+        // User is not authenticated, clear data and show appropriate state
+        _isWaitingForAuth = false;
+        _currentUserId = null;
+        _clearDataForUnauthenticatedUser();
+      }
+    });
+  }
+
+  void _clearDataForUnauthenticatedUser() {
+    print("ClientDashboardControllers: Clearing data for unauthenticated user");
+    meals.clear();
+    isLoading.value = false;
+    isRefreshing.value = false;
+    error.value = '';
+    _isInitialized = false;
+    update();
+  }
+
   Future<void> _initData() async {
     if (_isInitialized) {
       print("ClientDashboardControllers: Already initialized, skipping");
@@ -117,7 +156,12 @@ class ClientDashboardControllers extends GetxController {
       // Get current user ID for user-specific meals
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        throw Exception('User not authenticated');
+        // Don't throw error, just wait for auth state
+        print(
+          "ClientDashboardControllers: No authenticated user, waiting for auth",
+        );
+        isLoading.value = false;
+        return;
       }
 
       print("ClientDashboardControllers: User authenticated: ${user.uid}");
@@ -311,7 +355,15 @@ class ClientDashboardControllers extends GetxController {
   Future<void> refreshMeals() async {
     isRefreshing.value = true;
     _isInitialized = false;
-    await _initData();
+
+    // If user is authenticated, reload data
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await _initData();
+    } else {
+      // If not authenticated, just clear the refreshing state
+      isRefreshing.value = false;
+    }
   }
 
   // Force refresh from server (bypass cache)
@@ -385,11 +437,13 @@ class ClientDashboardControllers extends GetxController {
   // Check if we have any data (cached or fresh)
   bool get hasData => meals.isNotEmpty;
 
-  // Check if we should show loading state (only when no data exists)
-  bool get shouldShowLoading => isLoading.value && meals.isEmpty;
+  // Check if we should show loading state (only when no data exists and either loading or waiting for auth)
+  bool get shouldShowLoading =>
+      (isLoading.value || _isWaitingForAuth) && meals.isEmpty;
 
-  // Check if we should show error state (only when no data and error exists)
-  bool get shouldShowError => error.value.isNotEmpty && meals.isEmpty;
+  // Check if we should show error state (only when no data and error exists and not waiting for auth)
+  bool get shouldShowError =>
+      error.value.isNotEmpty && meals.isEmpty && !_isWaitingForAuth;
 
   // Check if current category has any meals at all
   bool get currentCategoryHasMeals => currentCategoryMealCount > 0;
