@@ -137,21 +137,36 @@ class SimpleRealTimeSearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Color(0xFFC2D86A).withValues(alpha: 0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, color: Colors.white54),
-          const SizedBox(width: 12),
+          Icon(Icons.search, color: Colors.white54),
+          SizedBox(width: 12),
           Expanded(
             child: TextField(
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
               decoration: InputDecoration(
                 hintText: hintText,
-                hintStyle: const TextStyle(color: Colors.white54),
+                hintStyle: const TextStyle(color: Colors.white54, fontSize: 16),
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
@@ -162,7 +177,6 @@ class SimpleRealTimeSearchBar extends StatelessWidget {
               },
             ),
           ),
-          const SizedBox(width: 8),
           Obx(
             () => searchQuery.value.isNotEmpty
                 ? GestureDetector(
@@ -171,22 +185,32 @@ class SimpleRealTimeSearchBar extends StatelessWidget {
                       onSearchChanged('');
                     },
                     child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF3A3A3A),
-                        shape: BoxShape.circle,
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFFC2D86A).withValues(alpha: 0.2),
+                            Color(0xFFC2D86A).withValues(alpha: 0.1),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(
-                        Icons.clear,
-                        color: Colors.white54,
-                        size: 16,
-                      ),
+                      child: Icon(Icons.clear, color: Colors.white, size: 16),
                     ),
                   )
                 : showFilterIcon
-                ? GestureDetector(
-                    onTap: onFilterTap,
-                    child: const Icon(Icons.tune, color: Colors.white54),
+                ? Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFC2D86A).withValues(alpha: 0.2),
+                          Color(0xFFC2D86A).withValues(alpha: 0.1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.tune, color: Color(0xFFC2D86A), size: 20),
                   )
                 : const SizedBox.shrink(),
           ),

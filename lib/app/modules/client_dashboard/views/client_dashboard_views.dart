@@ -21,224 +21,234 @@ class ClientDashboardScreen extends StatelessWidget {
     String id = Get.parameters["id"] ?? "";
     final controller = Get.find<ClientDashboardControllers>();
 
-    return BaseScreenWrapper(
-      requiresAuth: true,
-      drawer: DrawerMenu(),
-      bottomNavigationBar: _buildBottomNavigationBar(id),
-      child: RefreshIndicator(
-        onRefresh: () async {
-          final controller = Get.find<ClientDashboardControllers>();
-          await controller.refreshMeals();
-        },
-        color: Colors.green,
-        backgroundColor: Color(0xFF2A2A2A),
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
+            stops: [0.0, 0.3, 1.0],
+          ),
+        ),
         child: SafeArea(
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Dynamic Profile Header
-                  DynamicProfileHeader(
-                    onProfileTap: () => Get.toNamed('/profile-settings'),
-                    onNotificationTap: () =>
-                        Get.toNamed('/notification?id=$id'),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with gradient background
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+                    ),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(25),
+                      bottomRight: Radius.circular(25),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
                   ),
-
-                  const SizedBox(height: 24),
-
-                  // Dynamic Live Stats Card
-                  const DynamicLiveStatsCard(),
-
-                  const SizedBox(height: 24),
-
-                  // Real-time Search Bar
-                  SimpleRealTimeSearchBar(
-                    searchQuery: controller.searchQuery,
-                    onSearchChanged: controller.updateSearchQuery,
-                    hintText: 'Search meals...',
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Dynamic Day Counter with Add Meal Button
-                  DynamicDayCounter(
-                    onAddMealTap: () {
-                      final userData = Get.find<AuthController>().userdataget();
-                      Get.toNamed(
-                        "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Meal Type Tabs
-                  Obx(
-                    () => Row(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
                       children: [
-                        _buildMealTab(
-                          '🍳',
-                          'Breakfast',
-                          controller.selectedCategory.value == 'Breakfast',
-                          () => controller.changeCategory('Breakfast'),
+                        // Dynamic Profile Header
+                        DynamicProfileHeader(
+                          onProfileTap: () => Get.toNamed('/profile-settings'),
+                          onNotificationTap: () =>
+                              Get.toNamed('/notification?id=$id'),
                         ),
-                        const SizedBox(width: 16),
-                        _buildMealTab(
-                          '🥗',
-                          'Lunch',
-                          controller.selectedCategory.value == 'Lunch',
-                          () => controller.changeCategory('Lunch'),
-                        ),
-                        const SizedBox(width: 16),
-                        _buildMealTab(
-                          '🍽️',
-                          'Dinner',
-                          controller.selectedCategory.value == 'Dinner',
-                          () => controller.changeCategory('Dinner'),
-                        ),
+
+                        const SizedBox(height: 24),
+
+                        // Dynamic Live Stats Card
+                        const DynamicLiveStatsCard(),
                       ],
                     ),
                   ),
+                ),
 
-                  const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-                  // Meals List - Simplified for now
-                  GetBuilder<ClientDashboardControllers>(
-                    builder: (controller) {
-                      if (controller.shouldShowLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: Color(0xFFC2D86A),
-                          ),
-                        );
-                      }
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Real-time Search Bar
+                      SimpleRealTimeSearchBar(
+                        searchQuery: controller.searchQuery,
+                        onSearchChanged: controller.updateSearchQuery,
+                        hintText: 'Search here...',
+                      ),
 
-                      if (controller.shouldShowError) {
-                        return Container(
-                          padding: const EdgeInsets.all(32),
-                          child: Column(
-                            children: [
-                              const Icon(
-                                Icons.error_outline,
-                                color: Colors.red,
-                                size: 64,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                controller.error.value,
-                                style: const TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        );
-                      }
+                      const SizedBox(height: 24),
 
-                      final meals = controller.displayMeals;
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: meals.length,
-                        itemBuilder: (context, index) {
-                          final meal = meals[index];
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF2A2A2A),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: ListTile(
-                              leading: Container(
-                                width: 60,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFC2D86A),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Icon(
-                                  Icons.restaurant,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              title: Text(
-                                meal.name,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              subtitle: Text(
-                                '${meal.kcal} Kcal',
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              onTap: () {
-                                final box = GetStorage();
-                                box.write("mealdetails", meal.toJson());
-                                Get.toNamed(
-                                  '/meals-details?id=${Get.find<AuthController>().userdataget()["_id"] ?? ""}',
-                                );
-                              },
-                              onLongPress: () => _showDeleteMealDialog(
-                                context,
-                                meal,
-                                controller,
-                              ),
-                            ),
+                      // Dynamic Day Counter with Add Meal Button
+                      DynamicDayCounter(
+                        onAddMealTap: () {
+                          final userData = Get.find<AuthController>()
+                              .userdataget();
+                          Get.toNamed(
+                            "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
                           );
                         },
-                      );
-                    },
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Meal Type Tabs
+                      Obx(
+                        () => Row(
+                          children: [
+                            _buildModernMealTab(
+                              '🍳',
+                              'Breakfast',
+                              controller.selectedCategory.value == 'Breakfast',
+                              () => controller.changeCategory('Breakfast'),
+                            ),
+                            const SizedBox(width: 12),
+                            _buildModernMealTab(
+                              '🥗',
+                              'Lunch',
+                              controller.selectedCategory.value == 'Lunch',
+                              () => controller.changeCategory('Lunch'),
+                            ),
+                            const SizedBox(width: 12),
+                            _buildModernMealTab(
+                              '🍽️',
+                              'Dinner',
+                              controller.selectedCategory.value == 'Dinner',
+                              () => controller.changeCategory('Dinner'),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Meals List - Firebase-backed with modern styling
+                      GetBuilder<ClientDashboardControllers>(
+                        builder: (controller) {
+                          if (controller.shouldShowLoading) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: Color(0xFFC2D86A),
+                              ),
+                            );
+                          }
+
+                          if (controller.shouldShowError) {
+                            return Container(
+                              padding: const EdgeInsets.all(32),
+                              child: Column(
+                                children: [
+                                  const Icon(
+                                    Icons.error_outline,
+                                    color: Colors.red,
+                                    size: 64,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    controller.error.value,
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 16,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          final meals = controller.displayMeals;
+
+                          if (meals.isEmpty) {
+                            return Center(
+                              child: Column(
+                                children: [
+                                  Image.asset(
+                                    'assets/no_diet.png',
+                                    height: 250,
+                                    width: 250,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: meals.length,
+                            itemBuilder: (context, index) {
+                              final meal = meals[index];
+                              return _buildModernMealCard(
+                                meal,
+                                index,
+                                controller,
+                                context,
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
       ),
+      bottomNavigationBar: _buildModernBottomNavigationBar(id),
     );
   }
 
-  Widget _buildBottomNavigationBar(String id) {
+  Widget _buildModernBottomNavigationBar(String id) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF2A2A2A),
-        border: Border(top: BorderSide(color: Color(0xFF3A3A3A), width: 1)),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+        ),
+        border: Border(
+          top: BorderSide(
+            color: Color(0xFFC2D86A).withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(Icons.person, 'Member', true, () {}),
-              _buildNavItem(
-                Icons.group,
-                'Group',
-                false,
-                () => Get.toNamed(Routes.GROUP),
-              ),
-              _buildNavItem(
-                Icons.notifications,
-                'Notification',
-                false,
-                () => Get.toNamed('/notification?id=$id'),
-              ),
-              _buildNavItem(
-                Icons.person,
-                'Profile',
-                false,
-                () => Get.toNamed(Routes.PROFILE_MAIN),
-              ),
+              _buildNavItem(Icons.person, 'Member', true, () {
+                // Already on member/dashboard screen
+              }),
+              _buildNavItem(Icons.group, 'Group', false, () {
+                Get.toNamed(Routes.GROUP);
+              }),
+              _buildNavItem(Icons.notifications, 'Notification', false, () {
+                Get.toNamed('/notification?id=$id');
+              }),
+              _buildNavItem(Icons.person, 'Profile', false, () {
+                Get.toNamed(Routes.PROFILE_MAIN);
+              }),
             ],
           ),
         ),
@@ -257,26 +267,17 @@ class ClientDashboardScreen extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: isActive
-                ? BoxDecoration(
-                    color: const Color(0xFFC2D86A),
-                    borderRadius: BorderRadius.circular(8),
-                  )
-                : null,
-            child: Icon(
-              icon,
-              color: isActive ? Colors.black : Colors.white54,
-              size: 24,
-            ),
+          Icon(
+            icon,
+            color: isActive ? Color(0xFFC2D86A) : Colors.white54,
+            size: 24,
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: isActive ? const Color(0xFFC2D86A) : Colors.white54,
-              fontSize: 10,
+              color: isActive ? Color(0xFFC2D86A) : Colors.white54,
+              fontSize: 12,
               fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -285,7 +286,7 @@ class ClientDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMealTab(
+  Widget _buildModernMealTab(
     String emoji,
     String label,
     bool isSelected,
@@ -294,29 +295,279 @@ class ClientDashboardScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFC2D86A) : Colors.transparent,
-          borderRadius: BorderRadius.circular(24),
-          border: isSelected
-              ? null
-              : Border.all(color: Colors.white54.withValues(alpha: 0.3)),
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [
+                    Color(0xFFC2D86A).withValues(alpha: 0.3),
+                    Color(0xFFC2D86A).withValues(alpha: 0.1),
+                  ],
+                )
+              : null,
+          color: isSelected ? null : Colors.transparent,
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(
+            color: isSelected
+                ? Color(0xFFC2D86A)
+                : Colors.white.withValues(alpha: 0.2),
+            width: 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Color(0xFFC2D86A).withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 16)),
-            const SizedBox(width: 6),
+            Text(emoji, style: TextStyle(fontSize: 16)),
+            SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.black : Colors.white70,
-                fontSize: 14,
+                color: isSelected ? Colors.white : Colors.white54,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildModernMealCard(
+    MealModel meal,
+    int index,
+    ClientDashboardControllers controller,
+    BuildContext context,
+  ) {
+    // Different gradient combinations for variety
+    List<List<Color>> gradients = [
+      [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+      [Color(0xFF2D2D2D), Color(0xFF1D1D1D)],
+      [Color(0xFF252525), Color(0xFF151515)],
+    ];
+
+    List<Color> cardGradient = gradients[index % gradients.length];
+
+    return GestureDetector(
+      onTap: () {
+        final box = GetStorage();
+        box.write("mealdetails", meal.toJson());
+        Get.toNamed(
+          '/meals-details?id=${Get.find<AuthController>().userdataget()["_id"] ?? ""}',
+        );
+      },
+      onLongPress: () => _showDeleteMealDialog(context, meal, controller),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: cardGradient,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Color(0xFFC2D86A).withValues(alpha: 0.2),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 15,
+              offset: Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Subtle pattern overlay
+            Positioned(
+              top: -30,
+              right: -30,
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [
+                      Color(0xFFC2D86A).withValues(alpha: 0.1),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  // Meal Image
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xFFC2D86A).withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.restaurant,
+                      color: Colors.black,
+                      size: 35,
+                    ),
+                  ),
+                  SizedBox(width: 20),
+
+                  // Meal Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          meal.name,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.orange.withValues(alpha: 0.2),
+                                    Colors.orange.withValues(alpha: 0.1),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Icon(
+                                Icons.local_fire_department,
+                                color: Colors.orange,
+                                size: 16,
+                              ),
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              '${meal.kcal} Kcal',
+                              style: TextStyle(
+                                color: Colors.orange,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Text(
+                              '• 100g',
+                              style: TextStyle(
+                                color: Colors.white54,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12),
+
+                        // Nutritional Info
+                        Row(
+                          children: [
+                            _buildModernNutrientBar(
+                              '${meal.protein}g',
+                              'Protein',
+                              Colors.green,
+                            ),
+                            SizedBox(width: 12),
+                            _buildModernNutrientBar(
+                              '${meal.fat}g',
+                              'Fat',
+                              Colors.blue,
+                            ),
+                            SizedBox(width: 12),
+                            _buildModernNutrientBar(
+                              '${meal.carbs}g',
+                              'Carbs',
+                              Colors.red,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // More Options
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xFFC2D86A).withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.more_horiz,
+                      color: Colors.black,
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModernNutrientBar(String value, String label, Color color) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(label, style: TextStyle(color: Colors.white54, fontSize: 10)),
+        ],
       ),
     );
   }

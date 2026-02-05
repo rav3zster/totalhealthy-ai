@@ -28,31 +28,45 @@ class DynamicDayCounter extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${controller.dayCountDisplay} (${controller.primaryGoal})',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${controller.dayCountDisplay} (${controller.primaryGoal})',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 4),
-              Text(
-                controller.planDateRange,
-                style: const TextStyle(color: Colors.white54, fontSize: 14),
+            ),
+            Text(
+              controller.planDateRange.isNotEmpty
+                  ? controller.planDateRange
+                  : '23 Oct - 17 Dec',
+              style: TextStyle(color: Colors.white54, fontSize: 14),
+            ),
+          ],
+        ),
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+            ),
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: Color(0xFFC2D86A).withValues(alpha: 0.3),
+                blurRadius: 8,
+                offset: Offset(0, 4),
               ),
             ],
           ),
-        ),
-        if (onAddMealTap != null)
-          ElevatedButton.icon(
+          child: ElevatedButton.icon(
             onPressed: onAddMealTap,
-            icon: const Icon(Icons.add, color: Colors.black),
-            label: const Text(
+            icon: Icon(Icons.add, color: Colors.black),
+            label: Text(
               'Add Meal',
               style: TextStyle(
                 color: Colors.black,
@@ -60,13 +74,15 @@ class DynamicDayCounter extends StatelessWidget {
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFC2D86A),
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(25),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
           ),
+        ),
       ],
     );
   }
@@ -79,20 +95,18 @@ class DynamicDayCounter extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Skeleton for day counter
               Container(
-                width: 200,
                 height: 18,
+                width: 200,
                 decoration: BoxDecoration(
                   color: const Color(0xFF2A2A2A),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
               const SizedBox(height: 8),
-              // Skeleton for date range
               Container(
-                width: 120,
                 height: 14,
+                width: 120,
                 decoration: BoxDecoration(
                   color: const Color(0xFF2A2A2A),
                   borderRadius: BorderRadius.circular(4),
@@ -101,25 +115,14 @@ class DynamicDayCounter extends StatelessWidget {
             ],
           ),
         ),
-        if (onAddMealTap != null)
-          ElevatedButton.icon(
-            onPressed: onAddMealTap,
-            icon: const Icon(Icons.add, color: Colors.black),
-            label: const Text(
-              'Add Meal',
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFC2D86A),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            ),
+        Container(
+          height: 40,
+          width: 120,
+          decoration: BoxDecoration(
+            color: const Color(0xFF2A2A2A),
+            borderRadius: BorderRadius.circular(20),
           ),
+        ),
       ],
     );
   }
@@ -132,40 +135,18 @@ class DynamicDayCounter extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.error_outline, color: Colors.red, size: 16),
-                  const SizedBox(width: 4),
-                  const Text(
-                    'Day 1/55 (General Fitness)',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+              const Text(
+                'Day 1/55 (Weight Loss)',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 4),
-              Row(
-                children: [
-                  const Text(
-                    'Failed to load dates',
-                    style: TextStyle(color: Colors.red, fontSize: 14),
-                  ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () => controller.refreshUserData(),
-                    child: const Text(
-                      'Retry',
-                      style: TextStyle(
-                        color: Color(0xFFC2D86A),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
+              const Text(
+                'Oct 1 - Nov 1',
+                style: TextStyle(color: Colors.white54, fontSize: 14),
               ),
             ],
           ),
