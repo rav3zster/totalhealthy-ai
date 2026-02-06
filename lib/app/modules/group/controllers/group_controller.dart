@@ -417,6 +417,17 @@ class GroupController extends GetxController {
     String? groupName,
   }) async {
     try {
+      // Validate groupId
+      if (groupId == null || groupId.isEmpty || groupId == 'default') {
+        Get.snackbar(
+          "Error",
+          "Invalid group. Please select a specific group to send invitations.",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
       // Prevent duplicate pending invitations
       final isAlreadyPending = sentInvitations.any(
         (n) => n.recipientId == user.id && n.groupId == groupId,
@@ -446,10 +457,8 @@ class GroupController extends GetxController {
 
       await _notificationsService.sendNotification(notification);
 
-      // Refresh available users list
-      if (groupId != null) {
-        availableUsers.value = await getAvailableUsers(groupId);
-      }
+      // Refresh available users list (groupId is guaranteed to be valid here)
+      availableUsers.value = await getAvailableUsers(groupId);
 
       Get.snackbar(
         "Invitation Sent",

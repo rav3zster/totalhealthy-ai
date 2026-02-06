@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/user_controller.dart';
+import '../core/utitlity/responsive_helper.dart';
 
 class DynamicLiveStatsCard extends StatelessWidget {
   const DynamicLiveStatsCard({super.key});
@@ -11,20 +12,24 @@ class DynamicLiveStatsCard extends StatelessWidget {
       final controller = Get.find<UserController>();
 
       if (controller.isLoading && controller.currentUser == null) {
-        return _buildLoadingCard();
+        return _buildLoadingCard(context);
       }
 
       if (controller.error.isNotEmpty && controller.currentUser == null) {
-        return _buildErrorCard(controller);
+        return _buildErrorCard(controller, context);
       }
 
-      return _buildStatsCard(controller);
+      return _buildStatsCard(controller, context);
     });
   }
 
-  Widget _buildStatsCard(UserController controller) {
+  Widget _buildStatsCard(UserController controller, BuildContext context) {
+    final padding = ResponsiveHelper.getResponsivePadding(context, 20);
+    final fontSize = ResponsiveHelper.getResponsiveFontSize(context, 20);
+    final isSmallScreen = ResponsiveHelper.isSmallPhone(context);
+
     return Container(
-      padding: EdgeInsets.all(24),
+      padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -64,42 +69,91 @@ class DynamicLiveStatsCard extends StatelessWidget {
                 'Live Stats',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildModernStatItem(
-                controller.goalAchievedPercent,
-                'Goal Achieved',
-                Colors.orange,
-              ),
-              _buildModernStatItem(
-                controller.fatLost,
-                'Fat Lost',
-                Colors.yellow,
-              ),
-              _buildModernStatItem(
-                controller.muscleGained,
-                'Muscle Gained',
-                Colors.purple,
-              ),
-            ],
-          ),
+          SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, 20)),
+          // Use Wrap for better responsiveness on small screens
+          isSmallScreen
+              ? Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _buildModernStatItem(
+                      controller.goalAchievedPercent,
+                      'Goal Achieved',
+                      Colors.orange,
+                      context,
+                    ),
+                    _buildModernStatItem(
+                      controller.fatLost,
+                      'Fat Lost',
+                      Colors.yellow,
+                      context,
+                    ),
+                    _buildModernStatItem(
+                      controller.muscleGained,
+                      'Muscle Gained',
+                      Colors.purple,
+                      context,
+                    ),
+                  ],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      child: _buildModernStatItem(
+                        controller.goalAchievedPercent,
+                        'Goal Achieved',
+                        Colors.orange,
+                        context,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: _buildModernStatItem(
+                        controller.fatLost,
+                        'Fat Lost',
+                        Colors.yellow,
+                        context,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: _buildModernStatItem(
+                        controller.muscleGained,
+                        'Muscle Gained',
+                        Colors.purple,
+                        context,
+                      ),
+                    ),
+                  ],
+                ),
         ],
       ),
     );
   }
 
-  Widget _buildModernStatItem(String value, String label, Color color) {
+  Widget _buildModernStatItem(
+    String value,
+    String label,
+    Color color,
+    BuildContext context,
+  ) {
+    final isSmallScreen = ResponsiveHelper.isSmallPhone(context);
+    final fontSize = ResponsiveHelper.getResponsiveFontSize(context, 18);
+    final labelFontSize = ResponsiveHelper.getResponsiveFontSize(context, 11);
+
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.symmetric(
+        horizontal: isSmallScreen ? 8 : 12,
+        vertical: isSmallScreen ? 10 : 14,
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -114,25 +168,40 @@ class DynamicLiveStatsCard extends StatelessWidget {
         ),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            value,
-            style: TextStyle(
-              color: color,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: TextStyle(
+                color: color,
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           SizedBox(height: 4),
-          Text(label, style: TextStyle(color: Colors.white70, fontSize: 12)),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: TextStyle(color: Colors.white70, fontSize: labelFontSize),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildLoadingCard() {
+  Widget _buildLoadingCard(BuildContext context) {
+    final padding = ResponsiveHelper.getResponsivePadding(context, 20);
+
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         color: const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(16),
@@ -152,9 +221,11 @@ class DynamicLiveStatsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildLoadingStatItem(),
-              _buildLoadingStatItem(),
-              _buildLoadingStatItem(),
+              Expanded(child: _buildLoadingStatItem()),
+              SizedBox(width: 8),
+              Expanded(child: _buildLoadingStatItem()),
+              SizedBox(width: 8),
+              Expanded(child: _buildLoadingStatItem()),
             ],
           ),
         ],
@@ -193,9 +264,11 @@ class DynamicLiveStatsCard extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorCard(UserController controller) {
+  Widget _buildErrorCard(UserController controller, BuildContext context) {
+    final padding = ResponsiveHelper.getResponsivePadding(context, 20);
+
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         color: const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(16),
@@ -215,9 +288,32 @@ class DynamicLiveStatsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatItem('0%', 'Goal Achieved', Colors.orange),
-              _buildStatItem('0kg', 'Fat Lost', Colors.yellow),
-              _buildStatItem('0g', 'Muscle Gained', Colors.purple),
+              Expanded(
+                child: _buildStatItem(
+                  '0%',
+                  'Goal Achieved',
+                  Colors.orange,
+                  context,
+                ),
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: _buildStatItem(
+                  '0kg',
+                  'Fat Lost',
+                  Colors.yellow,
+                  context,
+                ),
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: _buildStatItem(
+                  '0g',
+                  'Muscle Gained',
+                  Colors.purple,
+                  context,
+                ),
+              ),
             ],
           ),
         ],
@@ -225,7 +321,12 @@ class DynamicLiveStatsCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(String value, String label, Color color) {
+  Widget _buildStatItem(
+    String value,
+    String label,
+    Color color,
+    BuildContext context,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -234,18 +335,25 @@ class DynamicLiveStatsCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
-            value,
-            style: TextStyle(
-              color: color,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: TextStyle(
+                color: color,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(color: Colors.white70, fontSize: 12),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
+              textAlign: TextAlign.center,
+            ),
           ),
         ],
       ),

@@ -22,6 +22,7 @@ class ClientDashboardScreen extends StatelessWidget {
     final controller = Get.find<ClientDashboardControllers>();
 
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -32,183 +33,194 @@ class ClientDashboardScreen extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header with gradient background
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                    ),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(25),
-                      bottomRight: Radius.circular(25),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        blurRadius: 10,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      children: [
-                        // Dynamic Profile Header
-                        DynamicProfileHeader(
-                          onProfileTap: () => Get.toNamed('/profile-settings'),
-                          onNotificationTap: () =>
-                              Get.toNamed('/notification?id=$id'),
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Dynamic Live Stats Card
-                        const DynamicLiveStatsCard(),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Real-time Search Bar
-                      SimpleRealTimeSearchBar(
-                        searchQuery: controller.searchQuery,
-                        onSearchChanged: controller.updateSearchQuery,
-                        hintText: 'Search here...',
+                      // Header with gradient background
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+                          ),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(25),
+                            bottomRight: Radius.circular(25),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.3),
+                              blurRadius: 10,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            children: [
+                              // Dynamic Profile Header
+                              DynamicProfileHeader(
+                                onProfileTap: () =>
+                                    Get.toNamed('/profile-settings'),
+                                onNotificationTap: () =>
+                                    Get.toNamed('/notification?id=$id'),
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              // Dynamic Live Stats Card
+                              const DynamicLiveStatsCard(),
+                            ],
+                          ),
+                        ),
                       ),
 
                       const SizedBox(height: 24),
 
-                      // Dynamic Day Counter with Add Meal Button
-                      DynamicDayCounter(
-                        onAddMealTap: () {
-                          final userData = Get.find<AuthController>()
-                              .userdataget();
-                          Get.toNamed(
-                            "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
-                          );
-                        },
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Meal Type Tabs
-                      Obx(
-                        () => Row(
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildModernMealTab(
-                              '🍳',
-                              'Breakfast',
-                              controller.selectedCategory.value == 'Breakfast',
-                              () => controller.changeCategory('Breakfast'),
+                            // Real-time Search Bar
+                            SimpleRealTimeSearchBar(
+                              searchQuery: controller.searchQuery,
+                              onSearchChanged: controller.updateSearchQuery,
+                              hintText: 'Search here...',
                             ),
-                            const SizedBox(width: 12),
-                            _buildModernMealTab(
-                              '🥗',
-                              'Lunch',
-                              controller.selectedCategory.value == 'Lunch',
-                              () => controller.changeCategory('Lunch'),
+
+                            const SizedBox(height: 24),
+
+                            // Dynamic Day Counter with Add Meal Button
+                            DynamicDayCounter(
+                              onAddMealTap: () {
+                                final userData = Get.find<AuthController>()
+                                    .userdataget();
+                                Get.toNamed(
+                                  "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
+                                );
+                              },
                             ),
-                            const SizedBox(width: 12),
-                            _buildModernMealTab(
-                              '🍽️',
-                              'Dinner',
-                              controller.selectedCategory.value == 'Dinner',
-                              () => controller.changeCategory('Dinner'),
+
+                            const SizedBox(height: 20),
+
+                            // Meal Type Tabs
+                            Obx(
+                              () => Row(
+                                children: [
+                                  _buildModernMealTab(
+                                    '🍳',
+                                    'Breakfast',
+                                    controller.selectedCategory.value ==
+                                        'Breakfast',
+                                    () =>
+                                        controller.changeCategory('Breakfast'),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  _buildModernMealTab(
+                                    '🥗',
+                                    'Lunch',
+                                    controller.selectedCategory.value ==
+                                        'Lunch',
+                                    () => controller.changeCategory('Lunch'),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  _buildModernMealTab(
+                                    '🍽️',
+                                    'Dinner',
+                                    controller.selectedCategory.value ==
+                                        'Dinner',
+                                    () => controller.changeCategory('Dinner'),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // Meals List - Firebase-backed with modern styling
+                            GetBuilder<ClientDashboardControllers>(
+                              builder: (controller) {
+                                if (controller.shouldShowLoading) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Color(0xFFC2D86A),
+                                    ),
+                                  );
+                                }
+
+                                if (controller.shouldShowError) {
+                                  return Container(
+                                    padding: const EdgeInsets.all(32),
+                                    child: Column(
+                                      children: [
+                                        const Icon(
+                                          Icons.error_outline,
+                                          color: Colors.red,
+                                          size: 64,
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          controller.error.value,
+                                          style: const TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 16,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
+
+                                final meals = controller.displayMeals;
+
+                                if (meals.isEmpty) {
+                                  return Center(
+                                    child: Column(
+                                      children: [
+                                        Image.asset(
+                                          'assets/no_diet.png',
+                                          height: 250,
+                                          width: 250,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
+
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: meals.length,
+                                  itemBuilder: (context, index) {
+                                    final meal = meals[index];
+                                    return _buildModernMealCard(
+                                      meal,
+                                      index,
+                                      controller,
+                                      context,
+                                    );
+                                  },
+                                );
+                              },
                             ),
                           ],
                         ),
                       ),
-
-                      const SizedBox(height: 20),
-
-                      // Meals List - Firebase-backed with modern styling
-                      GetBuilder<ClientDashboardControllers>(
-                        builder: (controller) {
-                          if (controller.shouldShowLoading) {
-                            return const Center(
-                              child: CircularProgressIndicator(
-                                color: Color(0xFFC2D86A),
-                              ),
-                            );
-                          }
-
-                          if (controller.shouldShowError) {
-                            return Container(
-                              padding: const EdgeInsets.all(32),
-                              child: Column(
-                                children: [
-                                  const Icon(
-                                    Icons.error_outline,
-                                    color: Colors.red,
-                                    size: 64,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    controller.error.value,
-                                    style: const TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 16,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-
-                          final meals = controller.displayMeals;
-
-                          if (meals.isEmpty) {
-                            return Center(
-                              child: Column(
-                                children: [
-                                  Image.asset(
-                                    'assets/no_diet.png',
-                                    height: 250,
-                                    width: 250,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: meals.length,
-                            itemBuilder: (context, index) {
-                              final meal = meals[index];
-                              return _buildModernMealCard(
-                                meal,
-                                index,
-                                controller,
-                                context,
-                              );
-                            },
-                          );
-                        },
-                      ),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

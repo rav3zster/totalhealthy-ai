@@ -170,8 +170,8 @@ class ClientDashboardControllers extends GetxController {
       // Seed dummy data in background (don't wait for it)
       _seedDummyDataInBackground();
 
-      // Try fallback approach immediately since Firebase stream has issues
-      await _tryFallbackQuery(user.uid);
+      // Use Firestore stream for real-time updates
+      await _setupMealsStream(user.uid);
 
       _isInitialized = true;
       print(
@@ -186,6 +186,58 @@ class ClientDashboardControllers extends GetxController {
 
       // CRITICAL: Force UI update for GetBuilder
       update();
+    }
+  }
+
+  Future<void> _setupMealsStream(String userId) async {
+    try {
+      print(
+        "ClientDashboardControllers: Setting up meals stream for user: $userId",
+      );
+
+      // Cancel existing subscription if any
+      await _mealsSubscription?.cancel();
+
+      // Subscribe to user-specific meals stream
+      _mealsSubscription = _mealsService
+          .getUserMealsStream(userId)
+          .listen(
+            (userMeals) {
+              print(
+                "ClientDashboardControllers: Received ${userMeals.length} meals from stream",
+              );
+
+              meals.value = userMeals;
+              _cacheMeals(userMeals);
+
+              // Clear loading and error states
+              isLoading.value = false;
+              isRefreshing.value = false;
+              error.value = '';
+
+              // Force UI update
+              update();
+            },
+            onError: (error) {
+              print("ClientDashboardControllers: Stream error: $error");
+
+              // Only show error if we don't have cached data
+              if (meals.isEmpty) {
+                this.error.value = 'Failed to load meals - check connection';
+              }
+
+              isLoading.value = false;
+              isRefreshing.value = false;
+              update();
+            },
+          );
+
+      print("ClientDashboardControllers: Meals stream setup completed");
+    } catch (e) {
+      print("ClientDashboardControllers: Failed to setup meals stream: $e");
+
+      // Fallback to one-time fetch if stream fails
+      await _tryFallbackQuery(userId);
     }
   }
 
@@ -354,12 +406,12 @@ class ClientDashboardControllers extends GetxController {
   // Refresh meals data with pull-to-refresh
   Future<void> refreshMeals() async {
     isRefreshing.value = true;
-    _isInitialized = false;
 
     // If user is authenticated, reload data
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      await _initData();
+      // Re-setup the stream to get fresh data
+      await _setupMealsStream(user.uid);
     } else {
       // If not authenticated, just clear the refreshing state
       isRefreshing.value = false;
@@ -374,7 +426,6 @@ class ClientDashboardControllers extends GetxController {
     } catch (e) {
       // Cache clear failed, continue anyway
     }
-    _isInitialized = false;
     await refreshMeals();
   }
 

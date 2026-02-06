@@ -13,9 +13,18 @@ class ProfileMainView extends StatelessWidget {
       title: 'Profile',
       actions: [
         Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFFC2D86A),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+            ),
             shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: IconButton(
             icon: const Icon(Icons.edit, color: Colors.black),
@@ -57,14 +66,33 @@ class ProfileMainView extends StatelessWidget {
   Widget _buildProfileHeader(UserController userController) {
     return Column(
       children: [
-        CircleAvatar(
-          radius: 50,
-          backgroundImage: userController.profileImage.isNotEmpty
-              ? NetworkImage(userController.profileImage)
-              : const AssetImage('assets/user_avatar.png') as ImageProvider,
-          onBackgroundImageError: (_, _) {
-            // Handle image loading error silently
-          },
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                const Color(0xFFC2D86A).withValues(alpha: 0.1),
+              ],
+            ),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(3),
+          child: CircleAvatar(
+            radius: 50,
+            backgroundImage: userController.profileImage.isNotEmpty
+                ? NetworkImage(userController.profileImage)
+                : const AssetImage('assets/user_avatar.png') as ImageProvider,
+            onBackgroundImageError: (_, _) {
+              // Handle image loading error silently
+            },
+          ),
         ),
         const SizedBox(height: 16),
         Text(
@@ -145,12 +173,23 @@ class ProfileMainView extends StatelessWidget {
   Widget _buildProgressSection(UserController userController) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+        ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -227,8 +266,23 @@ class ProfileMainView extends StatelessWidget {
   Widget _buildStatCard(String label, String value, String unit) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+        ),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -272,8 +326,23 @@ class ProfileMainView extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF2A2A2A),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+          ),
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -282,8 +351,17 @@ class ProfileMainView extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFC2D86A),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+                  ),
                   borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Icon(icon, color: Colors.black, size: 20),
               ),

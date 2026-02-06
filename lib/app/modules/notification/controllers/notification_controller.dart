@@ -50,33 +50,65 @@ class NotificationController extends GetxController {
 
   Future<void> acceptInvitation(AppNotification notification) async {
     try {
-      if (notification.groupId != null) {
-        // Add the user to the group in Firestore
-        await _groupsService.addMemberToGroup(
-          notification.groupId!,
-          notification.recipientId,
+      // Validate groupId
+      if (notification.groupId == null ||
+          notification.groupId!.isEmpty ||
+          notification.groupId == 'default') {
+        Get.snackbar(
+          "Error",
+          "Invalid invitation. The group information is missing or incorrect.",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 4),
         );
 
-        Get.snackbar(
-          "Success",
-          "You have joined ${notification.groupName ?? 'the group'}!",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+        // Mark invitation as rejected since it's invalid
+        await _notificationsService.updateNotificationStatus(
+          notification.id,
+          NotificationStatus.rejected,
         );
+        return;
       }
 
-      // Update status to accepted instead of deleting
+      // Add the user to the group in Firestore
+      await _groupsService.addMemberToGroup(
+        notification.groupId!,
+        notification.recipientId,
+      );
+
+      // Update status to accepted
       await _notificationsService.updateNotificationStatus(
         notification.id,
         NotificationStatus.accepted,
       );
+
+      Get.snackbar(
+        "Success",
+        "You have joined ${notification.groupName ?? 'the group'}!",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 3),
+      );
     } catch (e) {
+      String errorMessage = "Failed to accept invitation";
+
+      // Provide more specific error messages
+      if (e.toString().contains('not-found') ||
+          e.toString().contains('Group not found')) {
+        errorMessage = "This group no longer exists or has been deleted.";
+      } else if (e.toString().contains('Invalid group ID')) {
+        errorMessage = "Invalid invitation. Please contact the group admin.";
+      }
+
       Get.snackbar(
         "Error",
-        "Failed to accept invitation: $e",
+        errorMessage,
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        duration: const Duration(seconds: 4),
       );
+
+      print("DEBUG: Error accepting invitation: $e");
     }
   }
 

@@ -72,6 +72,25 @@ class GroupsFirestoreService {
 
   /// Add a user to a group
   Future<void> addMemberToGroup(String groupId, String userId) async {
+    // Validate groupId
+    if (groupId.isEmpty || groupId == 'default') {
+      throw ArgumentError(
+        'Invalid group ID. Cannot add member to group with ID: $groupId',
+      );
+    }
+
+    // Check if group exists
+    final groupDoc = await _firestore
+        .collection(_collection)
+        .doc(groupId)
+        .get();
+    if (!groupDoc.exists) {
+      throw Exception(
+        'Group not found. The group may have been deleted or the invitation is invalid.',
+      );
+    }
+
+    // Add member to group
     await _firestore.collection(_collection).doc(groupId).update({
       'members_list': FieldValue.arrayUnion([userId]),
       'member_count': FieldValue.increment(1),

@@ -412,23 +412,26 @@ class GroupView extends GetView<GroupController> {
               ),
             ),
             Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFFC2D86A),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
                 icon: const Icon(
-                  Icons.person_add_outlined,
-                  color: Colors.black,
+                  Icons.info_outline,
+                  color: Colors.white54,
                   size: 24,
                 ),
                 onPressed: () {
-                  // For now, we'll use a placeholder group ID
-                  // In a real implementation, this should be passed from the parent widget
-                  controller.inviteUser(
-                    user,
-                    groupId: 'default',
-                    groupName: 'Default Group',
+                  Get.snackbar(
+                    "Info",
+                    "To invite users, please open a specific group and use the 'Manage Members' option.",
+                    backgroundColor: const Color(0xFF2A2A2A),
+                    colorText: Colors.white,
+                    snackPosition: SnackPosition.BOTTOM,
+                    margin: const EdgeInsets.all(16),
+                    borderRadius: 12,
+                    duration: const Duration(seconds: 4),
                   );
                 },
               ),

@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 import '../core/middlewares/global_middleware.dart';
-import '../modules/Onboarding_Screen/Onboarding_binding.dart';
+import '../core/theme/page_transitions.dart';
 import '../modules/Onboarding_Screen/Onboarding_view.dart';
 import '../modules/client_dashboard/bindings/client_dashboard_bindings.dart';
 import '../modules/client_dashboard/views/client_dashboard_views.dart';
@@ -54,7 +54,6 @@ import '../modules/welcom_screen/views/welcome-screen-views.dart';
 import '../modules/manage_accounts/views/manage_accounts_views.dart';
 import '../modules/Help_and_support/views/helpAndSuportPage.dart';
 import '../widgets/switch_role_screen.dart';
-import '../widgets/base_screen_wrapper.dart';
 
 part 'app_routes.dart';
 
@@ -68,182 +67,264 @@ class AppPages {
       name: _Paths.HOME,
       page: () => HomeView(),
       binding: HomeBinding(),
-      transition: Transition.fadeIn,
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
       middlewares: [AuthCheckMiddleware()],
     ),
-    GetPage(name: _Paths.ONBOARDING, page: () => OnboardingView()),
+    GetPage(
+      name: _Paths.ONBOARDING,
+      page: () => OnboardingView(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
     GetPage(
       name: _Paths.SwipeScreen,
       page: () => SwipeScreenView(),
       binding: SwipeScreenBindings(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
       name: _Paths.WelcomeScreen,
       page: () => WelcomeScreenView(),
       binding: WelcomeScreenBindings(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
       name: _Paths.Registration,
       page: () => RegistrationView(),
       binding: RegistrationBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
       name: _Paths.Login,
       page: () => LoginView(),
-      transition: Transition.rightToLeft,
       binding: LoginBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
       name: _Paths.NUTRITION_GOAL,
       page: () => NutritionGoalView(),
       binding: NutritionGoalBinding(),
-      transition: Transition.fadeIn,
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
       name: _Paths.NOTIFICATION,
       page: () => NotificationView(),
       binding: NotificationBinding(),
-      transition: Transition.fadeIn,
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.GENERATE_AI,
       page: () => GenerateAiView(),
       binding: GenerateAiBinding(),
-      transition: Transition.fadeIn,
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.MEAL_HISTORY,
       page: () => MealHistoryView(),
       binding: MealHistoryBinding(),
-      transition: Transition.fadeIn,
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.MEALS_DETAILS,
       page: () => MealsDetailsView(),
       binding: MealsDetailsBinding(),
-      transition: Transition.fadeIn,
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350), // iOS-style timing
+      popGesture: true, // Enable iOS-style swipe-back
+      preventDuplicates: true,
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.MEAL_TIMING,
       page: () => MealTimingView(),
-      transition: Transition.fadeIn,
       binding: MealTimingBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.TrainerDashboard,
       page: () => TrainerDashboardView(),
       binding: TrainerDashboardBindings(),
-      transition: Transition.fadeIn,
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
       middlewares: [AuthCheckMiddleware()],
     ),
-    GetPage(name: _Paths.SWITCHROLE, page: () => SwitchRoleScreen()),
+    GetPage(
+      name: _Paths.SWITCHROLE,
+      page: () => SwitchRoleScreen(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
     GetPage(
       name: _Paths.UserDiet,
       page: () => UserDietView(),
-      transition: Transition.fadeIn,
       binding: UserDietScreenBindings(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.ClientDashboard,
       page: () => ClientDashboardScreen(),
       binding: ClientDashboardBindings(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
       middlewares: <GetMiddleware>[AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.FORGETPASSWORD,
       binding: ForgetPasswordScreenBindings(),
       page: () => ForgetPasswordScreenViews(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
       name: _Paths.CreateMeal,
-      transition: Transition.fadeIn,
       binding: CreateMealBinding(),
       page: () => CreateMealScreen(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350), // iOS-style timing
+      popGesture: true, // Enable iOS-style swipe-back
+      preventDuplicates: true,
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.GROUP,
       page: () => GroupView(),
       binding: GroupBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.CREATE_GROUP,
       page: () => CreateGroupScreen(),
       binding: GroupBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350), // iOS-style timing
+      popGesture: true, // Enable iOS-style swipe-back
+      preventDuplicates: true,
     ),
     GetPage(
       name: _Paths.GROUP_DETAILS,
       page: () => GroupDetailsScreen(),
       binding: GroupBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350), // iOS-style timing
+      popGesture: true, // Enable iOS-style swipe-back
+      preventDuplicates: true,
     ),
     GetPage(
       name: _Paths.MEMBER_MANAGEMENT,
       page: () => MemberManagementScreen(),
       binding: GroupBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350), // iOS-style timing
+      popGesture: true, // Enable iOS-style swipe-back
+      preventDuplicates: true,
     ),
     GetPage(
       name: _Paths.CLIENT_LIST,
       page: () => ClientListScreen(),
       binding: GroupBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.SIGNUP,
-      transition: Transition.leftToRight,
       page: () => SignupView(),
       binding: SignupBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
       name: _Paths.SETTING,
       page: () => const SettingView(),
       binding: SettingBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350), // iOS-style timing
+      popGesture: true, // Enable iOS-style swipe-back
+      preventDuplicates: true,
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.GENERAL_SETTINGS,
       page: () => const GeneralSettingsView(),
       binding: SettingBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350), // iOS-style timing
+      popGesture: true, // Enable iOS-style swipe-back
+      preventDuplicates: true,
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.PROFILE_SETTINGS,
       page: () => const ProfileSettingsView(),
       binding: SettingBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350), // iOS-style timing
+      popGesture: true, // Enable iOS-style swipe-back
+      preventDuplicates: true,
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.NOTIFICATION_SETTINGS,
       page: () => const NotificationSettingsView(),
       binding: SettingBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350), // iOS-style timing
+      popGesture: true, // Enable iOS-style swipe-back
+      preventDuplicates: true,
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.ACCOUNT_PASSWORD_SETTINGS,
       page: () => const AccountPasswordSettingsView(),
       binding: SettingBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350), // iOS-style timing
+      popGesture: true, // Enable iOS-style swipe-back
+      preventDuplicates: true,
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.PROFILE_MAIN,
       page: () => const ProfileMainView(),
       binding: ProfileBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: '/manage-accounts',
       page: () => ManageAccountScreen(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350), // iOS-style timing
+      popGesture: true, // Enable iOS-style swipe-back
+      preventDuplicates: true,
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: '/help-support',
       page: () => HelpPage(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350), // iOS-style timing
+      popGesture: true, // Enable iOS-style swipe-back
+      preventDuplicates: true,
       middlewares: [AuthCheckMiddleware()],
     ),
   ];

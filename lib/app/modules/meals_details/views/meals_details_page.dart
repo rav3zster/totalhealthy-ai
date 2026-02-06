@@ -1,12 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/modules/meals_details/controllers/meals_details_controller.dart';
 import 'package:totalhealthy/app/widgets/baseWidget.dart';
-
-import '../../../core/base/constants/appcolor.dart';
 
 import '../../../widgets/nutritional_card.dart';
 
@@ -24,9 +20,7 @@ class _MealsDetailsPageState extends State<MealsDetailsPage> {
   @override
   void initState() {
     super.initState();
-
     recipeData = box.read('mealdetails');
-    print(recipeData);
   }
 
   @override
@@ -34,342 +28,518 @@ class _MealsDetailsPageState extends State<MealsDetailsPage> {
     if (recipeData.isEmpty) {
       return Scaffold(
         backgroundColor: Colors.black,
-        body: Center(child: CircularProgressIndicator()),
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
+              stops: [0.0, 0.3, 1.0],
+            ),
+          ),
+          child: const Center(
+            child: CircularProgressIndicator(color: Color(0xFFC2D86A)),
+          ),
+        ),
       );
     }
 
     return BaseWidget(
-      // backgroundColor: Colors.black,
-      // appBar: AppBar(
-      //   backgroundColor: Colors.transparent,
-      //   elevation: 0,
-      // ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Recipe Card Section
-              Card(
-                color: Colors.grey[900],
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: CircleAvatar(
-                              backgroundColor: AppColors.chineseGreen,
-                              child: Icon(
-                                Icons.arrow_back,
-                                color: Colors.black,
-                              ),
-                            ),
-                            onPressed: () {
-                              Get.back();
-                            },
-                          ),
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: CircleAvatar(
-                                  backgroundColor: AppColors.chineseGreen,
-                                  child: Icon(
-                                    Icons.favorite_border,
-                                    color: Colors.black,
-                                  ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
+            stops: [0.0, 0.3, 1.0],
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Recipe Card Section
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFC2D86A),
+                                    Color(0xFFB8CC5A),
+                                  ],
                                 ),
-                                onPressed: () {},
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFFC2D86A,
+                                    ).withValues(alpha: 0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
-                              IconButton(
-                                icon: CircleAvatar(
-                                  backgroundColor: AppColors.chineseGreen,
-                                  child: Icon(Icons.share, color: Colors.black),
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.black,
                                 ),
                                 onPressed: () {
-                                  // Share button logic
+                                  Get.back();
                                 },
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      // Recipe Image (from JSON)
-                      Image.network(
-                        "${recipeData['imageUrl']} ",
-                        width: 150,
-                        height: 150,
-                        errorBuilder: (context, error, stackTrace) {
-                          // Display a fallback image in case of an error
-                          return Image.asset(
-                            "assets/burger.png",
-                            width: 150,
-                            height: 150,
-                          );
-                        },
-                      ),
-
-                      SizedBox(height: 10),
-                      // Recipe Name (from JSON)
-                      Text(
-                        " ${recipeData['name'] ?? "Not Found"}",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      // Recipe Info (Kcal, Time, Dishes from JSON)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Icon(
-                                Icons.local_fire_department,
-                                color: Colors.red,
-                                size: 25,
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                "${recipeData['kcal'] ?? "0"} Kcal",
-                                style: TextStyle(
-                                  color: AppColors.neplesYellow,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 5),
-                                child: Icon(
-                                  Icons.circle,
-                                  size: 5,
-                                  color: AppColors.neplesYellow,
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Icon(
-                                Icons.access_time_filled,
-                                color: AppColors.neplesYellow,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                "30 min",
-                                style: TextStyle(
-                                  color: AppColors.neplesYellow,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 5),
-                                child: Icon(
-                                  Icons.circle,
-                                  size: 5,
-                                  color: AppColors.neplesYellow,
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Icon(
-                                Icons.restaurant_menu,
-                                color: AppColors.neplesYellow,
-                              ),
-                              Text(
-                                "${recipeData['ingredients'].length} Dishes",
-                                style: TextStyle(
-                                  color: AppColors.neplesYellow,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          // Nutritional Information (from JSON)
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                        padding: EdgeInsets.all(15),
-                        decoration: BoxDecoration(
-                          color: AppColors.chineseGreen,
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            NutrientIndicator(
-                              isPadding: false,
-                              amount: "${recipeData['protein'] ?? "0"}",
-                              color: Colors.green,
-                              label: "Protein",
-                              textcolor: Colors.black,
                             ),
-                            SizedBox(width: 20),
-                            NutrientIndicator(
-                              isPadding: false,
-                              amount: "${recipeData['fat'] ?? "0"}",
-                              color: Colors.blue,
-                              label: "Protein",
-                              textcolor: Colors.black,
-                            ),
-                            SizedBox(width: 20),
-                            NutrientIndicator(
-                              amount: "${recipeData['carbs'] ?? "0"}",
-                              color: Colors.red,
-                              label: 'Carbs',
-                              textcolor: Colors.black,
-                              isPadding: false,
+                            Row(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        const Color(
+                                          0xFFC2D86A,
+                                        ).withValues(alpha: 0.2),
+                                        const Color(
+                                          0xFFC2D86A,
+                                        ).withValues(alpha: 0.1),
+                                      ],
+                                    ),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.favorite_border,
+                                      color: Color(0xFFC2D86A),
+                                    ),
+                                    onPressed: () {},
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        const Color(
+                                          0xFFC2D86A,
+                                        ).withValues(alpha: 0.2),
+                                        const Color(
+                                          0xFFC2D86A,
+                                        ).withValues(alpha: 0.1),
+                                      ],
+                                    ),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.share,
+                                      color: Color(0xFFC2D86A),
+                                    ),
+                                    onPressed: () {},
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ),
-                      SizedBox(height: 8),
-                    ],
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 16),
-
-              // Details Section
-              Text(
-                'Details',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Icon(Icons.access_time_filled, color: AppColors.neplesYellow),
-                  SizedBox(width: 10),
-                  Text(
-                    "30 min",
-                    style: TextStyle(
-                      color: AppColors.neplesYellow,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 5),
-                    child: Icon(
-                      Icons.circle,
-                      size: 5,
-                      color: AppColors.neplesYellow,
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Icon(Icons.restaurant_menu, color: AppColors.neplesYellow),
-                  Text(
-                    "${recipeData['ingredients'].length} Dishes",
-                    style: TextStyle(
-                      color: AppColors.neplesYellow,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-
-              // Ingredients Section (from JSON)
-              Card(
-                color: Colors.grey[800],
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.notifications,
-                            color: AppColors.chineseGreen,
+                        const SizedBox(height: 20),
+                        // Recipe Image
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(
+                                  0xFFC2D86A,
+                                ).withValues(alpha: 0.3),
+                                blurRadius: 15,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
                           ),
-                          SizedBox(width: 8),
-                          Text(
-                            'Ingredients',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                          padding: const EdgeInsets.all(3),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(18),
+                            child: Image.network(
+                              "${recipeData['imageUrl']} ",
+                              width: 150,
+                              height: 150,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  "assets/burger.png",
+                                  width: 150,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                );
+                              },
                             ),
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      // Build ingredient list dynamically
-                      ...List.generate(recipeData['ingredients'].length, (
-                        index,
-                      ) {
-                        var ingredient = recipeData['ingredients'][index];
-                        return buildIngredientItem(
-                          "${ingredient['name']}",
-                          "${ingredient['amount']}",
-                        );
-                      }),
-                    ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Recipe Name
+                        Text(
+                          "${recipeData['name'] ?? "Not Found"}",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        // Recipe Info
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 12,
+                          runSpacing: 8,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.local_fire_department,
+                                  color: Colors.orange,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "${recipeData['kcal'] ?? "0"} Kcal",
+                                  style: const TextStyle(
+                                    color: Colors.orange,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              width: 4,
+                              height: 4,
+                              decoration: const BoxDecoration(
+                                color: Colors.white54,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.access_time_filled,
+                                  color: Color(0xFFC2D86A),
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 4),
+                                const Text(
+                                  "30 min",
+                                  style: TextStyle(
+                                    color: Color(0xFFC2D86A),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              width: 4,
+                              height: 4,
+                              decoration: const BoxDecoration(
+                                color: Colors.white54,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.restaurant_menu,
+                                  color: Color(0xFFC2D86A),
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "${recipeData['ingredients'].length} Dishes",
+                                  style: const TextStyle(
+                                    color: Color(0xFFC2D86A),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Nutritional Information
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 16,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+                            ),
+                            borderRadius: BorderRadius.circular(50),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(
+                                  0xFFC2D86A,
+                                ).withValues(alpha: 0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              NutrientIndicator(
+                                isPadding: false,
+                                amount: "${recipeData['protein'] ?? "0"}",
+                                color: Colors.green,
+                                label: "Protein",
+                                textcolor: Colors.black,
+                              ),
+                              const SizedBox(width: 24),
+                              NutrientIndicator(
+                                isPadding: false,
+                                amount: "${recipeData['fat'] ?? "0"}",
+                                color: Colors.blue,
+                                label: "Fat",
+                                textcolor: Colors.black,
+                              ),
+                              const SizedBox(width: 24),
+                              NutrientIndicator(
+                                amount: "${recipeData['carbs'] ?? "0"}",
+                                color: Colors.red,
+                                label: 'Carbs',
+                                textcolor: Colors.black,
+                                isPadding: false,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 50),
-            ],
+
+                const SizedBox(height: 24),
+
+                // Details Section
+                const Text(
+                  'Details',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.access_time_filled,
+                      color: Color(0xFFC2D86A),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      "30 min",
+                      style: TextStyle(
+                        color: Color(0xFFC2D86A),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      width: 4,
+                      height: 4,
+                      decoration: const BoxDecoration(
+                        color: Colors.white54,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Icon(
+                      Icons.restaurant_menu,
+                      color: Color(0xFFC2D86A),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "${recipeData['ingredients'].length} Dishes",
+                      style: const TextStyle(
+                        color: Color(0xFFC2D86A),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Ingredients Section
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFC2D86A),
+                                    Color(0xFFB8CC5A),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFFC2D86A,
+                                    ).withValues(alpha: 0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.restaurant,
+                                color: Colors.black,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Ingredients',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        // Build ingredient list dynamically
+                        ...List.generate(recipeData['ingredients'].length, (
+                          index,
+                        ) {
+                          var ingredient = recipeData['ingredients'][index];
+                          return buildIngredientItem(
+                            "${ingredient['name']}",
+                            "${ingredient['amount']}",
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 50),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // Reusable widget for nutritional info
-  Widget buildNutritionInfo(String amount, String type) {
-    return Column(
-      children: [
-        Text(
-          amount,
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(type, style: TextStyle(color: Colors.white)),
-      ],
-    );
-  }
-
   // Reusable widget for ingredient item
   Widget buildIngredientItem(String name, String amount) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.circle, size: 8, color: AppColors.neplesYellow),
-              SizedBox(width: 10),
-              Text(name, style: TextStyle(color: Colors.white)),
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFC2D86A),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
-          Text("${amount} G", style: TextStyle(color: Colors.white)),
-          // Text(
-          //   unit,
-          //   style: TextStyle(color: Colors.white),
-          // ),
+          Text(
+            "$amount G",
+            style: const TextStyle(
+              color: Color(0xFFC2D86A),
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
