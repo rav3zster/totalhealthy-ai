@@ -2,15 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/user_controller.dart';
 import '../../../widgets/base_screen_wrapper.dart';
+import '../../../widgets/phone_nav_bar.dart';
 import 'profile_edit_view.dart';
 
-class ProfileMainView extends StatelessWidget {
+class ProfileMainView extends StatefulWidget {
   const ProfileMainView({super.key});
+
+  @override
+  State<ProfileMainView> createState() => _ProfileMainViewState();
+}
+
+class _ProfileMainViewState extends State<ProfileMainView> {
+  @override
+  void initState() {
+    super.initState();
+    OntapStore.index = 3; // Set to Profile tab
+  }
 
   @override
   Widget build(BuildContext context) {
     return BaseScreenWrapper(
       title: 'Profile',
+      bottomNavigationBar: const MobileNavBar(),
       actions: [
         Container(
           decoration: BoxDecoration(

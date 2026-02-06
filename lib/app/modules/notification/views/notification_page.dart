@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:totalhealthy/app/modules/notification/controllers/notification_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:totalhealthy/app/data/models/notification_model.dart';
+import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 
 class NotificationsPage extends StatefulWidget {
   final NotificationController controller;
@@ -21,152 +22,150 @@ class _NotificationsPageState extends State<NotificationsPage> {
   bool showAllNotifications = true;
 
   @override
+  void initState() {
+    super.initState();
+    OntapStore.index = 2; // Set to Notification tab
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
-            stops: [0.0, 0.3, 1.0],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Header with gradient background
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+      backgroundColor: const Color(0xFF121212),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header with gradient background
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [const Color(0xFF1E1E1E), const Color(0xFF121212)],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(25),
-                    bottomRight: Radius.circular(25),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 10,
-                      offset: Offset(0, 5),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    // App bar
+                    Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2A2A2A),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: IconButton(
+                            onPressed: () => Get.back(),
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: Color(0xFFC2D86A),
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        const Text(
+                          'Notifications',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Toggle buttons
+                    Row(
+                      children: [
+                        _buildModernToggleButton(
+                          'All',
+                          showAllNotifications,
+                          () {
+                            setState(() => showAllNotifications = true);
+                          },
+                        ),
+                        const SizedBox(width: 12),
+                        _buildModernToggleButton(
+                          'Unread',
+                          !showAllNotifications,
+                          () {
+                            setState(() => showAllNotifications = false);
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    children: [
-                      // App bar
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: () => Get.back(),
-                            icon: const Icon(
-                              Icons.arrow_back_ios_new_outlined,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Notifications',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Toggle buttons
-                      Row(
-                        children: [
-                          _buildModernToggleButton(
-                            'All',
-                            showAllNotifications,
-                            () {
-                              setState(() => showAllNotifications = true);
-                            },
-                          ),
-                          const SizedBox(width: 12),
-                          _buildModernToggleButton(
-                            'Unread',
-                            !showAllNotifications,
-                            () {
-                              setState(() => showAllNotifications = false);
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
               ),
+            ),
 
-              const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-              // Notifications list
-              Expanded(
-                child: Obx(() {
-                  if (widget.controller.isLoading.value) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFFC2D86A),
-                      ),
-                    );
-                  }
-
-                  final filteredList = widget.controller.notifications.where((
-                    n,
-                  ) {
-                    if (showAllNotifications) return true;
-                    return n.status == NotificationStatus.pending;
-                  }).toList();
-
-                  if (filteredList.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.notifications_none,
-                            size: 64,
-                            color: Colors.white54,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            showAllNotifications
-                                ? 'No notifications yet'
-                                : 'No unread notifications',
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: filteredList.length,
-                    itemBuilder: (context, index) {
-                      final notification = filteredList[index];
-                      return _buildModernNotificationCard(notification, index);
-                    },
+            // Notifications list
+            Expanded(
+              child: Obx(() {
+                if (widget.controller.isLoading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: Color(0xFFC2D86A)),
                   );
-                }),
-              ),
-            ],
-          ),
+                }
+
+                final filteredList = widget.controller.notifications.where((n) {
+                  if (showAllNotifications) return true;
+                  return n.status == NotificationStatus.pending;
+                }).toList();
+
+                if (filteredList.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.notifications_none_rounded,
+                          size: 64,
+                          color: Colors.white.withValues(alpha: 0.3),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          showAllNotifications
+                              ? 'No notifications yet'
+                              : 'No unread notifications',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.6),
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: filteredList.length,
+                  itemBuilder: (context, index) {
+                    final notification = filteredList[index];
+                    return _buildModernNotificationCard(notification, index);
+                  },
+                );
+              }),
+            ),
+          ],
         ),
       ),
+      bottomNavigationBar: const MobileNavBar(),
     );
   }
 
@@ -175,43 +174,47 @@ class _NotificationsPageState extends State<NotificationsPage> {
     bool isSelected,
     VoidCallback onTap,
   ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        decoration: BoxDecoration(
-          gradient: isSelected
-              ? LinearGradient(
-                  colors: [
-                    Color(0xFFC2D86A).withValues(alpha: 0.3),
-                    Color(0xFFC2D86A).withValues(alpha: 0.1),
-                  ],
-                )
-              : null,
-          color: isSelected ? null : Colors.transparent,
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(
-            color: isSelected
-                ? Color(0xFFC2D86A)
-                : Colors.white.withValues(alpha: 0.2),
-            width: 1,
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          decoration: BoxDecoration(
+            gradient: isSelected
+                ? const LinearGradient(
+                    colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
+                  )
+                : null,
+            color: isSelected ? null : const Color(0xFF1E1E1E),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected
+                  ? const Color(0xFFC2D86A)
+                  : Colors.white.withValues(alpha: 0.1),
+              width: 1.5,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: Color(0xFFC2D86A).withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.white54,
-            fontSize: 16,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: isSelected
+                  ? const Color(0xFF121212)
+                  : Colors.white.withValues(alpha: 0.6),
+              fontSize: 15,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+              letterSpacing: 0.3,
+            ),
           ),
         ),
       ),
@@ -222,310 +225,303 @@ class _NotificationsPageState extends State<NotificationsPage> {
     final isInvite = notification.type == NotificationType.invitation;
     final isPending = notification.status == NotificationStatus.pending;
 
-    // Different gradient combinations for variety
-    List<List<Color>> gradients = [
-      [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-      [Color(0xFF2D2D2D), Color(0xFF1D1D1D)],
-      [Color(0xFF252525), Color(0xFF151515)],
-    ];
-
-    List<Color> cardGradient = gradients[index % gradients.length];
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: cardGradient,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Color(0xFFC2D86A).withValues(alpha: 0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 15,
-            offset: Offset(0, 8),
+    return TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 300 + (index * 50)),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 20 * (1 - value)),
+          child: Opacity(opacity: value, child: child),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF1E1E1E), Color(0xFF1A1A1A)],
           ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Subtle pattern overlay
-          Positioned(
-            top: -30,
-            right: -30,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  colors: [
-                    Color(0xFFC2D86A).withValues(alpha: 0.1),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isInvite && isPending
+                ? const Color(0xFFC2D86A).withValues(alpha: 0.3)
+                : Colors.white.withValues(alpha: 0.05),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isInvite && isPending
+                  ? const Color(0xFFC2D86A).withValues(alpha: 0.1)
+                  : Colors.black.withValues(alpha: 0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
             ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Icon with gradient
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: isInvite
-                              ? [Color(0xFFC2D86A), Color(0xFFB8CC5A)]
-                              : [Color(0xFF3A3A3A), Color(0xFF2A2A2A)],
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Icon with gradient
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: isInvite
+                            ? [const Color(0xFFC2D86A), const Color(0xFFD4E87C)]
+                            : [
+                                Colors.white.withValues(alpha: 0.1),
+                                Colors.white.withValues(alpha: 0.05),
+                              ],
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: isInvite
+                              ? const Color(0xFFC2D86A).withValues(alpha: 0.3)
+                              : Colors.black.withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
                         ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: isInvite
-                                ? Color(0xFFC2D86A).withValues(alpha: 0.3)
-                                : Colors.black.withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        isInvite
-                            ? Icons.mail_outline
-                            : Icons.notifications_none,
-                        color: isInvite ? Colors.black : Colors.white,
-                        size: 24,
-                      ),
+                      ],
                     ),
+                    child: Icon(
+                      isInvite
+                          ? Icons.mail_outline_rounded
+                          : Icons.notifications_none_rounded,
+                      color: isInvite
+                          ? const Color(0xFF121212)
+                          : Colors.white.withValues(alpha: 0.8),
+                      size: 24,
+                    ),
+                  ),
 
-                    const SizedBox(width: 16),
+                  const SizedBox(width: 16),
 
-                    // Content
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                  // Content
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                notification.title,
+                                style: const TextStyle(
+                                  color: Color(0xFFC2D86A),
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Text(
+                                DateFormat(
+                                  'HH:mm',
+                                ).format(notification.timestamp),
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.5),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        Text(
+                          notification.message,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontSize: 14,
+                            height: 1.5,
+                          ),
+                        ),
+
+                        if (isInvite && isPending) ...[
+                          const SizedBox(height: 16),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(
-                                child: Text(
-                                  notification.title,
-                                  style: const TextStyle(
-                                    color: Color(0xFFC2D86A),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.3,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFFC2D86A),
+                                        Color(0xFFD4E87C),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFFC2D86A,
+                                        ).withValues(alpha: 0.3),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(12),
+                                      onTap: () => widget.controller
+                                          .acceptInvitation(notification),
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 12,
+                                        ),
+                                        child: Text(
+                                          'Accept',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Color(0xFF121212),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 0.3,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.white.withValues(alpha: 0.1),
-                                      Colors.white.withValues(alpha: 0.05),
-                                    ],
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.05),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.2,
+                                      ),
+                                      width: 1.5,
+                                    ),
                                   ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  DateFormat(
-                                    'HH:mm',
-                                  ).format(notification.timestamp),
-                                  style: const TextStyle(
-                                    color: Colors.white54,
-                                    fontSize: 11,
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(12),
+                                      onTap: () => widget.controller
+                                          .rejectInvitation(notification),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 12,
+                                        ),
+                                        child: Text(
+                                          'Reject',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.8,
+                                            ),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 0.3,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ],
                           ),
-
-                          const SizedBox(height: 8),
-
-                          Text(
-                            notification.message,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              height: 1.5,
+                        ] else if (isInvite && !isPending) ...[
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
                             ),
-                          ),
-
-                          if (isInvite && isPending) ...[
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Color(0xFFC2D86A),
-                                          Color(0xFFB8CC5A),
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Color(
-                                            0xFFC2D86A,
-                                          ).withValues(alpha: 0.3),
-                                          blurRadius: 8,
-                                          offset: Offset(0, 4),
-                                        ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors:
+                                    notification.status ==
+                                        NotificationStatus.accepted
+                                    ? [
+                                        Colors.green.withValues(alpha: 0.2),
+                                        Colors.green.withValues(alpha: 0.1),
+                                      ]
+                                    : [
+                                        Colors.red.withValues(alpha: 0.2),
+                                        Colors.red.withValues(alpha: 0.1),
                                       ],
-                                    ),
-                                    child: ElevatedButton(
-                                      onPressed: () => widget.controller
-                                          .acceptInvitation(notification),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        shadowColor: Colors.transparent,
-                                        foregroundColor: Colors.black,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 12,
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        'Accept',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.white.withValues(alpha: 0.1),
-                                          Colors.white.withValues(alpha: 0.05),
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.2,
-                                        ),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: ElevatedButton(
-                                      onPressed: () => widget.controller
-                                          .rejectInvitation(notification),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        shadowColor: Colors.transparent,
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 12,
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        'Reject',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ] else if (isInvite && !isPending) ...[
-                            const SizedBox(height: 12),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
                               ),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors:
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color:
+                                    notification.status ==
+                                        NotificationStatus.accepted
+                                    ? Colors.green.withValues(alpha: 0.3)
+                                    : Colors.red.withValues(alpha: 0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  notification.status ==
+                                          NotificationStatus.accepted
+                                      ? Icons.check_circle_outline_rounded
+                                      : Icons.cancel_outlined,
+                                  color:
                                       notification.status ==
                                           NotificationStatus.accepted
-                                      ? [
-                                          Colors.green.withValues(alpha: 0.2),
-                                          Colors.green.withValues(alpha: 0.1),
-                                        ]
-                                      : [
-                                          Colors.red.withValues(alpha: 0.2),
-                                          Colors.red.withValues(alpha: 0.1),
-                                        ],
+                                      ? Colors.green
+                                      : Colors.red,
+                                  size: 16,
                                 ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    notification.status ==
-                                            NotificationStatus.accepted
-                                        ? Icons.check_circle_outline
-                                        : Icons.cancel_outlined,
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Status: ${notification.status.name.capitalizeFirst}',
+                                  style: TextStyle(
                                     color:
                                         notification.status ==
                                             NotificationStatus.accepted
                                         ? Colors.green
                                         : Colors.red,
-                                    size: 16,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
                                   ),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'Status: ${notification.status.name.capitalizeFirst}',
-                                    style: TextStyle(
-                                      color:
-                                          notification.status ==
-                                              NotificationStatus.accepted
-                                          ? Colors.green
-                                          : Colors.red,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ],
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

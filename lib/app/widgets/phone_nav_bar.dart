@@ -1,37 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../core/base/constants/appcolor.dart';
 import '../core/base/controllers/auth_controller.dart';
 import '../routes/app_pages.dart';
-// ignore_for_file: prefer_const_constructors
-
-class MobileNavBar extends StatefulWidget {
-  const MobileNavBar({
-    super.key,
-  });
-
-  @override
-  State<MobileNavBar> createState() => _MobileNavBarState();
-}
 
 class OntapStore {
   static var index = 0;
   static List<String> routes = [
     Routes.ClientDashboard,
-    Routes.GROUP, // Chat functionality can be added later
-    Routes.MEAL_HISTORY, // Meal screen
-    Routes.PROFILE_MAIN, // Profile main screen
+    Routes.GROUP,
+    Routes.NOTIFICATION,
+    Routes.PROFILE_MAIN,
   ];
 }
 
+class MobileNavBar extends StatefulWidget {
+  const MobileNavBar({super.key});
+
+  @override
+  State<MobileNavBar> createState() => _MobileNavBarState();
+}
+
 class _MobileNavBarState extends State<MobileNavBar> {
-  ontapFunction(int value) {
-    Get.offAllNamed(value == 0
-        ? Get.find<AuthController>().roleGet() == "admin"
-            ? Routes.TrainerDashboard
-            : OntapStore.routes[value]
-        : OntapStore.routes[value]);
+  void ontapFunction(int value) {
+    Get.offAllNamed(
+      value == 0
+          ? Get.find<AuthController>().roleGet() == "admin"
+                ? Routes.TrainerDashboard
+                : OntapStore.routes[value]
+          : OntapStore.routes[value],
+    );
 
     setState(() {
       OntapStore.index = value;
@@ -46,149 +44,83 @@ class _MobileNavBarState extends State<MobileNavBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 80,
       decoration: BoxDecoration(
-        color: Color(0xFF1A1A1A), // Darker background to match the image
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+        ),
+        border: Border(
+          top: BorderSide(
+            color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+            width: 1,
+          ),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(
+                Icons.person,
+                'Member',
+                OntapStore.index == 0,
+                () => ontapFunction(0),
+              ),
+              _buildNavItem(
+                Icons.group,
+                'Group',
+                OntapStore.index == 1,
+                () => ontapFunction(1),
+              ),
+              _buildNavItem(
+                Icons.notifications,
+                'Notification',
+                OntapStore.index == 2,
+                () => ontapFunction(2),
+              ),
+              _buildNavItem(
+                Icons.person,
+                'Profile',
+                OntapStore.index == 3,
+                () => ontapFunction(3),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(
+    IconData icon,
+    String label,
+    bool isActive,
+    VoidCallback onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          _buildNavItem(
-            index: 0,
-            icon: Icons.home_outlined,
-            selectedIcon: Icons.home,
-            label: "Home",
-            isSelected: OntapStore.index == 0,
+          Icon(
+            icon,
+            color: isActive ? const Color(0xFFC2D86A) : Colors.white54,
+            size: 24,
           ),
-          _buildNavItem(
-            index: 1,
-            icon: Icons.timeline_outlined,
-            selectedIcon: Icons.timeline,
-            label: "Tracking",
-            isSelected: OntapStore.index == 1,
-          ),
-          _buildNavItem(
-            index: 2,
-            icon: Icons.restaurant_outlined,
-            selectedIcon: Icons.restaurant,
-            label: "Recipe",
-            isSelected: OntapStore.index == 2,
-          ),
-          _buildNavItem(
-            index: 3,
-            icon: Icons.person_outline,
-            selectedIcon: Icons.person,
-            label: "Profile",
-            isSelected: OntapStore.index == 3,
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isActive ? const Color(0xFFC2D86A) : Colors.white54,
+              fontSize: 12,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+            ),
           ),
         ],
       ),
     );
   }
-
-  Widget _buildNavItem({
-    required int index,
-    required IconData icon,
-    required IconData selectedIcon,
-    required String label,
-    required bool isSelected,
-  }) {
-    return GestureDetector(
-      onTap: () => ontapFunction(index),
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isSelected ? selectedIcon : icon,
-              size: 24,
-              color: isSelected ? Color(0xFFC2D86A) : Colors.white54,
-            ),
-            SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                color: isSelected ? Color(0xFFC2D86A) : Colors.white54,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
-//
-// class ButtomNav extends StatefulWidget {
-//   const ButtomNav({
-//     super.key,
-//   });
-//   @override
-//   State<ButtomNav> createState() => _ButtomNavState();
-// }
-//
-// class _ButtomNavState extends State<ButtomNav> {
-//   var index = 0;
-//
-//   ontapFunction(int value) {
-//     setState(() {
-//       index = value;
-//     });
-//
-//     Get.toNamed(
-//       routes[value],
-//     );
-//   }
-//
-//   List<String> routes = [
-//     Routes.HOME,
-//   ];
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Theme(
-//       data: ThemeData(
-//         canvasColor: Colors.green,
-//       ),
-//       child: BottomNavigationBar(
-//         iconSize: 20,
-//         items: const [
-//           BottomNavigationBarItem(
-//             icon: Icon(Icons.home),
-//             label: 'Home',
-//           ),
-//           BottomNavigationBarItem(
-//             icon: Icon(Icons.person),
-//             label: 'Users',
-//           ),
-//           BottomNavigationBarItem(
-//             icon: Icon(Icons.person),
-//             label: 'Customers',
-//           ),
-//           BottomNavigationBarItem(
-//             icon: Icon(Icons.shopping_cart),
-//             label: 'Orders',
-//           ),
-//           BottomNavigationBarItem(
-//             icon: Icon(Icons.settings),
-//             label: 'Settings',
-//           ),
-//         ],
-//         currentIndex: index,
-//         onTap: (value) => ontapFunction(value),
-//       ),
-//     );
-//   }
-//
-//   int chnageIndex(int index) {
-//     var i = 0;
-//     i = index;
-//     return i;
-//   }
-// }

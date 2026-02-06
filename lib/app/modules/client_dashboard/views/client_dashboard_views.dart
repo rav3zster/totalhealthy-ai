@@ -4,17 +4,27 @@ import 'package:get_storage/get_storage.dart';
 
 import '../../../core/base/controllers/auth_controller.dart';
 import '../../../routes/app_pages.dart';
-import '../../../widgets/drawer_menu.dart';
 import '../../../widgets/dynamic_profile_header.dart';
 import '../../../widgets/dynamic_live_stats_card.dart';
 import '../../../widgets/dynamic_day_counter.dart';
 import '../../../widgets/real_time_search_bar.dart';
-import '../../../widgets/base_screen_wrapper.dart';
+import '../../../widgets/phone_nav_bar.dart';
 import '../../../data/models/meal_model.dart';
 import '../controllers/client_dashboard_controllers.dart';
 
-class ClientDashboardScreen extends StatelessWidget {
+class ClientDashboardScreen extends StatefulWidget {
   const ClientDashboardScreen({super.key});
+
+  @override
+  State<ClientDashboardScreen> createState() => _ClientDashboardScreenState();
+}
+
+class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    OntapStore.index = 0; // Set to Member/Home tab
+  }
 
   @override
   Widget build(BuildContext context) {

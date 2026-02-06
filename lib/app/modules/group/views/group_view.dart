@@ -5,160 +5,276 @@ import '../controllers/group_controller.dart';
 import '../../../data/models/group_model.dart';
 import '../../../data/models/user_model.dart';
 import '../../../routes/app_pages.dart';
+import '../../../widgets/phone_nav_bar.dart';
 
-class GroupView extends GetView<GroupController> {
+class GroupView extends StatefulWidget {
   const GroupView({super.key});
 
   @override
+  State<GroupView> createState() => _GroupViewState();
+}
+
+class _GroupViewState extends State<GroupView>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final controller = Get.find<GroupController>();
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    OntapStore.index = 1; // Set to Groups tab
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        backgroundColor: const Color(0xFF1A1A1A),
-        body: SafeArea(
-          child: Column(
-            children: [
-              // Header with gradient background
-              Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                  ),
+    return Scaffold(
+      backgroundColor: const Color(0xFF121212),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Modern Header
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [const Color(0xFF1E1E1E), const Color(0xFF121212)],
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2A2A2A),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: IconButton(
                             icon: const Icon(
-                              Icons.arrow_back_ios,
-                              color: Colors.white,
+                              Icons.arrow_back_ios_new_rounded,
+                              color: Color(0xFFC2D86A),
+                              size: 20,
                             ),
                             onPressed: () {
                               Get.offNamed(Routes.ClientDashboard);
                             },
                           ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Groups',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const Spacer(),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              _showCreateGroupDialog(context);
-                            },
-                            icon: const Icon(
-                              Icons.add,
-                              color: Colors.black,
-                              size: 20,
-                            ),
-                            label: const Text(
-                              'Add Group',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFC2D86A),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 16,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      TabBar(
-                        indicatorColor: const Color(0xFFC2D86A),
-                        labelColor: Colors.white,
-                        unselectedLabelColor: Colors.white54,
-                        indicatorSize: TabBarIndicatorSize.label,
-                        labelStyle: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
                         ),
-                        unselectedLabelStyle: const TextStyle(fontSize: 14),
+                        const SizedBox(width: 16),
+                        const Text(
+                          'Groups',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(
+                                  0xFFC2D86A,
+                                ).withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () {
+                                _showCreateGroupDialog(context);
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.add_rounded,
+                                      color: Color(0xFF121212),
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Add Group',
+                                      style: TextStyle(
+                                        color: Color(0xFF121212),
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 0.3,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Modern Tab Bar
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E1E1E),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.05),
+                          width: 1,
+                        ),
+                      ),
+                      child: TabBar(
+                        controller: _tabController,
+                        indicator: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(
+                                0xFFC2D86A,
+                              ).withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        dividerColor: Colors.transparent,
+                        labelColor: const Color(0xFF121212),
+                        unselectedLabelColor: Colors.white.withValues(
+                          alpha: 0.5,
+                        ),
+                        labelStyle: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.3,
+                        ),
+                        unselectedLabelStyle: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
                         tabs: const [
-                          Tab(text: 'Groups'),
-                          Tab(text: 'Members'),
+                          Tab(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.groups_rounded, size: 18),
+                                SizedBox(width: 6),
+                                Text('Groups'),
+                              ],
+                            ),
+                          ),
+                          Tab(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.people_rounded, size: 18),
+                                SizedBox(width: 6),
+                                Text('Members'),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Content
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    // Groups Tab
-                    Obx(() {
-                      if (controller.isLoading.value) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: Color(0xFFC2D86A),
-                          ),
-                        );
-                      }
-
-                      if (controller.groupData.isEmpty) {
-                        return _buildEmptyState(
-                          Icons.group_off,
-                          "No groups found.\nCreate one to get started!",
-                        );
-                      }
-
-                      return ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: controller.groupData.length,
-                        itemBuilder: (context, index) {
-                          final group = controller.groupData[index];
-                          return _buildGroupCard(group);
-                        },
-                      );
-                    }),
-
-                    // Members Tab
-                    Obx(() {
-                      if (controller.users.isEmpty) {
-                        return _buildEmptyState(
-                          Icons.people_outline,
-                          "No platform members found.",
-                        );
-                      }
-
-                      return ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: controller.users.length,
-                        itemBuilder: (context, index) {
-                          final user = controller.users[index];
-                          return _buildUserCard(user);
-                        },
-                      );
-                    }),
+                    ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Content
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // Groups Tab
+                  Obx(() {
+                    if (controller.isLoading.value) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFFC2D86A),
+                        ),
+                      );
+                    }
+
+                    if (controller.groupData.isEmpty) {
+                      return _buildEmptyState(
+                        Icons.group_off,
+                        "No groups found.\nCreate one to get started!",
+                      );
+                    }
+
+                    return ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: controller.groupData.length,
+                      itemBuilder: (context, index) {
+                        final group = controller.groupData[index];
+                        return _buildGroupCard(group);
+                      },
+                    );
+                  }),
+
+                  // Members Tab
+                  Obx(() {
+                    if (controller.users.isEmpty) {
+                      return _buildEmptyState(
+                        Icons.people_outline,
+                        "No platform members found.",
+                      );
+                    }
+
+                    return ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: controller.users.length,
+                      itemBuilder: (context, index) {
+                        final user = controller.users[index];
+                        return _buildUserCard(user);
+                      },
+                    );
+                  }),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
+      bottomNavigationBar: const MobileNavBar(),
     );
   }
 
@@ -180,73 +296,171 @@ class GroupView extends GetView<GroupController> {
   }
 
   Widget _buildGroupCard(GroupModel group) {
-    return GestureDetector(
-      onTap: () {
-        Get.toNamed(Routes.GROUP_DETAILS, arguments: group.toJson());
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 300),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: 0.95 + (0.05 * value),
+          child: Opacity(opacity: value, child: child),
+        );
       },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF2A2A2A),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Group Name
-              Text(
-                group.name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // Description
-              Text(
-                group.description,
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
-              ),
-              const SizedBox(height: 16),
-
-              // Created Date
-              Row(
-                children: [
-                  const Icon(
-                    Icons.calendar_today,
-                    color: Color(0xFFC2D86A),
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Created On: ${DateFormat('MMM dd, yyyy').format(group.createdAt)}',
-                    style: const TextStyle(color: Colors.white54, fontSize: 12),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              // Total Members
-              Row(
-                children: [
-                  const Icon(Icons.people, color: Color(0xFFC2D86A), size: 16),
-                  const SizedBox(width: 8),
-                  Obx(
-                    () => Text(
-                      'Total Members: ${controller.totalUsers.value} Members',
-                      style: const TextStyle(
-                        color: Colors.white54,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
+      child: GestureDetector(
+        onTap: () {
+          Get.toNamed(Routes.GROUP_DETAILS, arguments: group.toJson());
+        },
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF1E1E1E), Color(0xFF1A1A1A)],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.05),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
             ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () {
+                Get.toNamed(Routes.GROUP_DETAILS, arguments: group.toJson());
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Group Name
+                    Text(
+                      group.name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Description
+                    Text(
+                      group.description,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        fontSize: 14,
+                        height: 1.4,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Info Row
+                    Row(
+                      children: [
+                        // Created Date
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFFC2D86A,
+                              ).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: const Color(
+                                  0xFFC2D86A,
+                                ).withValues(alpha: 0.2),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.calendar_today_rounded,
+                                  color: Color(0xFFC2D86A),
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    'Created On: ${DateFormat('MMM dd, yyyy').format(group.createdAt)}',
+                                    style: const TextStyle(
+                                      color: Color(0xFFC2D86A),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+
+                        // Total Members
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: const Color(
+                                0xFFC2D86A,
+                              ).withValues(alpha: 0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.people_rounded,
+                                color: Color(0xFFC2D86A),
+                                size: 14,
+                              ),
+                              const SizedBox(width: 6),
+                              Obx(
+                                () => Text(
+                                  '${controller.totalUsers.value}',
+                                  style: const TextStyle(
+                                    color: Color(0xFFC2D86A),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
@@ -373,70 +587,172 @@ class GroupView extends GetView<GroupController> {
   }
 
   Widget _buildUserCard(UserModel user) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 25,
-              backgroundImage: NetworkImage(
-                user.profileImage.isNotEmpty
-                    ? user.profileImage
-                    : 'https://via.placeholder.com/150',
-              ),
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 300),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: 0.95 + (0.05 * value),
+          child: Opacity(opacity: value, child: child),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF1E1E1E), Color(0xFF1A1A1A)],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.05),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () {},
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
                 children: [
-                  Text(
-                    user.username,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                  // Modern Profile Image
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white.withValues(alpha: 0.1),
+                          Colors.white.withValues(alpha: 0.05),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(3),
+                    child: CircleAvatar(
+                      radius: 28,
+                      backgroundImage: NetworkImage(
+                        user.profileImage.isNotEmpty
+                            ? user.profileImage
+                            : 'https://via.placeholder.com/150',
+                      ),
                     ),
                   ),
-                  Text(
-                    'Plan: ${user.planName}',
-                    style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  const SizedBox(width: 16),
+
+                  // User Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user.username,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.3,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: const Color(
+                                0xFFC2D86A,
+                              ).withValues(alpha: 0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.workspace_premium_rounded,
+                                size: 12,
+                                color: Color(0xFFC2D86A),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                user.planName,
+                                style: const TextStyle(
+                                  color: Color(0xFFC2D86A),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Info Button
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        width: 1,
+                      ),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.info_outline_rounded,
+                        color: Colors.white.withValues(alpha: 0.6),
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        Get.snackbar(
+                          "Info",
+                          "To invite users, please open a specific group and use the 'Manage Members' option.",
+                          backgroundColor: const Color(0xFF2A2A2A),
+                          colorText: Colors.white,
+                          snackPosition: SnackPosition.BOTTOM,
+                          margin: const EdgeInsets.all(16),
+                          borderRadius: 12,
+                          duration: const Duration(seconds: 4),
+                          icon: const Icon(
+                            Icons.info_rounded,
+                            color: Color(0xFFC2D86A),
+                          ),
+                        );
+                      },
+                      padding: const EdgeInsets.all(8),
+                      constraints: const BoxConstraints(),
+                    ),
                   ),
                 ],
               ),
             ),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.info_outline,
-                  color: Colors.white54,
-                  size: 24,
-                ),
-                onPressed: () {
-                  Get.snackbar(
-                    "Info",
-                    "To invite users, please open a specific group and use the 'Manage Members' option.",
-                    backgroundColor: const Color(0xFF2A2A2A),
-                    colorText: Colors.white,
-                    snackPosition: SnackPosition.BOTTOM,
-                    margin: const EdgeInsets.all(16),
-                    borderRadius: 12,
-                    duration: const Duration(seconds: 4),
-                  );
-                },
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
