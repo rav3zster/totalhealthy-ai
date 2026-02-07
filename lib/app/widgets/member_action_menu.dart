@@ -12,6 +12,16 @@ class MemberActionMenu {
           _MemberActionSheet(member: member, isAdmin: isAdmin),
     );
   }
+
+  // Show menu for current user (from profile header)
+  static void showForCurrentUser(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => _CurrentUserActionSheet(),
+    );
+  }
 }
 
 class _MemberActionSheet extends StatelessWidget {
@@ -253,6 +263,184 @@ class _MemberActionSheet extends StatelessWidget {
                   label,
                   style: const TextStyle(
                     color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white.withValues(alpha: 0.3),
+                size: 16,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CurrentUserActionSheet extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+        ),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12, bottom: 20),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.person,
+                      color: Color(0xFF121212),
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Text(
+                      'Profile Options',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Action Items
+            _buildActionItem(
+              icon: Icons.person_outline,
+              label: 'View Profile',
+              onTap: () {
+                Get.back();
+                Get.toNamed('/profile-settings');
+              },
+            ),
+            _buildActionItem(
+              icon: Icons.edit_outlined,
+              label: 'Edit Profile',
+              onTap: () {
+                Get.back();
+                Get.toNamed('/profile-settings');
+              },
+            ),
+            _buildActionItem(
+              icon: Icons.settings_outlined,
+              label: 'Settings',
+              onTap: () {
+                Get.back();
+                Get.toNamed('/setting');
+              },
+            ),
+            _buildActionItem(
+              icon: Icons.help_outline,
+              label: 'Help & Support',
+              onTap: () {
+                Get.back();
+                Get.toNamed('/help-support');
+              },
+            ),
+            _buildActionItem(
+              icon: Icons.logout,
+              label: 'Logout',
+              color: Colors.red,
+              onTap: () {
+                Get.back();
+                // TODO: Implement logout
+                Get.snackbar(
+                  'Logout',
+                  'Logging out...',
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                  snackPosition: SnackPosition.BOTTOM,
+                  margin: const EdgeInsets.all(16),
+                  borderRadius: 12,
+                );
+              },
+            ),
+
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionItem({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    Color? color,
+  }) {
+    final itemColor = color ?? const Color(0xFFC2D86A);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      itemColor.withValues(alpha: 0.2),
+                      itemColor.withValues(alpha: 0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: itemColor, size: 22),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: color == Colors.red ? Colors.red : Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),

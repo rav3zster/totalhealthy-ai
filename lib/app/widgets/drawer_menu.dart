@@ -1,15 +1,11 @@
-import 'package:totalhealthy/app/core/utitlity/debug_print.dart';
-
 import '../core/base/controllers/auth_controller.dart';
 import '../modules/Help_and_support/views/helpAndSuportPage.dart';
 import '../routes/app_pages.dart';
-import '/app/core/base/constants/appcolor.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../core/utitlity/responsive_settings.dart';
-import 'phone_nav_bar.dart';
 
 class DrawerMenu extends StatefulWidget {
   const DrawerMenu({super.key});
@@ -19,281 +15,369 @@ class DrawerMenu extends StatefulWidget {
 }
 
 class _DrawerMenuState extends State<DrawerMenu> {
-  bool isTrainer = false;
   var userData = Get.find<AuthController>().userdataget();
+
   @override
   Widget build(BuildContext context) {
     return Responsive.isMobile(context)
         ? Drawer(
-      backgroundColor: AppColors.cardbackground,
-      width: 300,
-      shape:
-      RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              width: double.infinity,
-              decoration: const BoxDecoration(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Row(
-                      // crossAxisAlignment: WrapCrossAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundImage:
-                          AssetImage("assets/user_avatar.png"),
+            backgroundColor: Colors.transparent,
+            width: 300,
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+                ),
+              ),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    // Header Section
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                            const Color(0xFFC2D86A).withValues(alpha: 0.05),
+                          ],
                         ),
-                        SizedBox(
-                          width: 10,
+                        border: Border(
+                          bottom: BorderSide(
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.2),
+                            width: 1,
+                          ),
                         ),
-                        Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            // mainAxisAlignment: MainAxisAlignment,
-                            children: [
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Text(
-                                "${userData["name"] ?? ""}",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontFamily: "Public Sans",
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                "${userData["name"] ?? ""}",
-                                style: TextStyle(
-                                    fontFamily: "inter",
-                                    fontSize: 12,
-                                    color: Color(0xff7B7B7A)),
-                              ),
-                            ]),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  ListView(
-                    shrinkWrap: true,
-                    children: [
-                      // Swtich user switch bar
-
-                      NavRow(
-                          redirect: () {
-                            Get.toNamed(Routes.Registration);
-                          },
-                          heading: "Profile",
-                          icon: Icons.perm_identity_outlined),
-                      NavRow(
-                          redirect: () {},
-                          heading: "Setting",
-                          icon: Icons.settings_outlined),
-                      NavRow(
-                          redirect: () {
-                            Get.toNamed(Routes.MEAL_HISTORY);
-                          },
-                          heading: "Your Deit History",
-                          icon: Icons.list_alt_rounded),
-
-                      NavRow(
-                          redirect: () {
-                            Get.find<AuthController>().roleStore("admin");
-                            Get.offAllNamed(Routes.TrainerDashboard);
-                          },
-                          heading: "Switch as Advisor",
-                          icon: Icons.supervised_user_circle_outlined),
-                      NavRow(
-                          redirect: () {
-                            Get.find<AuthController>().roleStore("user");
-                            Get.offAllNamed(Routes.ClientDashboard);
-                          },
-                          heading: "Switch as Member",
-                          icon: Icons.person),
-
-                      NavRow(
-                        redirect: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => HelpPage()),
-                          );
-                        },
-                        heading: "Help & Support",
-                        icon: Icons.headset_mic_outlined,
                       ),
-
-                      // ListTile(
-                      //   onTap: () {
-                      //     Get.offAllNamed(OntapStore.routes[1]);
-                      //
-                      //     setState(() {
-                      //       OntapStore.index = 1;
-                      //     });
-                      //   },
-                      //   title: const Text(
-                      //     "Group",
-                      //   ),
-                      //   leading: const Icon(Icons.group),
-                      // ),
-                      // ListTile(
-                      //   onTap: () {
-                      //     Get.offAllNamed(OntapStore.routes[0]);
-                      //
-                      //     setState(() {
-                      //       OntapStore.index = 0;
-                      //     });
-                      //   },
-                      //   title: Text(
-                      //     "User",
-                      //   ),
-                      //   leading: Icon(Icons.person),
-                      // ),
-                      // ListTile(
-                      //   onTap: () {
-                      //     Get.toNamed(Routes.USER_GROUP_VIEW);
-                      //     setState(() {
-                      //       OntapStore.index = 1;
-                      //     });
-                      //   },
-                      //   title: Text(
-                      //     "SwitchUser",
-                      //   ),
-                      //   leading: Icon(Icons.person),
-                      // ),
-                      // ListTile(
-                      //   onTap: () {
-                      //     // Get.offAllNamed(OntapStore.routes[0]);
-                      //     Get.toNamed(Routes.UserDiet);
-                      //     // setState(() {
-                      //     //   OntapStore.index = 0;
-                      //     // });
-                      //   },
-                      //   title: Text(
-                      //     "SwitchAdmin",
-                      //   ),
-                      //   leading: Icon(Icons.person),
-                      // ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const Divider(),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.cardbackground,
-                    ),
-                    child: IconButton(
-                      icon: Row(
+                      child: Row(
                         children: [
-                          Text("Logout"),
-                          Icon(
-                            Icons.logout,
-                            color: Colors.white,
+                          // Profile Avatar
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
+                              ),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFFC2D86A,
+                                  ).withValues(alpha: 0.4),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            padding: const EdgeInsets.all(3),
+                            child: const CircleAvatar(
+                              radius: 28,
+                              backgroundImage: AssetImage(
+                                "assets/user_avatar.png",
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          // User Info
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${userData["name"] ?? "User"}",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.3,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFFC2D86A),
+                                        Color(0xFFD4E87C),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    userData["role"] ?? "Member",
+                                    style: const TextStyle(
+                                      color: Color(0xFF121212),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      onPressed: () {
-                        Get.find<AuthController>().clearAuth();
-                      },
                     ),
-                  ),
-                ],
+
+                    // Menu Items
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Column(
+                          children: [
+                            _buildModernMenuItem(
+                              icon: Icons.person_outline,
+                              title: "Profile",
+                              onTap: () {
+                                Get.back();
+                                Get.toNamed(Routes.Registration);
+                              },
+                            ),
+                            _buildModernMenuItem(
+                              icon: Icons.settings_outlined,
+                              title: "Settings",
+                              onTap: () {
+                                Get.back();
+                                // TODO: Navigate to settings
+                              },
+                            ),
+                            _buildModernMenuItem(
+                              icon: Icons.history_rounded,
+                              title: "Diet History",
+                              onTap: () {
+                                Get.back();
+                                Get.toNamed(Routes.MEAL_HISTORY);
+                              },
+                            ),
+
+                            // Divider
+                            Container(
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              height: 1,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.transparent,
+                                    const Color(
+                                      0xFFC2D86A,
+                                    ).withValues(alpha: 0.3),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            // Switch Role Section
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: Text(
+                                "SWITCH ROLE",
+                                style: TextStyle(
+                                  color: const Color(
+                                    0xFFC2D86A,
+                                  ).withValues(alpha: 0.7),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+
+                            _buildModernMenuItem(
+                              icon: Icons.supervisor_account_outlined,
+                              title: "Switch as Advisor",
+                              onTap: () {
+                                Get.back();
+                                Get.find<AuthController>().roleStore("admin");
+                                Get.offAllNamed(Routes.TrainerDashboard);
+                              },
+                            ),
+                            _buildModernMenuItem(
+                              icon: Icons.person_outline,
+                              title: "Switch as Member",
+                              onTap: () {
+                                Get.back();
+                                Get.find<AuthController>().roleStore("user");
+                                Get.offAllNamed(Routes.ClientDashboard);
+                              },
+                            ),
+
+                            // Divider
+                            Container(
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              height: 1,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.transparent,
+                                    const Color(
+                                      0xFFC2D86A,
+                                    ).withValues(alpha: 0.3),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            _buildModernMenuItem(
+                              icon: Icons.help_outline_rounded,
+                              title: "Help & Support",
+                              onTap: () {
+                                Get.back();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HelpPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Logout Button
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () {
+                            Get.back();
+                            Get.find<AuthController>().clearAuth();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.red.withValues(alpha: 0.2),
+                                  Colors.red.withValues(alpha: 0.1),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.red.withValues(alpha: 0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.logout_rounded,
+                                  color: Colors.red,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  "Logout",
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
-        ),
-      ),
-    )
+          )
         : const SizedBox();
   }
-}
 
-class NavRow extends StatelessWidget {
-  const NavRow(
-      {super.key,
-        required this.redirect,
-        required this.heading,
-        required this.icon});
-
-  final VoidCallback redirect;
-  final String heading;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildModernMenuItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
     return Container(
-      margin: EdgeInsets.only(bottom: 20),
-      alignment: Alignment.center,
-      width: double.infinity,
-      height: 50,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: Color(0xff333333),
-      ),
-      child: ListTile(
-        onTap: () {
-          redirect();
-        },
-        leading: Icon(
-          icon,
-          color: Color(0xffDBDBDB),
-        ),
-        title: Text(
-          "$heading",
-          style: TextStyle(color: Color(0xffDBDBDB)),
-        ),
-        trailing: Icon(Icons.arrow_forward_ios, color: Color(0xffDBDBDB)),
-      ),
-    );
-  }
-}
-
-class AvatarWithLetter extends StatelessWidget {
-  final String username;
-
-  const AvatarWithLetter({super.key, required this.username});
-
-  // Generate a color based on the ASCII value of the first letter
-  Color _getColorForLetter(String letter) {
-    int asciiValue = letter.codeUnitAt(0);
-    // Generate a color using the ASCII value, you can tweak the numbers to get different color variations
-    return Color.fromARGB(
-      255, // Opaque color
-      (asciiValue * 3) % 256,
-      (asciiValue * 5) % 256,
-      (asciiValue * 7) % 256,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    String firstLetter = username.isNotEmpty ? username[0].toUpperCase() : '?';
-
-    return CircleAvatar(
-      radius: 30, // You can change the size of the avatar here
-      backgroundColor: _getColorForLetter(firstLetter),
-      child: Text(
-        firstLetter,
-        style: const TextStyle(
-          fontSize: 24, // Adjust font size here
-          color: Colors.white, // Text color
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                        const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, color: const Color(0xFFC2D86A), size: 20),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Colors.white.withValues(alpha: 0.3),
+                  size: 14,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

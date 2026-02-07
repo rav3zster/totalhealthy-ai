@@ -9,6 +9,7 @@ import '../../../widgets/dynamic_live_stats_card.dart';
 import '../../../widgets/dynamic_day_counter.dart';
 import '../../../widgets/real_time_search_bar.dart';
 import '../../../widgets/phone_nav_bar.dart';
+import '../../../widgets/drawer_menu.dart';
 import '../../../data/models/meal_model.dart';
 import '../controllers/client_dashboard_controllers.dart';
 
@@ -30,9 +31,12 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   Widget build(BuildContext context) {
     String id = Get.parameters["id"] ?? "";
     final controller = Get.find<ClientDashboardControllers>();
+    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.black,
+      drawer: const DrawerMenu(), // Add the drawer here
       body: GestureDetector(
         onTap: () {
           // Unfocus search when tapping outside
@@ -82,8 +86,10 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                               children: [
                                 // Dynamic Profile Header
                                 DynamicProfileHeader(
-                                  onProfileTap: () =>
-                                      Get.toNamed('/profile-settings'),
+                                  onProfileTap: () {
+                                    // Open the side drawer
+                                    _scaffoldKey.currentState?.openDrawer();
+                                  },
                                 ),
 
                                 const SizedBox(height: 24),
