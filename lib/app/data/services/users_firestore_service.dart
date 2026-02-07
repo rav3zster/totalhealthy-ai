@@ -150,4 +150,76 @@ class UsersFirestoreService {
       return 0;
     }
   }
+
+  /// Get users by role (for filtering members/trainers/advisors)
+  Stream<List<UserModel>> getUsersByRoleStream(String role) {
+    return _firestore
+        .collection(_collection)
+        .where('role', isEqualTo: role)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            try {
+              final data = Map<String, dynamic>.from(doc.data());
+              data['id'] = doc.id;
+              return UserModel.fromJson(data);
+            } catch (e) {
+              print('Error parsing user ${doc.id}: $e');
+              rethrow;
+            }
+          }).toList();
+        })
+        .handleError((error) {
+          print('Error in getUsersByRoleStream: $error');
+          return <UserModel>[];
+        });
+  }
+
+  /// Get clients assigned to a specific trainer
+  Stream<List<UserModel>> getTrainerClientsStream(String trainerId) {
+    return _firestore
+        .collection(_collection)
+        .where('assignedTrainerId', isEqualTo: trainerId)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            try {
+              final data = Map<String, dynamic>.from(doc.data());
+              data['id'] = doc.id;
+              return UserModel.fromJson(data);
+            } catch (e) {
+              print('Error parsing client ${doc.id}: $e');
+              rethrow;
+            }
+          }).toList();
+        })
+        .handleError((error) {
+          print('Error in getTrainerClientsStream: $error');
+          return <UserModel>[];
+        });
+  }
+
+  /// Assign a client to a trainer
+  Future<void> assignClientToTrainer(String clientId, String trainerId) async {
+    try {
+      await _firestore.collection(_collection).doc(clientId).update({
+        'assignedTrainerId': trainerId,
+      });
+    } catch (e) {
+      print('Error assigning client $clientId to trainer $trainerId: $e');
+      rethrow;
+    }
+  }
+
+  /// Unassign a client from a trainer
+  Future<void> unassignClientFromTrainer(String clientId) async {
+    try {
+      await _firestore.collection(_collection).doc(clientId).update({
+        'assignedTrainerId': FieldValue.delete(),
+      });
+    } catch (e) {
+      print('Error unassigning client $clientId: $e');
+      rethrow;
+    }
+  }
 }

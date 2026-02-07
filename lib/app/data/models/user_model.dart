@@ -20,6 +20,8 @@ class UserModel {
   final double fatLost;
   final double muscleGained;
   final int goalDuration; // in days
+  final String role; // "member", "trainer", "advisor"
+  final String? assignedTrainerId; // ID of trainer this client is assigned to
 
   UserModel({
     required this.id,
@@ -43,6 +45,8 @@ class UserModel {
     this.fatLost = 0.0,
     this.muscleGained = 0.0,
     this.goalDuration = 55,
+    this.role = "member", // Default role
+    this.assignedTrainerId,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -70,6 +74,8 @@ class UserModel {
       fatLost: (json['fatLost'] ?? 0.0).toDouble(),
       muscleGained: (json['muscleGained'] ?? 0.0).toDouble(),
       goalDuration: json['goalDuration'] ?? 55,
+      role: json['role'] ?? 'member',
+      assignedTrainerId: json['assignedTrainerId'],
     );
   }
 
@@ -96,6 +102,8 @@ class UserModel {
       'fatLost': fatLost,
       'muscleGained': muscleGained,
       'goalDuration': goalDuration,
+      'role': role,
+      'assignedTrainerId': assignedTrainerId,
     };
   }
 

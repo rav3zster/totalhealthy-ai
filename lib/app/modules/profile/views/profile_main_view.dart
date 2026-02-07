@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import '../../../controllers/user_controller.dart';
 import '../../../widgets/base_screen_wrapper.dart';
 import '../../../widgets/phone_nav_bar.dart';
-import 'profile_edit_view.dart';
 
 class ProfileMainView extends StatefulWidget {
   const ProfileMainView({super.key});
@@ -24,27 +23,6 @@ class _ProfileMainViewState extends State<ProfileMainView> {
     return BaseScreenWrapper(
       title: 'Profile',
       bottomNavigationBar: const MobileNavBar(),
-      actions: [
-        Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-            ),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.edit, color: Colors.black),
-            onPressed: () => Get.to(() => const ProfileEditView()),
-          ),
-        ),
-      ],
       child: GetBuilder<UserController>(
         builder: (userController) {
           return SingleChildScrollView(

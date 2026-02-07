@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../../data/models/user_model.dart';
+import '../../../data/services/users_firestore_service.dart';
 
 class ClientListScreen extends StatefulWidget {
   const ClientListScreen({super.key});
@@ -10,100 +13,181 @@ class ClientListScreen extends StatefulWidget {
 
 class _ClientListScreenState extends State<ClientListScreen> {
   final TextEditingController searchController = TextEditingController();
-  
-  // Mock client data based on the image
-  final List<Map<String, dynamic>> clients = [
-    {
-      'id': '1',
-      'userName': 'Ayush Shukla',
-      'planName': 'Keto Plan',
-      'planDuration': 'Oct 1 - Nov 1',
-      'email': 'ayush@gmail.com',
-      'profileImage': 'assets/men.jpg',
-    },
-    {
-      'id': '2',
-      'userName': 'Rahul Sharma',
-      'planName': 'Vegan Balanced Diet',
-      'planDuration': 'Oct 1 - Nov 1',
-      'email': 'rahul@gmail.com',
-      'profileImage': 'assets/user_avatar.png',
-    },
-    {
-      'id': '3',
-      'userName': 'Pankaj Singh',
-      'planName': 'High Protein Diet',
-      'planDuration': 'Oct 1 - Nov 1',
-      'email': 'pankaj@gmail.com',
-      'profileImage': 'assets/male.png',
-    },
-  ];
-  
-  List<Map<String, dynamic>> filteredClients = [];
+  final UsersFirestoreService _usersService = UsersFirestoreService();
+
+  List<UserModel> allMembers = [];
+  List<UserModel> filteredMembers = [];
+  Set<String> assignedClientIds = {};
+  bool isLoading = true;
+  Set<String> addingClients = {};
 
   @override
   void initState() {
     super.initState();
-    filteredClients = clients;
+    _loadMembers();
   }
 
-  void _filterClients(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        filteredClients = clients;
-      } else {
-        filteredClients = clients.where((client) {
-          return client['userName'].toLowerCase().contains(query.toLowerCase()) ||
-                 client['email'].toLowerCase().contains(query.toLowerCase());
-        }).toList();
+  void _loadMembers() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      debugPrint('❌ No current user found');
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
+
+    debugPrint('✅ Loading members for trainer: ${currentUser.uid}');
+
+    // Get assigned clients first
+    _usersService.getTrainerClientsStream(currentUser.uid).listen((
+      assignedClients,
+    ) {
+      debugPrint('📋 Assigned clients: ${assignedClients.length}');
+      assignedClientIds = assignedClients.map((c) => c.id).toSet();
+
+      // Trigger re-filter when assigned clients change
+      if (mounted) {
+        setState(() {
+          allMembers = allMembers
+              .where((m) => !assignedClientIds.contains(m.id))
+              .toList();
+          _filterMembers(searchController.text);
+        });
       }
     });
+
+    // Get all users from Firebase
+    _usersService.getUsersStream().listen(
+      (users) {
+        debugPrint('👥 Total users from Firebase: ${users.length}');
+
+        if (mounted) {
+          setState(() {
+            // Filter: exclude current user and assigned clients
+            // Show users with role="member" OR users without role field (for backward compatibility)
+            allMembers = users.where((user) {
+              final isNotCurrentUser = user.id != currentUser.uid;
+              final isNotAssigned = !assignedClientIds.contains(user.id);
+              final isMemberOrNoRole =
+                  user.role == 'member' || user.role.isEmpty;
+
+              return isNotCurrentUser && isNotAssigned && isMemberOrNoRole;
+            }).toList();
+
+            debugPrint('✨ Available members to add: ${allMembers.length}');
+            _filterMembers(searchController.text);
+            isLoading = false;
+          });
+        }
+      },
+      onError: (error) {
+        debugPrint('❌ Error loading users: $error');
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      },
+    );
+  }
+
+  void _filterMembers(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        filteredMembers = allMembers;
+      } else {
+        filteredMembers = allMembers.where((member) {
+          return member.username.toLowerCase().contains(query.toLowerCase()) ||
+              member.email.toLowerCase().contains(query.toLowerCase()) ||
+              member.fullName.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+      }
+      debugPrint('🔍 Filtered members: ${filteredMembers.length}');
+    });
+  }
+
+  Future<void> _addClientToTrainer(UserModel client) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    setState(() {
+      addingClients.add(client.id);
+    });
+
+    try {
+      await _usersService.assignClientToTrainer(client.id, currentUser.uid);
+      debugPrint('✅ Client ${client.fullName} assigned successfully');
+
+      if (mounted) {
+        Get.snackbar(
+          'Success',
+          '${client.fullName} has been added as your client!',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+
+        // Remove from list immediately
+        setState(() {
+          allMembers.removeWhere((m) => m.id == client.id);
+          _filterMembers(searchController.text);
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Error adding client: $e');
+      if (mounted) {
+        Get.snackbar(
+          'Error',
+          'Failed to add client: $e',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } finally {
+      setState(() {
+        addingClients.remove(client.id);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.black,
-              Color(0xFF1A1A1A),
-              Colors.black,
-            ],
+            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
             stops: [0.0, 0.3, 1.0],
           ),
         ),
         child: SafeArea(
           child: Column(
             children: [
-              // Header with gradient background
+              // Header
               Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF2A2A2A),
-                      Color(0xFF1A1A1A),
-                    ],
+                    colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
                   ),
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(25),
                     bottomRight: Radius.circular(25),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 10,
-                      offset: Offset(0, 5),
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
                       // App Bar
@@ -113,14 +197,21 @@ class _ClientListScreenState extends State<ClientListScreen> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Color(0xFFC2D86A).withOpacity(0.2),
-                                  Color(0xFFC2D86A).withOpacity(0.1),
+                                  const Color(
+                                    0xFFC2D86A,
+                                  ).withValues(alpha: 0.2),
+                                  const Color(
+                                    0xFFC2D86A,
+                                  ).withValues(alpha: 0.1),
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: IconButton(
-                              icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+                              icon: const Icon(
+                                Icons.arrow_back_ios,
+                                color: Colors.white,
+                              ),
                               onPressed: () => Get.back(),
                             ),
                           ),
@@ -132,7 +223,7 @@ class _ClientListScreenState extends State<ClientListScreen> {
                                   width: 4,
                                   height: 24,
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(
+                                    gradient: const LinearGradient(
                                       colors: [
                                         Color(0xFFC2D86A),
                                         Color(0xFFB8CC5A),
@@ -141,8 +232,8 @@ class _ClientListScreenState extends State<ClientListScreen> {
                                     borderRadius: BorderRadius.circular(2),
                                   ),
                                 ),
-                                SizedBox(width: 12),
-                                Text(
+                                const SizedBox(width: 12),
+                                const Text(
                                   'Client List',
                                   style: TextStyle(
                                     color: Colors.white,
@@ -154,47 +245,46 @@ class _ClientListScreenState extends State<ClientListScreen> {
                               ],
                             ),
                           ),
-                          SizedBox(width: 48), // Balance the back button
+                          const SizedBox(width: 48),
                         ],
                       ),
-                      
-                      SizedBox(height: 20),
-                      
+
+                      const SizedBox(height: 20),
+
                       // Search Bar
                       Container(
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
+                          gradient: const LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFF2D2D2D),
-                              Color(0xFF1D1D1D),
-                            ],
+                            colors: [Color(0xFF2D2D2D), Color(0xFF1D1D1D)],
                           ),
                           borderRadius: BorderRadius.circular(25),
                           border: Border.all(
-                            color: Color(0xFFC2D86A).withOpacity(0.2),
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.2),
                             width: 1,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
+                              color: Colors.black.withValues(alpha: 0.3),
                               blurRadius: 10,
-                              offset: Offset(0, 5),
+                              offset: const Offset(0, 5),
                             ),
                           ],
                         ),
                         child: TextField(
                           controller: searchController,
-                          onChanged: _filterClients,
-                          style: TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            hintText: 'Search here by email id...',
+                          onChanged: _filterMembers,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: const InputDecoration(
+                            hintText: 'Search by name or email...',
                             hintStyle: TextStyle(
                               color: Colors.white54,
                               fontSize: 16,
                             ),
-                            prefixIcon: Container(
+                            prefixIcon: Padding(
                               padding: EdgeInsets.all(12),
                               child: Icon(
                                 Icons.search,
@@ -214,21 +304,65 @@ class _ClientListScreenState extends State<ClientListScreen> {
                   ),
                 ),
               ),
-              
-              SizedBox(height: 20),
-              
+
+              const SizedBox(height: 20),
+
               // Client List
               Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: ListView.builder(
-                    itemCount: filteredClients.length,
-                    itemBuilder: (context, index) {
-                      final client = filteredClients[index];
-                      return _buildModernClientCard(client, index);
-                    },
-                  ),
-                ),
+                child: isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFFC2D86A),
+                        ),
+                      )
+                    : filteredMembers.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.people_outline,
+                                size: 80,
+                                color: Colors.white.withValues(alpha: 0.3),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                searchController.text.isEmpty
+                                    ? 'No members available'
+                                    : 'No members found',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.8),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                searchController.text.isEmpty
+                                    ? 'All members have been added or no members exist'
+                                    : 'Try a different search term',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.5),
+                                  fontSize: 14,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: ListView.builder(
+                          itemCount: filteredMembers.length,
+                          itemBuilder: (context, index) {
+                            final member = filteredMembers[index];
+                            return _buildModernClientCard(member, index);
+                          },
+                        ),
+                      ),
               ),
             ],
           ),
@@ -236,19 +370,18 @@ class _ClientListScreenState extends State<ClientListScreen> {
       ),
     );
   }
-  
-  Widget _buildModernClientCard(Map<String, dynamic> client, int index) {
-    // Different gradient combinations for variety
+
+  Widget _buildModernClientCard(UserModel client, int index) {
     List<List<Color>> gradients = [
-      [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-      [Color(0xFF2D2D2D), Color(0xFF1D1D1D)],
-      [Color(0xFF252525), Color(0xFF151515)],
+      [const Color(0xFF2A2A2A), const Color(0xFF1A1A1A)],
+      [const Color(0xFF2D2D2D), const Color(0xFF1D1D1D)],
+      [const Color(0xFF252525), const Color(0xFF151515)],
     ];
-    
+
     List<Color> cardGradient = gradients[index % gradients.length];
-    
+
     return Container(
-      margin: EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -257,20 +390,19 @@ class _ClientListScreenState extends State<ClientListScreen> {
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Color(0xFFC2D86A).withOpacity(0.2),
+          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 15,
-            offset: Offset(0, 8),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Stack(
         children: [
-          // Subtle pattern overlay
           Positioned(
             top: -30,
             right: -30,
@@ -280,16 +412,16 @@ class _ClientListScreenState extends State<ClientListScreen> {
               decoration: BoxDecoration(
                 gradient: RadialGradient(
                   colors: [
-                    Color(0xFFC2D86A).withOpacity(0.1),
+                    const Color(0xFFC2D86A).withValues(alpha: 0.1),
                     Colors.transparent,
                   ],
                 ),
               ),
             ),
           ),
-          
+
           Padding(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Row(
               children: [
                 // Profile Image
@@ -297,150 +429,168 @@ class _ClientListScreenState extends State<ClientListScreen> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Color(0xFFC2D86A).withOpacity(0.3),
-                        Color(0xFFC2D86A).withOpacity(0.1),
+                        const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                        const Color(0xFFC2D86A).withValues(alpha: 0.1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0xFFC2D86A).withOpacity(0.3),
+                        color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
                         blurRadius: 10,
-                        offset: Offset(0, 5),
+                        offset: const Offset(0, 5),
                       ),
                     ],
                   ),
-                  padding: EdgeInsets.all(3),
+                  padding: const EdgeInsets.all(3),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(13),
                     child: Container(
                       width: 80,
                       height: 80,
-                      child: Image.asset(
-                        client['profileImage'],
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Color(0xFF2A2A2A),
-                            child: Icon(
+                      color: const Color(0xFF2A2A2A),
+                      child: client.profileImage.isNotEmpty
+                          ? Image.asset(
+                              client.profileImage,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(
+                                  Icons.person,
+                                  color: Color(0xFFC2D86A),
+                                  size: 40,
+                                );
+                              },
+                            )
+                          : const Icon(
                               Icons.person,
                               color: Color(0xFFC2D86A),
                               size: 40,
                             ),
-                          );
-                        },
-                      ),
                     ),
                   ),
                 ),
-                
-                SizedBox(width: 20),
-                
+
+                const SizedBox(width: 20),
+
                 // Client Info
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'User Name: ${client['userName']}',
-                        style: TextStyle(
+                        client.fullName,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.3,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
-                        'Plan Name: ${client['planName']}',
-                        style: TextStyle(
+                        'Plan: ${client.planName}',
+                        style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 14,
                         ),
                       ),
-                      SizedBox(height: 6),
+                      const SizedBox(height: 6),
                       Text(
-                        'Plan Duration: ${client['planDuration']}',
-                        style: TextStyle(
+                        'Duration: ${client.planDuration}',
+                        style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 14,
                         ),
                       ),
-                      SizedBox(height: 6),
+                      const SizedBox(height: 6),
                       Text(
-                        'Email: ${client['email']}',
-                        style: TextStyle(
+                        client.email,
+                        style: const TextStyle(
                           color: Colors.white70,
-                          fontSize: 14,
+                          fontSize: 13,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 16),
-                      
+                      const SizedBox(height: 16),
+
                       // Add Client Button
                       Container(
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
+                          gradient: const LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFFC2D86A),
-                              Color(0xFFB8CC5A),
-                            ],
+                            colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
                           ),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Color(0xFFC2D86A).withOpacity(0.3),
+                              color: const Color(
+                                0xFFC2D86A,
+                              ).withValues(alpha: 0.3),
                               blurRadius: 8,
-                              offset: Offset(0, 4),
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
                         child: ElevatedButton(
-                          onPressed: () {
-                            _addClientToGroup(client);
-                          },
+                          onPressed: addingClients.contains(client.id)
+                              ? null
+                              : () => _addClientToTrainer(client),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
                             shadowColor: Colors.transparent,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                          ),
-                          child: Text(
-                            'Add Client',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
                             ),
                           ),
+                          child: addingClients.contains(client.id)
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.black,
+                                    ),
+                                  ),
+                                )
+                              : const Text(
+                                  'Add Client',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                
+
                 // Action Buttons
                 Column(
                   children: [
                     _buildActionButton(
                       Icons.phone,
-                      Color(0xFFF5D657),
-                      () => _makePhoneCall(client['email']),
+                      const Color(0xFFF5D657),
+                      () => _makePhoneCall(client.phone),
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     _buildActionButton(
                       Icons.email,
-                      Color(0xFFC2D86A),
-                      () => _sendEmail(client['email']),
+                      const Color(0xFFC2D86A),
+                      () => _sendEmail(client.email),
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     _buildActionButton(
                       Icons.chat,
-                      Color(0xFFF5D657),
-                      () => _openChat(client['id']),
+                      const Color(0xFFF5D657),
+                      () => _openChat(client.id),
                     ),
                   ],
                 ),
@@ -451,56 +601,41 @@ class _ClientListScreenState extends State<ClientListScreen> {
       ),
     );
   }
-  
-  Widget _buildActionButton(IconData icon, Color color, VoidCallback onPressed) {
+
+  Widget _buildActionButton(
+    IconData icon,
+    Color color,
+    VoidCallback onPressed,
+  ) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            color,
-            color.withOpacity(0.8),
-          ],
-        ),
+        gradient: LinearGradient(colors: [color, color.withValues(alpha: 0.8)]),
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha: 0.3),
             blurRadius: 8,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: IconButton(
         onPressed: onPressed,
-        icon: Icon(
-          icon,
-          color: Colors.black,
-          size: 20,
-        ),
-        padding: EdgeInsets.all(8),
+        icon: Icon(icon, color: Colors.black, size: 20),
+        padding: const EdgeInsets.all(8),
       ),
     );
   }
-  
-  void _addClientToGroup(Map<String, dynamic> client) {
-    Get.snackbar(
-      'Success',
-      '${client['userName']} has been added to the group!',
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-      duration: Duration(seconds: 2),
-    );
-  }
-  
-  void _makePhoneCall(String email) {
+
+  void _makePhoneCall(String phone) {
     Get.snackbar(
       'Phone Call',
-      'Calling client...',
+      'Calling $phone...',
       backgroundColor: Colors.blue,
       colorText: Colors.white,
     );
   }
-  
+
   void _sendEmail(String email) {
     Get.snackbar(
       'Email',
@@ -509,7 +644,7 @@ class _ClientListScreenState extends State<ClientListScreen> {
       colorText: Colors.white,
     );
   }
-  
+
   void _openChat(String clientId) {
     Get.snackbar(
       'Chat',

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../data/services/mock_api_service.dart';
+import '../../../data/services/users_firestore_service.dart';
+import '../../../data/models/user_model.dart';
 import '../../../routes/app_pages.dart';
 
 import '../../../widgets/drawer_menu.dart';
@@ -18,9 +21,14 @@ class TrainerDashboardView extends StatefulWidget {
 }
 
 class _TrainerDashboardViewState extends State<TrainerDashboardView> {
+  final UsersFirestoreService _usersService = UsersFirestoreService();
   var searchController = TextEditingController();
   bool isLoading = false;
   var userData = {};
+
+  // Real-time client list
+  List<UserModel> assignedClients = [];
+  bool isClientsLoading = true;
   Future<void> submitUser() async {
     try {
       setState(() {
@@ -167,6 +175,25 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
     super.initState();
     OntapStore.index = 0; // Set to Member/Home tab
     getMember();
+    _loadAssignedClients();
+  }
+
+  void _loadAssignedClients() {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      setState(() {
+        isClientsLoading = false;
+      });
+      return;
+    }
+
+    // Listen to real-time updates of assigned clients
+    _usersService.getTrainerClientsStream(currentUser.uid).listen((clients) {
+      setState(() {
+        assignedClients = clients;
+        isClientsLoading = false;
+      });
+    });
   }
 
   String? valueDropDown;
@@ -354,9 +381,9 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
                                         _buildStatItem(
-                                          groupMemberData.length < 10
-                                              ? "0${groupMemberData.length}"
-                                              : "${groupMemberData.length}",
+                                          assignedClients.length < 10
+                                              ? "0${assignedClients.length}"
+                                              : "${assignedClients.length}",
                                           'No. Of Clients',
                                           const Color(0xFFF57552),
                                         ),
@@ -511,7 +538,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 const Text(
-                                  'Client List',
+                                  'Your Clients',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 24,
@@ -573,7 +600,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                             const SizedBox(height: 20),
 
                             // Client List
-                            isMemberLoading || isLoading
+                            isClientsLoading
                                 ? const Center(
                                     child: Padding(
                                       padding: EdgeInsets.all(32.0),
@@ -582,7 +609,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                       ),
                                     ),
                                   )
-                                : groupMemberData.isEmpty
+                                : assignedClients.isEmpty
                                 ? Center(
                                     child: Padding(
                                       padding: const EdgeInsets.all(32.0),
@@ -597,7 +624,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                           ),
                                           const SizedBox(height: 16),
                                           Text(
-                                            'No clients yet',
+                                            'No clients added yet',
                                             style: TextStyle(
                                               color: Colors.white.withValues(
                                                 alpha: 0.8,
@@ -624,11 +651,11 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                     shrinkWrap: true,
                                     physics:
                                         const NeverScrollableScrollPhysics(),
-                                    itemCount: groupMemberData.length,
+                                    itemCount: assignedClients.length,
                                     itemBuilder: (context, index) {
-                                      var data = groupMemberData[index];
+                                      var client = assignedClients[index];
                                       return _buildModernClientCard(
-                                        data,
+                                        client,
                                         index,
                                       );
                                     },
@@ -670,7 +697,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
     );
   }
 
-  Widget _buildModernClientCard(Map<String, dynamic> data, int index) {
+  Widget _buildModernClientCard(UserModel client, int index) {
     // Different gradient combinations for variety
     List<List<Color>> gradients = [
       [const Color(0xFF2A2A2A), const Color(0xFF1A1A1A)],
@@ -680,22 +707,10 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
 
     List<Color> cardGradient = gradients[index % gradients.length];
 
-    String clientName = "Not Found";
-    String clientEmail = "";
-
-    if (data["id"] != null) {
-      clientEmail = "${data["email"]}";
-    } else {
-      clientName = "${data["user_details"]["name"]}";
-      clientEmail = "${data["user_details"]["email"]}";
-    }
-
     return GestureDetector(
       onTap: () {
-        if (data["id"] == null) {
-          GetStorage().write("clientData", data);
-          Get.toNamed("/userdiet?id=${data["user_id"]}");
-        }
+        GetStorage().write("clientData", client.toJson());
+        Get.toNamed("/userdiet?id=${client.id}");
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
@@ -739,7 +754,22 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.person, color: Colors.black, size: 30),
+                child: client.profileImage.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.asset(
+                          client.profileImage,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(
+                              Icons.person,
+                              color: Colors.black,
+                              size: 30,
+                            );
+                          },
+                        ),
+                      )
+                    : const Icon(Icons.person, color: Colors.black, size: 30),
               ),
               const SizedBox(width: 16),
 
@@ -749,7 +779,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      clientName,
+                      client.fullName,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -759,7 +789,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      clientEmail,
+                      client.email,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 13,
@@ -776,7 +806,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '56%',
+                              '${client.progressPercentage}%',
                               style: TextStyle(
                                 color: const Color(
                                   0xFFC2D86A,
@@ -796,7 +826,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                           ),
                           child: FractionallySizedBox(
                             alignment: Alignment.centerLeft,
-                            widthFactor: 0.56,
+                            widthFactor: client.progressPercentage / 100,
                             child: Container(
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
