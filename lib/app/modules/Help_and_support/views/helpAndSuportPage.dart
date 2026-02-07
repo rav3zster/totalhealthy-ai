@@ -1,437 +1,334 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:totalhealthy/app/widgets/baseWidget.dart';
-
-import '../../../core/utitlity/appvalidator.dart';
+import 'package:get/get.dart';
 
 class HelpPage extends StatefulWidget {
-  const HelpPage({Key? key}) : super(key: key);
+  const HelpPage({super.key});
 
   @override
   State<HelpPage> createState() => _HelpPageState();
 }
 
-class _HelpPageState extends State<HelpPage> {
-  final _formKey = GlobalKey<FormState>();
+class _HelpPageState extends State<HelpPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
 
-  // Controllers for form fields
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _subjectController = TextEditingController();
-  final TextEditingController _messageController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
 
-  // Sample FAQ data
-  final List<FAQItem> _faqItems = [
-    FAQItem(
-      question: "How do I reset my password?",
-      answer:
-      "To reset your password, go to the login screen and click 'Forgot Password.' You will receive an email with instructions on how to create a new password.",
-    ),
-    FAQItem(
-      question: "How can I track my order?",
-      answer:
-      "Once your order has shipped, you will receive an email with tracking information. You can use that information to track your package on the carrier’s website.",
-    ),
-    FAQItem(
-      question: "What payment methods do you accept?",
-      answer:
-      "We accept credit cards, debit cards, PayPal, and select digital wallets. Check our payment options page for more details.",
-    ),
-    FAQItem(
-      question: "What is your return policy?",
-      answer:
-      "We offer a 30-day return policy. If you are not satisfied with your purchase, please contact our support team to initiate a return.",
-    ),
-  ];
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
+
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2, // We have two tabs
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Need Help?'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Contact Us'),
-              Tab(text: 'FAQ'),
-            ],
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.black, Color(0xFF0A0A0A), Colors.black],
+            stops: [0.0, 0.5, 1.0],
           ),
         ),
-        body: TabBarView(
-          children: [
-            // 1. Contact Us Tab
-            SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  // Contact Details
-                  _buildContactDetailsCard(),
-                  const SizedBox(height: 16.0),
-                  // Contact Form
-                  _buildContactForm(),
-                ],
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Custom App Bar
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      onPressed: () => Get.back(),
+                    ),
+                    const Expanded(
+                      child: Text(
+                        "Help & Support",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.search,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            // 2. FAQ Tab
-            SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: _buildFAQList(),
+              // Content
+              Expanded(
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          children: [
+                            // Consult Your Dietician Section
+                            _buildAnimatedCard(
+                              delay: 0,
+                              child: _buildDieticianCard(),
+                            ),
+                            const SizedBox(height: 20),
+
+                            // Chat With Chatbot Section
+                            _buildAnimatedCard(
+                              delay: 200,
+                              child: _buildChatbotCard(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // Builds a card displaying contact details
-  Widget _buildContactDetailsCard() {
-    return Column(
-      children: [
-        Align(
-          alignment: Alignment.center,
-          child: Text(
-            "Need Help?",
+  Widget _buildAnimatedCard({required int delay, required Widget child}) {
+    return TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 600 + delay),
+      tween: Tween(begin: 0.0, end: 1.0),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 30 * (1 - value)),
+          child: Opacity(opacity: value, child: child),
+        );
+      },
+      child: child,
+    );
+  }
 
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 30,
+  Widget _buildDieticianCard() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF2A2A2A).withValues(alpha: 0.95),
+            const Color(0xFF1A1A1A).withValues(alpha: 0.95),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: const Color(0xFFC2D86A).withValues(alpha: 0.15),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+            blurRadius: 30,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          children: [
+            // Background pattern
+            Positioned(
+              top: -50,
+              right: -50,
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      const Color(0xFFC2D86A).withValues(alpha: 0.08),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-        Text(
-          "We're here to help! Check out our FAQ's or get in touch with us directly.",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.grey,
-            fontSize: 14,
-          ),
-        ),
-        SizedBox(
-          height: 5,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+
+            // Content
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
                 children: [
-                  Expanded(
-                    child: Container(
-                      child: _buildDetailRow(
-                          Icons.phone_outlined, 'Phone', '+1 (555) 123-4567'),
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black12)),
+                  // Image blended with background
+                  Container(
+                    height: 140,
+                    width: 140,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                          const Color(0xFFC2D86A).withValues(alpha: 0.05),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
+                    ),
+                    child: Center(
+                      child: Container(
+                        height: 110,
+                        width: 110,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.3),
+                            width: 2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(
+                                0xFFC2D86A,
+                              ).withValues(alpha: 0.2),
+                              blurRadius: 20,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/dietician.jpeg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 8,
-                    width: 8,
-                  ),
-                  Expanded(
-                    child: Container(
-                      child: _buildDetailRow(
-                          Icons.email_outlined, 'Email', 'support@example.com'),
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black12)),
+                  const SizedBox(height: 20),
+
+                  // Title
+                  const Text(
+                    "Consult Your Dietician",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
                     ),
                   ),
                   const SizedBox(height: 8),
-                ],
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      child: _buildDetailRow(
-                        Icons.location_on_outlined,
-                        'Address',
-                        '123 Business Ave\nSuite 100\nNew York, NY 10001',
-                      ),
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black12)),
+                  Text(
+                    "Get personalized nutrition advice",
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      fontSize: 14,
+                      letterSpacing: 0.3,
                     ),
                   ),
-                  const SizedBox(
-                    height: 8,
-                    width: 8,
+                  const SizedBox(height: 28),
+
+                  // Action Buttons
+                  _buildActionButton(
+                    icon: Icons.chat_bubble_outline,
+                    label: "Chat",
+                    onPressed: () {
+                      Get.snackbar(
+                        'Chat',
+                        'Opening chat with dietician...',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: const Color(0xFF2A2A2A),
+                        colorText: Colors.white,
+                        margin: const EdgeInsets.all(16),
+                        borderRadius: 12,
+                      );
+                    },
+                    delay: 0,
                   ),
-                  Expanded(
-                    child: Container(
-                      child: _buildDetailRow(
-                        Icons.access_time_outlined,
-                        'Hours',
-                        'Mon-Fri: 9am - 6pm\nSat: 10am - 4pm\nSun: Closed',
-                      ),
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black12)),
-                    ),
+                  const SizedBox(height: 12),
+                  _buildActionButton(
+                    icon: Icons.phone_outlined,
+                    label: "Voice Call",
+                    onPressed: () {
+                      Get.snackbar(
+                        'Voice Call',
+                        'Initiating voice call...',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: const Color(0xFF2A2A2A),
+                        colorText: Colors.white,
+                        margin: const EdgeInsets.all(16),
+                        borderRadius: 12,
+                      );
+                    },
+                    delay: 100,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildActionButton(
+                    icon: Icons.videocam_outlined,
+                    label: "Video Call",
+                    onPressed: () {
+                      Get.snackbar(
+                        'Video Call',
+                        'Starting video call...',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: const Color(0xFF2A2A2A),
+                        colorText: Colors.white,
+                        margin: const EdgeInsets.all(16),
+                        borderRadius: 12,
+                      );
+                    },
+                    delay: 200,
                   ),
                 ],
-              )
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Helper widget for each row of detail
-  Widget _buildDetailRow(IconData iconData, String name, String text) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Icon(iconData),
-        const SizedBox(height: 5),
-        Text(
-          name,
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 5),
-        Text(text),
-      ],
-    );
-  }
-
-  // Builds the contact form
-  Widget _buildContactForm() {
-    return Form(
-      key: _formKey,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                "Get in Touch",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                // First Name
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'First Name',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0XFFDBDBDB),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-
-                      // Email Field
-                      TextFormField(
-                        controller: _firstNameController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Color(0XFF242522),
-                          hintText: 'John',
-                          hintStyle: TextStyle(color: Colors.white54),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide.none,
-                          ),
-                          // Custom Border Properties
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.transparent),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.transparent),
-                          ),
-                        ),
-                        style: TextStyle(color: Colors.white),
-                        validator: AppValidator.validateUsername,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 20), // Space between First Name and Last Name
-                // Last Name
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Last Name',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0XFFDBDBDB),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-
-                      // Email Field
-                      TextFormField(
-                        controller: _lastNameController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Color(0XFF242522),
-                          hintText: 'Doe',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide.none,
-                          ),
-                          // Custom Border Properties
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.transparent),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.transparent),
-                          ),
-                        ),
-                        style: TextStyle(color: Colors.white),
-                        validator: AppValidator.validateUsername,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16.0),
-            Text(
-              'Email Address',
-              style: TextStyle(
-                fontSize: 16,
-                color: Color(0XFFDBDBDB),
-              ),
-            ),
-            SizedBox(height: 10),
-
-            // Email Field
-            TextFormField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Color(0XFF242522),
-                hintText: 'john@example.com',
-                hintStyle: TextStyle(color: Colors.white54),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
-                // Custom Border Properties
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.transparent),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.transparent),
-                ),
-              ),
-              style: TextStyle(color: Colors.white),
-              validator: AppValidator.validateEmail,
-            ),
-            const SizedBox(height: 16.0),
-            Text(
-              'Subject',
-              style: TextStyle(
-                fontSize: 16,
-                color: Color(0XFFDBDBDB),
-              ),
-            ),
-            SizedBox(height: 10),
-
-            // Email Field
-            TextFormField(
-              controller: _subjectController,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Color(0XFF242522),
-                hintText: 'How can we help?',
-                hintStyle: TextStyle(color: Colors.white54),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
-                // Custom Border Properties
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.transparent),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.transparent),
-                ),
-              ),
-              style: TextStyle(color: Colors.white),
-              validator: AppValidator.validateEmail,
-            ),
-            const SizedBox(height: 16.0),
-            // Message
-            Text(
-              'Message',
-              style: TextStyle(
-                fontSize: 16,
-                color: Color(0XFFDBDBDB),
-              ),
-            ),
-            SizedBox(height: 10),
-
-            // Email Field
-            TextFormField(
-              controller: _messageController,
-              decoration: InputDecoration(
-
-                filled: true,
-                fillColor: Color(0XFF242522),
-                hintText: 'Tell us more about your inquiry....',
-                hintStyle: TextStyle(color: Colors.white54),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
-                // Custom Border Properties
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.transparent),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.transparent),
-                ),
-              ),
-              maxLines: 5,
-              style: TextStyle(color: Colors.white),
-              validator: AppValidator.validateEmail,
-            ),
-            const SizedBox(height: 16.0),
-            // Submit Button
-            Container(
-              width: MediaQuery.sizeOf(context).width,
-              child: ElevatedButton.icon(
-                onPressed: _submitForm,
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white),
-                icon: const Icon(Icons.chat_bubble_outline),
-                label: const Text('Send Message'),
               ),
             ),
           ],
@@ -440,62 +337,238 @@ class _HelpPageState extends State<HelpPage> {
     );
   }
 
-  // Form submission logic
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      // For now, just print the values. In a real app, you’d send these to your backend or an API.
-      print('First Name: ${_firstNameController.text}');
-      print('Last Name: ${_lastNameController.text}');
-      print('Email: ${_emailController.text}');
-      print('Subject: ${_subjectController.text}');
-      print('Message: ${_messageController.text}');
-
-      // Clear fields after submission if you want
-      _firstNameController.clear();
-      _lastNameController.clear();
-      _emailController.clear();
-      _subjectController.clear();
-      _messageController.clear();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Message sent successfully!')),
-      );
-    }
-  }
-
-  // Builds a list of ExpansionTiles for FAQ items
-  List<Widget> _buildFAQList() {
-    return _faqItems.map((faqItem) {
-      return Container(
-        decoration: BoxDecoration(
-          color: Colors.black,
-          border: Border.all( // Add a border that stays constant
-            color: Colors.white,
-          ),
-          borderRadius: BorderRadius.circular(4), // Optional: rounded corners for a smoother look
+  Widget _buildChatbotCard() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF2A2A2A).withValues(alpha: 0.95),
+            const Color(0xFF1A1A1A).withValues(alpha: 0.95),
+          ],
         ),
-        child: ExpansionTile(
-          shape: OutlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
-          title: Text(faqItem.question),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: const Color(0xFFC2D86A).withValues(alpha: 0.15),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+            blurRadius: 30,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
           children: [
+            // Background pattern
+            Positioned(
+              bottom: -50,
+              left: -50,
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      const Color(0xFFC2D86A).withValues(alpha: 0.08),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Content
             Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(faqItem.answer),
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  // Image blended with background
+                  Container(
+                    height: 140,
+                    width: 140,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                          const Color(0xFFC2D86A).withValues(alpha: 0.05),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
+                    ),
+                    child: Center(
+                      child: Container(
+                        height: 110,
+                        width: 110,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.3),
+                            width: 2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(
+                                0xFFC2D86A,
+                              ).withValues(alpha: 0.2),
+                              blurRadius: 20,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/chatbot.jpeg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Title
+                  const Text(
+                    "Chat With Chatbot",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "24/7 instant support and answers",
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      fontSize: 14,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+
+                  // Action Button
+                  _buildActionButton(
+                    icon: Icons.chat_bubble_outline,
+                    label: "Chat",
+                    onPressed: () {
+                      Get.snackbar(
+                        'Chatbot',
+                        'Opening chatbot...',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: const Color(0xFF2A2A2A),
+                        colorText: Colors.white,
+                        margin: const EdgeInsets.all(16),
+                        borderRadius: 12,
+                      );
+                    },
+                    delay: 0,
+                  ),
+                ],
+              ),
             ),
           ],
-          onExpansionChanged: (isExpanded) {
-            // This can be used if you want to handle anything specific when expanded or collapsed
-          },
         ),
-      );
-    }).toList();
+      ),
+    );
   }
-}
 
-// Simple model class for FAQ items
-class FAQItem {
-  final String question;
-  final String answer;
-
-  FAQItem({required this.question, required this.answer});
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+    required int delay,
+  }) {
+    return TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 400 + delay),
+      tween: Tween(begin: 0.0, end: 1.0),
+      curve: Curves.easeOut,
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: 0.9 + (0.1 * value),
+          child: Opacity(opacity: value, child: child),
+        );
+      },
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(16),
+          splashColor: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+          highlightColor: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+          child: Ink(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF333333).withValues(alpha: 0.8),
+                  const Color(0xFF252525).withValues(alpha: 0.8),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.25),
+                width: 1,
+              ),
+            ),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                          const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(icon, color: const Color(0xFFC2D86A), size: 20),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      label,
+                      style: const TextStyle(
+                        color: Color(0xFFC2D86A),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: const Color(0xFFC2D86A).withValues(alpha: 0.4),
+                    size: 16,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

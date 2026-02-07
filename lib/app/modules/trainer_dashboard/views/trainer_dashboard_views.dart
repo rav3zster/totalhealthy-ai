@@ -12,6 +12,7 @@ import '../../../routes/app_pages.dart';
 import '../../../widgets/drawer_menu.dart';
 import '../../../widgets/notification_services.dart';
 import '../../../widgets/phone_nav_bar.dart';
+import '../../../widgets/real_time_search_bar.dart';
 
 class TrainerDashboardView extends StatefulWidget {
   const TrainerDashboardView({super.key});
@@ -22,19 +23,23 @@ class TrainerDashboardView extends StatefulWidget {
 
 class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   final UsersFirestoreService _usersService = UsersFirestoreService();
-  var searchController = TextEditingController();
+  final RxString searchQuery = ''.obs;
   bool isLoading = false;
   var userData = {};
 
   // Real-time client list
   List<UserModel> assignedClients = [];
   bool isClientsLoading = true;
+
+  // Search state management
+  bool isSearchActive = false;
+  List<UserModel> filteredClients = [];
   Future<void> submitUser() async {
     try {
       setState(() {
         isLoading = true;
       });
-      String input = searchController.text.trim();
+      String input = searchQuery.value.trim();
       var phone = int.tryParse(input);
 
       // Use mock API instead of real API
@@ -178,6 +183,46 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
     _loadAssignedClients();
   }
 
+  void updateSearchQuery(String query) {
+    searchQuery.value = query;
+    _performSearch(query);
+  }
+
+  void onSearchFocused() {
+    if (!isSearchActive) {
+      setState(() {
+        isSearchActive = true;
+        filteredClients = [];
+      });
+    }
+  }
+
+  void clearSearch() {
+    searchQuery.value = '';
+    setState(() {
+      isSearchActive = false;
+      filteredClients = [];
+    });
+  }
+
+  void _performSearch(String query) {
+    final trimmedQuery = query.trim();
+
+    setState(() {
+      if (trimmedQuery.isEmpty) {
+        filteredClients = [];
+      } else {
+        final lowerQuery = trimmedQuery.toLowerCase();
+        filteredClients = assignedClients.where((client) {
+          final nameLower = client.fullName.toLowerCase();
+          final emailLower = client.email.toLowerCase();
+          return nameLower.contains(lowerQuery) ||
+              emailLower.contains(lowerQuery);
+        }).toList();
+      }
+    });
+  }
+
   void _loadAssignedClients() {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
@@ -189,6 +234,10 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
 
     // Listen to real-time updates of assigned clients
     _usersService.getTrainerClientsStream(currentUser.uid).listen((clients) {
+      debugPrint('Loaded ${clients.length} clients for trainer');
+      for (var client in clients) {
+        debugPrint('Client: ${client.fullName} (${client.email})');
+      }
       setState(() {
         assignedClients = clients;
         isClientsLoading = false;
@@ -197,6 +246,137 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   }
 
   String? valueDropDown;
+
+  Widget _buildClientList() {
+    // Search mode: show empty state initially, then filtered results
+    if (isSearchActive) {
+      if (searchQuery.value.isEmpty) {
+        // Empty search state - show nothing
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.search,
+                  size: 80,
+                  color: Colors.white.withValues(alpha: 0.3),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Start typing to search',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Search by client name or email',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      } else if (filteredClients.isEmpty) {
+        // No results found
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.search_off,
+                  size: 80,
+                  color: Colors.white.withValues(alpha: 0.3),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'No clients found',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Try a different search term',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      } else {
+        // Show filtered results
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: filteredClients.length,
+          itemBuilder: (context, index) {
+            var client = filteredClients[index];
+            return _buildModernClientCard(client, index);
+          },
+        );
+      }
+    }
+
+    // Normal mode: show all clients or empty state
+    if (assignedClients.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            children: [
+              Icon(
+                Icons.people_outline,
+                size: 80,
+                color: Colors.white.withValues(alpha: 0.3),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No clients added yet',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Add your first client to get started',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.5),
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Show all clients
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: assignedClients.length,
+      itemBuilder: (context, index) {
+        var client = assignedClients[index];
+        return _buildModernClientCard(client, index);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -428,107 +608,20 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Search Bar
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          const Color(
-                                            0xFF2A2A2A,
-                                          ).withValues(alpha: 0.8),
-                                          const Color(
-                                            0xFF1A1A1A,
-                                          ).withValues(alpha: 0.8),
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(50),
-                                      border: Border.all(
-                                        color: const Color(
-                                          0xFFC2D86A,
-                                        ).withValues(alpha: 0.3),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: TextFormField(
-                                      controller: searchController,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                      decoration: InputDecoration(
-                                        hintText: 'Search here...',
-                                        hintStyle: TextStyle(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.5,
-                                          ),
-                                        ),
-                                        prefixIcon: Icon(
-                                          Icons.search,
-                                          color: const Color(
-                                            0xFFC2D86A,
-                                          ).withValues(alpha: 0.7),
-                                        ),
-                                        border: InputBorder.none,
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              horizontal: 20,
-                                              vertical: 16,
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                GestureDetector(
-                                  onTap: isLoading ? null : submitUser,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 24,
-                                      vertical: 16,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [
-                                          Color(0xFFC2D86A),
-                                          Color(0xFFD4E87C),
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(50),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: const Color(
-                                            0xFFC2D86A,
-                                          ).withValues(alpha: 0.3),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: isLoading
-                                        ? const SizedBox(
-                                            width: 20,
-                                            height: 20,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                    Color(0xFF121212),
-                                                  ),
-                                            ),
-                                          )
-                                        : const Text(
-                                            "Search",
-                                            style: TextStyle(
-                                              color: Color(0xFF121212),
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                  ),
-                                ),
-                              ],
+                            // Search Bar - Using working SimpleRealTimeSearchBar
+                            SimpleRealTimeSearchBar(
+                              searchQuery: searchQuery,
+                              onSearchChanged: (query) {
+                                updateSearchQuery(query);
+                              },
+                              onSearchFocused: () {
+                                onSearchFocused();
+                              },
+                              onSearchCleared: () {
+                                clearSearch();
+                              },
+                              hintText: 'Search clients by name or email...',
+                              showFilterIcon: false,
                             ),
 
                             const SizedBox(height: 24),
@@ -609,57 +702,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                       ),
                                     ),
                                   )
-                                : assignedClients.isEmpty
-                                ? Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(32.0),
-                                      child: Column(
-                                        children: [
-                                          Icon(
-                                            Icons.people_outline,
-                                            size: 80,
-                                            color: Colors.white.withValues(
-                                              alpha: 0.3,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 16),
-                                          Text(
-                                            'No clients added yet',
-                                            style: TextStyle(
-                                              color: Colors.white.withValues(
-                                                alpha: 0.8,
-                                              ),
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            'Add your first client to get started',
-                                            style: TextStyle(
-                                              color: Colors.white.withValues(
-                                                alpha: 0.5,
-                                              ),
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                : ListView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: assignedClients.length,
-                                    itemBuilder: (context, index) {
-                                      var client = assignedClients[index];
-                                      return _buildModernClientCard(
-                                        client,
-                                        index,
-                                      );
-                                    },
-                                  ),
+                                : _buildClientList(),
                           ],
                         ),
                       ),

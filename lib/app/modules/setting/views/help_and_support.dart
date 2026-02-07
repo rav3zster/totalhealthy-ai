@@ -3,148 +3,236 @@ import 'package:get/get.dart';
 
 import '../controllers/setting_controller.dart';
 
-class HelpAndSupport extends StatelessWidget {
-  var controller = Get.find<SettingController>();
+class HelpAndSupport extends StatefulWidget {
+  const HelpAndSupport({super.key});
+
+  @override
+  State<HelpAndSupport> createState() => _HelpAndSupportState();
+}
+
+class _HelpAndSupportState extends State<HelpAndSupport>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
+
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<SettingController>();
+
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
+        elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_outlined, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+            size: 20,
+          ),
+          onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           "Help & Support",
           style: TextStyle(
-              color: Color(0XFFB3B3B3),
-              fontSize: 25,
-              fontWeight: FontWeight.normal), // Set title color to white
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w400,
+          ),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.search, color: Colors.white),
+            icon: const Icon(Icons.search, color: Colors.white, size: 24),
             onPressed: () {
               // Add search functionality here
             },
           ),
         ],
       ),
-      backgroundColor: Colors.black, // Set the background to black
-      body: Column(
-        children: [
-          // Consult Your Dietician Section
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Color(0xFF242522),
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.asset('assets/dietician.jpeg', height: 100),
-                    SizedBox(height: 10),
-                    Text(
-                      "Consult Your Dietician",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    // Using Column to stack buttons vertically
-                    Column(
-                      children: [
-                        _buildFullWidthButton(
-                            Icons.chat, "Chat", controller.onChatPressed),
-                        SizedBox(height: 8), // Space between buttons
-                        _buildFullWidthButton(Icons.call, "Voice Call",
-                            controller.onVoiceCallPressed),
-                        SizedBox(height: 8), // Space between buttons
-                        _buildFullWidthButton(Icons.video_call, "Video Call",
-                            controller.onVideoCallPressed),
-                      ],
-                    ),
-                  ],
-                ),
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: SlideTransition(
+          position: _slideAnimation,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  // Consult Your Dietician Section
+                  _buildCard(
+                    imagePath: 'assets/dietician.jpeg',
+                    title: 'Consult Your Dietician',
+                    buttons: [
+                      _ButtonData(
+                        icon: Icons.chat_bubble_outline,
+                        label: 'Chat',
+                        onPressed: controller.onChatPressed,
+                      ),
+                      _ButtonData(
+                        icon: Icons.phone_outlined,
+                        label: 'Voice Call',
+                        onPressed: controller.onVoiceCallPressed,
+                      ),
+                      _ButtonData(
+                        icon: Icons.videocam_outlined,
+                        label: 'Video Call',
+                        onPressed: controller.onVideoCallPressed,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Chat With Chatbot Section
+                  _buildCard(
+                    imagePath: 'assets/chatbot.jpeg',
+                    title: 'Chat With Chatbot',
+                    buttons: [
+                      _ButtonData(
+                        icon: Icons.chat_bubble_outline,
+                        label: 'Chat',
+                        onPressed: controller.onChatbotPressed,
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
-
-          // Chat With Chatbot Section
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Color(0xFF242522),
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.asset('assets/chatbot.jpeg', height: 100),
-                    SizedBox(height: 10),
-                    Text(
-                      "Chat With Chatbot",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    // Using Column to stack buttons vertically
-                    Column(
-                      children: [
-                        _buildFullWidthButton(
-                            Icons.chat, "Chat", controller.onChatbotPressed),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFullWidthButton(
-      IconData icon, String label, VoidCallback onPressed) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0XFF333333),
-        padding: EdgeInsets.symmetric(vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0), // Round the buttons
         ),
-        minimumSize: Size(double.infinity, 48), // Full width
-      ),
-      onPressed: onPressed,
-      child: Row(
-        children: [
-          SizedBox(width: 8), // Space from the left edge
-          Icon(icon, color: Color(0XFFCCE16B)), // Set icon color
-          SizedBox(width: 8), // Space between icon and text
-          Text(
-            label,
-            style: TextStyle(
-                color: Color(0XFFCCE16B)), // Change text color to CCE16B
-          ),
-        ],
       ),
     );
   }
+
+  Widget _buildCard({
+    required String imagePath,
+    required String title,
+    required List<_ButtonData> buttons,
+  }) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            // Image
+            Image.asset(
+              imagePath,
+              height: 120,
+              width: 120,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(height: 16),
+
+            // Title
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Buttons
+            ...buttons.map(
+              (buttonData) => Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: _buildButton(
+                  icon: buttonData.icon,
+                  label: buttonData.label,
+                  onPressed: buttonData.onPressed,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(12),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: const Color(0xFF3A3A3A),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            child: Row(
+              children: [
+                Icon(icon, color: const Color(0xFFC2D86A), size: 22),
+                const SizedBox(width: 12),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: Color(0xFFC2D86A),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ButtonData {
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  _ButtonData({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
 }
