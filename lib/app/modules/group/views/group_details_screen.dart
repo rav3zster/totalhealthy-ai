@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/models/user_model.dart';
+import '../../../widgets/member_action_menu.dart';
 import '../controllers/group_controller.dart';
 
 class GroupDetailsScreen extends StatefulWidget {
@@ -516,7 +517,10 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
-            onTap: () {},
+            onTap: () {
+              // Show member action menu
+              MemberActionMenu.show(context, member, isAdmin);
+            },
             child: Padding(
               padding: const EdgeInsets.all(14),
               child: Row(
@@ -600,6 +604,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         // Name and Admin Badge Row
                         Row(
@@ -678,26 +683,43 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                         ),
                         const SizedBox(height: 4),
 
-                        // Email
-                        _buildCompactInfo(Icons.email_rounded, member.email),
+                        // Email and Action Buttons Row
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildCompactInfo(
+                                Icons.email_rounded,
+                                member.email,
+                              ),
+                            ),
+                            // Action Buttons (only for non-admin members)
+                            if (!isAdmin) ...[
+                              const SizedBox(width: 8),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _buildCompactActionButton(
+                                    Icons.phone_rounded,
+                                    () {},
+                                  ),
+                                  const SizedBox(width: 6),
+                                  _buildCompactActionButton(
+                                    Icons.email_rounded,
+                                    () {},
+                                  ),
+                                  const SizedBox(width: 6),
+                                  _buildCompactActionButton(
+                                    Icons.chat_rounded,
+                                    () {},
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
+                        ),
                       ],
                     ),
                   ),
-
-                  // Action Buttons (only for non-admin members)
-                  if (!isAdmin) ...[
-                    const SizedBox(width: 8),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildCompactActionButton(Icons.phone_rounded, () {}),
-                        const SizedBox(height: 6),
-                        _buildCompactActionButton(Icons.email_rounded, () {}),
-                        const SizedBox(height: 6),
-                        _buildCompactActionButton(Icons.chat_rounded, () {}),
-                      ],
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -737,13 +759,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
 
   Widget _buildCompactActionButton(IconData icon, VoidCallback onTap) {
     return Container(
-      width: 36,
-      height: 36,
+      width: 32,
+      height: 32,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
         ),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
@@ -755,9 +777,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
           onTap: onTap,
-          child: Icon(icon, color: const Color(0xFF121212), size: 16),
+          child: Icon(icon, color: const Color(0xFF121212), size: 15),
         ),
       ),
     );

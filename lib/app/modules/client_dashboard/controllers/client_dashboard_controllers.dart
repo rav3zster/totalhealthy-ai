@@ -23,6 +23,7 @@ class ClientDashboardControllers extends GetxController {
   final selectedCategory = 'Breakfast'.obs;
   final searchQuery = ''.obs;
   final error = ''.obs;
+  final isSearchFocused = false.obs; // Track if search field is focused/active
 
   // Stream subscription for cleanup
   StreamSubscription<List<MealModel>>? _mealsSubscription;
@@ -306,12 +307,24 @@ class ClientDashboardControllers extends GetxController {
 
   // Enhanced filtered meals with comprehensive search functionality
   List<MealModel> get filteredMeals {
-    // Start with all meals
+    // Start with all meals (master list)
     var filtered = List<MealModel>.from(meals);
 
-    // If search is active, search across ALL meals (ignore category)
-    if (searchQuery.value.isNotEmpty) {
-      final query = searchQuery.value.toLowerCase().trim();
+    // DEBUG: Log the data flow
+    print('🔍 SEARCH DEBUG - Total meals in allMeals: ${meals.length}');
+    print('🔍 SEARCH DEBUG - Search query raw: "${searchQuery.value}"');
+    print(
+      '🔍 SEARCH DEBUG - Search query trimmed: "${searchQuery.value.trim()}"',
+    );
+    print('🔍 SEARCH DEBUG - isSearchFocused: $isSearchFocused');
+
+    // CRITICAL: Check if search query has actual content (after trimming)
+    final trimmedQuery = searchQuery.value.trim();
+
+    if (trimmedQuery.isNotEmpty) {
+      // SEARCH MODE: Search across ALL meals, ignore category
+      final query = trimmedQuery.toLowerCase();
+      print('🔍 SEARCH DEBUG - Entering search mode with query: "$query"');
 
       filtered = filtered.where((meal) {
         // Search in meal name
@@ -328,7 +341,7 @@ class ClientDashboardControllers extends GetxController {
         final fatMatch = meal.fat.toLowerCase().contains(query);
         final carbsMatch = meal.carbs.toLowerCase().contains(query);
 
-        // Search in categories
+        // Search in categories (meal type: Breakfast, Lunch, Dinner)
         final categoryMatch = meal.categories.any(
           (cat) => cat.toLowerCase().contains(query),
         );
@@ -350,7 +363,8 @@ class ClientDashboardControllers extends GetxController {
         final prepTimeMatch = meal.prepTime.toLowerCase().contains(query);
         final difficultyMatch = meal.difficulty.toLowerCase().contains(query);
 
-        return nameMatch ||
+        final matches =
+            nameMatch ||
             descriptionMatch ||
             calorieMatch ||
             proteinMatch ||
@@ -361,12 +375,26 @@ class ClientDashboardControllers extends GetxController {
             instructionsMatch ||
             prepTimeMatch ||
             difficultyMatch;
+
+        if (matches) {
+          print('🔍 SEARCH DEBUG - Match found: ${meal.name}');
+        }
+
+        return matches;
       }).toList();
+
+      print('🔍 SEARCH DEBUG - Filtered meals count: ${filtered.length}');
     } else {
-      // If search is empty, filter by selected category
+      // CATEGORY MODE: Filter by selected category only
+      print(
+        '🔍 SEARCH DEBUG - Category mode, selected: ${selectedCategory.value}',
+      );
       filtered = filtered.where((meal) {
         return meal.categories.contains(selectedCategory.value);
       }).toList();
+      print(
+        '🔍 SEARCH DEBUG - Category filtered meals count: ${filtered.length}',
+      );
     }
 
     return filtered;
@@ -390,21 +418,46 @@ class ClientDashboardControllers extends GetxController {
     }
   }
 
-  // Enhanced search with debouncing for better performance
+  // Enhanced search with immediate update
   void updateSearchQuery(String query) {
-    final trimmedQuery = query.trim();
-    if (searchQuery.value != trimmedQuery) {
-      searchQuery.value = trimmedQuery;
+    print('📝 CONTROLLER DEBUG - updateSearchQuery called with: "$query"');
+    // Don't trim here - let the value pass through as-is
+    // Trimming will be done in the view when checking isEmpty
+    if (searchQuery.value != query) {
+      print(
+        '📝 CONTROLLER DEBUG - Updating searchQuery from "${searchQuery.value}" to "$query"',
+      );
+      searchQuery.value = query;
+      print('📝 CONTROLLER DEBUG - Calling update() to rebuild UI');
+      update(); // Force immediate UI update
+      print('📝 CONTROLLER DEBUG - update() called successfully');
+    } else {
+      print('📝 CONTROLLER DEBUG - Query unchanged, skipping update');
+    }
+  }
+
+  // Called when search field is focused/activated
+  void onSearchFocused() {
+    if (!isSearchFocused.value) {
+      isSearchFocused.value = true;
       update(); // Force immediate UI update
     }
   }
 
-  // Clear search and update UI
-  void clearSearch() {
-    if (searchQuery.value.isNotEmpty) {
-      searchQuery.value = '';
+  // Called when search field loses focus and is empty
+  void onSearchBlurred() {
+    // Only blur if search is empty
+    if (searchQuery.value.isEmpty && isSearchFocused.value) {
+      isSearchFocused.value = false;
       update(); // Force immediate UI update
     }
+  }
+
+  // Clear search and exit search mode
+  void clearSearch() {
+    searchQuery.value = '';
+    isSearchFocused.value = false;
+    update(); // Force immediate UI update
   }
 
   // Refresh meals data with pull-to-refresh
@@ -487,10 +540,15 @@ class ClientDashboardControllers extends GetxController {
   int get searchResultCount => filteredMeals.length;
 
   // Check if search is active
-  bool get isSearchActive => searchQuery.value.isNotEmpty;
+  bool get isSearchActive =>
+      isSearchFocused.value || searchQuery.value.isNotEmpty;
 
   // Check if category buttons should be visible
-  bool get shouldShowCategoryButtons => searchQuery.value.isEmpty;
+  bool get shouldShowCategoryButtons => !isSearchActive;
+
+  // Check if we should show meals (only when not in search mode OR when search has text)
+  bool get shouldShowMeals =>
+      !isSearchFocused.value || searchQuery.value.isNotEmpty;
 
   // Check if we have any data (cached or fresh)
   bool get hasData => meals.isNotEmpty;

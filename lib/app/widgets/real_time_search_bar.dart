@@ -120,6 +120,8 @@ class _RealTimeSearchBarState extends State<RealTimeSearchBar> {
 // Alternative simpler version without debouncing for immediate feedback
 class SimpleRealTimeSearchBar extends StatefulWidget {
   final Function(String) onSearchChanged;
+  final VoidCallback? onSearchFocused;
+  final VoidCallback? onSearchCleared;
   final String hintText;
   final bool showFilterIcon;
   final VoidCallback? onFilterTap;
@@ -129,6 +131,8 @@ class SimpleRealTimeSearchBar extends StatefulWidget {
     super.key,
     required this.onSearchChanged,
     required this.searchQuery,
+    this.onSearchFocused,
+    this.onSearchCleared,
     this.hintText = 'Search meals...',
     this.showFilterIcon = true,
     this.onFilterTap,
@@ -141,33 +145,44 @@ class SimpleRealTimeSearchBar extends StatefulWidget {
 
 class _SimpleRealTimeSearchBarState extends State<SimpleRealTimeSearchBar> {
   late final TextEditingController _textController;
+  late final FocusNode _focusNode;
 
   @override
   void initState() {
     super.initState();
     _textController = TextEditingController(text: widget.searchQuery.value);
+    _focusNode = FocusNode();
 
-    // Listen to searchQuery changes to sync TextField
-    ever(widget.searchQuery, (String value) {
-      if (_textController.text != value) {
-        _textController.text = value;
-        _textController.selection = TextSelection.fromPosition(
-          TextPosition(offset: value.length),
-        );
-      }
-    });
+    // Listen to focus changes
+    _focusNode.addListener(_onFocusChanged);
   }
 
   @override
   void dispose() {
+    _focusNode.removeListener(_onFocusChanged);
+    _focusNode.dispose();
     _textController.dispose();
     super.dispose();
   }
 
+  void _onFocusChanged() {
+    if (_focusNode.hasFocus) {
+      // Search field is focused
+      widget.onSearchFocused?.call();
+    } else {
+      // Search field lost focus - if empty, exit search mode
+      if (_textController.text.trim().isEmpty) {
+        widget.onSearchCleared?.call();
+      }
+    }
+  }
+
   void _clearSearch() {
     _textController.clear();
-    widget.searchQuery.value = '';
+    // DON'T set searchQuery.value here - let controller do it via callbacks
     widget.onSearchChanged('');
+    widget.onSearchCleared?.call();
+    _focusNode.unfocus(); // Remove focus when clearing
   }
 
   @override
@@ -200,6 +215,7 @@ class _SimpleRealTimeSearchBarState extends State<SimpleRealTimeSearchBar> {
           Expanded(
             child: TextField(
               controller: _textController,
+              focusNode: _focusNode,
               style: const TextStyle(color: Colors.white, fontSize: 16),
               decoration: InputDecoration(
                 hintText: widget.hintText,
@@ -209,8 +225,14 @@ class _SimpleRealTimeSearchBarState extends State<SimpleRealTimeSearchBar> {
                 contentPadding: EdgeInsets.zero,
               ),
               onChanged: (value) {
-                widget.searchQuery.value = value;
+                print(
+                  '🔤 WIDGET DEBUG - TextField onChanged called with: "$value"',
+                );
+                // DON'T set searchQuery.value here - let the controller do it
+                // widget.searchQuery.value = value;
+                print('🔤 WIDGET DEBUG - Calling onSearchChanged callback');
                 widget.onSearchChanged(value);
+                print('🔤 WIDGET DEBUG - onSearchChanged callback completed');
               },
             ),
           ),

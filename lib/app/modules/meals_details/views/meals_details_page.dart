@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/modules/meals_details/controllers/meals_details_controller.dart';
-import 'package:totalhealthy/app/widgets/baseWidget.dart';
 
 import '../../../widgets/nutritional_card.dart';
 
@@ -44,7 +43,8 @@ class _MealsDetailsPageState extends State<MealsDetailsPage> {
       );
     }
 
-    return BaseWidget(
+    return Scaffold(
+      backgroundColor: Colors.black,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
