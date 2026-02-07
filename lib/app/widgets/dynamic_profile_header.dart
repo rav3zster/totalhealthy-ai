@@ -84,21 +84,6 @@ class DynamicProfileHeader extends StatelessWidget {
             ],
           ),
         ),
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFC2D86A).withValues(alpha: 0.2),
-                Color(0xFFC2D86A).withValues(alpha: 0.1),
-              ],
-            ),
-            shape: BoxShape.circle,
-          ),
-          child: IconButton(
-            icon: Icon(Icons.notifications_none, color: Colors.white),
-            onPressed: onNotificationTap,
-          ),
-        ),
       ],
     );
   }
@@ -190,17 +175,6 @@ class DynamicProfileHeader extends StatelessWidget {
             ],
           ),
         ),
-        if (onNotificationTap != null)
-          Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF242424),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.notifications_none, color: Colors.white),
-              onPressed: onNotificationTap,
-            ),
-          ),
       ],
     );
   }

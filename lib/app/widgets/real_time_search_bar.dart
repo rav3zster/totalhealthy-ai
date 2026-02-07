@@ -118,7 +118,7 @@ class _RealTimeSearchBarState extends State<RealTimeSearchBar> {
 }
 
 // Alternative simpler version without debouncing for immediate feedback
-class SimpleRealTimeSearchBar extends StatelessWidget {
+class SimpleRealTimeSearchBar extends StatefulWidget {
   final Function(String) onSearchChanged;
   final String hintText;
   final bool showFilterIcon;
@@ -135,82 +135,124 @@ class SimpleRealTimeSearchBar extends StatelessWidget {
   });
 
   @override
+  State<SimpleRealTimeSearchBar> createState() =>
+      _SimpleRealTimeSearchBarState();
+}
+
+class _SimpleRealTimeSearchBarState extends State<SimpleRealTimeSearchBar> {
+  late final TextEditingController _textController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textController = TextEditingController(text: widget.searchQuery.value);
+
+    // Listen to searchQuery changes to sync TextField
+    ever(widget.searchQuery, (String value) {
+      if (_textController.text != value) {
+        _textController.text = value;
+        _textController.selection = TextSelection.fromPosition(
+          TextPosition(offset: value.length),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
+
+  void _clearSearch() {
+    _textController.clear();
+    widget.searchQuery.value = '';
+    widget.onSearchChanged('');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Color(0xFFC2D86A).withValues(alpha: 0.2),
+          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 10,
-            offset: Offset(0, 5),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
       child: Row(
         children: [
-          Icon(Icons.search, color: Colors.white54),
-          SizedBox(width: 12),
+          const Icon(Icons.search, color: Colors.white54),
+          const SizedBox(width: 12),
           Expanded(
             child: TextField(
+              controller: _textController,
               style: const TextStyle(color: Colors.white, fontSize: 16),
               decoration: InputDecoration(
-                hintText: hintText,
+                hintText: widget.hintText,
                 hintStyle: const TextStyle(color: Colors.white54, fontSize: 16),
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
               ),
               onChanged: (value) {
-                searchQuery.value = value;
-                onSearchChanged(value);
+                widget.searchQuery.value = value;
+                widget.onSearchChanged(value);
               },
             ),
           ),
           Obx(
-            () => searchQuery.value.isNotEmpty
+            () => widget.searchQuery.value.isNotEmpty
                 ? GestureDetector(
-                    onTap: () {
-                      searchQuery.value = '';
-                      onSearchChanged('');
-                    },
+                    onTap: _clearSearch,
                     child: Container(
-                      padding: EdgeInsets.all(6),
+                      padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            Color(0xFFC2D86A).withValues(alpha: 0.2),
-                            Color(0xFFC2D86A).withValues(alpha: 0.1),
+                            const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                            const Color(0xFFC2D86A).withValues(alpha: 0.1),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Icon(Icons.clear, color: Colors.white, size: 16),
+                      child: const Icon(
+                        Icons.clear,
+                        color: Colors.white,
+                        size: 16,
+                      ),
                     ),
                   )
-                : showFilterIcon
+                : widget.showFilterIcon
                 ? Container(
-                    padding: EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Color(0xFFC2D86A).withValues(alpha: 0.2),
-                          Color(0xFFC2D86A).withValues(alpha: 0.1),
+                          const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                          const Color(0xFFC2D86A).withValues(alpha: 0.1),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(Icons.tune, color: Color(0xFFC2D86A), size: 20),
+                    child: const Icon(
+                      Icons.tune,
+                      color: Color(0xFFC2D86A),
+                      size: 20,
+                    ),
                   )
                 : const SizedBox.shrink(),
           ),

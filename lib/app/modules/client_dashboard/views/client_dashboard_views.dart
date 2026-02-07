@@ -79,8 +79,6 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                               DynamicProfileHeader(
                                 onProfileTap: () =>
                                     Get.toNamed('/profile-settings'),
-                                onNotificationTap: () =>
-                                    Get.toNamed('/notification?id=$id'),
                               ),
 
                               const SizedBox(height: 24),
@@ -121,39 +119,52 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
 
                             const SizedBox(height: 20),
 
-                            // Meal Type Tabs
-                            Obx(
-                              () => Row(
-                                children: [
-                                  _buildModernMealTab(
-                                    '🍳',
-                                    'Breakfast',
-                                    controller.selectedCategory.value ==
-                                        'Breakfast',
-                                    () =>
-                                        controller.changeCategory('Breakfast'),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  _buildModernMealTab(
-                                    '🥗',
-                                    'Lunch',
-                                    controller.selectedCategory.value ==
-                                        'Lunch',
-                                    () => controller.changeCategory('Lunch'),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  _buildModernMealTab(
-                                    '🍽️',
-                                    'Dinner',
-                                    controller.selectedCategory.value ==
-                                        'Dinner',
-                                    () => controller.changeCategory('Dinner'),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            const SizedBox(height: 20),
+                            // Meal Type Tabs - Conditionally visible based on search state
+                            Obx(() {
+                              // Only show category buttons when search is empty
+                              if (controller.shouldShowCategoryButtons) {
+                                return Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        _buildModernMealTab(
+                                          '🍳',
+                                          'Breakfast',
+                                          controller.selectedCategory.value ==
+                                              'Breakfast',
+                                          () => controller.changeCategory(
+                                            'Breakfast',
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        _buildModernMealTab(
+                                          '🥗',
+                                          'Lunch',
+                                          controller.selectedCategory.value ==
+                                              'Lunch',
+                                          () => controller.changeCategory(
+                                            'Lunch',
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        _buildModernMealTab(
+                                          '🍽️',
+                                          'Dinner',
+                                          controller.selectedCategory.value ==
+                                              'Dinner',
+                                          () => controller.changeCategory(
+                                            'Dinner',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 20),
+                                  ],
+                                );
+                              }
+                              // Return empty widget when searching
+                              return const SizedBox.shrink();
+                            }),
 
                             // Meals List - Firebase-backed with modern styling
                             GetBuilder<ClientDashboardControllers>(
@@ -193,14 +204,106 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                 final meals = controller.displayMeals;
 
                                 if (meals.isEmpty) {
+                                  // Show different empty states for search vs category
+                                  if (controller.isSearchActive) {
+                                    return Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(32.0),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.search_off_rounded,
+                                              size: 80,
+                                              color: Colors.white.withValues(
+                                                alpha: 0.3,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 16),
+                                            Text(
+                                              'No meals found',
+                                              style: TextStyle(
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.8,
+                                                ),
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Try searching with different keywords',
+                                              style: TextStyle(
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.5,
+                                                ),
+                                                fontSize: 14,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            const SizedBox(height: 16),
+                                            ElevatedButton.icon(
+                                              onPressed: controller.clearSearch,
+                                              icon: const Icon(
+                                                Icons.clear,
+                                                size: 18,
+                                              ),
+                                              label: const Text('Clear Search'),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: const Color(
+                                                  0xFFC2D86A,
+                                                ),
+                                                foregroundColor: Colors.black,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 24,
+                                                      vertical: 12,
+                                                    ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  // Empty state for category with no meals
                                   return Center(
                                     child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Image.asset(
                                           'assets/no_diet.png',
                                           height: 250,
                                           width: 250,
                                           fit: BoxFit.cover,
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          'No ${controller.selectedCategory.value.toLowerCase()} meals yet',
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.8,
+                                            ),
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          'Add your first meal to get started',
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.5,
+                                            ),
+                                            fontSize: 14,
+                                          ),
                                         ),
                                       ],
                                     ),

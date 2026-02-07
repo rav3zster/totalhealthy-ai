@@ -309,12 +309,7 @@ class ClientDashboardControllers extends GetxController {
     // Start with all meals
     var filtered = List<MealModel>.from(meals);
 
-    // Apply category filter first - ALWAYS filter by category
-    filtered = filtered.where((meal) {
-      return meal.categories.contains(selectedCategory.value);
-    }).toList();
-
-    // Apply search filter if query is not empty
+    // If search is active, search across ALL meals (ignore category)
     if (searchQuery.value.isNotEmpty) {
       final query = searchQuery.value.toLowerCase().trim();
 
@@ -332,6 +327,11 @@ class ClientDashboardControllers extends GetxController {
         final proteinMatch = meal.protein.toLowerCase().contains(query);
         final fatMatch = meal.fat.toLowerCase().contains(query);
         final carbsMatch = meal.carbs.toLowerCase().contains(query);
+
+        // Search in categories
+        final categoryMatch = meal.categories.any(
+          (cat) => cat.toLowerCase().contains(query),
+        );
 
         // Search in ingredients (name, amount, unit)
         final ingredientMatch = meal.ingredients.any(
@@ -356,10 +356,16 @@ class ClientDashboardControllers extends GetxController {
             proteinMatch ||
             fatMatch ||
             carbsMatch ||
+            categoryMatch ||
             ingredientMatch ||
             instructionsMatch ||
             prepTimeMatch ||
             difficultyMatch;
+      }).toList();
+    } else {
+      // If search is empty, filter by selected category
+      filtered = filtered.where((meal) {
+        return meal.categories.contains(selectedCategory.value);
       }).toList();
     }
 
@@ -378,10 +384,8 @@ class ClientDashboardControllers extends GetxController {
   void changeCategory(String category) {
     if (selectedCategory.value != category) {
       selectedCategory.value = category;
-      // Clear search when changing categories for better UX
-      if (searchQuery.value.isNotEmpty) {
-        searchQuery.value = '';
-      }
+      // Keep search query active when changing categories
+      // This allows search + category filtering to work together
       update(); // Force immediate UI update
     }
   }
@@ -484,6 +488,9 @@ class ClientDashboardControllers extends GetxController {
 
   // Check if search is active
   bool get isSearchActive => searchQuery.value.isNotEmpty;
+
+  // Check if category buttons should be visible
+  bool get shouldShowCategoryButtons => searchQuery.value.isEmpty;
 
   // Check if we have any data (cached or fresh)
   bool get hasData => meals.isNotEmpty;
