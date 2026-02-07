@@ -206,16 +206,12 @@ class UserModel {
   }
 
   // Data validation methods
-  static bool isValidWeight(double weight) => weight > 0 && weight < 1000;
-  static bool isValidHeight(int height) => height > 0 && height < 300;
-  static bool isValidAge(int age) => age > 0 && age < 150;
+  static bool isValidWeight(double weight) => weight >= 0 && weight < 1000;
+  static bool isValidHeight(int height) => height >= 0 && height < 300;
+  static bool isValidAge(int age) => age >= 0 && age < 150;
 
   String? validateUserData() {
-    if (!isValidWeight(weight))
-      return 'Invalid weight: must be between 0-1000kg';
-    if (!isValidHeight(height))
-      return 'Invalid height: must be between 0-300cm';
-    if (!isValidAge(age)) return 'Invalid age: must be between 0-150 years';
+    // Basic structural validation
     if (email.isEmpty || !email.contains('@')) return 'Invalid email address';
     if (firstName.isEmpty && lastName.isEmpty && username.isEmpty) {
       return 'Name is required';

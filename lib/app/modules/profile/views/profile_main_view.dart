@@ -77,9 +77,12 @@ class _ProfileMainViewState extends State<ProfileMainView> {
           padding: const EdgeInsets.all(3),
           child: CircleAvatar(
             radius: 50,
-            backgroundImage: userController.profileImage.isNotEmpty
-                ? NetworkImage(userController.profileImage)
-                : const AssetImage('assets/user_avatar.png') as ImageProvider,
+            backgroundImage: UserController.getImageProvider(
+              userController.profileImage,
+            ),
+            child: userController.profileImage.isEmpty
+                ? const Icon(Icons.person, color: Colors.white24, size: 50)
+                : null,
             onBackgroundImageError: (_, _) {
               // Handle image loading error silently
             },
