@@ -4,6 +4,8 @@ import '../../../controllers/user_controller.dart';
 import '../../../widgets/loading_state_widget.dart';
 import '../../../widgets/error_state_widget.dart';
 import '../../../core/utitlity/appvalidator.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class ProfileEditView extends StatefulWidget {
   const ProfileEditView({super.key});
@@ -256,33 +258,148 @@ class _ProfileEditViewState extends State<ProfileEditView> {
 
   Widget _buildProfileImageSection() {
     return Center(
-      child: Stack(
-        children: [
-          CircleAvatar(
-            radius: 50,
-            backgroundImage: userController.profileImage.isNotEmpty
-                ? NetworkImage(userController.profileImage)
-                : const AssetImage('assets/user_avatar.png') as ImageProvider,
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: Color(0xFFC2D86A),
-                shape: BoxShape.circle,
+      child: GestureDetector(
+        onTap: _showImagePickerOptions,
+        child: Stack(
+          children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundColor: const Color(0xFF2A2A2A),
+              backgroundImage: UserController.getImageProvider(
+                userController.profileImage,
               ),
-              child: const Icon(
-                Icons.camera_alt,
-                color: Colors.black,
-                size: 20,
+              child: userController.profileImage.isEmpty
+                  ? const Icon(Icons.person, size: 50, color: Colors.white24)
+                  : null,
+            ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFC2D86A),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.camera_alt,
+                  color: Colors.black,
+                  size: 20,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  void _showImagePickerOptions() {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Color(0xFF1A1A1A),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Profile Photo',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: const Icon(
+                Icons.photo_library,
+                color: Color(0xFFC2D86A),
+              ),
+              title: const Text(
+                'Gallery',
+                style: TextStyle(color: Colors.white),
+              ),
+              onTap: () {
+                Get.back();
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: Color(0xFFC2D86A)),
+              title: const Text(
+                'Camera',
+                style: TextStyle(color: Colors.white),
+              ),
+              onTap: () {
+                Get.back();
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            if (userController.profileImage.isNotEmpty)
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: const Text(
+                  'Remove Photo',
+                  style: TextStyle(color: Colors.red),
+                ),
+                onTap: () {
+                  Get.back();
+                  _removePhoto();
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: source,
+        imageQuality: 50, // Reduced quality for Base64 storage
+        maxWidth: 256, // Smaller size for Base64 storage
+        maxHeight: 256, // Smaller size for Base64 storage
+      );
+
+      if (image != null) {
+        await userController.uploadProfileImage(File(image.path));
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to pick image: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> _removePhoto() async {
+    try {
+      await userController.updateUserProfile(profileImage: '');
+      Get.snackbar(
+        'Success',
+        'Profile photo removed',
+        backgroundColor: const Color(0xFFC2D86A),
+        colorText: Colors.black,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to remove photo: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 
   Widget _buildSectionTitle(String title) {

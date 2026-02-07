@@ -54,12 +54,18 @@ class DynamicProfileHeader extends StatelessWidget {
             padding: EdgeInsets.all(3),
             child: CircleAvatar(
               radius: 25,
-              backgroundImage: controller.profileImage.isNotEmpty
-                  ? NetworkImage(controller.profileImage)
-                  : const AssetImage('assets/user_avatar.png') as ImageProvider,
-              onBackgroundImageError: (_, _) {
-                // Handle image loading error
-              },
+              backgroundColor: const Color(0xFF2A2A2A),
+              backgroundImage: UserController.getImageProvider(
+                controller.profileImage,
+              ),
+              child: controller.profileImage.isEmpty
+                  ? const Icon(Icons.person, color: Colors.white24, size: 25)
+                  : null,
+              onBackgroundImageError: controller.profileImage.isNotEmpty
+                  ? (_, __) {
+                      // Image failed to load, handled by child Icon if background is null
+                    }
+                  : null,
             ),
           ),
         ),

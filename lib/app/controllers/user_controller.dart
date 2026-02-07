@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,8 @@ import 'package:get_storage/get_storage.dart';
 import '../data/models/user_model.dart';
 import '../data/services/users_firestore_service.dart';
 import '../core/base/controllers/auth_controller.dart';
+
+import 'dart:io';
 
 class UserController extends GetxController {
   final UsersFirestoreService _usersService = Get.find<UsersFirestoreService>();
@@ -42,6 +45,24 @@ class UserController extends GetxController {
       _currentUser.value?.fullName ?? _getCachedUser()?.fullName ?? 'User';
   String get profileImage =>
       _currentUser.value?.profileImage ?? _getCachedUser()?.profileImage ?? '';
+
+  // Helper method to get correct ImageProvider (URL or Base64)
+  static ImageProvider? getImageProvider(String imageSource) {
+    if (imageSource.isEmpty) return null;
+    if (imageSource.startsWith('http')) {
+      return NetworkImage(imageSource);
+    } else if (imageSource.startsWith('data:image')) {
+      try {
+        final base64String = imageSource.split(',').last;
+        return MemoryImage(base64Decode(base64String));
+      } catch (e) {
+        print('Error decoding Base64 image: $e');
+        return null;
+      }
+    }
+    return null;
+  }
+
   String get email =>
       _currentUser.value?.email ?? _getCachedUser()?.email ?? '';
   int get currentDay =>
@@ -362,6 +383,41 @@ class UserController extends GetxController {
       _error.value = 'Failed to update profile: $e';
       _isLoading.value = false;
       print('Update profile error: $e');
+      rethrow;
+    }
+  }
+
+  // Method to upload profile image (Using Base64 for Firestore storage - Free alternative)
+  Future<void> uploadProfileImage(File file) async {
+    try {
+      _isLoading.value = true;
+      _error.value = '';
+
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('User not authenticated');
+
+      // Read file bytes
+      final bytes = await file.readAsBytes();
+
+      // Check size (Firestore limit is 1MB total per document, aim for < 100KB for profile)
+      if (bytes.lengthInBytes > 500000) {
+        throw Exception(
+          'Image is too large. Please choose a smaller image or resize it.',
+        );
+      }
+
+      // Convert to Base64 string
+      final String base64Image =
+          'data:image/jpeg;base64,${base64Encode(bytes)}';
+
+      // Update the user profile with the Base64 string instead of a URL
+      await updateUserProfile(profileImage: base64Image);
+
+      _isLoading.value = false;
+    } catch (e) {
+      _error.value = 'Failed to save profile image: $e';
+      _isLoading.value = false;
+      print('Save profile image error: $e');
       rethrow;
     }
   }

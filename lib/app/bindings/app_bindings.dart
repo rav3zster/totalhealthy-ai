@@ -5,6 +5,8 @@ import '../data/services/meals_firestore_service.dart';
 import '../modules/client_dashboard/controllers/client_dashboard_controllers.dart';
 import '../modules/group/controllers/group_controller.dart';
 
+import '../data/services/storage_service.dart';
+
 class AppBindings extends Bindings {
   @override
   void dependencies() {
@@ -14,6 +16,9 @@ class AppBindings extends Bindings {
     }
     if (!Get.isRegistered<MealsFirestoreService>()) {
       Get.put<MealsFirestoreService>(MealsFirestoreService(), permanent: true);
+    }
+    if (!Get.isRegistered<StorageService>()) {
+      Get.put<StorageService>(StorageService(), permanent: true);
     }
 
     // Core controllers - Initialize immediately, not lazily
@@ -42,6 +47,7 @@ class InitialBindings extends Bindings {
     // Essential services that need to be available immediately
     Get.put<UsersFirestoreService>(UsersFirestoreService(), permanent: true);
     Get.put<MealsFirestoreService>(MealsFirestoreService(), permanent: true);
+    Get.put<StorageService>(StorageService(), permanent: true);
     Get.put<UserController>(UserController(), permanent: true);
   }
 }
