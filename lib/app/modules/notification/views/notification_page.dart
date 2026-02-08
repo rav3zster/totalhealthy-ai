@@ -57,20 +57,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     // App bar
                     Row(
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2A2A2A),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: IconButton(
-                            onPressed: () => Get.back(),
-                            icon: const Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              color: Color(0xFFC2D86A),
-                              size: 20,
-                            ),
-                          ),
-                        ),
                         const SizedBox(width: 16),
                         const Text(
                           'Notifications',

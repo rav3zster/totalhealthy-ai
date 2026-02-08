@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,7 +34,7 @@ class AuthController extends GetxController {
     return this;
   }
 
-  _setInitialScreen(User? user) {
+  _setInitialScreen(User? user) async {
     if (user == null) {
       print("User is currently signed out!");
       isAuthenticated.value = false;
@@ -42,6 +43,24 @@ class AuthController extends GetxController {
       print("User is signed in!");
       isAuthenticated.value = true;
       box.write('authToken', user.uid);
+
+      // Check if profile is completed
+      final usersService = UsersFirestoreService();
+      UserModel? profile = await usersService.getUserProfile(user.uid);
+
+      if (profile != null && profile.needsProfileCompletion) {
+        // Redirect to profile settings to complete profile
+        Get.offAllNamed(Routes.SETTING);
+        Get.snackbar(
+          "Complete Your Profile",
+          "Please complete your profile information to continue",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: const Color(0xFFC2D86A),
+          colorText: Colors.black,
+          duration: const Duration(seconds: 4),
+        );
+        return;
+      }
 
       // Determine dashboard based on role
       if (box.hasData("role") && box.read("role") == "admin") {
@@ -80,9 +99,10 @@ class AuthController extends GetxController {
             age: 0,
             weight: 0.0,
             height: 0,
-            activityLevel: "Moderate",
+            activityLevel: "Not Set",
             goals: [],
             joinDate: DateTime.now(),
+            profileCompleted: false, // Mark as incomplete for legacy users
           );
           await usersService.createUserProfile(profile);
         }
@@ -137,7 +157,7 @@ class AuthController extends GetxController {
       );
 
       if (credential.user != null) {
-        // Create user profile in Firestore
+        // Create user profile in Firestore with safe defaults
         final newUser = UserModel(
           id: credential.user!.uid,
           email: email,
@@ -148,12 +168,17 @@ class AuthController extends GetxController {
               ? name.split(' ').last
               : "",
           profileImage: "",
-          age: 0,
-          weight: 0.0,
-          height: 0,
-          activityLevel: "Moderate",
-          goals: [],
+          age: 0, // Safe default
+          weight: 0.0, // Safe default
+          height: 0, // Safe default
+          activityLevel: "Not Set", // Safe default
+          goals: [], // Empty list is safe
           joinDate: DateTime.now(),
+          targetWeight: 0.0,
+          initialWeight: 0.0,
+          fatLost: 0.0,
+          muscleGained: 0.0,
+          profileCompleted: false, // Mark as incomplete
         );
 
         final usersService = UsersFirestoreService();
@@ -177,7 +202,7 @@ class AuthController extends GetxController {
     } catch (e) {
       Get.snackbar(
         "Error",
-        e.toString(),
+        "Failed to create account. Please try again.",
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Get.theme.colorScheme.error,
         colorText: Get.theme.colorScheme.onError,

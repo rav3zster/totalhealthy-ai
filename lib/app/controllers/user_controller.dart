@@ -364,6 +364,7 @@ class UserController extends GetxController {
         planName: currentUserData.planName,
         planDuration: currentUserData.planDuration,
         progressPercentage: currentUserData.progressPercentage,
+        profileCompleted: true, // Mark profile as completed when user saves
       );
 
       await _usersService.updateUserProfile(updatedUser);

@@ -22,6 +22,29 @@ class _ProfileMainViewState extends State<ProfileMainView> {
   Widget build(BuildContext context) {
     return BaseScreenWrapper(
       title: 'Profile',
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        automaticallyImplyLeading: false, // Remove back button
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+            ),
+          ),
+        ),
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
       bottomNavigationBar: const MobileNavBar(),
       child: GetBuilder<UserController>(
         builder: (userController) {

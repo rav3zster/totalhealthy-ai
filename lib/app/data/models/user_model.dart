@@ -22,6 +22,7 @@ class UserModel {
   final int goalDuration; // in days
   final String role; // "member", "trainer", "advisor"
   final String? assignedTrainerId; // ID of trainer this client is assigned to
+  final bool profileCompleted; // Track if user has completed their profile
 
   UserModel({
     required this.id,
@@ -47,6 +48,7 @@ class UserModel {
     this.goalDuration = 55,
     this.role = "member", // Default role
     this.assignedTrainerId,
+    this.profileCompleted = false, // Default to false for new users
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -76,6 +78,7 @@ class UserModel {
       goalDuration: json['goalDuration'] ?? 55,
       role: json['role'] ?? 'member',
       assignedTrainerId: json['assignedTrainerId'],
+      profileCompleted: json['profileCompleted'] ?? false,
     );
   }
 
@@ -104,6 +107,7 @@ class UserModel {
       'goalDuration': goalDuration,
       'role': role,
       'assignedTrainerId': assignedTrainerId,
+      'profileCompleted': profileCompleted,
     };
   }
 
@@ -205,18 +209,37 @@ class UserModel {
     return '${progress.toInt()}%';
   }
 
-  // Data validation methods
+  // Data validation methods - safe for new users
   static bool isValidWeight(double weight) => weight >= 0 && weight < 1000;
   static bool isValidHeight(int height) => height >= 0 && height < 300;
   static bool isValidAge(int age) => age >= 0 && age < 150;
 
   String? validateUserData() {
-    // Basic structural validation
+    // Basic structural validation only - don't validate incomplete profiles
     if (email.isEmpty || !email.contains('@')) return 'Invalid email address';
-    if (firstName.isEmpty && lastName.isEmpty && username.isEmpty) {
-      return 'Name is required';
+
+    // Only validate profile data if profile is marked as completed
+    if (profileCompleted) {
+      if (firstName.isEmpty && lastName.isEmpty && username.isEmpty) {
+        return 'Name is required';
+      }
+      if (weight > 0 && !isValidWeight(weight)) {
+        return 'Invalid weight value';
+      }
+      if (height > 0 && !isValidHeight(height)) {
+        return 'Invalid height value';
+      }
+      if (age > 0 && !isValidAge(age)) {
+        return 'Invalid age value';
+      }
     }
+
     return null;
+  }
+
+  // Check if profile needs completion
+  bool get needsProfileCompletion {
+    return !profileCompleted || (weight == 0 && height == 0 && age == 0);
   }
 
   // Helper method for month abbreviations

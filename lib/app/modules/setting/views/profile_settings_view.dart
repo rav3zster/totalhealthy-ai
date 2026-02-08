@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../../controllers/user_controller.dart';
 import '../../../widgets/loading_state_widget.dart';
 import '../../../widgets/error_state_widget.dart';
 import '../../../core/utitlity/appvalidator.dart';
+import '../../../routes/app_pages.dart';
 
 class ProfileSettingsView extends StatefulWidget {
   const ProfileSettingsView({super.key});
@@ -839,13 +841,24 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
         goals: _selectedGoals,
       );
 
-      Get.back();
       Get.snackbar(
         'Success',
         'Profile updated successfully',
         backgroundColor: const Color(0xFFC2D86A),
         colorText: Colors.black,
       );
+
+      // Check if user came from incomplete profile flow
+      // If so, redirect to appropriate dashboard
+      final box = GetStorage();
+
+      // If user doesn't have a role yet, they need to choose one
+      if (!box.hasData("role") || box.read("role").isEmpty) {
+        Get.offAllNamed(Routes.SWITCHROLE);
+      } else {
+        // User has a role, go to their dashboard
+        Get.back();
+      }
     } catch (e) {
       Get.snackbar(
         'Error',
