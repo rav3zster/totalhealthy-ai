@@ -47,12 +47,12 @@ class SignupScreenState extends State<SignupScreen> {
           // You might want to save other user details (name, phone) to Firestore here
           print("User registered: ${emailController.text}");
 
-          // Redirect to profile settings to complete profile
-          Get.offAllNamed(Routes.SETTING);
+          // Redirect to role selection first
+          Get.offAllNamed(Routes.SWITCHROLE);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                'Sign Up Successful! Please complete your profile to continue.',
+                'Sign Up Successful! Please choose your role to continue.',
               ),
               backgroundColor: Colors.green,
             ),

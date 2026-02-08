@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:totalhealthy/app/widgets/baseWidget.dart';
 import '../../../routes/app_pages.dart';
 
 class NutritionGoalsScreen extends StatefulWidget {
@@ -364,8 +363,8 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
             child: ElevatedButton(
               onPressed: selectedDietaryRestriction != -1
                   ? () {
-                      // Navigate to client dashboard after completing all steps
-                      Get.offAllNamed(Routes.ClientDashboard);
+                      // Navigate to profile settings to complete profile
+                      Get.offAllNamed(Routes.SETTING);
                     }
                   : null,
               style: ElevatedButton.styleFrom(

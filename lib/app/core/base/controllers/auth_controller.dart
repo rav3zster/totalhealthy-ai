@@ -44,7 +44,14 @@ class AuthController extends GetxController {
       isAuthenticated.value = true;
       box.write('authToken', user.uid);
 
-      // Check if profile is completed
+      // Check if profile is completed (only for existing users logging in)
+      // Don't interrupt the signup flow
+      if (box.hasData('isSignupFlow') && box.read('isSignupFlow') == true) {
+        // User is in signup flow, don't redirect
+        box.remove('isSignupFlow');
+        return;
+      }
+
       final usersService = UsersFirestoreService();
       UserModel? profile = await usersService.getUserProfile(user.uid);
 
@@ -186,6 +193,9 @@ class AuthController extends GetxController {
 
         // Save locally
         await userdataStore(newUser.toJson());
+
+        // Set flag to indicate user is in signup flow
+        box.write('isSignupFlow', true);
       }
 
       roleStore("user"); // Default role

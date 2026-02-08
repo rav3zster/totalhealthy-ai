@@ -848,16 +848,14 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
         colorText: Colors.black,
       );
 
-      // Check if user came from incomplete profile flow
-      // If so, redirect to appropriate dashboard
+      // After profile completion, navigate to appropriate dashboard
       final box = GetStorage();
+      final role = box.read("role") ?? "user";
 
-      // If user doesn't have a role yet, they need to choose one
-      if (!box.hasData("role") || box.read("role").isEmpty) {
-        Get.offAllNamed(Routes.SWITCHROLE);
+      if (role == "admin") {
+        Get.offAllNamed(Routes.TrainerDashboard);
       } else {
-        // User has a role, go to their dashboard
-        Get.back();
+        Get.offAllNamed(Routes.ClientDashboard);
       }
     } catch (e) {
       Get.snackbar(
