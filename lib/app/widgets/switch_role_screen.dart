@@ -1,8 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:totalhealthy/app/widgets/custom_button.dart';
 
 import '../core/base/controllers/auth_controller.dart';
 import '../routes/app_pages.dart';
@@ -14,176 +11,437 @@ class SwitchRoleScreen extends StatefulWidget {
   State<SwitchRoleScreen> createState() => _SwitchRoleScreenState();
 }
 
-class _SwitchRoleScreenState extends State<SwitchRoleScreen> {
-  bool isMaleSelected = false; // Track Male selection
-  bool isFemaleSelected = false;
-  String slectedValue = "";
+class _SwitchRoleScreenState extends State<SwitchRoleScreen>
+    with TickerProviderStateMixin {
+  bool isAdvisorSelected = false;
+  bool isMemberSelected = false;
   String role = "";
+
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Fade animation for text
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeIn));
+
+    // Slide animation for cards
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
+
+    // Start animations
+    _fadeController.forward();
+    Future.delayed(const Duration(milliseconds: 200), () {
+      _slideController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    _slideController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 150,
-            ),
-            Text(
-              "Choose As Who You Want",
-              style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0XFFFFFFFF)),
-            ),
-            Text(
-              "To Continue!",
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Color(0XFFFFFFFF),
-              ),
-            ),
-            Text(
-              "How Do You Identify Yourself?",
-              style: TextStyle(color: Color(0XFF7B7B7A), fontSize: 16),
-            ),
-            SizedBox(
-              height: 60,
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  slectedValue = "isUser=false";
-                  role = "admin";
-                  isMaleSelected = true;
-                  isFemaleSelected = false; // Deselect female
-                });
-              },
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 36, 36, 36),
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(
-                    color: isMaleSelected
-                        ? const Color.fromARGB(255, 146, 159, 83)
-                        : Colors.transparent,
-                    width: 3,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
+            stops: [0.0, 0.3, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 60),
+
+                        // Animated Header
+                        FadeTransition(
+                          opacity: _fadeAnimation,
+                          child: Column(
+                            children: [
+                              // Decorative icon
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      const Color(
+                                        0xFFC2D86A,
+                                      ).withValues(alpha: 0.3),
+                                      const Color(
+                                        0xFFC2D86A,
+                                      ).withValues(alpha: 0.1),
+                                    ],
+                                  ),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFFC2D86A,
+                                      ).withValues(alpha: 0.3),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.person_outline,
+                                  size: 50,
+                                  color: Color(0xFFC2D86A),
+                                ),
+                              ),
+
+                              const SizedBox(height: 32),
+
+                              // Title
+                              const Text(
+                                "Choose Your Role",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+
+                              const SizedBox(height: 12),
+
+                              // Subtitle
+                              Text(
+                                "Select how you want to use the app",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.6),
+                                  fontSize: 16,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 60),
+
+                        // Animated Role Cards
+                        SlideTransition(
+                          position: _slideAnimation,
+                          child: FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: Column(
+                              children: [
+                                // Advisor Card
+                                _buildModernRoleCard(
+                                  title: "Advisor",
+                                  subtitle:
+                                      "Manage clients and create meal plans",
+                                  icon: Icons.psychology_outlined,
+                                  imagePath: "assets/advisor.png",
+                                  isSelected: isAdvisorSelected,
+                                  accentColor: const Color(0xFFC2D86A),
+                                  onTap: () {
+                                    setState(() {
+                                      isAdvisorSelected = true;
+                                      isMemberSelected = false;
+                                      role = "admin";
+                                    });
+                                  },
+                                ),
+
+                                const SizedBox(height: 24),
+
+                                // Member Card
+                                _buildModernRoleCard(
+                                  title: "Member",
+                                  subtitle:
+                                      "Track your nutrition and fitness goals",
+                                  icon: Icons.fitness_center_outlined,
+                                  imagePath: "assets/member.png",
+                                  isSelected: isMemberSelected,
+                                  accentColor: const Color(0xFFFFD700),
+                                  onTap: () {
+                                    setState(() {
+                                      isMemberSelected = true;
+                                      isAdvisorSelected = false;
+                                      role = "user";
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 60),
+                      ],
+                    ),
                   ),
                 ),
-                height: 70,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Image.asset(
-                      "assets/advisor.png",
-                      fit: BoxFit.cover,
-                      height: 55,
-                      width: 50,
-                    ),
-                    SizedBox(width: 18),
-                    Text(
-                      "Advisor",
-                      style: TextStyle(
-                        color: Color(0XFF8C8C8C),
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
+              ),
+
+              // Continue Button
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: AnimatedOpacity(
+                  opacity: role.isNotEmpty ? 1.0 : 0.5,
+                  duration: const Duration(milliseconds: 300),
+                  child: AnimatedScale(
+                    scale: role.isNotEmpty ? 1.0 : 0.95,
+                    duration: const Duration(milliseconds: 300),
+                    child: Container(
+                      width: double.infinity,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        gradient: role.isNotEmpty
+                            ? const LinearGradient(
+                                colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+                              )
+                            : LinearGradient(
+                                colors: [
+                                  Colors.grey.shade800,
+                                  Colors.grey.shade700,
+                                ],
+                              ),
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: role.isNotEmpty
+                            ? [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFFC2D86A,
+                                  ).withValues(alpha: 0.4),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: role.isNotEmpty
+                              ? () {
+                                  Get.find<AuthController>().roleStore(role);
+
+                                  if (role == "admin") {
+                                    Get.offAllNamed(Routes.TrainerDashboard);
+                                  } else {
+                                    Get.offAllNamed(Routes.NUTRITION_GOAL);
+                                  }
+                                }
+                              : null,
+                          borderRadius: BorderRadius.circular(30),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  "Continue",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(
+                                  Icons.arrow_forward_rounded,
+                                  color: Colors.black,
+                                  size: 24,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  slectedValue = "isUser=true";
-                  role = "user";
-                  // Get.find<AuthController>().roleStore("user");
-                  isFemaleSelected = true;
-                  isMaleSelected = false; // Deselect male
-                });
-              },
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 36, 36, 36),
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(
-                    color: isFemaleSelected
-                        ? Colors.amberAccent
-                        : Colors.transparent,
-                    width: 3,
                   ),
                 ),
-                height: 70,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Image.asset(
-                      "assets/member.png",
-                      fit: BoxFit.cover,
-                      height: 55,
-                      width: 50,
-                    ),
-                    SizedBox(width: 18),
-                    Text(
-                      "Member",
-                      style: TextStyle(
-                        color: Color(0XFF8C8C8C),
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModernRoleCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required String imagePath,
+    required bool isSelected,
+    required Color accentColor,
+    required VoidCallback onTap,
+  }) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isSelected
+                    ? [const Color(0xFF2D2D2D), const Color(0xFF1D1D1D)]
+                    : [const Color(0xFF2A2A2A), const Color(0xFF1A1A1A)],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected
+                    ? accentColor
+                    : Colors.white.withValues(alpha: 0.1),
+                width: isSelected ? 2 : 1,
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: accentColor.withValues(alpha: 0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
                       ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+            ),
+            child: Row(
+              children: [
+                // Image/Icon Container
+                Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: isSelected
+                          ? [accentColor, accentColor.withValues(alpha: 0.7)]
+                          : [
+                              Colors.white.withValues(alpha: 0.1),
+                              Colors.white.withValues(alpha: 0.05),
+                            ],
                     ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 200,
-            ),
-            SizedBox(
-              width: 410,
-              height: 60,
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Color(0XFFCDE26D),
-                    borderRadius: BorderRadius.circular(30)),
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (slectedValue == "" || role == "") return;
-                    
-                    Get.find<AuthController>().roleStore(role);
-                    
-                    if (role == "admin") {
-                      Get.offAllNamed(Routes.TrainerDashboard);
-                    } else {
-                      // Navigate to nutrition goals for clients
-                      Get.offAllNamed(Routes.NUTRITION_GOAL);
-                    }
-                  },
-                  child: const Text(
-                    "Continue",
-                    style: TextStyle(
-                        color: Color(0XFF242522),
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: accentColor.withValues(alpha: 0.3),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      imagePath,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(
+                          icon,
+                          size: 40,
+                          color: isSelected ? Colors.black : Colors.white54,
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
-            )
-          ],
+
+                const SizedBox(width: 20),
+
+                // Text Content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.white70,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          color: isSelected
+                              ? Colors.white.withValues(alpha: 0.7)
+                              : Colors.white.withValues(alpha: 0.5),
+                          fontSize: 14,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Selection Indicator
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: isSelected ? accentColor : Colors.transparent,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected
+                          ? accentColor
+                          : Colors.white.withValues(alpha: 0.3),
+                      width: 2,
+                    ),
+                  ),
+                  child: isSelected
+                      ? const Icon(Icons.check, color: Colors.black, size: 18)
+                      : null,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
