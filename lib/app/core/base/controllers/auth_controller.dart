@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,58 +22,77 @@ class AuthController extends GetxController {
   @override
   void onReady() {
     super.onReady();
+    // DO NOT bind auth state changes to navigation
+    // Navigation is handled explicitly by login/register/bootstrap
     firebaseUser.bindStream(_auth.authStateChanges());
-    ever(firebaseUser, _setInitialScreen);
+    ever(firebaseUser, (user) {
+      if (user == null) {
+        isAuthenticated.value = false;
+      } else {
+        isAuthenticated.value = true;
+        box.write('authToken', user.uid);
+      }
+    });
   }
 
   Future<AuthController> init() async {
     Get.putAsync<ThemeController>(() async => ThemeController());
-    // Trigger initial check
-    firebaseUser.value = _auth.currentUser;
+    // Check if user is already authenticated on app start
+    final currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      firebaseUser.value = currentUser;
+      // Bootstrap user on app start
+      await bootstrapUser(currentUser.uid);
+    }
     return this;
   }
 
-  _setInitialScreen(User? user) async {
-    if (user == null) {
-      print("User is currently signed out!");
-      isAuthenticated.value = false;
-      Get.offAllNamed(Routes.Login);
-    } else {
-      print("User is signed in!");
-      isAuthenticated.value = true;
-      box.write('authToken', user.uid);
-
-      // Check if profile is completed (only for existing users logging in)
-      // Don't interrupt the signup flow
-      if (box.hasData('isSignupFlow') && box.read('isSignupFlow') == true) {
-        // User is in signup flow, don't redirect
-        box.remove('isSignupFlow');
-        return;
-      }
+  /// CENTRALIZED BOOTSTRAP FUNCTION
+  /// This is the ONLY function that makes navigation decisions
+  /// Called after login, signup, and app start
+  Future<void> bootstrapUser(String uid) async {
+    try {
+      print("🚀 Bootstrapping user: $uid");
 
       final usersService = UsersFirestoreService();
-      UserModel? profile = await usersService.getUserProfile(user.uid);
 
-      if (profile != null && profile.needsProfileCompletion) {
-        // Redirect to profile settings to complete profile
-        Get.offAllNamed(Routes.SETTING);
-        Get.snackbar(
-          "Complete Your Profile",
-          "Please complete your profile information to continue",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: const Color(0xFFC2D86A),
-          colorText: Colors.black,
-          duration: const Duration(seconds: 4),
-        );
+      // Fetch Firestore document
+      UserModel? profile = await usersService.getUserProfile(uid);
+
+      if (profile == null) {
+        // Document DOES NOT exist - this is a BRAND NEW USER
+        print("📝 New user detected - no Firestore document");
+        Get.offAllNamed(Routes.SWITCHROLE);
         return;
       }
 
-      // Determine dashboard based on role
-      if (box.hasData("role") && box.read("role") == "admin") {
+      // Document EXISTS - check if role is set
+      print("👤 Existing user found - role: ${profile.role}");
+
+      // Sync profile to local storage
+      await userdataStore(profile.toJson());
+
+      if (profile.role == null || profile.role!.isEmpty) {
+        // User exists but hasn't selected role yet
+        print("⚠️ User has no role - showing Switch Role");
+        Get.offAllNamed(Routes.SWITCHROLE);
+        return;
+      }
+
+      // User has a role - navigate to appropriate dashboard
+      roleStore(profile.role!);
+
+      if (profile.role == "admin" || profile.role == "trainer") {
+        print("✅ Navigating to Trainer Dashboard");
         Get.offAllNamed(Routes.TrainerDashboard);
       } else {
+        print("✅ Navigating to Client Dashboard");
         Get.offAllNamed(Routes.ClientDashboard);
       }
+    } catch (e) {
+      print("❌ Bootstrap error: $e");
+      // On error, go to login
+      Get.offAllNamed(Routes.Login);
     }
   }
 
@@ -88,41 +106,9 @@ class AuthController extends GetxController {
       );
 
       if (credential.user != null) {
-        final usersService = UsersFirestoreService();
-        UserModel? profile = await usersService.getUserProfile(
-          credential.user!.uid,
-        );
-
-        if (profile == null) {
-          // Create missing profile for legacy users
-          profile = UserModel(
-            id: credential.user!.uid,
-            email: email,
-            username: email.split('@')[0],
-            phone: "",
-            firstName: "",
-            lastName: "",
-            profileImage: "",
-            age: 0,
-            weight: 0.0,
-            height: 0,
-            activityLevel: "Not Set",
-            goals: [],
-            joinDate: DateTime.now(),
-            profileCompleted: false, // Mark as incomplete for legacy users
-          );
-          await usersService.createUserProfile(profile);
-        }
-
-        // Sync with local storage
-        await userdataStore(profile.toJson());
-
-        // Check if role is admin
-        if (email == "admin@gmail.com") {
-          roleStore("admin");
-        } else {
-          roleStore("user");
-        }
+        // DO NOT create or modify Firestore documents on login
+        // Just call bootstrap to handle navigation
+        await bootstrapUser(credential.user!.uid);
       }
       return true;
     } on FirebaseAuthException catch (e) {
@@ -164,7 +150,7 @@ class AuthController extends GetxController {
       );
 
       if (credential.user != null) {
-        // Create user profile in Firestore with safe defaults
+        // Create EMPTY Firestore document immediately (without role)
         final newUser = UserModel(
           id: credential.user!.uid,
           email: email,
@@ -175,17 +161,18 @@ class AuthController extends GetxController {
               ? name.split(' ').last
               : "",
           profileImage: "",
-          age: 0, // Safe default
-          weight: 0.0, // Safe default
-          height: 0, // Safe default
-          activityLevel: "Not Set", // Safe default
-          goals: [], // Empty list is safe
+          age: 0,
+          weight: 0.0,
+          height: 0,
+          activityLevel: "Not Set",
+          goals: [],
           joinDate: DateTime.now(),
           targetWeight: 0.0,
           initialWeight: 0.0,
           fatLost: 0.0,
           muscleGained: 0.0,
-          profileCompleted: false, // Mark as incomplete
+          profileCompleted: false,
+          role: null, // No role - will be set via Switch Role
         );
 
         final usersService = UsersFirestoreService();
@@ -194,11 +181,10 @@ class AuthController extends GetxController {
         // Save locally
         await userdataStore(newUser.toJson());
 
-        // Set flag to indicate user is in signup flow
-        box.write('isSignupFlow', true);
+        // Call bootstrap to handle navigation
+        await bootstrapUser(credential.user!.uid);
       }
 
-      roleStore("user"); // Default role
       return true;
     } on FirebaseAuthException catch (e) {
       Get.snackbar(

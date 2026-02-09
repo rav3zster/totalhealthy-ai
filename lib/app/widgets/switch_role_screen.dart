@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../core/base/controllers/auth_controller.dart';
 import '../routes/app_pages.dart';
+import '../data/services/users_firestore_service.dart';
+import '../data/models/user_model.dart';
 
 class SwitchRoleScreen extends StatefulWidget {
   const SwitchRoleScreen({super.key});
@@ -251,9 +254,56 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen>
                         color: Colors.transparent,
                         child: InkWell(
                           onTap: role.isNotEmpty
-                              ? () {
-                                  Get.find<AuthController>().roleStore(role);
+                              ? () async {
+                                  // Save role to both local storage and Firestore
+                                  final authController =
+                                      Get.find<AuthController>();
+                                  authController.roleStore(role);
 
+                                  // Update role in Firestore
+                                  final user =
+                                      FirebaseAuth.instance.currentUser;
+                                  if (user != null) {
+                                    final usersService =
+                                        UsersFirestoreService();
+                                    final profile = await usersService
+                                        .getUserProfile(user.uid);
+
+                                    if (profile != null) {
+                                      // Update profile with selected role
+                                      final updatedProfile = UserModel(
+                                        id: profile.id,
+                                        email: profile.email,
+                                        username: profile.username,
+                                        phone: profile.phone,
+                                        firstName: profile.firstName,
+                                        lastName: profile.lastName,
+                                        profileImage: profile.profileImage,
+                                        age: profile.age,
+                                        weight: profile.weight,
+                                        height: profile.height,
+                                        activityLevel: profile.activityLevel,
+                                        goals: profile.goals,
+                                        joinDate: profile.joinDate,
+                                        targetWeight: profile.targetWeight,
+                                        initialWeight: profile.initialWeight,
+                                        fatLost: profile.fatLost,
+                                        muscleGained: profile.muscleGained,
+                                        profileCompleted:
+                                            profile.profileCompleted,
+                                        role: role, // Set the selected role
+                                      );
+
+                                      await usersService.updateUserProfile(
+                                        updatedProfile,
+                                      );
+                                      await authController.userdataStore(
+                                        updatedProfile.toJson(),
+                                      );
+                                    }
+                                  }
+
+                                  // Navigate based on role
                                   if (role == "admin") {
                                     Get.offAllNamed(Routes.TrainerDashboard);
                                   } else {

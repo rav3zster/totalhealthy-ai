@@ -363,8 +363,8 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
             child: ElevatedButton(
               onPressed: selectedDietaryRestriction != -1
                   ? () {
-                      // Navigate to profile settings to complete profile
-                      Get.offAllNamed(Routes.SETTING);
+                      // Navigate to client dashboard after completing nutrition goals
+                      Get.offAllNamed(Routes.ClientDashboard);
                     }
                   : null,
               style: ElevatedButton.styleFrom(

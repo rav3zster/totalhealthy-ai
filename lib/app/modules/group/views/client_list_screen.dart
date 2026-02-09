@@ -70,7 +70,9 @@ class _ClientListScreenState extends State<ClientListScreen> {
               final isNotCurrentUser = user.id != currentUser.uid;
               final isNotAssigned = !assignedClientIds.contains(user.id);
               final isMemberOrNoRole =
-                  user.role == 'member' || user.role.isEmpty;
+                  user.role == 'member' ||
+                  user.role == null ||
+                  user.role!.isEmpty;
 
               return isNotCurrentUser && isNotAssigned && isMemberOrNoRole;
             }).toList();

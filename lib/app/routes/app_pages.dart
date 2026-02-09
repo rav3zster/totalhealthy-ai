@@ -42,7 +42,7 @@ import '../modules/setting/views/account_password_settings_view.dart';
 import '../modules/profile/views/profile_main_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/signup/bindings/signup_binding.dart';
-import '../modules/signup/views/signup_view.dart';
+import '../modules/signup/views/signup_screen.dart';
 import '../modules/swipe_screen/bindings/swipe_screen_bindings.dart';
 import '../modules/swipe_screen/views/swipe_screen_views.dart';
 import '../modules/trainer_dashboard/bindings/trainer_dashboard_bindings.dart';
@@ -100,7 +100,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.Login,
-      page: () => LoginView(),
+      page: () => const LoginView(),
       binding: LoginBinding(),
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 300),
@@ -246,7 +246,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.SIGNUP,
-      page: () => SignupView(),
+      page: () => const SignupScreen(),
       binding: SignupBinding(),
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 300),

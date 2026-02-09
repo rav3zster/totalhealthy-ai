@@ -20,7 +20,8 @@ class UserModel {
   final double fatLost;
   final double muscleGained;
   final int goalDuration; // in days
-  final String role; // "member", "trainer", "advisor"
+  final String?
+  role; // "member", "trainer", "advisor" - null if not selected yet
   final String? assignedTrainerId; // ID of trainer this client is assigned to
   final bool profileCompleted; // Track if user has completed their profile
 
@@ -46,7 +47,7 @@ class UserModel {
     this.fatLost = 0.0,
     this.muscleGained = 0.0,
     this.goalDuration = 55,
-    this.role = "member", // Default role
+    this.role, // No default - null means role not selected
     this.assignedTrainerId,
     this.profileCompleted = false, // Default to false for new users
   });
@@ -76,7 +77,7 @@ class UserModel {
       fatLost: (json['fatLost'] ?? 0.0).toDouble(),
       muscleGained: (json['muscleGained'] ?? 0.0).toDouble(),
       goalDuration: json['goalDuration'] ?? 55,
-      role: json['role'] ?? 'member',
+      role: json['role'], // Can be null if not selected
       assignedTrainerId: json['assignedTrainerId'],
       profileCompleted: json['profileCompleted'] ?? false,
     );

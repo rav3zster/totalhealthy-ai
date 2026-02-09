@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import '../../../controllers/user_controller.dart';
 import '../../../widgets/loading_state_widget.dart';
 import '../../../widgets/error_state_widget.dart';
 import '../../../core/utitlity/appvalidator.dart';
-import '../../../routes/app_pages.dart';
 
 class ProfileSettingsView extends StatefulWidget {
   const ProfileSettingsView({super.key});
@@ -848,15 +846,8 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
         colorText: Colors.black,
       );
 
-      // After profile completion, navigate to appropriate dashboard
-      final box = GetStorage();
-      final role = box.read("role") ?? "user";
-
-      if (role == "admin") {
-        Get.offAllNamed(Routes.TrainerDashboard);
-      } else {
-        Get.offAllNamed(Routes.ClientDashboard);
-      }
+      // Just go back - don't force navigation
+      Get.back();
     } catch (e) {
       Get.snackbar(
         'Error',
