@@ -3,11 +3,14 @@ import 'package:get/get.dart';
 import '../../../routes/app_pages.dart';
 
 class NutritionGoalsScreen extends StatefulWidget {
+  const NutritionGoalsScreen({super.key});
+
   @override
-  _NutritionGoalsScreenState createState() => _NutritionGoalsScreenState();
+  State<NutritionGoalsScreen> createState() => _NutritionGoalsScreenState();
 }
 
-class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
+class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
+    with TickerProviderStateMixin {
   final PageController _pageController = PageController();
   int currentPageIndex = 0;
 
@@ -15,6 +18,12 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
   int selectedGoal = -1;
   int selectedMealFrequency = -1;
   int selectedDietaryRestriction = -1;
+
+  // Animation controllers
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
 
   // Data for each screen
   final List<String> nutritionGoals = [
@@ -36,6 +45,58 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
     "Lactose intolerance",
     "I don't have",
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Fade animation
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeIn));
+
+    // Slide animation
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
+
+    // Start animations
+    _fadeController.forward();
+    Future.delayed(const Duration(milliseconds: 200), () {
+      _slideController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    _slideController.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _restartAnimations() {
+    _fadeController.reset();
+    _slideController.reset();
+    _fadeController.forward();
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) {
+        _slideController.forward();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +122,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Back button with gradient background
                     Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -70,6 +132,15 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                           ],
                         ),
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.2),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: IconButton(
                         onPressed: () {
@@ -79,26 +150,72 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                               curve: Curves.easeInOut,
                             );
                           } else {
-                            Get.back();
+                            // Navigate back to Switch Role screen
+                            Get.offAllNamed(Routes.SWITCHROLE);
                           }
                         },
                         icon: const Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white,
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Color(0xFFC2D86A),
+                          size: 20,
                         ),
                       ),
                     ),
+
+                    // Skip button
                     TextButton(
                       onPressed: () {
                         // Skip to dashboard
                         Get.offAllNamed(Routes.ClientDashboard);
                       },
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                      ),
                       child: const Text(
                         'Skip',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(
+                          color: Color(0xFFC2D86A),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
+                ),
+              ),
+
+              // Progress indicator
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                child: Row(
+                  children: List.generate(3, (index) {
+                    return Expanded(
+                      child: Container(
+                        height: 4,
+                        margin: EdgeInsets.only(right: index < 2 ? 8 : 0),
+                        decoration: BoxDecoration(
+                          gradient: currentPageIndex >= index
+                              ? const LinearGradient(
+                                  colors: [
+                                    Color(0xFFC2D86A),
+                                    Color(0xFFB8CC5A),
+                                  ],
+                                )
+                              : null,
+                          color: currentPageIndex < index
+                              ? Colors.white.withValues(alpha: 0.2)
+                              : null,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    );
+                  }),
                 ),
               ),
 
@@ -110,6 +227,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
                     setState(() {
                       currentPageIndex = index;
                     });
+                    _restartAnimations();
                   },
                   children: [
                     _buildNutritionGoalScreen(),
@@ -126,266 +244,755 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen> {
   }
 
   Widget _buildNutritionGoalScreen() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 40),
-          Text(
-            "What goal are you pursuing with your nutrition?",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "Choose a more suitable option.",
-            style: TextStyle(color: Color(0xFFC2D86A), fontSize: 16),
-          ),
-          SizedBox(height: 40),
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
 
-          // Goal options
-          Expanded(
-            child: ListView.builder(
-              itemCount: nutritionGoals.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedGoal = index;
-                    });
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(bottom: 16),
-                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: Color(0xFF2A2A2A),
-                      borderRadius: BorderRadius.circular(12),
-                      border: selectedGoal == index
-                          ? Border.all(color: Color(0xFFC2D86A), width: 2)
-                          : null,
+              // Decorative icon
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                    ],
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
                     ),
-                    child: Text(
-                      nutritionGoals[index],
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.track_changes_rounded,
+                  size: 40,
+                  color: Color(0xFFC2D86A),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              const Text(
+                "What goal are you pursuing with your nutrition?",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                  letterSpacing: 0.3,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Choose a more suitable option.",
+                style: TextStyle(
+                  color: const Color(0xFFC2D86A).withValues(alpha: 0.8),
+                  fontSize: 16,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(height: 30),
+
+              // Goal options
+              Expanded(
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: nutritionGoals.length,
+                  itemBuilder: (context, index) {
+                    final isSelected = selectedGoal == index;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              selectedGoal = index;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 20,
+                              horizontal: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: isSelected
+                                  ? LinearGradient(
+                                      colors: [
+                                        const Color(0xFF2D2D2D),
+                                        const Color(0xFF1D1D1D),
+                                      ],
+                                    )
+                                  : LinearGradient(
+                                      colors: [
+                                        const Color(0xFF2A2A2A),
+                                        const Color(0xFF1A1A1A),
+                                      ],
+                                    ),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color(0xFFC2D86A)
+                                    : Colors.white.withValues(alpha: 0.1),
+                                width: isSelected ? 2 : 1,
+                              ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFFC2D86A,
+                                        ).withValues(alpha: 0.3),
+                                        blurRadius: 15,
+                                        offset: const Offset(0, 5),
+                                      ),
+                                    ]
+                                  : [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 5),
+                                      ),
+                                    ],
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    nutritionGoals[index],
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.white.withValues(alpha: 0.8),
+                                      fontSize: 16,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                      letterSpacing: 0.2,
+                                    ),
+                                  ),
+                                ),
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? const Color(0xFFC2D86A)
+                                        : Colors.transparent,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? const Color(0xFFC2D86A)
+                                          : Colors.white.withValues(alpha: 0.3),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: isSelected
+                                      ? const Icon(
+                                          Icons.check,
+                                          color: Colors.black,
+                                          size: 16,
+                                        )
+                                      : null,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // Save button
+              Container(
+                width: double.infinity,
+                height: 60,
+                margin: const EdgeInsets.only(bottom: 20, top: 10),
+                decoration: BoxDecoration(
+                  gradient: selectedGoal != -1
+                      ? const LinearGradient(
+                          colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+                        )
+                      : LinearGradient(
+                          colors: [Colors.grey.shade800, Colors.grey.shade700],
+                        ),
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: selectedGoal != -1
+                      ? [
+                          BoxShadow(
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.4),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: selectedGoal != -1
+                        ? () {
+                            _pageController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        : null,
+                    borderRadius: BorderRadius.circular(30),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Save',
+                            style: TextStyle(
+                              color: selectedGoal != -1
+                                  ? Colors.black
+                                  : Colors.white.withValues(alpha: 0.5),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: selectedGoal != -1
+                                ? Colors.black
+                                : Colors.white.withValues(alpha: 0.5),
+                            size: 24,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-
-          // Save button
-          Container(
-            width: double.infinity,
-            margin: EdgeInsets.only(bottom: 30),
-            child: ElevatedButton(
-              onPressed: selectedGoal != -1
-                  ? () {
-                      _pageController.nextPage(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFC2D86A),
-                padding: EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Save',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildMealFrequencyScreen() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 40),
-          Text(
-            "How many times a day do you usually eat?",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "Choose a more suitable option.",
-            style: TextStyle(color: Color(0xFFC2D86A), fontSize: 16),
-          ),
-          SizedBox(height: 40),
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
 
-          // Meal frequency options
-          Expanded(
-            child: ListView.builder(
-              itemCount: mealFrequencies.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedMealFrequency = index;
-                    });
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(bottom: 16),
-                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: Color(0xFF2A2A2A),
-                      borderRadius: BorderRadius.circular(12),
-                      border: selectedMealFrequency == index
-                          ? Border.all(color: Color(0xFFC2D86A), width: 2)
-                          : null,
+              // Decorative icon
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                    ],
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
                     ),
-                    child: Text(
-                      mealFrequencies[index],
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.restaurant_menu_rounded,
+                  size: 40,
+                  color: Color(0xFFC2D86A),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              const Text(
+                "How many times a day do you usually eat?",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                  letterSpacing: 0.3,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Choose a more suitable option.",
+                style: TextStyle(
+                  color: const Color(0xFFC2D86A).withValues(alpha: 0.8),
+                  fontSize: 16,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(height: 30),
+
+              // Meal frequency options
+              Expanded(
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: mealFrequencies.length,
+                  itemBuilder: (context, index) {
+                    final isSelected = selectedMealFrequency == index;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              selectedMealFrequency = index;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 20,
+                              horizontal: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: isSelected
+                                  ? LinearGradient(
+                                      colors: [
+                                        const Color(0xFF2D2D2D),
+                                        const Color(0xFF1D1D1D),
+                                      ],
+                                    )
+                                  : LinearGradient(
+                                      colors: [
+                                        const Color(0xFF2A2A2A),
+                                        const Color(0xFF1A1A1A),
+                                      ],
+                                    ),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color(0xFFC2D86A)
+                                    : Colors.white.withValues(alpha: 0.1),
+                                width: isSelected ? 2 : 1,
+                              ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFFC2D86A,
+                                        ).withValues(alpha: 0.3),
+                                        blurRadius: 15,
+                                        offset: const Offset(0, 5),
+                                      ),
+                                    ]
+                                  : [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 5),
+                                      ),
+                                    ],
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    mealFrequencies[index],
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.white.withValues(alpha: 0.8),
+                                      fontSize: 16,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                      letterSpacing: 0.2,
+                                    ),
+                                  ),
+                                ),
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? const Color(0xFFC2D86A)
+                                        : Colors.transparent,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? const Color(0xFFC2D86A)
+                                          : Colors.white.withValues(alpha: 0.3),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: isSelected
+                                      ? const Icon(
+                                          Icons.check,
+                                          color: Colors.black,
+                                          size: 16,
+                                        )
+                                      : null,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // Continue button
+              Container(
+                width: double.infinity,
+                height: 60,
+                margin: const EdgeInsets.only(bottom: 20, top: 10),
+                decoration: BoxDecoration(
+                  gradient: selectedMealFrequency != -1
+                      ? const LinearGradient(
+                          colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+                        )
+                      : LinearGradient(
+                          colors: [Colors.grey.shade800, Colors.grey.shade700],
+                        ),
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: selectedMealFrequency != -1
+                      ? [
+                          BoxShadow(
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.4),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: selectedMealFrequency != -1
+                        ? () {
+                            _pageController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        : null,
+                    borderRadius: BorderRadius.circular(30),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Continue',
+                            style: TextStyle(
+                              color: selectedMealFrequency != -1
+                                  ? Colors.black
+                                  : Colors.white.withValues(alpha: 0.5),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: selectedMealFrequency != -1
+                                ? Colors.black
+                                : Colors.white.withValues(alpha: 0.5),
+                            size: 24,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-
-          // Continue button
-          Container(
-            width: double.infinity,
-            margin: EdgeInsets.only(bottom: 30),
-            child: ElevatedButton(
-              onPressed: selectedMealFrequency != -1
-                  ? () {
-                      _pageController.nextPage(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFC2D86A),
-                padding: EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Continue',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildDietaryRestrictionsScreen() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 40),
-          Text(
-            "Do you have any dietary restrictions?",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "Choose a more suitable option.",
-            style: TextStyle(color: Color(0xFFC2D86A), fontSize: 16),
-          ),
-          SizedBox(height: 40),
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
 
-          // Dietary restriction options
-          Expanded(
-            child: ListView.builder(
-              itemCount: dietaryRestrictions.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedDietaryRestriction = index;
-                    });
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(bottom: 16),
-                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: Color(0xFF2A2A2A),
-                      borderRadius: BorderRadius.circular(12),
-                      border: selectedDietaryRestriction == index
-                          ? Border.all(color: Color(0xFFC2D86A), width: 2)
-                          : null,
+              // Decorative icon
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                    ],
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
                     ),
-                    child: Text(
-                      dietaryRestrictions[index],
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.health_and_safety_rounded,
+                  size: 40,
+                  color: Color(0xFFC2D86A),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              const Text(
+                "Do you have any dietary restrictions?",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                  letterSpacing: 0.3,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Choose a more suitable option.",
+                style: TextStyle(
+                  color: const Color(0xFFC2D86A).withValues(alpha: 0.8),
+                  fontSize: 16,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(height: 30),
+
+              // Dietary restriction options
+              Expanded(
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: dietaryRestrictions.length,
+                  itemBuilder: (context, index) {
+                    final isSelected = selectedDietaryRestriction == index;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              selectedDietaryRestriction = index;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 20,
+                              horizontal: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: isSelected
+                                  ? LinearGradient(
+                                      colors: [
+                                        const Color(0xFF2D2D2D),
+                                        const Color(0xFF1D1D1D),
+                                      ],
+                                    )
+                                  : LinearGradient(
+                                      colors: [
+                                        const Color(0xFF2A2A2A),
+                                        const Color(0xFF1A1A1A),
+                                      ],
+                                    ),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color(0xFFC2D86A)
+                                    : Colors.white.withValues(alpha: 0.1),
+                                width: isSelected ? 2 : 1,
+                              ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFFC2D86A,
+                                        ).withValues(alpha: 0.3),
+                                        blurRadius: 15,
+                                        offset: const Offset(0, 5),
+                                      ),
+                                    ]
+                                  : [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 5),
+                                      ),
+                                    ],
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    dietaryRestrictions[index],
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.white.withValues(alpha: 0.8),
+                                      fontSize: 16,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                      letterSpacing: 0.2,
+                                    ),
+                                  ),
+                                ),
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? const Color(0xFFC2D86A)
+                                        : Colors.transparent,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? const Color(0xFFC2D86A)
+                                          : Colors.white.withValues(alpha: 0.3),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: isSelected
+                                      ? const Icon(
+                                          Icons.check,
+                                          color: Colors.black,
+                                          size: 16,
+                                        )
+                                      : null,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // Continue button
+              Container(
+                width: double.infinity,
+                height: 60,
+                margin: const EdgeInsets.only(bottom: 20, top: 10),
+                decoration: BoxDecoration(
+                  gradient: selectedDietaryRestriction != -1
+                      ? const LinearGradient(
+                          colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+                        )
+                      : LinearGradient(
+                          colors: [Colors.grey.shade800, Colors.grey.shade700],
+                        ),
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: selectedDietaryRestriction != -1
+                      ? [
+                          BoxShadow(
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.4),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: selectedDietaryRestriction != -1
+                        ? () {
+                            // Navigate to client dashboard after completing nutrition goals
+                            Get.offAllNamed(Routes.ClientDashboard);
+                          }
+                        : null,
+                    borderRadius: BorderRadius.circular(30),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Complete',
+                            style: TextStyle(
+                              color: selectedDietaryRestriction != -1
+                                  ? Colors.black
+                                  : Colors.white.withValues(alpha: 0.5),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.check_circle_rounded,
+                            color: selectedDietaryRestriction != -1
+                                ? Colors.black
+                                : Colors.white.withValues(alpha: 0.5),
+                            size: 24,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-
-          // Continue button
-          Container(
-            width: double.infinity,
-            margin: EdgeInsets.only(bottom: 30),
-            child: ElevatedButton(
-              onPressed: selectedDietaryRestriction != -1
-                  ? () {
-                      // Navigate to client dashboard after completing nutrition goals
-                      Get.offAllNamed(Routes.ClientDashboard);
-                    }
-                  : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFC2D86A),
-                padding: EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Continue',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
