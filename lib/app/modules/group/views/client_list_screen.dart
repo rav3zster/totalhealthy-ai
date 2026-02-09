@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/services/users_firestore_service.dart';
+import '../../../data/services/role_permissions_service.dart';
 
 class ClientListScreen extends StatefulWidget {
   const ClientListScreen({super.key});
@@ -14,6 +15,7 @@ class ClientListScreen extends StatefulWidget {
 class _ClientListScreenState extends State<ClientListScreen> {
   final TextEditingController searchController = TextEditingController();
   final UsersFirestoreService _usersService = UsersFirestoreService();
+  final RolePermissionsService _permissionsService = RolePermissionsService();
 
   List<UserModel> allMembers = [];
   List<UserModel> filteredMembers = [];
@@ -64,17 +66,18 @@ class _ClientListScreenState extends State<ClientListScreen> {
 
         if (mounted) {
           setState(() {
-            // Filter: exclude current user and assigned clients
-            // Show users with role="member" OR users without role field (for backward compatibility)
-            allMembers = users.where((user) {
+            // CRITICAL: Filter using RolePermissionsService
+            // This ensures ONLY Members appear (Advisors NEVER appear)
+            final membersOnly = _permissionsService.filterMembersOnly(users);
+            debugPrint(
+              '✅ Members only (Advisors excluded): ${membersOnly.length}',
+            );
+
+            // Further filter: exclude current user and assigned clients
+            allMembers = membersOnly.where((user) {
               final isNotCurrentUser = user.id != currentUser.uid;
               final isNotAssigned = !assignedClientIds.contains(user.id);
-              final isMemberOrNoRole =
-                  user.role == 'member' ||
-                  user.role == null ||
-                  user.role!.isEmpty;
-
-              return isNotCurrentUser && isNotAssigned && isMemberOrNoRole;
+              return isNotCurrentUser && isNotAssigned;
             }).toList();
 
             debugPrint('✨ Available members to add: ${allMembers.length}');
@@ -112,6 +115,18 @@ class _ClientListScreenState extends State<ClientListScreen> {
   Future<void> _addClientToTrainer(UserModel client) async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) return;
+
+    // RBAC: Validate permission to add client
+    final validationError = _permissionsService.validateAddClient(client);
+    if (validationError != null) {
+      Get.snackbar(
+        'Permission Denied',
+        validationError,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
 
     setState(() {
       addingClients.add(client.id);

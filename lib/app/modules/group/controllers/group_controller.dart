@@ -204,6 +204,7 @@ class GroupController extends GetxController {
 
   /// Get users who can be invited (all Firebase users except current members and pending invites)
   /// RBAC: Only Members can be invited (Advisors are filtered out)
+  /// CRITICAL: Advisors must NEVER appear in this list
   Future<List<UserModel>> getAvailableUsers(String groupId) async {
     try {
       if (groupId.isEmpty) {
@@ -227,19 +228,20 @@ class GroupController extends GetxController {
           .map((invitation) => invitation.recipientId)
           .toSet();
 
-      // RBAC: Filter to show ONLY Members (exclude Advisors)
-      // Show all Firebase users except current members, pending invites, and Advisors
-      final availableUsers = users
-          .where(
-            (user) =>
-                !currentMemberIds.contains(user.id) &&
-                !pendingUserIds.contains(user.id) &&
-                user.isMember, // RBAC: Only Members can be invited
-          )
-          .toList();
+      // CRITICAL: Use permission service to filter available members
+      // This ensures Advisors NEVER appear in the list
+      final availableUsers = _permissionsService.filterAvailableMembers(
+        users,
+        currentMemberIds,
+        pendingUserIds,
+      );
 
       // Sort alphabetically for better UX
       availableUsers.sort((a, b) => a.username.compareTo(b.username));
+
+      print(
+        "DEBUG: Filtered ${availableUsers.length} available members (Advisors excluded)",
+      );
 
       return availableUsers;
     } catch (e) {

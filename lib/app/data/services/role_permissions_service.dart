@@ -53,45 +53,71 @@ class RolePermissionsService {
   // ==================== GROUP PERMISSIONS ====================
 
   /// Can user create groups?
-  /// RULE: Only Advisors can create groups
+  /// RULE: Both Members and Advisors can create groups
   bool canCreateGroup() {
-    return isAdvisor;
+    return hasRole; // Any user with a role can create groups
   }
 
   /// Can user add members to a group?
-  /// RULE: Only Advisors can add members
+  /// RULE: Both Members and Advisors can add members
   bool canAddMembersToGroup() {
-    return isAdvisor;
+    return hasRole; // Any user with a role can add members
   }
 
   /// Can user invite users to a group?
-  /// RULE: Only Advisors can send invitations
+  /// RULE: Both Members and Advisors can send invitations
   bool canInviteUsers() {
-    return isAdvisor;
+    return hasRole; // Any user with a role can invite
   }
 
   /// Can user remove members from a group?
-  /// RULE: Only Advisors (group admins) can remove members
+  /// RULE: Group creators can remove members
   bool canRemoveMembers() {
-    return isAdvisor;
+    return hasRole; // Any user with a role can remove (if they're the creator)
   }
 
   /// Can user be invited to a group?
-  /// RULE: Only Members can be invited (Advisors cannot be invited)
+  /// RULE: ONLY Members can be invited (Advisors CANNOT be invited)
   bool canBeInvited(UserModel targetUser) {
-    return targetUser.isMember;
+    return targetUser.isMember; // CRITICAL: Block advisors from being invited
   }
 
   /// Can user be added to a group?
-  /// RULE: Only Members can be added (Advisors cannot be added)
+  /// RULE: ONLY Members can be added (Advisors CANNOT be added)
   bool canBeAddedToGroup(UserModel targetUser) {
-    return targetUser.isMember;
+    return targetUser.isMember; // CRITICAL: Block advisors from being added
   }
 
   /// Is user a group admin?
-  /// RULE: Group creator (Advisor) is always the admin
+  /// RULE: Group creator is the admin (regardless of role)
   bool isGroupAdmin(String userId, String groupCreatorId) {
-    return userId == groupCreatorId && isAdvisor;
+    return userId == groupCreatorId;
+  }
+
+  // ==================== CLIENT MANAGEMENT PERMISSIONS ====================
+
+  /// Can user manage clients?
+  /// RULE: Only Advisors can manage clients
+  bool canManageClients() {
+    return isAdvisor;
+  }
+
+  /// Can user be added as a client?
+  /// RULE: Only Members can be clients (Advisors cannot be clients)
+  bool canBeClient(UserModel targetUser) {
+    return targetUser.isMember;
+  }
+
+  /// Should user appear in client list?
+  /// RULE: ONLY Members appear in client lists (Advisors NEVER appear)
+  bool shouldAppearInClientList(UserModel user) {
+    return user.isMember; // CRITICAL: Advisors must NEVER appear
+  }
+
+  /// Should user appear in add member list?
+  /// RULE: ONLY Members appear (Advisors NEVER appear)
+  bool shouldAppearInAddMemberList(UserModel user) {
+    return user.isMember; // CRITICAL: Advisors must NEVER appear
   }
 
   // ==================== VALIDATION METHODS ====================
@@ -103,7 +129,7 @@ class RolePermissionsService {
       return "Please select your role first";
     }
     if (!canCreateGroup()) {
-      return "Only Advisors can create groups";
+      return "You need a role to create groups";
     }
     return null;
   }
@@ -115,7 +141,7 @@ class RolePermissionsService {
       return "Please select your role first";
     }
     if (!canAddMembersToGroup()) {
-      return "Only Advisors can add members to groups";
+      return "You need a role to add members to groups";
     }
     if (!canBeAddedToGroup(targetUser)) {
       return "Cannot add Advisors to groups. Only Members can be added.";
@@ -130,7 +156,7 @@ class RolePermissionsService {
       return "Please select your role first";
     }
     if (!canInviteUsers()) {
-      return "Only Advisors can send invitations";
+      return "You need a role to send invitations";
     }
     if (!canBeInvited(targetUser)) {
       return "Cannot invite Advisors. Only Members can be invited.";
@@ -145,10 +171,22 @@ class RolePermissionsService {
       return "Please select your role first";
     }
     if (!canRemoveMembers()) {
-      return "Only Advisors can remove members";
+      return "You need a role to remove members";
     }
     if (targetUserId == groupCreatorId) {
-      return "Cannot remove group admin";
+      return "Cannot remove group creator";
+    }
+    return null;
+  }
+
+  /// Validate if user can be added as a client
+  /// Returns error message if not allowed, null if allowed
+  String? validateAddClient(UserModel targetUser) {
+    if (!canManageClients()) {
+      return "Only Advisors can manage clients";
+    }
+    if (!canBeClient(targetUser)) {
+      return "Cannot add Advisors as clients. Only Members can be clients.";
     }
     return null;
   }
@@ -191,5 +229,30 @@ class RolePermissionsService {
       return "Track your nutrition and fitness goals";
     }
     return "Please select your role";
+  }
+
+  // ==================== FILTERING METHODS ====================
+
+  /// Filter users to show only Members (exclude Advisors)
+  /// Used for: Client lists, Add member lists, Invitation lists
+  List<UserModel> filterMembersOnly(List<UserModel> users) {
+    return users.where((user) => user.isMember).toList();
+  }
+
+  /// Filter users to exclude current members and pending invites
+  /// AND exclude all Advisors (CRITICAL)
+  List<UserModel> filterAvailableMembers(
+    List<UserModel> allUsers,
+    Set<String> currentMemberIds,
+    Set<String> pendingInviteIds,
+  ) {
+    return allUsers
+        .where(
+          (user) =>
+              !currentMemberIds.contains(user.id) &&
+              !pendingInviteIds.contains(user.id) &&
+              user.isMember, // CRITICAL: Only Members
+        )
+        .toList();
   }
 }
