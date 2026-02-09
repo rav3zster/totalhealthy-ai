@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
@@ -9,12 +8,14 @@ import 'package:totalhealthy/app/data/services/groups_firestore_service.dart';
 import 'package:totalhealthy/app/data/services/users_firestore_service.dart';
 import 'package:totalhealthy/app/data/services/notifications_firestore_service.dart';
 import 'package:totalhealthy/app/data/models/notification_model.dart';
+import 'package:totalhealthy/app/data/services/role_permissions_service.dart';
 
 class GroupController extends GetxController {
   final GroupsFirestoreService _groupsService = GroupsFirestoreService();
   final UsersFirestoreService _usersService = UsersFirestoreService();
   final NotificationsFirestoreService _notificationsService =
       NotificationsFirestoreService();
+  final RolePermissionsService _permissionsService = RolePermissionsService();
 
   final groupData = <GroupModel>[].obs;
   final users = <UserModel>[].obs; // All system users
@@ -109,6 +110,18 @@ class GroupController extends GetxController {
 
   Future<void> createGroup(String name, String description) async {
     try {
+      // RBAC: Validate permission to create group
+      final validationError = _permissionsService.validateGroupCreation();
+      if (validationError != null) {
+        Get.snackbar(
+          "Permission Denied",
+          validationError,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
       if (name.trim().isEmpty) {
         Get.snackbar(
           "Error",
@@ -190,7 +203,7 @@ class GroupController extends GetxController {
   }
 
   /// Get users who can be invited (all Firebase users except current members and pending invites)
-  /// Get users who can be invited (all Firebase users except current members and pending invites)
+  /// RBAC: Only Members can be invited (Advisors are filtered out)
   Future<List<UserModel>> getAvailableUsers(String groupId) async {
     try {
       if (groupId.isEmpty) {
@@ -214,12 +227,14 @@ class GroupController extends GetxController {
           .map((invitation) => invitation.recipientId)
           .toSet();
 
-      // Show ALL Firebase users except current members and pending invites
+      // RBAC: Filter to show ONLY Members (exclude Advisors)
+      // Show all Firebase users except current members, pending invites, and Advisors
       final availableUsers = users
           .where(
             (user) =>
                 !currentMemberIds.contains(user.id) &&
-                !pendingUserIds.contains(user.id),
+                !pendingUserIds.contains(user.id) &&
+                user.isMember, // RBAC: Only Members can be invited
           )
           .toList();
 
@@ -234,18 +249,42 @@ class GroupController extends GetxController {
   }
 
   /// Add member to group in Firebase
+  /// RBAC: Only Advisors can add members, and only Members can be added
   Future<void> addMemberToGroup(String groupId, String userId) async {
     try {
+      // Get target user
+      final targetUser = users.firstWhereOrNull((u) => u.id == userId);
+      if (targetUser == null) {
+        Get.snackbar(
+          "Error",
+          "User not found",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      // RBAC: Validate permission to add member
+      final validationError = _permissionsService.validateAddMember(targetUser);
+      if (validationError != null) {
+        Get.snackbar(
+          "Permission Denied",
+          validationError,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
       await _groupsService.addMemberToGroup(groupId, userId);
 
       // Refresh group data
       await setCurrentGroup(groupId);
 
       // Send welcome notification to new member
-      final newMember = users.firstWhereOrNull((u) => u.id == userId);
       final group = groupData.firstWhereOrNull((g) => g.id == groupId);
 
-      if (newMember != null && group != null) {
+      if (group != null) {
         final notification = AppNotification(
           id: "",
           recipientId: userId,
@@ -280,26 +319,42 @@ class GroupController extends GetxController {
   }
 
   /// Remove member from group
+  /// RBAC: Only Advisors can remove members
   Future<void> removeMember(String groupId, String userId) async {
     try {
       final authController = Get.find<AuthController>();
       final currentUserId = authController.firebaseUser.value?.uid;
       final group = groupData.firstWhereOrNull((g) => g.id == groupId);
 
-      if (group == null || !group.isAdmin(currentUserId ?? '')) {
+      if (group == null) {
         Get.snackbar(
           "Error",
-          "Only group admin can remove members",
+          "Group not found",
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
         return;
       }
 
-      if (group.isAdmin(userId)) {
+      // RBAC: Validate permission to remove member
+      final validationError = _permissionsService.validateRemoveMember(
+        userId,
+        group.createdBy,
+      );
+      if (validationError != null) {
+        Get.snackbar(
+          "Permission Denied",
+          validationError,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      if (!group.isAdmin(currentUserId ?? '')) {
         Get.snackbar(
           "Error",
-          "Cannot remove group admin",
+          "Only group admin can remove members",
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
@@ -411,6 +466,7 @@ class GroupController extends GetxController {
   }
 
   /// Send invitation to user
+  /// RBAC: Only Advisors can send invitations, and only Members can be invited
   Future<void> inviteUserToGroup(
     UserModel user, {
     String? groupId,
@@ -422,6 +478,18 @@ class GroupController extends GetxController {
         Get.snackbar(
           "Error",
           "Invalid group. Please select a specific group to send invitations.",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      // RBAC: Validate permission to invite user
+      final validationError = _permissionsService.validateInviteUser(user);
+      if (validationError != null) {
+        Get.snackbar(
+          "Permission Denied",
+          validationError,
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
@@ -483,5 +551,42 @@ class GroupController extends GetxController {
     String? groupName,
   }) async {
     await inviteUserToGroup(user, groupId: groupId, groupName: groupName);
+  }
+
+  // ==================== RBAC UI HELPER METHODS ====================
+
+  /// Should show "Create Group" button in UI?
+  bool get canShowCreateGroupButton {
+    return _permissionsService.shouldShowCreateGroupButton();
+  }
+
+  /// Should show "Add Member" button in UI?
+  bool get canShowAddMemberButton {
+    return _permissionsService.shouldShowAddMemberButton();
+  }
+
+  /// Should show "Invite" button in UI?
+  bool get canShowInviteButton {
+    return _permissionsService.shouldShowInviteButton();
+  }
+
+  /// Should show "Remove" button for a specific member?
+  bool canShowRemoveButton(String userId, String groupCreatorId) {
+    return _permissionsService.shouldShowRemoveButton(userId, groupCreatorId);
+  }
+
+  /// Get current user's role display name
+  String get currentUserRole {
+    return _permissionsService.getRoleDisplayName();
+  }
+
+  /// Is current user an Advisor?
+  bool get isAdvisor {
+    return _permissionsService.isAdvisor;
+  }
+
+  /// Is current user a Member?
+  bool get isMember {
+    return _permissionsService.isMember;
   }
 }

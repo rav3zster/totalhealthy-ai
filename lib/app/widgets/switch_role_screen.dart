@@ -255,59 +255,105 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen>
                         child: InkWell(
                           onTap: role.isNotEmpty
                               ? () async {
-                                  // Save role to both local storage and Firestore
-                                  final authController =
-                                      Get.find<AuthController>();
-                                  authController.roleStore(role);
+                                  try {
+                                    final authController =
+                                        Get.find<AuthController>();
+                                    final user =
+                                        FirebaseAuth.instance.currentUser;
 
-                                  // Update role in Firestore
-                                  final user =
-                                      FirebaseAuth.instance.currentUser;
-                                  if (user != null) {
+                                    if (user == null) {
+                                      Get.snackbar(
+                                        "Error",
+                                        "No user logged in",
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                      );
+                                      return;
+                                    }
+
                                     final usersService =
                                         UsersFirestoreService();
                                     final profile = await usersService
                                         .getUserProfile(user.uid);
 
-                                    if (profile != null) {
-                                      // Update profile with selected role
-                                      final updatedProfile = UserModel(
-                                        id: profile.id,
-                                        email: profile.email,
-                                        username: profile.username,
-                                        phone: profile.phone,
-                                        firstName: profile.firstName,
-                                        lastName: profile.lastName,
-                                        profileImage: profile.profileImage,
-                                        age: profile.age,
-                                        weight: profile.weight,
-                                        height: profile.height,
-                                        activityLevel: profile.activityLevel,
-                                        goals: profile.goals,
-                                        joinDate: profile.joinDate,
-                                        targetWeight: profile.targetWeight,
-                                        initialWeight: profile.initialWeight,
-                                        fatLost: profile.fatLost,
-                                        muscleGained: profile.muscleGained,
-                                        profileCompleted:
-                                            profile.profileCompleted,
-                                        role: role, // Set the selected role
+                                    if (profile == null) {
+                                      Get.snackbar(
+                                        "Error",
+                                        "User profile not found",
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
                                       );
-
-                                      await usersService.updateUserProfile(
-                                        updatedProfile,
-                                      );
-                                      await authController.userdataStore(
-                                        updatedProfile.toJson(),
-                                      );
+                                      return;
                                     }
-                                  }
 
-                                  // Navigate based on role
-                                  if (role == "admin") {
-                                    Get.offAllNamed(Routes.TrainerDashboard);
-                                  } else {
-                                    Get.offAllNamed(Routes.NUTRITION_GOAL);
+                                    // CRITICAL: Check if role is already locked
+                                    if (profile.isRoleLocked) {
+                                      Get.snackbar(
+                                        "Role Already Set",
+                                        "Your role has already been set and cannot be changed",
+                                        backgroundColor: Colors.orange,
+                                        colorText: Colors.white,
+                                      );
+
+                                      // Navigate to appropriate dashboard
+                                      if (profile.isAdvisor) {
+                                        Get.offAllNamed(
+                                          Routes.TrainerDashboard,
+                                        );
+                                      } else {
+                                        Get.offAllNamed(Routes.ClientDashboard);
+                                      }
+                                      return;
+                                    }
+
+                                    // Set role ONE TIME ONLY with roleSetAt timestamp
+                                    final updatedProfile = UserModel(
+                                      id: profile.id,
+                                      email: profile.email,
+                                      username: profile.username,
+                                      phone: profile.phone,
+                                      firstName: profile.firstName,
+                                      lastName: profile.lastName,
+                                      profileImage: profile.profileImage,
+                                      age: profile.age,
+                                      weight: profile.weight,
+                                      height: profile.height,
+                                      activityLevel: profile.activityLevel,
+                                      goals: profile.goals,
+                                      joinDate: profile.joinDate,
+                                      targetWeight: profile.targetWeight,
+                                      initialWeight: profile.initialWeight,
+                                      fatLost: profile.fatLost,
+                                      muscleGained: profile.muscleGained,
+                                      profileCompleted:
+                                          profile.profileCompleted,
+                                      role: role, // Set role ONCE
+                                      roleSetAt:
+                                          DateTime.now(), // Lock role with timestamp
+                                      createdAt: profile.createdAt,
+                                    );
+
+                                    await usersService.updateUserProfile(
+                                      updatedProfile,
+                                    );
+                                    await authController.userdataStore(
+                                      updatedProfile.toJson(),
+                                    );
+                                    authController.roleStore(role);
+
+                                    // Navigate based on role
+                                    if (role == "admin") {
+                                      Get.offAllNamed(Routes.TrainerDashboard);
+                                    } else {
+                                      Get.offAllNamed(Routes.NUTRITION_GOAL);
+                                    }
+                                  } catch (e) {
+                                    Get.snackbar(
+                                      "Error",
+                                      "Failed to set role: $e",
+                                      backgroundColor: Colors.red,
+                                      colorText: Colors.white,
+                                    );
                                   }
                                 }
                               : null,
