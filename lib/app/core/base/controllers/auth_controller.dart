@@ -41,8 +41,8 @@ class AuthController extends GetxController {
     final currentUser = _auth.currentUser;
     if (currentUser != null) {
       firebaseUser.value = currentUser;
-      // Bootstrap user on app start
-      await bootstrapUser(currentUser.uid);
+      // Bootstrap user on app start (not a new signup)
+      await bootstrapUser(currentUser.uid, isNewSignup: false);
     }
     return this;
   }
@@ -50,9 +50,9 @@ class AuthController extends GetxController {
   /// CENTRALIZED BOOTSTRAP FUNCTION
   /// This is the ONLY function that makes navigation decisions
   /// Called after login, signup, and app start
-  Future<void> bootstrapUser(String uid) async {
+  Future<void> bootstrapUser(String uid, {bool isNewSignup = false}) async {
     try {
-      print("🚀 Bootstrapping user: $uid");
+      print("🚀 Bootstrapping user: $uid (isNewSignup: $isNewSignup)");
 
       final usersService = UsersFirestoreService();
 
@@ -74,15 +74,60 @@ class AuthController extends GetxController {
 
       if (profile.role == null || profile.role!.isEmpty) {
         // User exists but hasn't selected role yet
-        print("⚠️ User has no role - showing Switch Role");
-        Get.offAllNamed(Routes.SWITCHROLE);
-        return;
+
+        if (isNewSignup) {
+          // This is a new signup - show Switch Role screen
+          print("⚠️ New signup without role - showing Switch Role");
+          Get.offAllNamed(Routes.SWITCHROLE);
+          return;
+        } else {
+          // This is an existing user logging in - assign default role "member"
+          print(
+            "⚠️ Existing user without role - assigning default 'member' role",
+          );
+
+          // Update profile with default role
+          final updatedProfile = UserModel(
+            id: profile.id,
+            email: profile.email,
+            username: profile.username,
+            phone: profile.phone,
+            firstName: profile.firstName,
+            lastName: profile.lastName,
+            profileImage: profile.profileImage,
+            age: profile.age,
+            weight: profile.weight,
+            height: profile.height,
+            activityLevel: profile.activityLevel,
+            goals: profile.goals,
+            joinDate: profile.joinDate,
+            targetWeight: profile.targetWeight,
+            initialWeight: profile.initialWeight,
+            fatLost: profile.fatLost,
+            muscleGained: profile.muscleGained,
+            profileCompleted: profile.profileCompleted,
+            role: "member", // Assign default role
+            roleSetAt: DateTime.now(), // Mark role as set
+            createdAt: profile.createdAt,
+          );
+
+          await usersService.updateUserProfile(updatedProfile);
+          await userdataStore(updatedProfile.toJson());
+
+          roleStore("member");
+          print("✅ Navigating to Client Dashboard with default role");
+          Get.offAllNamed(Routes.ClientDashboard);
+          return;
+        }
       }
 
       // User has a role - navigate to appropriate dashboard
-      roleStore(profile.role!);
+      // Normalize role for routing
+      String normalizedRole = profile.normalizedRole;
 
-      if (profile.role == "admin" || profile.role == "trainer") {
+      roleStore(normalizedRole);
+
+      if (normalizedRole == "advisor") {
         print("✅ Navigating to Trainer Dashboard");
         Get.offAllNamed(Routes.TrainerDashboard);
       } else {
@@ -108,7 +153,7 @@ class AuthController extends GetxController {
       if (credential.user != null) {
         // DO NOT create or modify Firestore documents on login
         // Just call bootstrap to handle navigation
-        await bootstrapUser(credential.user!.uid);
+        await bootstrapUser(credential.user!.uid, isNewSignup: false);
       }
       return true;
     } on FirebaseAuthException catch (e) {
@@ -172,7 +217,9 @@ class AuthController extends GetxController {
           fatLost: 0.0,
           muscleGained: 0.0,
           profileCompleted: false,
-          role: null, // No role - will be set via Switch Role
+          role: null, // No role - will be set via Switch Role (ONE TIME ONLY)
+          roleSetAt: null, // Not set yet
+          createdAt: DateTime.now(), // Account creation timestamp
         );
 
         final usersService = UsersFirestoreService();
@@ -181,8 +228,8 @@ class AuthController extends GetxController {
         // Save locally
         await userdataStore(newUser.toJson());
 
-        // Call bootstrap to handle navigation
-        await bootstrapUser(credential.user!.uid);
+        // Call bootstrap to handle navigation (this is a NEW SIGNUP)
+        await bootstrapUser(credential.user!.uid, isNewSignup: true);
       }
 
       return true;

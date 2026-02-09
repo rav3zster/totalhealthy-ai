@@ -21,9 +21,12 @@ class UserModel {
   final double muscleGained;
   final int goalDuration; // in days
   final String?
-  role; // "member", "trainer", "advisor" - null if not selected yet
+  role; // "advisor", "member" - null if not selected yet, IMMUTABLE after first set
+  final DateTime?
+  roleSetAt; // Timestamp when role was first set (immutability marker)
   final String? assignedTrainerId; // ID of trainer this client is assigned to
   final bool profileCompleted; // Track if user has completed their profile
+  final DateTime createdAt; // Account creation timestamp
 
   UserModel({
     required this.id,
@@ -48,9 +51,11 @@ class UserModel {
     this.muscleGained = 0.0,
     this.goalDuration = 55,
     this.role, // No default - null means role not selected
+    this.roleSetAt, // Timestamp when role was set
     this.assignedTrainerId,
     this.profileCompleted = false, // Default to false for new users
-  });
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
@@ -78,8 +83,14 @@ class UserModel {
       muscleGained: (json['muscleGained'] ?? 0.0).toDouble(),
       goalDuration: json['goalDuration'] ?? 55,
       role: json['role'], // Can be null if not selected
+      roleSetAt: json['roleSetAt'] != null
+          ? DateTime.parse(json['roleSetAt'])
+          : null,
       assignedTrainerId: json['assignedTrainerId'],
       profileCompleted: json['profileCompleted'] ?? false,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
     );
   }
 
@@ -107,8 +118,10 @@ class UserModel {
       'muscleGained': muscleGained,
       'goalDuration': goalDuration,
       'role': role,
+      'roleSetAt': roleSetAt?.toIso8601String(),
       'assignedTrainerId': assignedTrainerId,
       'profileCompleted': profileCompleted,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 
@@ -241,6 +254,39 @@ class UserModel {
   // Check if profile needs completion
   bool get needsProfileCompletion {
     return !profileCompleted || (weight == 0 && height == 0 && age == 0);
+  }
+
+  // Role helper methods for RBAC
+  bool get isAdvisor {
+    return role != null &&
+        (role == 'advisor' || role == 'admin' || role == 'trainer');
+  }
+
+  bool get isMember {
+    return role != null && (role == 'member' || role == 'user');
+  }
+
+  bool get hasRole {
+    return role != null && role!.isNotEmpty;
+  }
+
+  bool get isRoleLocked {
+    return roleSetAt != null; // Role is locked once roleSetAt is set
+  }
+
+  String get normalizedRole {
+    if (role == null || role!.isEmpty) return '';
+    switch (role!.toLowerCase()) {
+      case 'admin':
+      case 'trainer':
+      case 'advisor':
+        return 'advisor';
+      case 'user':
+      case 'member':
+        return 'member';
+      default:
+        return role!.toLowerCase();
+    }
   }
 
   // Helper method for month abbreviations
