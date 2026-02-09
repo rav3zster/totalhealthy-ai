@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/modules/create_meal/controllers/create_meal_controller.dart';
+import '../../../controllers/user_controller.dart';
 
 import '../../../widgets/ingredient_input.dart';
 
@@ -229,104 +230,139 @@ class _CreateMealPageState extends State<CreateMealPage>
   }
 
   Widget _buildImageUploadSection() {
-    return TweenAnimationBuilder<double>(
-      duration: const Duration(milliseconds: 600),
-      tween: Tween(begin: 0.0, end: 1.0),
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: value,
-          child: Container(
-            height: 180,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color(0xFF2A2A2A).withValues(alpha: 0.8),
-                  const Color(0xFF1A1A1A).withValues(alpha: 0.8),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                width: 2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Animated gradient overlay
-                AnimatedBuilder(
-                  animation: _animationController,
-                  builder: (context, child) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        gradient: LinearGradient(
+    return Obx(() {
+      final hasImage = widget.controller.mealImage.value.isNotEmpty;
+      return GestureDetector(
+        onTap: widget.controller.pickAndUploadMealImage,
+        child: TweenAnimationBuilder<double>(
+          duration: const Duration(milliseconds: 600),
+          tween: Tween(begin: 0.0, end: 1.0),
+          builder: (context, value, child) {
+            return Transform.scale(
+              scale: value,
+              child: Container(
+                height: 180,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: hasImage
+                      ? null
+                      : LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            const Color(0xFFC2D86A).withValues(
-                              alpha: 0.1 * _animationController.value,
-                            ),
-                            Colors.transparent,
+                            const Color(0xFF2A2A2A).withValues(alpha: 0.8),
+                            const Color(0xFF1A1A1A).withValues(alpha: 0.8),
                           ],
                         ),
-                      ),
-                    );
-                  },
-                ),
-                // Camera icon
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-                        ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(
-                              0xFFC2D86A,
-                            ).withValues(alpha: 0.4),
-                            blurRadius: 15,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        color: Colors.black,
-                        size: 32,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Add Meal Photo',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  image: hasImage
+                      ? DecorationImage(
+                          image:
+                              UserController.getImageProvider(
+                                widget.controller.mealImage.value,
+                              ) ??
+                              const AssetImage('assets/meal_placeholder.png')
+                                  as ImageProvider,
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (hasImage)
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.black.withValues(alpha: 0.3),
+                        ),
+                      ),
+                    // Animated gradient overlay (only if no image)
+                    if (!hasImage)
+                      AnimatedBuilder(
+                        animation: _animationController,
+                        builder: (context, child) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  const Color(0xFFC2D86A).withValues(
+                                    alpha: 0.1 * _animationController.value,
+                                  ),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    // Camera icon
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+                            ),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(
+                                  0xFFC2D86A,
+                                ).withValues(alpha: 0.4),
+                                blurRadius: 15,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            hasImage ? Icons.edit : Icons.camera_alt,
+                            color: Colors.black,
+                            size: 32,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          hasImage ? 'Change Photo' : 'Add Meal Photo',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black,
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    });
   }
 
   Widget _buildSectionTitle(String title, {bool required = false}) {
@@ -463,7 +499,7 @@ class _CreateMealPageState extends State<CreateMealPage>
                 ],
               );
             }),
-            children: widget.controller.categories.map((category) {
+            children: widget.controller.categories.map<Widget>((category) {
               return Obx(() {
                 final isSelected = widget.controller.selectedCategories
                     .contains(category);
@@ -651,12 +687,14 @@ class _CreateMealPageState extends State<CreateMealPage>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Nutritional Information',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+              const Expanded(
+                child: Text(
+                  'Nutritional Information',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               Obx(() {

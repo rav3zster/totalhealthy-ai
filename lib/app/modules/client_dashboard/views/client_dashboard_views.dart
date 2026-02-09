@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
+import '../../../controllers/user_controller.dart';
 import '../../../core/base/controllers/auth_controller.dart';
 import '../../../routes/app_pages.dart';
 import '../../../widgets/dynamic_profile_header.dart';
@@ -725,10 +726,21 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                         ),
                       ],
                     ),
-                    child: Icon(
-                      Icons.restaurant,
-                      color: Colors.black,
-                      size: 35,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image(
+                        image:
+                            UserController.getImageProvider(meal.imageUrl) ??
+                            const AssetImage('assets/meal_placeholder.png')
+                                as ImageProvider,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(
+                              Icons.restaurant,
+                              color: Colors.black,
+                              size: 35,
+                            ),
+                      ),
                     ),
                   ),
                   SizedBox(width: 20),

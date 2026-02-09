@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/base/controllers/auth_controller.dart';
 import '../../../data/models/meal_model.dart';
@@ -13,6 +16,8 @@ class CreateMealController extends GetxController {
   final carbsController = TextEditingController();
   final proteinController = TextEditingController();
   final fatsController = TextEditingController();
+
+  final RxString mealImage = ''.obs;
 
   var ingredientControllers = <Map<String, dynamic>>[].obs;
   var selectedCategories = <String>[].obs;
@@ -107,8 +112,9 @@ class CreateMealController extends GetxController {
               ? "0"
               : fatsController.text.trim(),
           categories: selectedCategories.toList(),
-          imageUrl:
-              "https://example.com/meal_placeholder.png", // Default placeholder
+          imageUrl: mealImage.value.isEmpty
+              ? "https://example.com/meal_placeholder.png"
+              : mealImage.value,
           ingredients: cleanIngredients,
           instructions: "No instructions provided", // Default or empty
           createdAt: DateTime.now(),
@@ -173,6 +179,50 @@ class CreateMealController extends GetxController {
 
   void removeIngredientRow(int index) {
     ingredientControllers.removeAt(index);
+  }
+
+  Future<void> pickAndUploadMealImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+        maxWidth: 512,
+        maxHeight: 512,
+      );
+
+      if (image != null) {
+        final File file = File(image.path);
+        final bytes = await file.readAsBytes();
+
+        // Firestore limit check (aim for < 200KB for meal images)
+        if (bytes.lengthInBytes > 500000) {
+          Get.snackbar(
+            'Error',
+            'Image is too large. Please choose a smaller image.',
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+          return;
+        }
+
+        mealImage.value = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+        Get.snackbar(
+          'Success',
+          'Meal image added',
+          backgroundColor: const Color(0xFFC2D86A),
+          colorText: Colors.black,
+        );
+      }
+    } catch (e) {
+      print('Error picking meal image: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to pick image: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 
   // GlobalKey<FormState> key = GlobalKey<FormState>();

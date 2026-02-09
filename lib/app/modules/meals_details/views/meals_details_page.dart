@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/modules/meals_details/controllers/meals_details_controller.dart';
+import '../../../controllers/user_controller.dart';
 
 class MealsDetailsPage extends StatefulWidget {
   final String id;
@@ -193,8 +194,13 @@ class _MealsDetailsPageState extends State<MealsDetailsPage> {
               padding: const EdgeInsets.all(4),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(18),
-                child: Image.network(
-                  "${recipeData['imageUrl']}",
+                child: Image(
+                  image:
+                      UserController.getImageProvider(
+                        recipeData['imageUrl']?.toString() ?? '',
+                      ) ??
+                      const AssetImage('assets/meal_placeholder.png')
+                          as ImageProvider,
                   width: 180,
                   height: 180,
                   fit: BoxFit.cover,
