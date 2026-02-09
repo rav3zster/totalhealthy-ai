@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
 import '../../../controllers/user_controller.dart';
 import '../../../widgets/loading_state_widget.dart';
@@ -92,6 +94,12 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
     _ageController = TextEditingController(text: user?.age.toString() ?? '');
     _selectedActivityLevel = user?.activityLevel ?? 'Moderate';
     _selectedGoals = List<String>.from(user?.goals ?? []);
+    _selectedGender = user?.gender ?? 'Male';
+    _selectedDietType = user?.dietType ?? 'Not Specific';
+    if (user?.allergies != null) {
+      _foodAllergies.clear();
+      _foodAllergies.addAll(user!.allergies);
+    }
   }
 
   @override
@@ -380,26 +388,35 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
               ],
             ),
             padding: const EdgeInsets.all(3),
-            child: CircleAvatar(
-              radius: 50,
-              backgroundImage: userController.profileImage.isNotEmpty
-                  ? NetworkImage(userController.profileImage)
-                  : const AssetImage('assets/user_avatar.png') as ImageProvider,
+            child: GestureDetector(
+              onTap: _pickAndUploadImage,
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: const Color(0xFF2A2A2A),
+                backgroundImage:
+                    UserController.getImageProvider(
+                      userController.profileImage,
+                    ) ??
+                    const AssetImage('assets/user_avatar.png') as ImageProvider,
+              ),
             ),
           ),
           Positioned(
             bottom: 0,
             right: 0,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: Color(0xFFC2D86A),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.camera_alt,
-                color: Colors.black,
-                size: 20,
+            child: GestureDetector(
+              onTap: _pickAndUploadImage,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFC2D86A),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.camera_alt,
+                  color: Colors.black,
+                  size: 20,
+                ),
               ),
             ),
           ),
@@ -837,6 +854,9 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
         height: int.parse(_heightController.text.trim()),
         activityLevel: _selectedActivityLevel!,
         goals: _selectedGoals,
+        gender: _selectedGender,
+        dietType: _selectedDietType,
+        allergies: _foodAllergies,
       );
 
       Get.snackbar(
@@ -852,6 +872,35 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
       Get.snackbar(
         'Error',
         'Failed to update profile: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+        maxWidth: 512,
+        maxHeight: 512,
+      );
+
+      if (image != null) {
+        await userController.uploadProfileImage(File(image.path));
+        Get.snackbar(
+          'Success',
+          'Profile picture updated',
+          backgroundColor: const Color(0xFFC2D86A),
+          colorText: Colors.black,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to upload image: $e',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );

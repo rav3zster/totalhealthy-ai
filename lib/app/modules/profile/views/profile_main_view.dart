@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
 import '../../../controllers/user_controller.dart';
 import '../../../widgets/base_screen_wrapper.dart';
@@ -48,29 +50,43 @@ class _ProfileMainViewState extends State<ProfileMainView> {
       bottomNavigationBar: const MobileNavBar(),
       child: GetBuilder<UserController>(
         builder: (userController) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-            child: Column(
-              children: [
-                // Profile Image and Name
-                _buildProfileHeader(userController),
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 24,
+                ),
+                child: Column(
+                  children: [
+                    // Profile Image and Name
+                    _buildProfileHeader(userController),
 
-                const SizedBox(height: 32),
+                    const SizedBox(height: 32),
 
-                // Stats Cards
-                _buildStatsCards(userController),
+                    // Stats Cards
+                    _buildStatsCards(userController),
 
-                const SizedBox(height: 48),
+                    const SizedBox(height: 48),
 
-                // Menu Options
-                _buildMenuOptions(),
+                    // Menu Options
+                    _buildMenuOptions(),
 
-                const SizedBox(height: 48),
+                    const SizedBox(height: 48),
 
-                // Additional Profile Stats
-                _buildProgressSection(userController),
-              ],
-            ),
+                    // Additional Profile Stats
+                    _buildProgressSection(userController),
+                  ],
+                ),
+              ),
+              if (userController.isLoading)
+                Container(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  child: const Center(
+                    child: CircularProgressIndicator(color: Color(0xFFC2D86A)),
+                  ),
+                ),
+            ],
           );
         },
       ),
@@ -80,31 +96,64 @@ class _ProfileMainViewState extends State<ProfileMainView> {
   Widget _buildProfileHeader(UserController userController) {
     return Column(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                const Color(0xFFC2D86A).withValues(alpha: 0.1),
-              ],
-            ),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                blurRadius: 15,
-                offset: const Offset(0, 5),
+        Stack(
+          children: [
+            GestureDetector(
+              onTap: () => _pickAndUploadImage(userController),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                    ],
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(3),
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: const Color(0xFF2A2A2A),
+                  backgroundImage: UserController.getImageProvider(
+                    userController.profileImage,
+                  ),
+                  child: userController.profileImage.isEmpty
+                      ? const Icon(
+                          Icons.person,
+                          color: Colors.white24,
+                          size: 50,
+                        )
+                      : null,
+                ),
               ),
-            ],
-          ),
-          padding: const EdgeInsets.all(3),
-          child: CircleAvatar(
-            radius: 50,
-            backgroundColor: const Color(0xFF2A2A2A),
-            backgroundImage: userController.profileImage.isNotEmpty
-                ? NetworkImage(userController.profileImage)
-                : const AssetImage('assets/user_avatar.png') as ImageProvider,
-          ),
+            ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: GestureDetector(
+                onTap: () => _pickAndUploadImage(userController),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFC2D86A),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt,
+                    color: Colors.black,
+                    size: 16,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
         Text(
@@ -398,5 +447,34 @@ class _ProfileMainViewState extends State<ProfileMainView> {
         ),
       ),
     );
+  }
+
+  Future<void> _pickAndUploadImage(UserController userController) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+        maxWidth: 512,
+        maxHeight: 512,
+      );
+
+      if (image != null) {
+        await userController.uploadProfileImage(File(image.path));
+        Get.snackbar(
+          'Success',
+          'Profile picture updated',
+          backgroundColor: const Color(0xFFC2D86A),
+          colorText: Colors.black,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to upload image: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 }

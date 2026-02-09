@@ -335,6 +335,9 @@ class UserController extends GetxController {
     int? height,
     String? activityLevel,
     List<String>? goals,
+    String? gender,
+    String? dietType,
+    Map<String, bool>? allergies,
   }) async {
     try {
       _isLoading.value = true;
@@ -349,8 +352,8 @@ class UserController extends GetxController {
       // Create updated user model
       final updatedUser = UserModel(
         id: currentUserData.id,
-        email: currentUserData.email, // Email shouldn't change
-        username: currentUserData.username, // Keep existing username
+        email: currentUserData.email,
+        username: currentUserData.username,
         firstName: firstName ?? currentUserData.firstName,
         lastName: lastName ?? currentUserData.lastName,
         phone: phone ?? currentUserData.phone,
@@ -360,11 +363,23 @@ class UserController extends GetxController {
         height: height ?? currentUserData.height,
         activityLevel: activityLevel ?? currentUserData.activityLevel,
         goals: goals ?? currentUserData.goals,
-        joinDate: currentUserData.joinDate, // Keep original join date
+        joinDate: currentUserData.joinDate,
+        targetWeight: currentUserData.targetWeight,
         planName: currentUserData.planName,
         planDuration: currentUserData.planDuration,
         progressPercentage: currentUserData.progressPercentage,
-        profileCompleted: true, // Mark profile as completed when user saves
+        initialWeight: currentUserData.initialWeight,
+        fatLost: currentUserData.fatLost,
+        muscleGained: currentUserData.muscleGained,
+        goalDuration: currentUserData.goalDuration,
+        role: currentUserData.role,
+        roleSetAt: currentUserData.roleSetAt,
+        assignedTrainerId: currentUserData.assignedTrainerId,
+        profileCompleted: true,
+        createdAt: currentUserData.createdAt,
+        gender: gender ?? currentUserData.gender,
+        dietType: dietType ?? currentUserData.dietType,
+        allergies: allergies ?? currentUserData.allergies,
       );
 
       await _usersService.updateUserProfile(updatedUser);

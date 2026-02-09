@@ -27,6 +27,9 @@ class UserModel {
   final String? assignedTrainerId; // ID of trainer this client is assigned to
   final bool profileCompleted; // Track if user has completed their profile
   final DateTime createdAt; // Account creation timestamp
+  final String gender;
+  final String dietType;
+  final Map<String, bool> allergies;
 
   UserModel({
     required this.id,
@@ -55,6 +58,9 @@ class UserModel {
     this.assignedTrainerId,
     this.profileCompleted = false, // Default to false for new users
     DateTime? createdAt,
+    this.gender = 'Male',
+    this.dietType = 'Not Specific',
+    this.allergies = const {},
   }) : createdAt = createdAt ?? DateTime.now();
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -91,6 +97,11 @@ class UserModel {
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
+      gender: json['gender'] ?? 'Male',
+      dietType: json['dietType'] ?? 'Not Specific',
+      allergies: json['allergies'] != null
+          ? Map<String, bool>.from(json['allergies'])
+          : {},
     );
   }
 
@@ -122,6 +133,9 @@ class UserModel {
       'assignedTrainerId': assignedTrainerId,
       'profileCompleted': profileCompleted,
       'createdAt': createdAt.toIso8601String(),
+      'gender': gender,
+      'dietType': dietType,
+      'allergies': allergies,
     };
   }
 
