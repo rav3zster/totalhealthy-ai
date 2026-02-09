@@ -13,12 +13,17 @@ class ClientListScreen extends StatefulWidget {
 }
 
 class _ClientListScreenState extends State<ClientListScreen> {
+  // CRITICAL: Persistent controllers - NEVER recreate these
   final TextEditingController searchController = TextEditingController();
+  final FocusNode searchFocusNode = FocusNode();
   final UsersFirestoreService _usersService = UsersFirestoreService();
   final RolePermissionsService _permissionsService = RolePermissionsService();
 
+  // Use ValueNotifier to avoid rebuilding TextField
+  final ValueNotifier<List<UserModel>> filteredMembersNotifier =
+      ValueNotifier<List<UserModel>>([]);
+
   List<UserModel> allMembers = [];
-  List<UserModel> filteredMembers = [];
   Set<String> assignedClientIds = {};
   bool isLoading = true;
   Set<String> addingClients = {};
@@ -27,6 +32,14 @@ class _ClientListScreenState extends State<ClientListScreen> {
   void initState() {
     super.initState();
     _loadMembers();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    searchFocusNode.dispose();
+    filteredMembersNotifier.dispose();
+    super.dispose();
   }
 
   void _loadMembers() async {
@@ -98,18 +111,18 @@ class _ClientListScreenState extends State<ClientListScreen> {
   }
 
   void _filterMembers(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        filteredMembers = allMembers;
-      } else {
-        filteredMembers = allMembers.where((member) {
-          return member.username.toLowerCase().contains(query.toLowerCase()) ||
-              member.email.toLowerCase().contains(query.toLowerCase()) ||
-              member.fullName.toLowerCase().contains(query.toLowerCase());
-        }).toList();
-      }
-      debugPrint('🔍 Filtered members: ${filteredMembers.length}');
-    });
+    // CRITICAL: Do NOT call setState here - only update ValueNotifier
+    // This prevents TextField from rebuilding and losing focus
+    if (query.isEmpty) {
+      filteredMembersNotifier.value = allMembers;
+    } else {
+      filteredMembersNotifier.value = allMembers.where((member) {
+        return member.username.toLowerCase().contains(query.toLowerCase()) ||
+            member.email.toLowerCase().contains(query.toLowerCase()) ||
+            member.fullName.toLowerCase().contains(query.toLowerCase());
+      }).toList();
+    }
+    debugPrint('🔍 Filtered members: ${filteredMembersNotifier.value.length}');
   }
 
   Future<void> _addClientToTrainer(UserModel client) async {
@@ -268,7 +281,7 @@ class _ClientListScreenState extends State<ClientListScreen> {
 
                       const SizedBox(height: 20),
 
-                      // Search Bar
+                      // Search Bar - CRITICAL: NOT wrapped in any reactive widget
                       Container(
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
@@ -293,8 +306,10 @@ class _ClientListScreenState extends State<ClientListScreen> {
                         ),
                         child: TextField(
                           controller: searchController,
+                          focusNode: searchFocusNode,
                           onChanged: _filterMembers,
                           style: const TextStyle(color: Colors.white),
+                          cursorColor: const Color(0xFFC2D86A),
                           decoration: const InputDecoration(
                             hintText: 'Search by name or email...',
                             hintStyle: TextStyle(
@@ -324,7 +339,7 @@ class _ClientListScreenState extends State<ClientListScreen> {
 
               const SizedBox(height: 20),
 
-              // Client List
+              // Client List - CRITICAL: Only this part is reactive, NOT the TextField
               Expanded(
                 child: isLoading
                     ? const Center(
@@ -332,53 +347,66 @@ class _ClientListScreenState extends State<ClientListScreen> {
                           color: Color(0xFFC2D86A),
                         ),
                       )
-                    : filteredMembers.isEmpty
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(32.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.people_outline,
-                                size: 80,
-                                color: Colors.white.withValues(alpha: 0.3),
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                searchController.text.isEmpty
-                                    ? 'No members available'
-                                    : 'No members found',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.8),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
+                    : ValueListenableBuilder<List<UserModel>>(
+                        valueListenable: filteredMembersNotifier,
+                        builder: (context, filteredMembers, child) {
+                          if (filteredMembers.isEmpty) {
+                            return Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(32.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.people_outline,
+                                      size: 80,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      searchController.text.isEmpty
+                                          ? 'No members available'
+                                          : 'No members found',
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      searchController.text.isEmpty
+                                          ? 'All members have been added or no members exist'
+                                          : 'Try a different search term',
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.5,
+                                        ),
+                                        fontSize: 14,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                searchController.text.isEmpty
-                                    ? 'All members have been added or no members exist'
-                                    : 'Try a different search term',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.5),
-                                  fontSize: 14,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: ListView.builder(
-                          itemCount: filteredMembers.length,
-                          itemBuilder: (context, index) {
-                            final member = filteredMembers[index];
-                            return _buildModernClientCard(member, index);
-                          },
-                        ),
+                            );
+                          }
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: ListView.builder(
+                              itemCount: filteredMembers.length,
+                              itemBuilder: (context, index) {
+                                final member = filteredMembers[index];
+                                return _buildModernClientCard(member, index);
+                              },
+                            ),
+                          );
+                        },
                       ),
               ),
             ],
