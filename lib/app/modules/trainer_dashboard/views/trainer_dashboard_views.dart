@@ -34,9 +34,9 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   List<UserModel> assignedClients = [];
   bool isClientsLoading = true;
 
-  // Search state management
-  bool isSearchActive = false;
-  List<UserModel> filteredClients = [];
+  // Search state management - using Rx for reactive UI without full rebuilds
+  final RxBool isSearchActive = false.obs;
+  final RxList<UserModel> filteredClients = <UserModel>[].obs;
   Future<void> submitUser() async {
     try {
       setState(() {
@@ -184,46 +184,51 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
     OntapStore.index = 0; // Set to Member/Home tab
     getMember();
     _loadAssignedClients();
+
+    // Setup search listener
+    debounce(searchQuery, (String query) {
+      _performSearch(query);
+    }, time: const Duration(milliseconds: 300));
   }
 
   void updateSearchQuery(String query) {
-    searchQuery.value = query;
-    _performSearch(query);
+    // Only update the value, let the listener handle the search
+    // This avoids rebuilding the entire widget tree (preserving focus)
+    if (searchQuery.value != query) {
+      searchQuery.value = query;
+    }
   }
 
   void onSearchFocused() {
-    if (!isSearchActive) {
-      setState(() {
-        isSearchActive = true;
-        filteredClients = [];
-      });
+    if (!isSearchActive.value) {
+      isSearchActive.value = true;
+      // Initialize with all clients instead of empty list for better UX
+      filteredClients.assignAll(assignedClients);
     }
   }
 
   void clearSearch() {
     searchQuery.value = '';
-    setState(() {
-      isSearchActive = false;
-      filteredClients = [];
-    });
+    isSearchActive.value = false;
+    filteredClients.clear();
   }
 
   void _performSearch(String query) {
     final trimmedQuery = query.trim();
 
-    setState(() {
-      if (trimmedQuery.isEmpty) {
-        filteredClients = [];
-      } else {
-        final lowerQuery = trimmedQuery.toLowerCase();
-        filteredClients = assignedClients.where((client) {
-          final nameLower = client.fullName.toLowerCase();
-          final emailLower = client.email.toLowerCase();
-          return nameLower.contains(lowerQuery) ||
-              emailLower.contains(lowerQuery);
-        }).toList();
-      }
-    });
+    if (trimmedQuery.isEmpty) {
+      // If empty query but search active, show all clients
+      filteredClients.assignAll(assignedClients);
+    } else {
+      final lowerQuery = trimmedQuery.toLowerCase();
+      final results = assignedClients.where((client) {
+        final nameLower = client.fullName.toLowerCase();
+        final emailLower = client.email.toLowerCase();
+        return nameLower.contains(lowerQuery) ||
+            emailLower.contains(lowerQuery);
+      }).toList();
+      filteredClients.assignAll(results);
+    }
   }
 
   void _loadAssignedClients() {
@@ -251,76 +256,52 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   String? valueDropDown;
 
   Widget _buildClientList() {
-    // Search mode: show empty state initially, then filtered results
-    if (isSearchActive) {
-      if (searchQuery.value.isEmpty) {
-        // Empty search state - show nothing
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.search,
-                  size: 80,
-                  color: Colors.white.withValues(alpha: 0.3),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Start typing to search',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+    // Search mode: show filtered results
+    if (isSearchActive.value) {
+      // If search query is empty, filteredClients should contain all clients (handled in _performSearch)
+      // So we only show "No results" if filteredClients is truly empty AND we have a query
+
+      if (filteredClients.isEmpty) {
+        if (searchQuery.value.isNotEmpty) {
+          // No results found for the query
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.search_off,
+                    size: 80,
+                    color: Colors.white.withValues(alpha: 0.3),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Search by client name or email',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    fontSize: 14,
+                  const SizedBox(height: 16),
+                  Text(
+                    'No clients found',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Text(
+                    'Try a different search term',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      } else if (filteredClients.isEmpty) {
-        // No results found
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.search_off,
-                  size: 80,
-                  color: Colors.white.withValues(alpha: 0.3),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'No clients found',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Try a different search term',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+          );
+        } else {
+          // This case shouldn't happen often if assignedClients is not empty,
+          // since _performSearch populates filteredClients with all clients when query is empty.
+          // But if assignedClients IS empty, we fall through to the empty state below.
+        }
       } else {
-        // Show filtered results
+        // Show filtered results (or all clients if query is empty)
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -729,7 +710,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
 
                             const SizedBox(height: 20),
 
-                            // Client List
+                            // Client List - reactive search
                             isClientsLoading
                                 ? const Center(
                                     child: Padding(
@@ -739,7 +720,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                       ),
                                     ),
                                   )
-                                : _buildClientList(),
+                                : Obx(() => _buildClientList()),
                           ],
                         ),
                       ),
