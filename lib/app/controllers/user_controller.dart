@@ -248,7 +248,7 @@ class UserController extends GetxController {
     // Set a timeout for the user data subscription
     _userSubscription = _usersService
         .getUserProfileStream(uid)
-        .timeout(const Duration(seconds: 8))
+        .timeout(const Duration(seconds: 15))
         .listen(
           (userData) {
             print("UserController: Received user data: ${userData?.fullName}");
@@ -269,10 +269,18 @@ class UserController extends GetxController {
             print("UserController: User data loading completed");
           },
           onError: (err) {
-            print('UserController stream error: $err');
-            // Only show error if we don't have cached data
-            if (_currentUser.value == null) {
-              _error.value = 'Failed to load user data';
+            if (err is TimeoutException) {
+              print(
+                'UserController: Stream timed out after 15s. Using cached data if available.',
+              );
+              if (_currentUser.value == null) {
+                _error.value = 'Connection timed out';
+              }
+            } else {
+              print('UserController stream error: $err');
+              if (_currentUser.value == null) {
+                _error.value = 'Failed to load user data';
+              }
             }
             _isLoading.value = false;
             _isInitialized.value = true; // Mark as initialized even on error
@@ -338,6 +346,7 @@ class UserController extends GetxController {
     String? gender,
     String? dietType,
     Map<String, bool>? allergies,
+    String? mealFrequency,
   }) async {
     try {
       _isLoading.value = true;
@@ -380,6 +389,7 @@ class UserController extends GetxController {
         gender: gender ?? currentUserData.gender,
         dietType: dietType ?? currentUserData.dietType,
         allergies: allergies ?? currentUserData.allergies,
+        mealFrequency: mealFrequency ?? currentUserData.mealFrequency,
       );
 
       await _usersService.updateUserProfile(updatedUser);

@@ -33,16 +33,22 @@ class AuthController extends GetxController {
         box.write('authToken', user.uid);
       }
     });
+
+    // Handle initial navigation AFTER GetMaterialApp is ready
+    final currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      print("🏠 App start: User already authenticated, bootstrapping...");
+      bootstrapUser(currentUser.uid, isNewSignup: false);
+    }
   }
 
   Future<AuthController> init() async {
     Get.putAsync<ThemeController>(() async => ThemeController());
-    // Check if user is already authenticated on app start
+    // Just sync the current user state, don't navigate yet
     final currentUser = _auth.currentUser;
     if (currentUser != null) {
       firebaseUser.value = currentUser;
-      // Bootstrap user on app start (not a new signup)
-      await bootstrapUser(currentUser.uid, isNewSignup: false);
+      isAuthenticated.value = true;
     }
     return this;
   }
