@@ -6,6 +6,7 @@ import '../../../data/models/group_model.dart';
 import '../../../data/models/user_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../../widgets/phone_nav_bar.dart';
+import '../../../controllers/user_controller.dart';
 
 class GroupView extends StatefulWidget {
   const GroupView({super.key});
@@ -931,11 +932,14 @@ class _GroupViewState extends State<GroupView>
                     padding: const EdgeInsets.all(3),
                     child: CircleAvatar(
                       radius: 28,
-                      backgroundImage: NetworkImage(
-                        user.profileImage.isNotEmpty
-                            ? user.profileImage
-                            : 'https://via.placeholder.com/150',
+                      backgroundImage: UserController.getImageProvider(
+                        user.profileImage,
                       ),
+                      child:
+                          UserController.getImageProvider(user.profileImage) ==
+                              null
+                          ? const Icon(Icons.person, color: Colors.white54)
+                          : null,
                     ),
                   ),
                   const SizedBox(width: 16),

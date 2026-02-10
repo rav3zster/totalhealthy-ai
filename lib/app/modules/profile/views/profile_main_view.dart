@@ -238,6 +238,8 @@ class _ProfileMainViewState extends State<ProfileMainView> {
             Get.toNamed(Routes.PRIVACY_POLICY);
           },
         ),
+        const SizedBox(height: 16),
+        _buildLogoutOption(),
       ],
     );
   }

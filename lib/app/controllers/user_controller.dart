@@ -48,7 +48,10 @@ class UserController extends GetxController {
 
   // Helper method to get correct ImageProvider (URL or Base64)
   static ImageProvider? getImageProvider(String imageSource) {
-    if (imageSource.isEmpty) return null;
+    if (imageSource.isEmpty || imageSource.contains('via.placeholder.com')) {
+      return null;
+    }
+
     if (imageSource.startsWith('http')) {
       return NetworkImage(imageSource);
     } else if (imageSource.startsWith('data:image')) {
