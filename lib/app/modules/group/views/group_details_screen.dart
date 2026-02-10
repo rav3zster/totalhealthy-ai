@@ -19,6 +19,23 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+
+    // Load group members when screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final Map<String, dynamic> group = Get.arguments ?? {};
+      print('🔍 GROUP DETAILS DEBUG - Received arguments: $group');
+      final groupId = group['id'] ?? '';
+      print('🔍 GROUP DETAILS DEBUG - Group ID: $groupId');
+      if (groupId.isNotEmpty) {
+        final controller = Get.find<GroupController>();
+        print(
+          '🔍 GROUP DETAILS DEBUG - Calling setCurrentGroup with ID: $groupId',
+        );
+        controller.setCurrentGroup(groupId);
+      } else {
+        print('❌ GROUP DETAILS DEBUG - Group ID is empty!');
+      }
+    });
   }
 
   @override
@@ -423,50 +440,181 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
     Map<String, dynamic> group,
     GroupController controller,
   ) {
-    return FutureBuilder<List<UserModel>>(
-      future: controller.getGroupMembers(group['id'] ?? ''),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(color: Color(0xFFC2D86A)),
-          );
-        }
+    // CRITICAL: Persistent controllers for LEVEL 3 search - NEVER recreate these
+    final TextEditingController memberSearchController =
+        TextEditingController();
+    final FocusNode memberSearchFocusNode = FocusNode();
 
-        final members = snapshot.data ?? [];
-
-        if (members.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.people_outline_rounded,
-                  size: 64,
-                  color: Colors.white.withValues(alpha: 0.3),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  "No members in this group yet.",
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6),
-                    fontSize: 16,
-                  ),
+    return Column(
+      children: [
+        // LEVEL 3: Members Search Bar (scoped to THIS group only)
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF2D2D2D), Color(0xFF1D1D1D)],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),
-          );
-        }
+            child: TextField(
+              controller: memberSearchController,
+              focusNode: memberSearchFocusNode,
+              onChanged: (query) {
+                // Trigger member filtering for THIS group only
+                controller.filterGroupMembers(query);
+              },
+              style: const TextStyle(color: Colors.white),
+              cursorColor: const Color(0xFFC2D86A),
+              decoration: InputDecoration(
+                hintText: 'Search members in this group...',
+                hintStyle: const TextStyle(color: Colors.white54, fontSize: 14),
+                prefixIcon: const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Icon(Icons.search, color: Color(0xFFC2D86A), size: 20),
+                ),
+                suffixIcon: Obx(() {
+                  if (controller.groupMembersSearchQuery.value.isNotEmpty) {
+                    return IconButton(
+                      icon: const Icon(
+                        Icons.clear,
+                        color: Colors.white54,
+                        size: 18,
+                      ),
+                      onPressed: () {
+                        memberSearchController.clear();
+                        controller.clearGroupMembersSearch();
+                        memberSearchFocusNode.unfocus();
+                      },
+                    );
+                  }
+                  return const SizedBox.shrink();
+                }),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+              ),
+            ),
+          ),
+        ),
 
-        return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: members.length,
-          itemBuilder: (context, index) {
-            final member = members[index];
-            final isAdmin = group['created_by'] == member.id;
-            return _buildMemberCard(member, controller, group, isAdmin, index);
-          },
-        );
-      },
+        const SizedBox(height: 16),
+
+        // Members List - Filtered
+        Expanded(
+          child: Obx(() {
+            // Use filtered members from controller
+            final members = controller.filteredGroupMembers;
+            final isSearching =
+                controller.groupMembersSearchQuery.value.isNotEmpty;
+
+            print(
+              '🔍 MEMBERS TAB DEBUG - filteredGroupMembers count: ${members.length}',
+            );
+            print(
+              '🔍 MEMBERS TAB DEBUG - groupMembers count: ${controller.groupMembers.length}',
+            );
+            print('🔍 MEMBERS TAB DEBUG - isSearching: $isSearching');
+            print(
+              '🔍 MEMBERS TAB DEBUG - isMemberLoading: ${controller.isMemberLoading.value}',
+            );
+
+            if (controller.isMemberLoading.value) {
+              return const Center(
+                child: CircularProgressIndicator(color: Color(0xFFC2D86A)),
+              );
+            }
+
+            if (members.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      isSearching
+                          ? Icons.search_off_rounded
+                          : Icons.people_outline_rounded,
+                      size: 64,
+                      color: Colors.white.withValues(alpha: 0.3),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      isSearching
+                          ? "No members found"
+                          : "No members in this group yet.",
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 16,
+                      ),
+                    ),
+                    if (isSearching) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Try a different search term',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.4),
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          memberSearchController.clear();
+                          controller.clearGroupMembersSearch();
+                        },
+                        icon: const Icon(Icons.clear, size: 16),
+                        label: const Text('Clear Search'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFC2D86A),
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: members.length,
+              itemBuilder: (context, index) {
+                final member = members[index];
+                final isAdmin = group['created_by'] == member.id;
+                return _buildMemberCard(
+                  member,
+                  controller,
+                  group,
+                  isAdmin,
+                  index,
+                );
+              },
+            );
+          }),
+        ),
+      ],
     );
   }
 

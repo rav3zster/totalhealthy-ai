@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/setting_controller.dart';
-import '../../../core/base/controllers/auth_controller.dart';
 
 class SettingView extends GetView<SettingController> {
   const SettingView({super.key});
@@ -126,54 +125,6 @@ class SettingView extends GetView<SettingController> {
                         onTap: () {
                           Get.toNamed('/account-password-settings');
                         },
-                      ),
-                      const SizedBox(height: 40),
-                      // Log out button
-                      InkWell(
-                        onTap: () {
-                          Get.find<AuthController>().logOut();
-                        },
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 20,
-                          ),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.red.withValues(alpha: 0.2),
-                                Colors.red.withValues(alpha: 0.1),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(
-                                0xffFF6B6B,
-                              ).withValues(alpha: 0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.logout,
-                                size: 24,
-                                color: Color(0xffFF6B6B),
-                              ),
-                              SizedBox(width: 15),
-                              Text(
-                                "Log Out",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Color(0xffFF6B6B),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                       ),
                     ],
                   ),

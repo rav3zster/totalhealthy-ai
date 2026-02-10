@@ -30,6 +30,24 @@ class GroupController extends GetxController {
   final RxList<UserModel> availableUsers = <UserModel>[].obs;
   final RxBool isMemberLoading = false.obs;
 
+  // LEVEL 1: Groups Search State (scoped to Groups list only)
+  final RxString groupSearchQuery = ''.obs;
+  final RxList<Map<String, dynamic>> filteredGroups =
+      <Map<String, dynamic>>[].obs;
+
+  // LEVEL 1b: Groups View Search State (scoped to Groups tab in group_view.dart)
+  final RxString groupsViewSearchQuery = ''.obs;
+  final RxList<GroupModel> filteredGroupsView = <GroupModel>[].obs;
+
+  // LEVEL 2: Global Members Search State (scoped to Members tab only)
+  final RxString membersSearchQuery = ''.obs;
+  final RxList<UserModel> filteredMembers = <UserModel>[].obs;
+
+  // LEVEL 3: Group Details Members Search State (scoped to specific group members only)
+  final RxString groupMembersSearchQuery = ''.obs;
+  final RxList<UserModel> filteredGroupMembers = <UserModel>[].obs;
+
+  /// Initialize filtered groups list when groups data changes
   @override
   void onInit() {
     super.onInit();
@@ -51,6 +69,73 @@ class GroupController extends GetxController {
       } else {
         // User logged out, clear groups
         groupData.value = [];
+        filteredGroups.value = [];
+      }
+    });
+
+    // Initialize filtered groups when groupData changes
+    ever(groupData, (_) {
+      if (groupSearchQuery.value.isEmpty) {
+        filteredGroups.value = groupData
+            .map(
+              (group) => {
+                'id': group.id,
+                'name': group.name,
+                'description': group.description,
+                'createdDate': group.createdAt.toString(),
+                'created_by': group.createdBy,
+              },
+            )
+            .toList();
+      } else {
+        filterGroups(groupSearchQuery.value);
+      }
+
+      // Also initialize filteredGroupsView for the Groups tab
+      if (groupsViewSearchQuery.value.isEmpty) {
+        filteredGroupsView.value = groupData;
+      } else {
+        filterGroupsInView(groupsViewSearchQuery.value);
+      }
+    });
+
+    // Initialize filtered group members when groupMembers changes
+    ever(groupMembers, (_) {
+      print(
+        '🔍 EVER LISTENER - groupMembers changed, count: ${groupMembers.length}',
+      );
+      print(
+        '🔍 EVER LISTENER - groupMembersSearchQuery: "${groupMembersSearchQuery.value}"',
+      );
+      if (groupMembersSearchQuery.value.isEmpty) {
+        filteredGroupMembers.value = groupMembers;
+        print(
+          '🔍 EVER LISTENER - Set filteredGroupMembers to ${filteredGroupMembers.length} members',
+        );
+      } else {
+        filterGroupMembers(groupMembersSearchQuery.value);
+        print(
+          '🔍 EVER LISTENER - Filtered to ${filteredGroupMembers.length} members',
+        );
+      }
+    });
+
+    // Initialize filtered members when users changes (LEVEL 2 search)
+    ever(users, (_) {
+      print('🔍 EVER LISTENER - users changed, count: ${users.length}');
+      print(
+        '🔍 EVER LISTENER - membersSearchQuery: "${membersSearchQuery.value}"',
+      );
+      if (membersSearchQuery.value.isEmpty) {
+        filteredMembers.value = users;
+        print(
+          '🔍 EVER LISTENER - Set filteredMembers to ${filteredMembers.length} members',
+        );
+      } else {
+        filterMembers(membersSearchQuery.value);
+        print(
+          '🔍 EVER LISTENER - Filtered to ${filteredMembers.length} members',
+        );
       }
     });
   }
@@ -450,9 +535,14 @@ class GroupController extends GetxController {
         groupMembers.value = members;
         availableUsers.value = available;
 
+        // Initialize filtered members (LEVEL 3 search)
+        filteredGroupMembers.value = members;
+        groupMembersSearchQuery.value = '';
+
         // Force UI update
         groupMembers.refresh();
         availableUsers.refresh();
+        filteredGroupMembers.refresh();
       }
     } catch (e) {
       print("Error in setCurrentGroup: $e");
@@ -590,5 +680,152 @@ class GroupController extends GetxController {
   /// Is current user a Member?
   bool get isMember {
     return _permissionsService.isMember;
+  }
+
+  // ==================== SCOPED SEARCH METHODS ====================
+
+  /// LEVEL 1: Filter groups by name or description
+  /// This search is scoped ONLY to the Groups list screen
+  void filterGroups(String query) {
+    groupSearchQuery.value = query;
+
+    if (query.trim().isEmpty) {
+      // Show all groups when search is empty
+      filteredGroups.value = groupData
+          .map(
+            (group) => {
+              'id': group.id,
+              'name': group.name,
+              'description': group.description,
+              'createdDate': group.createdAt.toString(),
+              'created_by': group.createdBy,
+            },
+          )
+          .toList();
+    } else {
+      // Filter groups by name or description
+      final lowerQuery = query.toLowerCase();
+      filteredGroups.value = groupData
+          .where((group) {
+            return group.name.toLowerCase().contains(lowerQuery) ||
+                group.description.toLowerCase().contains(lowerQuery);
+          })
+          .map(
+            (group) => {
+              'id': group.id,
+              'name': group.name,
+              'description': group.description,
+              'createdDate': group.createdAt.toString(),
+              'created_by': group.createdBy,
+            },
+          )
+          .toList();
+    }
+
+    print(
+      '🔍 LEVEL 1 - Groups filtered: ${filteredGroups.length} results for "$query"',
+    );
+  }
+
+  /// Clear groups search
+  void clearGroupSearch() {
+    groupSearchQuery.value = '';
+    filteredGroups.value = groupData
+        .map(
+          (group) => {
+            'id': group.id,
+            'name': group.name,
+            'description': group.description,
+            'createdDate': group.createdAt.toString(),
+            'created_by': group.createdBy,
+          },
+        )
+        .toList();
+  }
+
+  /// LEVEL 1b: Filter groups in the Groups tab view
+  /// This search is scoped ONLY to the Groups tab in group_view.dart
+  void filterGroupsInView(String query) {
+    groupsViewSearchQuery.value = query;
+
+    if (query.trim().isEmpty) {
+      // Show all groups when search is empty
+      filteredGroupsView.value = groupData;
+    } else {
+      // Filter groups by name or description
+      final lowerQuery = query.toLowerCase();
+      filteredGroupsView.value = groupData.where((group) {
+        return group.name.toLowerCase().contains(lowerQuery) ||
+            group.description.toLowerCase().contains(lowerQuery);
+      }).toList();
+    }
+
+    print(
+      '🔍 LEVEL 1b - Groups view filtered: ${filteredGroupsView.length} results for "$query"',
+    );
+  }
+
+  /// Clear groups view search
+  void clearGroupsViewSearch() {
+    groupsViewSearchQuery.value = '';
+    filteredGroupsView.value = groupData;
+  }
+
+  /// LEVEL 2: Filter global members by name or email
+  /// This search is scoped ONLY to the Members tab (all platform members)
+  void filterMembers(String query) {
+    membersSearchQuery.value = query;
+
+    if (query.trim().isEmpty) {
+      // Show all members when search is empty
+      filteredMembers.value = users;
+    } else {
+      // Filter members by name or email
+      final lowerQuery = query.toLowerCase();
+      filteredMembers.value = users.where((member) {
+        return member.username.toLowerCase().contains(lowerQuery) ||
+            member.email.toLowerCase().contains(lowerQuery) ||
+            member.fullName.toLowerCase().contains(lowerQuery);
+      }).toList();
+    }
+
+    print(
+      '🔍 LEVEL 2 - Global members filtered: ${filteredMembers.length} results for "$query"',
+    );
+  }
+
+  /// Clear global members search
+  void clearMembersSearch() {
+    membersSearchQuery.value = '';
+    filteredMembers.value = users;
+  }
+
+  /// LEVEL 3: Filter members within a specific group
+  /// This search is scoped ONLY to members of the current group
+  void filterGroupMembers(String query) {
+    groupMembersSearchQuery.value = query;
+
+    if (query.trim().isEmpty) {
+      // Show all group members when search is empty
+      filteredGroupMembers.value = groupMembers;
+    } else {
+      // Filter members by name or email
+      final lowerQuery = query.toLowerCase();
+      filteredGroupMembers.value = groupMembers.where((member) {
+        return member.username.toLowerCase().contains(lowerQuery) ||
+            member.email.toLowerCase().contains(lowerQuery) ||
+            member.fullName.toLowerCase().contains(lowerQuery);
+      }).toList();
+    }
+
+    print(
+      '🔍 LEVEL 3 - Group members filtered: ${filteredGroupMembers.length} results for "$query"',
+    );
+  }
+
+  /// Clear group members search
+  void clearGroupMembersSearch() {
+    groupMembersSearchQuery.value = '';
+    filteredGroupMembers.value = groupMembers;
   }
 }

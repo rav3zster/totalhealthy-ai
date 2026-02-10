@@ -561,6 +561,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
           value: _selectedActivityLevel,
           isExpanded: true,
           dropdownColor: const Color(0xFF2A2A2A),
+          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
           style: const TextStyle(color: Colors.white, fontSize: 16),
           items: _activityLevels.map((level) {
             return DropdownMenuItem<String>(value: level, child: Text(level));
