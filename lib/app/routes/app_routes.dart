@@ -34,6 +34,7 @@ abstract class Routes {
   static const PROFILE_MAIN = _Paths.PROFILE_MAIN;
   static const SWITCHROLE = _Paths.SWITCHROLE;
   static const CLIENT_LIST = _Paths.CLIENT_LIST;
+  static const PRIVACY_POLICY = _Paths.PRIVACY_POLICY;
 }
 
 abstract class _Paths {
@@ -68,4 +69,5 @@ abstract class _Paths {
   static const PROFILE_MAIN = '/profile-main';
   static const SWITCHROLE = '/switch-role';
   static const CLIENT_LIST = '/client-list';
+  static const PRIVACY_POLICY = '/privacy-policy';
 }
