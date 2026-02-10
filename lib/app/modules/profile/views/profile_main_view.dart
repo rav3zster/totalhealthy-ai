@@ -3,6 +3,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import '../../../controllers/user_controller.dart';
 import '../../../widgets/base_screen_wrapper.dart';
 import '../../../widgets/phone_nav_bar.dart';
