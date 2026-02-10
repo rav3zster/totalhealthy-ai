@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../controllers/user_controller.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/services/users_firestore_service.dart';
 import '../../../data/services/role_permissions_service.dart';
@@ -184,460 +185,203 @@ class _ClientListScreenState extends State<ClientListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
-            stops: [0.0, 0.3, 1.0],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Header
-              Container(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(25),
-                    bottomRight: Radius.circular(25),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      // App Bar
-                      Row(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  const Color(
-                                    0xFFC2D86A,
-                                  ).withValues(alpha: 0.2),
-                                  const Color(
-                                    0xFFC2D86A,
-                                  ).withValues(alpha: 0.1),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.arrow_back_ios,
-                                color: Colors.white,
-                              ),
-                              onPressed: () => Get.back(),
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: 4,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFFC2D86A),
-                                        Color(0xFFB8CC5A),
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(2),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                const Text(
-                                  'Client List',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 48),
-                        ],
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Search Bar - CRITICAL: NOT wrapped in any reactive widget
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF2D2D2D), Color(0xFF1D1D1D)],
-                          ),
-                          borderRadius: BorderRadius.circular(25),
-                          border: Border.all(
-                            color: const Color(
-                              0xFFC2D86A,
-                            ).withValues(alpha: 0.2),
-                            width: 1,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.3),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          controller: searchController,
-                          focusNode: searchFocusNode,
-                          onChanged: _filterMembers,
-                          style: const TextStyle(color: Colors.white),
-                          cursorColor: const Color(0xFFC2D86A),
-                          decoration: const InputDecoration(
-                            hintText: 'Search by name or email...',
-                            hintStyle: TextStyle(
-                              color: Colors.white54,
-                              fontSize: 16,
-                            ),
-                            prefixIcon: Padding(
-                              padding: EdgeInsets.all(12),
-                              child: Icon(
-                                Icons.search,
-                                color: Colors.white54,
-                                size: 24,
-                              ),
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 16,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Client List - CRITICAL: Only this part is reactive, NOT the TextField
-              Expanded(
-                child: isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFFC2D86A),
-                        ),
-                      )
-                    : ValueListenableBuilder<List<UserModel>>(
-                        valueListenable: filteredMembersNotifier,
-                        builder: (context, filteredMembers, child) {
-                          if (filteredMembers.isEmpty) {
-                            return Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(32.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.people_outline,
-                                      size: 80,
-                                      color: Colors.white.withValues(
-                                        alpha: 0.3,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      searchController.text.isEmpty
-                                          ? 'No members available'
-                                          : 'No members found',
-                                      style: TextStyle(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.8,
-                                        ),
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      searchController.text.isEmpty
-                                          ? 'All members have been added or no members exist'
-                                          : 'Try a different search term',
-                                      style: TextStyle(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.5,
-                                        ),
-                                        fontSize: 14,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }
-
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: ListView.builder(
-                              itemCount: filteredMembers.length,
-                              itemBuilder: (context, index) {
-                                final member = filteredMembers[index];
-                                return _buildModernClientCard(member, index);
-                              },
-                            ),
-                          );
-                        },
-                      ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildModernClientCard(UserModel client, int index) {
-    List<List<Color>> gradients = [
-      [const Color(0xFF2A2A2A), const Color(0xFF1A1A1A)],
-      [const Color(0xFF2D2D2D), const Color(0xFF1D1D1D)],
-      [const Color(0xFF252525), const Color(0xFF151515)],
-    ];
-
-    List<Color> cardGradient = gradients[index % gradients.length];
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: cardGradient,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Stack(
+      backgroundColor: Colors.black,
+      body: Stack(
         children: [
+          // Background Elements
           Positioned(
-            top: -30,
-            right: -30,
+            top: -100,
+            right: -100,
             child: Container(
-              width: 80,
-              height: 80,
+              width: 300,
+              height: 300,
               decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  colors: [
-                    const Color(0xFFC2D86A).withValues(alpha: 0.1),
-                    Colors.transparent,
-                  ],
-                ),
+                shape: BoxShape.circle,
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.05),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -50,
+            left: -50,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.03),
               ),
             ),
           ),
 
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
+          SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Profile Image
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                        const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                // Premium Header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Get.back(),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1A1A1A),
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.05),
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Discover Clients',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          Text(
+                            'Connect with new members',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                // Modern Search Bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A1A1A),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
+                    child: TextField(
+                      controller: searchController,
+                      focusNode: searchFocusNode,
+                      onChanged: _filterMembers,
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      cursorColor: const Color(0xFFC2D86A),
+                      decoration: InputDecoration(
+                        hintText: 'Search members...',
+                        hintStyle: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.3),
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search_rounded,
+                          color: const Color(0xFFC2D86A).withValues(alpha: 0.7),
+                        ),
+                        suffixIcon: searchController.text.isNotEmpty
+                            ? GestureDetector(
+                                onTap: () {
+                                  searchController.clear();
+                                  _filterMembers('');
+                                },
+                                child: Icon(
+                                  Icons.close_rounded,
+                                  color: Colors.white.withValues(alpha: 0.3),
+                                  size: 20,
+                                ),
+                              )
+                            : null,
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+
+                // Section Title
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'AVAILABLE MEMBERS',
+                        style: TextStyle(
+                          color: Color(0xFFC2D86A),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                      ValueListenableBuilder<List<UserModel>>(
+                        valueListenable: filteredMembersNotifier,
+                        builder: (context, members, _) => Text(
+                          '${members.length} found',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.4),
+                            fontSize: 12,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.all(3),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(13),
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      color: const Color(0xFF2A2A2A),
-                      child: client.profileImage.isNotEmpty
-                          ? Image.asset(
-                              client.profileImage,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(
-                                  Icons.person,
-                                  color: Color(0xFFC2D86A),
-                                  size: 40,
+                ),
+
+                const SizedBox(height: 15),
+
+                // Scrollable List
+                Expanded(
+                  child: isLoading
+                      ? _buildLoadingState()
+                      : ValueListenableBuilder<List<UserModel>>(
+                          valueListenable: filteredMembersNotifier,
+                          builder: (context, filteredMembers, child) {
+                            if (filteredMembers.isEmpty) {
+                              return _buildEmptyState();
+                            }
+
+                            return ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                              itemCount: filteredMembers.length,
+                              itemBuilder: (context, index) {
+                                return _buildModernClientCard(
+                                  filteredMembers[index],
+                                  index,
                                 );
                               },
-                            )
-                          : const Icon(
-                              Icons.person,
-                              color: Color(0xFFC2D86A),
-                              size: 40,
-                            ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(width: 20),
-
-                // Client Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        client.fullName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.3,
+                            );
+                          },
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Plan: ${client.planName}',
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Duration: ${client.planDuration}',
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        client.email,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Add Client Button
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: addingClients.contains(client.id)
-                              ? null
-                              : () => _addClientToTrainer(client),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 10,
-                            ),
-                          ),
-                          child: addingClients.contains(client.id)
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.black,
-                                    ),
-                                  ),
-                                )
-                              : const Text(
-                                  'Add Client',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Action Buttons
-                Column(
-                  children: [
-                    _buildActionButton(
-                      Icons.phone,
-                      const Color(0xFFF5D657),
-                      () => _makePhoneCall(client.phone),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildActionButton(
-                      Icons.email,
-                      const Color(0xFFC2D86A),
-                      () => _sendEmail(client.email),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildActionButton(
-                      Icons.chat,
-                      const Color(0xFFF5D657),
-                      () => _openChat(client.id),
-                    ),
-                  ],
                 ),
               ],
             ),
@@ -647,55 +391,348 @@ class _ClientListScreenState extends State<ClientListScreen> {
     );
   }
 
-  Widget _buildActionButton(
-    IconData icon,
-    Color color,
-    VoidCallback onPressed,
-  ) {
+  Widget _buildLoadingState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(color: Color(0xFFC2D86A), strokeWidth: 3),
+          SizedBox(height: 20),
+          Text(
+            'Syncing Member Database...',
+            style: TextStyle(color: Colors.white54, fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(30),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1A1A1A),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                ),
+              ),
+              child: Icon(
+                Icons.person_search_rounded,
+                size: 60,
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'No Members Found',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              searchController.text.isEmpty
+                  ? 'There are currently no members available to connect with.'
+                  : 'Try searching for a different name or check for typos.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.4),
+                fontSize: 14,
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModernClientCard(UserModel client, int index) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [color, color.withValues(alpha: 0.8)]),
-        shape: BoxShape.circle,
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.05),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: color.withValues(alpha: 0.3),
-            blurRadius: 8,
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: IconButton(
-        onPressed: onPressed,
-        icon: Icon(icon, color: Colors.black, size: 20),
-        padding: const EdgeInsets.all(8),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          children: [
+            // Decorative Background Gradient
+            Positioned(
+              right: -50,
+              top: -50,
+              child: Container(
+                width: 150,
+                height: 150,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      const Color(0xFFC2D86A).withValues(alpha: 0.05),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      // Profile Image with Status Ring
+                      Stack(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFC2D86A), Color(0xFF2A2A2A)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: CircleAvatar(
+                              radius: 35,
+                              backgroundColor: const Color(0xFF2A2A2A),
+                              backgroundImage: UserController.getImageProvider(
+                                client.profileImage,
+                              ),
+                              child: client.profileImage.isEmpty
+                                  ? const Icon(
+                                      Icons.person,
+                                      color: Colors.white24,
+                                      size: 35,
+                                    )
+                                  : null,
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 2,
+                            right: 2,
+                            child: Container(
+                              width: 18,
+                              height: 18,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFC2D86A),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFF1A1A1A),
+                                  width: 3,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 20),
+                      // Client Details
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              client.fullName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              client.email,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.4),
+                                fontSize: 13,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                _buildBadge(
+                                  client.planName,
+                                  const Color(0xFFC2D86A),
+                                ),
+                                const SizedBox(width: 8),
+                                _buildBadge(
+                                  '${client.age} yrs',
+                                  Colors.white.withValues(alpha: 0.1),
+                                  textColor: Colors.white70,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Action Toolbar
+                  Divider(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    height: 1,
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      // Compact Action Buttons
+                      _buildCompactActionButton(
+                        Icons.phone_rounded,
+                        'Call',
+                        () => _makePhoneCall(client.phone),
+                      ),
+                      const SizedBox(width: 12),
+                      _buildCompactActionButton(
+                        Icons.chat_bubble_rounded,
+                        'Chat',
+                        () => _openChat(client.id),
+                      ),
+                      const Spacer(),
+                      // Add Client Button (Prime Action)
+                      SizedBox(
+                        height: 45,
+                        child: ElevatedButton(
+                          onPressed: addingClients.contains(client.id)
+                              ? null
+                              : () => _addClientToTrainer(client),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFC2D86A),
+                            foregroundColor: Colors.black,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                          child: addingClients.contains(client.id)
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.black,
+                                  ),
+                                )
+                              : const Text(
+                                  'Add Client',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBadge(String text, Color color, {Color? textColor}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: textColor ?? color,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactActionButton(
+    IconData icon,
+    String label,
+    VoidCallback onTap,
+  ) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: Colors.white60, size: 16),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   void _makePhoneCall(String phone) {
     Get.snackbar(
-      'Phone Call',
-      'Calling $phone...',
-      backgroundColor: Colors.blue,
+      'Dialer',
+      'Initiating call to $phone',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: const Color(0xFF1A1A1A),
       colorText: Colors.white,
-    );
-  }
-
-  void _sendEmail(String email) {
-    Get.snackbar(
-      'Email',
-      'Opening email to $email',
-      backgroundColor: Colors.blue,
-      colorText: Colors.white,
+      margin: const EdgeInsets.all(20),
     );
   }
 
   void _openChat(String clientId) {
     Get.snackbar(
-      'Chat',
-      'Opening chat...',
-      backgroundColor: Colors.blue,
+      'Messenger',
+      'Opening secure chat channel...',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: const Color(0xFF1A1A1A),
       colorText: Colors.white,
+      margin: const EdgeInsets.all(20),
     );
   }
 }

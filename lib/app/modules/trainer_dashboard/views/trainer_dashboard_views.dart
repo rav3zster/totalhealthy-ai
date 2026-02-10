@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:totalhealthy/app/controllers/user_controller.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -380,8 +381,6 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-    var userData = Get.find<AuthController>().userdataget();
-
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: Colors.black,
@@ -431,63 +430,86 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                               // Profile Header
                               Row(
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      scaffoldKey.currentState?.openDrawer();
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
-                                          colors: [
-                                            Color(0xFFC2D86A),
-                                            Color(0xFFD4E87C),
-                                          ],
-                                        ),
-                                        shape: BoxShape.circle,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: const Color(
-                                              0xFFC2D86A,
-                                            ).withValues(alpha: 0.4),
-                                            blurRadius: 12,
-                                            offset: const Offset(0, 4),
+                                  GetBuilder<UserController>(
+                                    builder: (userController) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          scaffoldKey.currentState
+                                              ?.openDrawer();
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(0xFFC2D86A),
+                                                Color(0xFFD4E87C),
+                                              ],
+                                            ),
+                                            shape: BoxShape.circle,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: const Color(
+                                                  0xFFC2D86A,
+                                                ).withValues(alpha: 0.4),
+                                                blurRadius: 12,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      padding: const EdgeInsets.all(3),
-                                      child: const CircleAvatar(
-                                        radius: 28,
-                                        backgroundImage: AssetImage(
-                                          "assets/user_avatar.png",
+                                          padding: const EdgeInsets.all(3),
+                                          child: CircleAvatar(
+                                            radius: 28,
+                                            backgroundColor: const Color(
+                                              0xFF2A2A2A,
+                                            ),
+                                            backgroundImage:
+                                                UserController.getImageProvider(
+                                                  userController.profileImage,
+                                                ),
+                                            child:
+                                                userController
+                                                    .profileImage
+                                                    .isEmpty
+                                                ? const Icon(
+                                                    Icons.person,
+                                                    color: Colors.white24,
+                                                    size: 28,
+                                                  )
+                                                : null,
+                                          ),
                                         ),
-                                      ),
-                                    ),
+                                      );
+                                    },
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          "Welcome Back,",
-                                          style: TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          "${userData["name"] ?? "Advisor"}",
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: 0.3,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
+                                    child: GetBuilder<UserController>(
+                                      builder: (userController) {
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              "Welcome Back,",
+                                              style: TextStyle(
+                                                color: Colors.white70,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              userController.fullName,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w700,
+                                                letterSpacing: 0.3,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        );
+                                      },
                                     ),
                                   ),
                                   Container(
@@ -797,22 +819,16 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                     ),
                   ],
                 ),
-                child: client.profileImage.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.asset(
-                          client.profileImage,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              Icons.person,
-                              color: Colors.black,
-                              size: 30,
-                            );
-                          },
-                        ),
-                      )
-                    : const Icon(Icons.person, color: Colors.black, size: 30),
+                child: CircleAvatar(
+                  radius: 28,
+                  backgroundColor: const Color(0xFF2A2A2A),
+                  backgroundImage: UserController.getImageProvider(
+                    client.profileImage,
+                  ),
+                  child: client.profileImage.isEmpty
+                      ? const Icon(Icons.person, color: Colors.black, size: 30)
+                      : null,
+                ),
               ),
               const SizedBox(width: 16),
 
