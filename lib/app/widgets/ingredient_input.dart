@@ -36,6 +36,7 @@ class IngredientInput extends StatelessWidget {
                 }
               },
               maxLines: 1,
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: "Name",
                 labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
@@ -70,6 +71,7 @@ class IngredientInput extends StatelessWidget {
                 }
               },
               maxLines: 1,
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: "Amount",
                 labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
@@ -104,6 +106,7 @@ class IngredientInput extends StatelessWidget {
                 }
               },
               maxLines: 1,
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: "Unit",
                 labelStyle: TextStyle(color: Color(0XFF7E7E7E)),
