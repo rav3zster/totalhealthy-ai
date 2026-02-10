@@ -154,98 +154,91 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                 if (controller.shouldShowCategoryButtons) {
                                   return Column(
                                     children: [
-                                      // First Row
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: _buildModernMealTab(
-                                              '🍳',
-                                              'Breakfast',
-                                              controller
-                                                      .selectedCategory
-                                                      .value ==
-                                                  'Breakfast',
-                                              () => controller.changeCategory(
+                                      // Horizontally scrollable category buttons
+                                      ScrollConfiguration(
+                                        behavior: ScrollConfiguration.of(
+                                          context,
+                                        ).copyWith(scrollbars: false),
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          physics:
+                                              const BouncingScrollPhysics(),
+                                          child: Row(
+                                            children: [
+                                              _buildModernMealTab(
+                                                '🍳',
                                                 'Breakfast',
+                                                controller
+                                                        .selectedCategory
+                                                        .value ==
+                                                    'Breakfast',
+                                                () => controller.changeCategory(
+                                                  'Breakfast',
+                                                ),
                                               ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: _buildModernMealTab(
-                                              '🥗',
-                                              'Lunch',
-                                              controller
-                                                      .selectedCategory
-                                                      .value ==
-                                                  'Lunch',
-                                              () => controller.changeCategory(
+                                              const SizedBox(width: 12),
+                                              _buildModernMealTab(
+                                                '🥗',
                                                 'Lunch',
+                                                controller
+                                                        .selectedCategory
+                                                        .value ==
+                                                    'Lunch',
+                                                () => controller.changeCategory(
+                                                  'Lunch',
+                                                ),
                                               ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: _buildModernMealTab(
-                                              '🍽️',
-                                              'Dinner',
-                                              controller
-                                                      .selectedCategory
-                                                      .value ==
-                                                  'Dinner',
-                                              () => controller.changeCategory(
+                                              const SizedBox(width: 12),
+                                              _buildModernMealTab(
+                                                '🍽️',
                                                 'Dinner',
+                                                controller
+                                                        .selectedCategory
+                                                        .value ==
+                                                    'Dinner',
+                                                () => controller.changeCategory(
+                                                  'Dinner',
+                                                ),
                                               ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 12),
-                                      // Second Row
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: _buildModernMealTab(
-                                              '🥐',
-                                              'Morning Snacks',
-                                              controller
-                                                      .selectedCategory
-                                                      .value ==
-                                                  'Morning Snacks',
-                                              () => controller.changeCategory(
+                                              const SizedBox(width: 12),
+                                              _buildModernMealTab(
+                                                '🥐',
                                                 'Morning Snacks',
+                                                controller
+                                                        .selectedCategory
+                                                        .value ==
+                                                    'Morning Snacks',
+                                                () => controller.changeCategory(
+                                                  'Morning Snacks',
+                                                ),
                                               ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: _buildModernMealTab(
-                                              '💪',
-                                              'Preworkout',
-                                              controller
-                                                      .selectedCategory
-                                                      .value ==
-                                                  'Preworkout',
-                                              () => controller.changeCategory(
+                                              const SizedBox(width: 12),
+                                              _buildModernMealTab(
+                                                '💪',
                                                 'Preworkout',
+                                                controller
+                                                        .selectedCategory
+                                                        .value ==
+                                                    'Preworkout',
+                                                () => controller.changeCategory(
+                                                  'Preworkout',
+                                                ),
                                               ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: _buildModernMealTab(
-                                              '🏋️',
-                                              'Post Workout',
-                                              controller
-                                                      .selectedCategory
-                                                      .value ==
-                                                  'Post Workout',
-                                              () => controller.changeCategory(
+                                              const SizedBox(width: 12),
+                                              _buildModernMealTab(
+                                                '🏋️',
                                                 'Post Workout',
+                                                controller
+                                                        .selectedCategory
+                                                        .value ==
+                                                    'Post Workout',
+                                                () => controller.changeCategory(
+                                                  'Post Workout',
+                                                ),
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                        ],
+                                        ),
                                       ),
                                       const SizedBox(height: 20),
                                     ],
@@ -617,7 +610,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           gradient: isSelected
               ? LinearGradient(
@@ -628,7 +621,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                 )
               : null,
           color: isSelected ? null : Colors.transparent,
-          borderRadius: BorderRadius.circular(25),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
                 ? const Color(0xFFC2D86A)
@@ -647,20 +640,15 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(emoji, style: const TextStyle(fontSize: 16)),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.white54,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  fontSize: 13,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.white54,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                fontSize: 13,
               ),
             ),
           ],

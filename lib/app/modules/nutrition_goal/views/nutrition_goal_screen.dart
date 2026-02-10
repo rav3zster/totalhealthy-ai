@@ -15,6 +15,9 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
   final PageController _pageController = PageController();
   int currentPageIndex = 0;
 
+  // Check if coming from signup flow
+  late final bool fromSignup;
+
   // Selected options for each screen
   int selectedGoal = -1;
   int selectedActivityLevel = -1;
@@ -66,6 +69,12 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
   @override
   void initState() {
     super.initState();
+
+    // Get the argument to determine where we came from
+    final args = Get.arguments as Map<String, dynamic>?;
+    fromSignup =
+        args?['fromSignup'] ??
+        true; // Default to true for backward compatibility
 
     // Fade animation
     _fadeController = AnimationController(
@@ -196,8 +205,17 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
                               curve: Curves.easeInOut,
                             );
                           } else {
-                            // Navigate back to Switch Role screen
-                            Get.offAllNamed(Routes.SWITCHROLE);
+                            // Navigate based on where we came from
+                            if (fromSignup) {
+                              // Coming from signup, go back to switch role with flag
+                              Get.offAllNamed(
+                                Routes.SWITCHROLE,
+                                arguments: {'fromGoalScreen': true},
+                              );
+                            } else {
+                              // Coming from profile, just go back
+                              Get.back();
+                            }
                           }
                         },
                         icon: const Icon(

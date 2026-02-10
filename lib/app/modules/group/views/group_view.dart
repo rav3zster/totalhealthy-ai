@@ -208,50 +208,350 @@ class _GroupViewState extends State<GroupView>
                 controller: _tabController,
                 children: [
                   // Groups Tab
-                  Obx(() {
-                    if (controller.isLoading.value) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFFC2D86A),
+                  Column(
+                    children: [
+                      // LEVEL 1: Groups Search Bar
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Color(0xFF2D2D2D), Color(0xFF1D1D1D)],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: const Color(
+                                0xFFC2D86A,
+                              ).withValues(alpha: 0.2),
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: TextField(
+                            onChanged: (query) {
+                              controller.filterGroupsInView(query);
+                            },
+                            style: const TextStyle(color: Colors.white),
+                            cursorColor: const Color(0xFFC2D86A),
+                            decoration: InputDecoration(
+                              hintText:
+                                  'Search groups by name or description...',
+                              hintStyle: const TextStyle(
+                                color: Colors.white54,
+                                fontSize: 15,
+                              ),
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.all(12),
+                                child: Icon(
+                                  Icons.search,
+                                  color: Color(0xFFC2D86A),
+                                  size: 22,
+                                ),
+                              ),
+                              suffixIcon: Obx(() {
+                                if (controller
+                                    .groupsViewSearchQuery
+                                    .value
+                                    .isNotEmpty) {
+                                  return IconButton(
+                                    icon: const Icon(
+                                      Icons.clear,
+                                      color: Colors.white54,
+                                      size: 20,
+                                    ),
+                                    onPressed: () {
+                                      controller.clearGroupsViewSearch();
+                                    },
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              }),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 16,
+                              ),
+                            ),
+                          ),
                         ),
-                      );
-                    }
+                      ),
 
-                    if (controller.groupData.isEmpty) {
-                      return _buildEmptyState(
-                        Icons.group_off,
-                        "No groups found.\nCreate one to get started!",
-                      );
-                    }
+                      // Groups List - Filtered
+                      Expanded(
+                        child: Obx(() {
+                          if (controller.isLoading.value) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: Color(0xFFC2D86A),
+                              ),
+                            );
+                          }
 
-                    return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: controller.groupData.length,
-                      itemBuilder: (context, index) {
-                        final group = controller.groupData[index];
-                        return _buildGroupCard(group);
-                      },
-                    );
-                  }),
+                          final groups = controller.filteredGroupsView;
+                          final isSearching =
+                              controller.groupsViewSearchQuery.value.isNotEmpty;
+
+                          if (groups.isEmpty) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isSearching
+                                        ? Icons.search_off_rounded
+                                        : Icons.group_off,
+                                    size: 80,
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    isSearching
+                                        ? 'No groups found'
+                                        : 'No groups found.\nCreate one to get started!',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.8,
+                                      ),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    isSearching
+                                        ? 'Try a different search term'
+                                        : 'Groups you create or join will appear here',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.5,
+                                      ),
+                                      fontSize: 14,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  if (isSearching) ...[
+                                    const SizedBox(height: 16),
+                                    ElevatedButton.icon(
+                                      onPressed: () {
+                                        controller.clearGroupsViewSearch();
+                                      },
+                                      icon: const Icon(Icons.clear, size: 18),
+                                      label: const Text('Clear Search'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFFC2D86A,
+                                        ),
+                                        foregroundColor: Colors.black,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 24,
+                                          vertical: 12,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            );
+                          }
+
+                          return ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: groups.length,
+                            itemBuilder: (context, index) {
+                              final group = groups[index];
+                              return _buildGroupCard(group);
+                            },
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
 
                   // Members Tab
-                  Obx(() {
-                    if (controller.users.isEmpty) {
-                      return _buildEmptyState(
-                        Icons.people_outline,
-                        "No platform members found.",
-                      );
-                    }
+                  Column(
+                    children: [
+                      // LEVEL 2: Global Members Search Bar
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Color(0xFF2D2D2D), Color(0xFF1D1D1D)],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: const Color(
+                                0xFFC2D86A,
+                              ).withValues(alpha: 0.2),
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: TextField(
+                            onChanged: (query) {
+                              controller.filterMembers(query);
+                            },
+                            style: const TextStyle(color: Colors.white),
+                            cursorColor: const Color(0xFFC2D86A),
+                            decoration: InputDecoration(
+                              hintText: 'Search members by name or email...',
+                              hintStyle: const TextStyle(
+                                color: Colors.white54,
+                                fontSize: 15,
+                              ),
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.all(12),
+                                child: Icon(
+                                  Icons.search,
+                                  color: Color(0xFFC2D86A),
+                                  size: 22,
+                                ),
+                              ),
+                              suffixIcon: Obx(() {
+                                if (controller
+                                    .membersSearchQuery
+                                    .value
+                                    .isNotEmpty) {
+                                  return IconButton(
+                                    icon: const Icon(
+                                      Icons.clear,
+                                      color: Colors.white54,
+                                      size: 20,
+                                    ),
+                                    onPressed: () {
+                                      controller.clearMembersSearch();
+                                    },
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              }),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
 
-                    return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: controller.users.length,
-                      itemBuilder: (context, index) {
-                        final user = controller.users[index];
-                        return _buildUserCard(user);
-                      },
-                    );
-                  }),
+                      // Members List - Filtered
+                      Expanded(
+                        child: Obx(() {
+                          final members = controller.filteredMembers;
+                          final isSearching =
+                              controller.membersSearchQuery.value.isNotEmpty;
+
+                          print(
+                            '🔍 MEMBERS TAB - filteredMembers count: ${members.length}',
+                          );
+                          print(
+                            '🔍 MEMBERS TAB - users count: ${controller.users.length}',
+                          );
+                          print('🔍 MEMBERS TAB - isSearching: $isSearching');
+
+                          if (members.isEmpty) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isSearching
+                                        ? Icons.search_off_rounded
+                                        : Icons.people_outline,
+                                    size: 80,
+                                    color: Colors.white.withValues(alpha: 0.3),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    isSearching
+                                        ? 'No members found'
+                                        : 'No platform members found.',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.8,
+                                      ),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    isSearching
+                                        ? 'Try a different search term'
+                                        : 'Members will appear here once they sign up',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.5,
+                                      ),
+                                      fontSize: 14,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  if (isSearching) ...[
+                                    const SizedBox(height: 16),
+                                    ElevatedButton.icon(
+                                      onPressed: () {
+                                        controller.clearMembersSearch();
+                                      },
+                                      icon: const Icon(Icons.clear, size: 18),
+                                      label: const Text('Clear Search'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFFC2D86A,
+                                        ),
+                                        foregroundColor: Colors.black,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 24,
+                                          vertical: 12,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            );
+                          }
+
+                          return ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: members.length,
+                            itemBuilder: (context, index) {
+                              final user = members[index];
+                              return _buildUserCard(user);
+                            },
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

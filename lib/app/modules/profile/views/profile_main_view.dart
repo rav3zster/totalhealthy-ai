@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
@@ -209,7 +210,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
           icon: Icons.track_changes_outlined,
           title: 'Goal Setting',
           onTap: () {
-            Get.toNamed('/nutrition-goal');
+            Get.toNamed('/nutrition-goal', arguments: {'fromSignup': false});
           },
         ),
         const SizedBox(height: 16),
@@ -455,6 +456,297 @@ class _ProfileMainViewState extends State<ProfileMainView> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLogoutOption() {
+    return GestureDetector(
+      onTap: _showLogoutDialog,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.red.withValues(alpha: 0.2),
+              Colors.red.withValues(alpha: 0.1),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: const Color(0xFFFF6B6B).withValues(alpha: 0.3),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFFFF6B6B).withValues(alpha: 0.3),
+                      const Color(0xFFFF6B6B).withValues(alpha: 0.2),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFF6B6B).withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.logout,
+                  color: Color(0xFFFF6B6B),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 16),
+              const Expanded(
+                child: Text(
+                  'Log Out',
+                  style: TextStyle(
+                    color: Color(0xFFFF6B6B),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Color(0xFFFF6B6B),
+                size: 16,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showLogoutDialog() {
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 340),
+          decoration: BoxDecoration(
+            // Glassmorphism with dark theme and lime green tint
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                const Color(0xFF2A2A2A).withValues(alpha: 0.95),
+                const Color(0xFF1A1A1A).withValues(alpha: 0.95),
+                const Color(0xFF1A1A1A).withValues(alpha: 0.98),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: const Color(0xFFC2D86A).withValues(alpha: 0.4),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.5),
+                blurRadius: 30,
+                offset: const Offset(0, 15),
+              ),
+              BoxShadow(
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Padding(
+                padding: const EdgeInsets.all(28),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Icon with lime green accent
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xFFC2D86A).withValues(alpha: 0.15),
+                            const Color(0xFFC2D86A).withValues(alpha: 0.08),
+                          ],
+                        ),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.2),
+                            blurRadius: 15,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.logout_rounded,
+                        color: Color(0xFFC2D86A),
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Title
+                    const Text(
+                      'Log Out',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Message
+                    Text(
+                      'Are you sure you want to\nlog out of your account?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.65),
+                        fontSize: 15,
+                        height: 1.4,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+
+                    // Buttons
+                    Column(
+                      children: [
+                        // Cancel Button with lime green gradient
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => Get.back(),
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color(
+                                      0xFFC2D86A,
+                                    ).withValues(alpha: 0.25),
+                                    const Color(
+                                      0xFFB8CC5A,
+                                    ).withValues(alpha: 0.2),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: const Color(
+                                    0xFFC2D86A,
+                                  ).withValues(alpha: 0.4),
+                                  width: 1.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFFC2D86A,
+                                    ).withValues(alpha: 0.15),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: const Text(
+                                'Cancel',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+
+                        // Logout Button
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              Get.back();
+                              Get.find<AuthController>().logOut();
+                            },
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color(
+                                      0xFF2A2A2A,
+                                    ).withValues(alpha: 0.8),
+                                    const Color(
+                                      0xFF1E1E1E,
+                                    ).withValues(alpha: 0.8),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.15),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Text(
+                                'Log Out',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.75),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: true,
+      barrierColor: Colors.black.withValues(alpha: 0.6),
     );
   }
 

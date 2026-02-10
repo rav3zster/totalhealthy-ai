@@ -30,6 +30,28 @@ class GroupController extends GetxController {
   final RxList<UserModel> availableUsers = <UserModel>[].obs;
   final RxBool isMemberLoading = false.obs;
 
+  // LEVEL 1: Groups Search State (scoped to Groups list only)
+  final RxString groupSearchQuery = ''.obs;
+  final RxList<Map<String, dynamic>> filteredGroups =
+      <Map<String, dynamic>>[].obs;
+
+  // LEVEL 1b: Groups View Search State (scoped to Groups tab in group_view.dart)
+  final RxString groupsViewSearchQuery = ''.obs;
+  final RxList<GroupModel> filteredGroupsView = <GroupModel>[].obs;
+
+  // LEVEL 2: Global Members Search State (scoped to Members tab only)
+  final RxString membersSearchQuery = ''.obs;
+  final RxList<UserModel> filteredMembers = <UserModel>[].obs;
+
+  // LEVEL 3: Group Details Members Search State (scoped to specific group members only)
+  final RxString groupMembersSearchQuery = ''.obs;
+  final RxList<UserModel> filteredGroupMembers = <UserModel>[].obs;
+
+  // LEVEL 4: Member Management Invite Search State (scoped to available users in invite tab)
+  final RxString availableUsersSearchQuery = ''.obs;
+  final RxList<UserModel> filteredAvailableUsers = <UserModel>[].obs;
+
+  /// Initialize filtered groups list when groups data changes
   @override
   void onInit() {
     super.onInit();
@@ -51,6 +73,94 @@ class GroupController extends GetxController {
       } else {
         // User logged out, clear groups
         groupData.value = [];
+        filteredGroups.value = [];
+      }
+    });
+
+    // Initialize filtered groups when groupData changes
+    ever(groupData, (_) {
+      if (groupSearchQuery.value.isEmpty) {
+        filteredGroups.value = groupData
+            .map(
+              (group) => {
+                'id': group.id,
+                'name': group.name,
+                'description': group.description,
+                'createdDate': group.createdAt.toString(),
+                'created_by': group.createdBy,
+              },
+            )
+            .toList();
+      } else {
+        filterGroups(groupSearchQuery.value);
+      }
+
+      // Also initialize filteredGroupsView for the Groups tab
+      if (groupsViewSearchQuery.value.isEmpty) {
+        filteredGroupsView.value = groupData;
+      } else {
+        filterGroupsInView(groupsViewSearchQuery.value);
+      }
+    });
+
+    // Initialize filtered group members when groupMembers changes
+    ever(groupMembers, (_) {
+      print(
+        '🔍 EVER LISTENER - groupMembers changed, count: ${groupMembers.length}',
+      );
+      print(
+        '🔍 EVER LISTENER - groupMembersSearchQuery: "${groupMembersSearchQuery.value}"',
+      );
+      if (groupMembersSearchQuery.value.isEmpty) {
+        filteredGroupMembers.value = groupMembers;
+        print(
+          '🔍 EVER LISTENER - Set filteredGroupMembers to ${filteredGroupMembers.length} members',
+        );
+      } else {
+        filterGroupMembers(groupMembersSearchQuery.value);
+        print(
+          '🔍 EVER LISTENER - Filtered to ${filteredGroupMembers.length} members',
+        );
+      }
+    });
+
+    // Initialize filtered members when users changes (LEVEL 2 search)
+    ever(users, (_) {
+      print('🔍 EVER LISTENER - users changed, count: ${users.length}');
+      print(
+        '🔍 EVER LISTENER - membersSearchQuery: "${membersSearchQuery.value}"',
+      );
+      if (membersSearchQuery.value.isEmpty) {
+        filteredMembers.value = users;
+        print(
+          '🔍 EVER LISTENER - Set filteredMembers to ${filteredMembers.length} members',
+        );
+      } else {
+        filterMembers(membersSearchQuery.value);
+        print(
+          '🔍 EVER LISTENER - Filtered to ${filteredMembers.length} members',
+        );
+      }
+    });
+
+    // Initialize filtered available users when availableUsers changes (LEVEL 4 search)
+    ever(availableUsers, (_) {
+      print(
+        '🔍 EVER LISTENER - availableUsers changed, count: ${availableUsers.length}',
+      );
+      print(
+        '🔍 EVER LISTENER - availableUsersSearchQuery: "${availableUsersSearchQuery.value}"',
+      );
+      if (availableUsersSearchQuery.value.isEmpty) {
+        filteredAvailableUsers.value = availableUsers;
+        print(
+          '🔍 EVER LISTENER - Set filteredAvailableUsers to ${filteredAvailableUsers.length} users',
+        );
+      } else {
+        filterAvailableUsers(availableUsersSearchQuery.value);
+        print(
+          '🔍 EVER LISTENER - Filtered to ${filteredAvailableUsers.length} users',
+        );
       }
     });
   }
@@ -203,8 +313,8 @@ class GroupController extends GetxController {
   }
 
   /// Get users who can be invited (all Firebase users except current members and pending invites)
-  /// RBAC: Only Members can be invited (Advisors are filtered out)
-  /// CRITICAL: Advisors must NEVER appear in this list
+  /// RBAC: Includes Members, Trainers, and users with no role assigned
+  /// Excludes only Advisors and Admins
   Future<List<UserModel>> getAvailableUsers(String groupId) async {
     try {
       if (groupId.isEmpty) {
@@ -218,18 +328,37 @@ class GroupController extends GetxController {
         return [];
       }
 
+      print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      print("DEBUG AVAILABLE USERS FILTERING:");
+      print("Total users in system: ${users.length}");
+
       // Get current member IDs (including creator)
       final currentMemberIds = Set<String>.from(group.membersList);
       currentMemberIds.add(group.createdBy); // Always include creator
+      print("Current members in group: ${currentMemberIds.length}");
+      print("Current member IDs: $currentMemberIds");
 
       // Get users who have pending invitations for this group
       final pendingUserIds = sentInvitations
           .where((invitation) => invitation.groupId == groupId)
           .map((invitation) => invitation.recipientId)
           .toSet();
+      print("Pending invitations: ${pendingUserIds.length}");
+      print("Pending user IDs: $pendingUserIds");
+
+      // Debug: Check each user's role
+      print("\nUser roles breakdown:");
+      final roleCount = <String, int>{};
+      for (final user in users) {
+        final role = user.role ?? 'null';
+        roleCount[role] = (roleCount[role] ?? 0) + 1;
+      }
+      roleCount.forEach((role, count) {
+        print("  $role: $count users");
+      });
 
       // CRITICAL: Use permission service to filter available members
-      // This ensures Advisors NEVER appear in the list
+      // Includes all users except Advisors/Admins and current members
       final availableUsers = _permissionsService.filterAvailableMembers(
         users,
         currentMemberIds,
@@ -239,9 +368,17 @@ class GroupController extends GetxController {
       // Sort alphabetically for better UX
       availableUsers.sort((a, b) => a.username.compareTo(b.username));
 
-      print(
-        "DEBUG: Filtered ${availableUsers.length} available members (Advisors excluded)",
-      );
+      print("\nFinal available users: ${availableUsers.length}");
+      print("Available users list:");
+      for (final user in availableUsers.take(10)) {
+        print(
+          "  - ${user.username} (${user.email}) [${user.role ?? 'no role'}]",
+        );
+      }
+      if (availableUsers.length > 10) {
+        print("  ... and ${availableUsers.length - 10} more");
+      }
+      print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
       return availableUsers;
     } catch (e) {
@@ -450,9 +587,14 @@ class GroupController extends GetxController {
         groupMembers.value = members;
         availableUsers.value = available;
 
+        // Initialize filtered members (LEVEL 3 search)
+        filteredGroupMembers.value = members;
+        groupMembersSearchQuery.value = '';
+
         // Force UI update
         groupMembers.refresh();
         availableUsers.refresh();
+        filteredGroupMembers.refresh();
       }
     } catch (e) {
       print("Error in setCurrentGroup: $e");
@@ -590,5 +732,181 @@ class GroupController extends GetxController {
   /// Is current user a Member?
   bool get isMember {
     return _permissionsService.isMember;
+  }
+
+  // ==================== SCOPED SEARCH METHODS ====================
+
+  /// LEVEL 1: Filter groups by name or description
+  /// This search is scoped ONLY to the Groups list screen
+  void filterGroups(String query) {
+    groupSearchQuery.value = query;
+
+    if (query.trim().isEmpty) {
+      // Show all groups when search is empty
+      filteredGroups.value = groupData
+          .map(
+            (group) => {
+              'id': group.id,
+              'name': group.name,
+              'description': group.description,
+              'createdDate': group.createdAt.toString(),
+              'created_by': group.createdBy,
+            },
+          )
+          .toList();
+    } else {
+      // Filter groups by name or description
+      final lowerQuery = query.toLowerCase();
+      filteredGroups.value = groupData
+          .where((group) {
+            return group.name.toLowerCase().contains(lowerQuery) ||
+                group.description.toLowerCase().contains(lowerQuery);
+          })
+          .map(
+            (group) => {
+              'id': group.id,
+              'name': group.name,
+              'description': group.description,
+              'createdDate': group.createdAt.toString(),
+              'created_by': group.createdBy,
+            },
+          )
+          .toList();
+    }
+
+    print(
+      '🔍 LEVEL 1 - Groups filtered: ${filteredGroups.length} results for "$query"',
+    );
+  }
+
+  /// Clear groups search
+  void clearGroupSearch() {
+    groupSearchQuery.value = '';
+    filteredGroups.value = groupData
+        .map(
+          (group) => {
+            'id': group.id,
+            'name': group.name,
+            'description': group.description,
+            'createdDate': group.createdAt.toString(),
+            'created_by': group.createdBy,
+          },
+        )
+        .toList();
+  }
+
+  /// LEVEL 1b: Filter groups in the Groups tab view
+  /// This search is scoped ONLY to the Groups tab in group_view.dart
+  void filterGroupsInView(String query) {
+    groupsViewSearchQuery.value = query;
+
+    if (query.trim().isEmpty) {
+      // Show all groups when search is empty
+      filteredGroupsView.value = groupData;
+    } else {
+      // Filter groups by name or description
+      final lowerQuery = query.toLowerCase();
+      filteredGroupsView.value = groupData.where((group) {
+        return group.name.toLowerCase().contains(lowerQuery) ||
+            group.description.toLowerCase().contains(lowerQuery);
+      }).toList();
+    }
+
+    print(
+      '🔍 LEVEL 1b - Groups view filtered: ${filteredGroupsView.length} results for "$query"',
+    );
+  }
+
+  /// Clear groups view search
+  void clearGroupsViewSearch() {
+    groupsViewSearchQuery.value = '';
+    filteredGroupsView.value = groupData;
+  }
+
+  /// LEVEL 2: Filter global members by name or email
+  /// This search is scoped ONLY to the Members tab (all platform members)
+  void filterMembers(String query) {
+    membersSearchQuery.value = query;
+
+    if (query.trim().isEmpty) {
+      // Show all members when search is empty
+      filteredMembers.value = users;
+    } else {
+      // Filter members by name or email
+      final lowerQuery = query.toLowerCase();
+      filteredMembers.value = users.where((member) {
+        return member.username.toLowerCase().contains(lowerQuery) ||
+            member.email.toLowerCase().contains(lowerQuery) ||
+            member.fullName.toLowerCase().contains(lowerQuery);
+      }).toList();
+    }
+
+    print(
+      '🔍 LEVEL 2 - Global members filtered: ${filteredMembers.length} results for "$query"',
+    );
+  }
+
+  /// Clear global members search
+  void clearMembersSearch() {
+    membersSearchQuery.value = '';
+    filteredMembers.value = users;
+  }
+
+  /// LEVEL 3: Filter members within a specific group
+  /// This search is scoped ONLY to members of the current group
+  void filterGroupMembers(String query) {
+    groupMembersSearchQuery.value = query;
+
+    if (query.trim().isEmpty) {
+      // Show all group members when search is empty
+      filteredGroupMembers.value = groupMembers;
+    } else {
+      // Filter members by name or email
+      final lowerQuery = query.toLowerCase();
+      filteredGroupMembers.value = groupMembers.where((member) {
+        return member.username.toLowerCase().contains(lowerQuery) ||
+            member.email.toLowerCase().contains(lowerQuery) ||
+            member.fullName.toLowerCase().contains(lowerQuery);
+      }).toList();
+    }
+
+    print(
+      '🔍 LEVEL 3 - Group members filtered: ${filteredGroupMembers.length} results for "$query"',
+    );
+  }
+
+  /// LEVEL 4: Filter available users for invitation
+  /// This search is scoped ONLY to available users in the invite tab
+  void filterAvailableUsers(String query) {
+    availableUsersSearchQuery.value = query;
+
+    if (query.trim().isEmpty) {
+      // Show all available users when search is empty
+      filteredAvailableUsers.value = availableUsers;
+    } else {
+      // Filter users by name or email
+      final lowerQuery = query.toLowerCase();
+      filteredAvailableUsers.value = availableUsers.where((user) {
+        return user.username.toLowerCase().contains(lowerQuery) ||
+            user.email.toLowerCase().contains(lowerQuery) ||
+            user.fullName.toLowerCase().contains(lowerQuery);
+      }).toList();
+    }
+
+    print(
+      '🔍 LEVEL 4 - Available users filtered: ${filteredAvailableUsers.length} results for "$query"',
+    );
+  }
+
+  /// Clear available users search
+  void clearAvailableUsersSearch() {
+    availableUsersSearchQuery.value = '';
+    filteredAvailableUsers.value = availableUsers;
+  }
+
+  /// Clear group members search
+  void clearGroupMembersSearch() {
+    groupMembersSearchQuery.value = '';
+    filteredGroupMembers.value = groupMembers;
   }
 }

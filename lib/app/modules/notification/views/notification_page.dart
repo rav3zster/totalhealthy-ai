@@ -18,13 +18,21 @@ class NotificationsPage extends StatefulWidget {
   State<NotificationsPage> createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState extends State<NotificationsPage> {
-  bool showAllNotifications = true;
+class _NotificationsPageState extends State<NotificationsPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     OntapStore.index = 2; // Set to Notification tab
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -51,7 +59,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 ],
               ),
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     // App bar
@@ -72,81 +80,92 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
                     const SizedBox(height: 20),
 
-                    // Toggle buttons
-                    Row(
-                      children: [
-                        _buildModernToggleButton(
-                          'All',
-                          showAllNotifications,
-                          () {
-                            setState(() => showAllNotifications = true);
-                          },
+                    // Modern Tab Bar
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E1E1E),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.05),
+                          width: 1,
                         ),
-                        const SizedBox(width: 12),
-                        _buildModernToggleButton(
-                          'Unread',
-                          !showAllNotifications,
-                          () {
-                            setState(() => showAllNotifications = false);
-                          },
+                      ),
+                      child: TabBar(
+                        controller: _tabController,
+                        indicator: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(
+                                0xFFC2D86A,
+                              ).withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ],
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        dividerColor: Colors.transparent,
+                        labelColor: const Color(0xFF121212),
+                        unselectedLabelColor: Colors.white.withValues(
+                          alpha: 0.5,
+                        ),
+                        labelStyle: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.3,
+                        ),
+                        unselectedLabelStyle: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        tabs: const [
+                          Tab(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.notifications_rounded, size: 18),
+                                SizedBox(width: 6),
+                                Text('All'),
+                              ],
+                            ),
+                          ),
+                          Tab(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.mark_email_unread_rounded, size: 18),
+                                SizedBox(width: 6),
+                                Text('Unread'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
-            // Notifications list
+            // Tab Content
             Expanded(
-              child: Obx(() {
-                if (widget.controller.isLoading.value) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: Color(0xFFC2D86A)),
-                  );
-                }
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // All Notifications Tab
+                  _buildNotificationsList(showAll: true),
 
-                final filteredList = widget.controller.notifications.where((n) {
-                  if (showAllNotifications) return true;
-                  return n.status == NotificationStatus.pending;
-                }).toList();
-
-                if (filteredList.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.notifications_none_rounded,
-                          size: 64,
-                          color: Colors.white.withValues(alpha: 0.3),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          showAllNotifications
-                              ? 'No notifications yet'
-                              : 'No unread notifications',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.6),
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: filteredList.length,
-                  itemBuilder: (context, index) {
-                    final notification = filteredList[index];
-                    return _buildModernNotificationCard(notification, index);
-                  },
-                );
-              }),
+                  // Unread Notifications Tab
+                  _buildNotificationsList(showAll: false),
+                ],
+              ),
             ),
           ],
         ),
@@ -155,56 +174,51 @@ class _NotificationsPageState extends State<NotificationsPage> {
     );
   }
 
-  Widget _buildModernToggleButton(
-    String text,
-    bool isSelected,
-    VoidCallback onTap,
-  ) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          decoration: BoxDecoration(
-            gradient: isSelected
-                ? const LinearGradient(
-                    colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                  )
-                : null,
-            color: isSelected ? null : const Color(0xFF1E1E1E),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isSelected
-                  ? const Color(0xFFC2D86A)
-                  : Colors.white.withValues(alpha: 0.1),
-              width: 1.5,
-            ),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : null,
+  Widget _buildNotificationsList({required bool showAll}) {
+    return Obx(() {
+      if (widget.controller.isLoading.value) {
+        return const Center(
+          child: CircularProgressIndicator(color: Color(0xFFC2D86A)),
+        );
+      }
+
+      final filteredList = widget.controller.notifications.where((n) {
+        if (showAll) return true;
+        return n.status == NotificationStatus.pending;
+      }).toList();
+
+      if (filteredList.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.notifications_none_rounded,
+                size: 64,
+                color: Colors.white.withValues(alpha: 0.3),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                showAll ? 'No notifications yet' : 'No unread notifications',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.6),
+                  fontSize: 16,
+                ),
+              ),
+            ],
           ),
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isSelected
-                  ? const Color(0xFF121212)
-                  : Colors.white.withValues(alpha: 0.6),
-              fontSize: 15,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ),
-      ),
-    );
+        );
+      }
+
+      return ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: filteredList.length,
+        itemBuilder: (context, index) {
+          final notification = filteredList[index];
+          return _buildModernNotificationCard(notification, index);
+        },
+      );
+    });
   }
 
   Widget _buildModernNotificationCard(AppNotification notification, int index) {

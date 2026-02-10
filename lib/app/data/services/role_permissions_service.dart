@@ -240,19 +240,56 @@ class RolePermissionsService {
   }
 
   /// Filter users to exclude current members and pending invites
-  /// AND exclude all Advisors (CRITICAL)
+  /// Shows Members, Trainers, and users with no role, but excludes Advisors/Admins only
   List<UserModel> filterAvailableMembers(
     List<UserModel> allUsers,
     Set<String> currentMemberIds,
     Set<String> pendingInviteIds,
   ) {
-    return allUsers
-        .where(
-          (user) =>
-              !currentMemberIds.contains(user.id) &&
-              !pendingInviteIds.contains(user.id) &&
-              user.isMember, // CRITICAL: Only Members
-        )
-        .toList();
+    print("\n🔍 FILTER DEBUG:");
+    print("Total users to filter: ${allUsers.length}");
+
+    int excludedByMembership = 0;
+    int excludedByPending = 0;
+    int excludedByRole = 0;
+
+    final result = allUsers.where((user) {
+      // Check if already a member
+      if (currentMemberIds.contains(user.id)) {
+        excludedByMembership++;
+        return false;
+      }
+
+      // Check if has pending invite
+      if (pendingInviteIds.contains(user.id)) {
+        excludedByPending++;
+        return false;
+      }
+
+      // Check if role is null or empty - INCLUDE them (they can be invited)
+      if (user.role == null || user.role!.isEmpty) {
+        print("  ✓ User ${user.username} included (no role assigned)");
+        return true;
+      }
+
+      // Check if role is excluded (only admin and advisor)
+      final isExcludedRole = user.role == 'admin' || user.role == 'advisor';
+
+      if (isExcludedRole) {
+        excludedByRole++;
+        print("  ⚠️ User ${user.username} excluded by role: ${user.role}");
+        return false;
+      }
+
+      // Include all other roles (member, user, trainer, etc.)
+      return true;
+    }).toList();
+
+    print("Excluded by membership: $excludedByMembership");
+    print("Excluded by pending invite: $excludedByPending");
+    print("Excluded by role type (admin/advisor): $excludedByRole");
+    print("Final result: ${result.length} users");
+
+    return result;
   }
 }
