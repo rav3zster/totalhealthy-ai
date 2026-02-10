@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../data/services/mock_api_service.dart';
 import '../../../data/services/users_firestore_service.dart';
+import '../../../data/services/role_permissions_service.dart';
 import '../../../data/models/user_model.dart';
 import '../../../routes/app_pages.dart';
 
@@ -24,6 +25,7 @@ class TrainerDashboardView extends StatefulWidget {
 
 class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   final UsersFirestoreService _usersService = UsersFirestoreService();
+  final RolePermissionsService _permissionsService = RolePermissionsService();
   final RxString searchQuery = ''.obs;
   bool isLoading = false;
   var userData = {};
@@ -663,6 +665,19 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                 ),
                                 GestureDetector(
                                   onTap: () {
+                                    // RBAC: Check permission before navigation
+                                    if (!_permissionsService
+                                        .canManageClients()) {
+                                      Get.snackbar(
+                                        'Permission Denied',
+                                        'Only Advisors can manage clients',
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                        duration: const Duration(seconds: 3),
+                                      );
+                                      return;
+                                    }
+
                                     Get.toNamed(Routes.CLIENT_LIST);
                                   },
                                   child: Container(

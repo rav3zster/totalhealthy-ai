@@ -32,6 +32,29 @@ class _ClientListScreenState extends State<ClientListScreen> {
   @override
   void initState() {
     super.initState();
+
+    // CRITICAL: RBAC Check - Only Advisors can access this screen
+    if (!_permissionsService.canManageClients()) {
+      debugPrint('❌ RBAC: Non-advisor attempted to access Client List');
+
+      // Show error message
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.snackbar(
+          'Permission Denied',
+          'Only Advisors can manage clients',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 3),
+        );
+
+        // Navigate back
+        Get.back();
+      });
+
+      return;
+    }
+
+    debugPrint('✅ RBAC: Advisor access granted to Client List');
     _loadMembers();
   }
 

@@ -276,12 +276,15 @@ class UserModel {
 
   // Role helper methods for RBAC
   bool get isAdvisor {
-    return role != null &&
-        (role == 'advisor' || role == 'admin' || role == 'trainer');
+    if (role == null) return false;
+    final r = role!.toLowerCase();
+    return r == 'advisor' || r == 'admin' || r == 'trainer';
   }
 
   bool get isMember {
-    return role != null && (role == 'member' || role == 'user');
+    if (role == null) return false;
+    final r = role!.toLowerCase();
+    return r == 'member' || r == 'user';
   }
 
   bool get hasRole {
