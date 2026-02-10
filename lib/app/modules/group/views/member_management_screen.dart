@@ -251,56 +251,131 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
     GroupController controller,
     Map<String, dynamic> group,
   ) {
-    return Obx(() {
-      if (controller.isMemberLoading.value) {
-        return const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(color: Color(0xFFC2D86A)),
-              SizedBox(height: 16),
-              Text(
-                'Loading available users...',
-                style: TextStyle(color: Colors.white70, fontSize: 14),
+    return Column(
+      children: [
+        // Search Bar
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF2A2A2A), Color(0xFF1E1E1E)],
               ),
-            ],
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: TextField(
+              onChanged: (value) {
+                controller.filterAvailableUsers(value);
+              },
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Search members to invite...',
+                hintStyle: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.4),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                ),
+                prefixIcon: Icon(
+                  Icons.search_rounded,
+                  color: const Color(0xFFC2D86A).withValues(alpha: 0.7),
+                  size: 22,
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    Icons.clear_rounded,
+                    color: Colors.white.withValues(alpha: 0.4),
+                    size: 20,
+                  ),
+                  onPressed: () {
+                    controller.clearAvailableUsersSearch();
+                  },
+                ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+              ),
+            ),
           ),
-        );
-      }
+        ),
 
-      final availableUsers = controller.availableUsers;
+        // User List
+        Expanded(
+          child: Obx(() {
+            if (controller.isMemberLoading.value) {
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(color: Color(0xFFC2D86A)),
+                    SizedBox(height: 16),
+                    Text(
+                      'Loading available users...',
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
+                  ],
+                ),
+              );
+            }
 
-      if (availableUsers.isEmpty) {
-        return const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.person_add_disabled, size: 64, color: Colors.white54),
-              SizedBox(height: 16),
-              Text(
-                'No users available to invite',
-                style: TextStyle(color: Colors.white70, fontSize: 14),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'All users are either already members or have pending invitations',
-                style: TextStyle(color: Colors.white54, fontSize: 12),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        );
-      }
+            final availableUsers = controller.filteredAvailableUsers;
 
-      return ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: availableUsers.length,
-        itemBuilder: (context, index) {
-          final user = availableUsers[index];
-          return _buildInviteUserCard(user, controller, group);
-        },
-      );
-    });
+            if (availableUsers.isEmpty) {
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.person_search_rounded,
+                      size: 64,
+                      color: Colors.white54,
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'No users found',
+                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Try adjusting your search',
+                      style: TextStyle(color: Colors.white54, fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: availableUsers.length,
+              itemBuilder: (context, index) {
+                final user = availableUsers[index];
+                return _buildInviteUserCard(user, controller, group);
+              },
+            );
+          }),
+        ),
+      ],
+    );
   }
 
   Widget _buildCurrentMemberCard(

@@ -20,6 +20,9 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen>
   bool isMemberSelected = false;
   String role = "";
 
+  // Track if user has already proceeded to goal screen
+  bool hasProceededToGoals = false;
+
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
@@ -28,6 +31,16 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen>
   @override
   void initState() {
     super.initState();
+
+    // Check if coming back from goal screen
+    final args = Get.arguments as Map<String, dynamic>?;
+    hasProceededToGoals = args?['fromGoalScreen'] ?? false;
+
+    // If coming back from goal screen, restore the member selection
+    if (hasProceededToGoals) {
+      isMemberSelected = true;
+      role = "user";
+    }
 
     // Fade animation for text
     _fadeController = AnimationController(
@@ -287,7 +300,9 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen>
                                     }
 
                                     // CRITICAL: Check if role is already locked
-                                    if (profile.isRoleLocked) {
+                                    // BUT allow going back to goals if user came from goal screen
+                                    if (profile.isRoleLocked &&
+                                        !hasProceededToGoals) {
                                       Get.snackbar(
                                         "Role Already Set",
                                         "Your role has already been set and cannot be changed",
@@ -306,7 +321,7 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen>
                                       return;
                                     }
 
-                                    // Set role ONE TIME ONLY with roleSetAt timestamp
+                                    // Set role (update if coming back from goals, or set for first time)
                                     final updatedProfile = UserModel(
                                       id: profile.id,
                                       email: profile.email,
@@ -327,9 +342,11 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen>
                                       muscleGained: profile.muscleGained,
                                       profileCompleted:
                                           profile.profileCompleted,
-                                      role: role, // Set role ONCE
+                                      role:
+                                          role, // Update role (may have changed)
                                       roleSetAt:
-                                          DateTime.now(), // Lock role with timestamp
+                                          profile.roleSetAt ??
+                                          DateTime.now(), // Keep existing or set new
                                       createdAt: profile.createdAt,
                                     );
 
@@ -345,7 +362,12 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen>
                                     if (role == "admin") {
                                       Get.offAllNamed(Routes.TrainerDashboard);
                                     } else {
-                                      Get.offAllNamed(Routes.NUTRITION_GOAL);
+                                      // If user already proceeded to goals before, go back to goals
+                                      // Otherwise, this is first time, so proceed normally
+                                      Get.offAllNamed(
+                                        Routes.NUTRITION_GOAL,
+                                        arguments: {'fromSignup': true},
+                                      );
                                     }
                                   } catch (e) {
                                     Get.snackbar(

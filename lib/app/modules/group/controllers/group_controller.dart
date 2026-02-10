@@ -47,6 +47,10 @@ class GroupController extends GetxController {
   final RxString groupMembersSearchQuery = ''.obs;
   final RxList<UserModel> filteredGroupMembers = <UserModel>[].obs;
 
+  // LEVEL 4: Member Management Invite Search State (scoped to available users in invite tab)
+  final RxString availableUsersSearchQuery = ''.obs;
+  final RxList<UserModel> filteredAvailableUsers = <UserModel>[].obs;
+
   /// Initialize filtered groups list when groups data changes
   @override
   void onInit() {
@@ -135,6 +139,27 @@ class GroupController extends GetxController {
         filterMembers(membersSearchQuery.value);
         print(
           '🔍 EVER LISTENER - Filtered to ${filteredMembers.length} members',
+        );
+      }
+    });
+
+    // Initialize filtered available users when availableUsers changes (LEVEL 4 search)
+    ever(availableUsers, (_) {
+      print(
+        '🔍 EVER LISTENER - availableUsers changed, count: ${availableUsers.length}',
+      );
+      print(
+        '🔍 EVER LISTENER - availableUsersSearchQuery: "${availableUsersSearchQuery.value}"',
+      );
+      if (availableUsersSearchQuery.value.isEmpty) {
+        filteredAvailableUsers.value = availableUsers;
+        print(
+          '🔍 EVER LISTENER - Set filteredAvailableUsers to ${filteredAvailableUsers.length} users',
+        );
+      } else {
+        filterAvailableUsers(availableUsersSearchQuery.value);
+        print(
+          '🔍 EVER LISTENER - Filtered to ${filteredAvailableUsers.length} users',
         );
       }
     });
@@ -288,8 +313,8 @@ class GroupController extends GetxController {
   }
 
   /// Get users who can be invited (all Firebase users except current members and pending invites)
-  /// RBAC: Only Members can be invited (Advisors are filtered out)
-  /// CRITICAL: Advisors must NEVER appear in this list
+  /// RBAC: Includes Members, Trainers, and users with no role assigned
+  /// Excludes only Advisors and Admins
   Future<List<UserModel>> getAvailableUsers(String groupId) async {
     try {
       if (groupId.isEmpty) {
@@ -303,18 +328,37 @@ class GroupController extends GetxController {
         return [];
       }
 
+      print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      print("DEBUG AVAILABLE USERS FILTERING:");
+      print("Total users in system: ${users.length}");
+
       // Get current member IDs (including creator)
       final currentMemberIds = Set<String>.from(group.membersList);
       currentMemberIds.add(group.createdBy); // Always include creator
+      print("Current members in group: ${currentMemberIds.length}");
+      print("Current member IDs: $currentMemberIds");
 
       // Get users who have pending invitations for this group
       final pendingUserIds = sentInvitations
           .where((invitation) => invitation.groupId == groupId)
           .map((invitation) => invitation.recipientId)
           .toSet();
+      print("Pending invitations: ${pendingUserIds.length}");
+      print("Pending user IDs: $pendingUserIds");
+
+      // Debug: Check each user's role
+      print("\nUser roles breakdown:");
+      final roleCount = <String, int>{};
+      for (final user in users) {
+        final role = user.role ?? 'null';
+        roleCount[role] = (roleCount[role] ?? 0) + 1;
+      }
+      roleCount.forEach((role, count) {
+        print("  $role: $count users");
+      });
 
       // CRITICAL: Use permission service to filter available members
-      // This ensures Advisors NEVER appear in the list
+      // Includes all users except Advisors/Admins and current members
       final availableUsers = _permissionsService.filterAvailableMembers(
         users,
         currentMemberIds,
@@ -324,9 +368,17 @@ class GroupController extends GetxController {
       // Sort alphabetically for better UX
       availableUsers.sort((a, b) => a.username.compareTo(b.username));
 
-      print(
-        "DEBUG: Filtered ${availableUsers.length} available members (Advisors excluded)",
-      );
+      print("\nFinal available users: ${availableUsers.length}");
+      print("Available users list:");
+      for (final user in availableUsers.take(10)) {
+        print(
+          "  - ${user.username} (${user.email}) [${user.role ?? 'no role'}]",
+        );
+      }
+      if (availableUsers.length > 10) {
+        print("  ... and ${availableUsers.length - 10} more");
+      }
+      print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
       return availableUsers;
     } catch (e) {
@@ -821,6 +873,35 @@ class GroupController extends GetxController {
     print(
       '🔍 LEVEL 3 - Group members filtered: ${filteredGroupMembers.length} results for "$query"',
     );
+  }
+
+  /// LEVEL 4: Filter available users for invitation
+  /// This search is scoped ONLY to available users in the invite tab
+  void filterAvailableUsers(String query) {
+    availableUsersSearchQuery.value = query;
+
+    if (query.trim().isEmpty) {
+      // Show all available users when search is empty
+      filteredAvailableUsers.value = availableUsers;
+    } else {
+      // Filter users by name or email
+      final lowerQuery = query.toLowerCase();
+      filteredAvailableUsers.value = availableUsers.where((user) {
+        return user.username.toLowerCase().contains(lowerQuery) ||
+            user.email.toLowerCase().contains(lowerQuery) ||
+            user.fullName.toLowerCase().contains(lowerQuery);
+      }).toList();
+    }
+
+    print(
+      '🔍 LEVEL 4 - Available users filtered: ${filteredAvailableUsers.length} results for "$query"',
+    );
+  }
+
+  /// Clear available users search
+  void clearAvailableUsersSearch() {
+    availableUsersSearchQuery.value = '';
+    filteredAvailableUsers.value = availableUsers;
   }
 
   /// Clear group members search
