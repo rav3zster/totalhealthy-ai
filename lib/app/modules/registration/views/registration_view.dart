@@ -4,6 +4,7 @@ import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:totalhealthy/app/modules/manage_accounts/views/manage_accounts_views.dart';
 import 'package:totalhealthy/app/widgets/baseWidget.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
+import 'package:totalhealthy/app/controllers/user_controller.dart';
 
 import '../../nutrition_goal/views/nutrition_goal_screen.dart';
 
@@ -37,9 +38,24 @@ class RegistrationView extends StatelessWidget {
                       padding: const EdgeInsets.all(16.0),
                       child: CircleAvatar(
                         radius: 50,
-                        backgroundImage: NetworkImage(
-                          'https://example.com/profile-picture.jpg',
+                        backgroundImage: UserController.getImageProvider(
+                          Get.find<AuthController>()
+                              .getCurrentUser()
+                              .profileImage,
                         ),
+                        child:
+                            UserController.getImageProvider(
+                                  Get.find<AuthController>()
+                                      .getCurrentUser()
+                                      .profileImage,
+                                ) ==
+                                null
+                            ? const Icon(
+                                Icons.person,
+                                size: 50,
+                                color: Colors.white24,
+                              )
+                            : null,
                       ),
                     ),
 

@@ -141,6 +141,7 @@ class SimpleRealTimeSearchBar extends StatefulWidget {
 class _SimpleRealTimeSearchBarState extends State<SimpleRealTimeSearchBar> {
   late final TextEditingController _textController;
   late final FocusNode _focusNode;
+  Worker? _searchWorker;
 
   @override
   void initState() {
@@ -150,10 +151,34 @@ class _SimpleRealTimeSearchBarState extends State<SimpleRealTimeSearchBar> {
 
     // Listen to focus changes
     _focusNode.addListener(_onFocusChanged);
+
+    // CRITICAL FIX: Listen to searchQuery changes to sync with text controller
+    // Store the worker to dispose of it later
+    _searchWorker = ever(widget.searchQuery, (String value) {
+      // Check if mounted to avoid "used after disposed" error
+      if (!mounted) return;
+
+      // Only update if value is different to avoid loops
+      if (_textController.text != value) {
+        // Use post frame callback to avoid build conflicts
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _textController.text = value;
+            // Maintain cursor position at end
+            _textController.selection = TextSelection.fromPosition(
+              TextPosition(offset: value.length),
+            );
+          }
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
+    // CRITICAL: Dispose worker first to stop listening
+    _searchWorker?.dispose();
+
     _focusNode.removeListener(_onFocusChanged);
     _focusNode.dispose();
     _textController.dispose();
@@ -223,8 +248,8 @@ class _SimpleRealTimeSearchBarState extends State<SimpleRealTimeSearchBar> {
                 print(
                   '🔤 WIDGET DEBUG - TextField onChanged called with: "$value"',
                 );
-                // DON'T set searchQuery.value here - let the controller do it
-                // widget.searchQuery.value = value;
+                // CRITICAL FIX: Update searchQuery immediately for reactive UI (clear button, etc.)
+                widget.searchQuery.value = value;
                 print('🔤 WIDGET DEBUG - Calling onSearchChanged callback');
                 widget.onSearchChanged(value);
                 print('🔤 WIDGET DEBUG - onSearchChanged callback completed');

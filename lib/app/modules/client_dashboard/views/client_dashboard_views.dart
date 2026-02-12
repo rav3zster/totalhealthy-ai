@@ -435,29 +435,58 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                         children: [
                                           Image.asset(
                                             'assets/no_diet.png',
-                                            height: 250,
-                                            width: 250,
+                                            height: 180,
+                                            width: 180,
                                             fit: BoxFit.cover,
                                           ),
-                                          const SizedBox(height: 16),
-                                          Text(
-                                            'No ${controller.selectedCategory.value.toLowerCase()} meals yet',
-                                            style: TextStyle(
-                                              color: Colors.white.withValues(
-                                                alpha: 0.8,
-                                              ),
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                          // const SizedBox(height: 12),
+                                          // Text(
+                                          //   'No Diet Plan\nFound!',
+                                          //   style: TextStyle(
+                                          //     color: const Color(0xFFC2D86A),
+                                          //     fontSize: 24,
+                                          //     fontWeight: FontWeight.bold,
+                                          //     letterSpacing: 0.5,
+                                          //     height: 1.2,
+                                          //   ),
+                                          //   textAlign: TextAlign.center,
+                                          // ),
+                                          const SizedBox(height: 32),
+
+                                          // Action Cards
+                                          _buildActionCard(
+                                            title: 'Create Manually',
+                                            buttonText: 'Create',
+                                            iconEmoji: '📋',
+                                            iconBgColor: Colors.orange
+                                                .withValues(alpha: 0.2),
+                                            onTap: () {
+                                              final userData =
+                                                  Get.find<AuthController>()
+                                                      .userdataget();
+                                              Get.toNamed(
+                                                "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
+                                              );
+                                            },
                                           ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            'Add your first meal to get started',
-                                            style: TextStyle(
-                                              color: Colors.white.withValues(
-                                                alpha: 0.5,
-                                              ),
-                                              fontSize: 14,
+                                          _buildActionCard(
+                                            title: 'Generate Using AI',
+                                            buttonText: 'Generate',
+                                            iconEmoji: '✨',
+                                            iconBgColor: Colors.purple
+                                                .withValues(alpha: 0.2),
+                                            onTap: () =>
+                                                Get.toNamed(Routes.GENERATE_AI),
+                                          ),
+                                          _buildActionCard(
+                                            title: 'Copy From Existing',
+                                            buttonText: 'Copy',
+                                            iconEmoji: '📄',
+                                            iconBgColor: Colors.blue.withValues(
+                                              alpha: 0.2,
+                                            ),
+                                            onTap: () => Get.toNamed(
+                                              Routes.MEAL_HISTORY,
                                             ),
                                           ),
                                         ],
@@ -986,6 +1015,89 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildActionCard({
+    required String title,
+    required String buttonText,
+    required String iconEmoji,
+    required Color iconBgColor,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.05),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Row(
+          children: [
+            // Icon Container
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: iconBgColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.center,
+              child: Text(iconEmoji, style: const TextStyle(fontSize: 24)),
+            ),
+            const SizedBox(width: 16),
+            // Title
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ),
+            // Action Button
+            ElevatedButton(
+              onPressed: onTap,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFC2D86A),
+                foregroundColor: Colors.black,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                minimumSize: const Size(90, 40),
+              ),
+              child: Text(
+                buttonText,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

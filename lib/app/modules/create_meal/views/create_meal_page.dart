@@ -411,27 +411,37 @@ class _CreateMealPageState extends State<CreateMealPage>
           ),
         ],
       ),
-      child: TextField(
-        controller: controller,
-        maxLines: maxLines,
-        style: const TextStyle(color: Colors.white, fontSize: 16),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(
-            color: Colors.white.withValues(alpha: 0.4),
-            fontSize: 14,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 16, top: 18),
+            child: Icon(
+              icon,
+              color: const Color(0xFFC2D86A).withValues(alpha: 0.7),
+              size: 22,
+            ),
           ),
-          prefixIcon: Icon(
-            icon,
-            color: const Color(0xFFC2D86A).withValues(alpha: 0.7),
-            size: 22,
+          Expanded(
+            child: TextField(
+              controller: controller,
+              maxLines: maxLines,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+              decoration: InputDecoration(
+                hintText: hint,
+                hintStyle: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.4),
+                  fontSize: 14,
+                ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 18,
+                ),
+              ),
+            ),
           ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 16,
-          ),
-        ),
+        ],
       ),
     );
   }

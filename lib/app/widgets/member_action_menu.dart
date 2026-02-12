@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../data/models/user_model.dart';
+import '../controllers/user_controller.dart';
+import '../core/base/controllers/auth_controller.dart';
 
 class MemberActionMenu {
   static void show(BuildContext context, UserModel member, bool isAdmin) {
@@ -89,11 +91,20 @@ class _MemberActionSheet extends StatelessWidget {
                     padding: const EdgeInsets.all(2),
                     child: CircleAvatar(
                       radius: 30,
-                      backgroundImage: NetworkImage(
-                        member.profileImage.isNotEmpty
-                            ? member.profileImage
-                            : 'https://via.placeholder.com/150',
+                      backgroundImage: UserController.getImageProvider(
+                        member.profileImage,
                       ),
+                      child:
+                          UserController.getImageProvider(
+                                member.profileImage,
+                              ) ==
+                              null
+                          ? const Icon(
+                              Icons.person,
+                              size: 30,
+                              color: Colors.white54,
+                            )
+                          : null,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -386,16 +397,7 @@ class _CurrentUserActionSheet extends StatelessWidget {
               color: Colors.red,
               onTap: () {
                 Get.back();
-                // TODO: Implement logout
-                Get.snackbar(
-                  'Logout',
-                  'Logging out...',
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                  snackPosition: SnackPosition.BOTTOM,
-                  margin: const EdgeInsets.all(16),
-                  borderRadius: 12,
-                );
+                Get.find<AuthController>().logOut();
               },
             ),
 

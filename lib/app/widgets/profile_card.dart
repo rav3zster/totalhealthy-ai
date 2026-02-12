@@ -12,8 +12,6 @@ class ProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       final userController = Get.find<UserController>();
-      final userData = userController.currentUser?.toJson() ?? {};
-
       return Row(
         children: [
           Builder(
@@ -54,8 +52,8 @@ class ProfileCard extends StatelessWidget {
                 ),
               ), // Smaller font
               Text(
-                userData["username"] ?? "Ayush Shukla",
-                style: TextStyle(fontSize: 14, color: Color(0XFF7B7B7A)),
+                userController.fullName,
+                style: const TextStyle(fontSize: 14, color: Color(0XFF7B7B7A)),
               ), // Smaller font
             ],
           ),

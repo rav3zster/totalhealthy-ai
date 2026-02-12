@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../data/models/user_model.dart';
 import '../../../widgets/member_action_menu.dart';
 import '../controllers/group_controller.dart';
+import '../../../controllers/user_controller.dart';
 
 class GroupDetailsScreen extends StatefulWidget {
   const GroupDetailsScreen({super.key});
@@ -705,11 +706,16 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                         padding: const EdgeInsets.all(2),
                         child: CircleAvatar(
                           radius: 26,
-                          backgroundImage: NetworkImage(
-                            member.profileImage.isNotEmpty
-                                ? member.profileImage
-                                : 'https://via.placeholder.com/150',
+                          backgroundImage: UserController.getImageProvider(
+                            member.profileImage,
                           ),
+                          child:
+                              UserController.getImageProvider(
+                                    member.profileImage,
+                                  ) ==
+                                  null
+                              ? const Icon(Icons.person, color: Colors.white54)
+                              : null,
                         ),
                       ),
                       if (isAdmin)

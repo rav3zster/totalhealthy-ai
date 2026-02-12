@@ -30,6 +30,7 @@ class UserModel {
   final String gender;
   final String dietType;
   final Map<String, bool> allergies;
+  final String mealFrequency;
 
   UserModel({
     required this.id,
@@ -61,6 +62,7 @@ class UserModel {
     this.gender = 'Male',
     this.dietType = 'Not Specific',
     this.allergies = const {},
+    this.mealFrequency = 'Not Specific',
   }) : createdAt = createdAt ?? DateTime.now();
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -102,6 +104,7 @@ class UserModel {
       allergies: json['allergies'] != null
           ? Map<String, bool>.from(json['allergies'])
           : {},
+      mealFrequency: json['mealFrequency'] ?? 'Not Specific',
     );
   }
 
@@ -136,6 +139,7 @@ class UserModel {
       'gender': gender,
       'dietType': dietType,
       'allergies': allergies,
+      'mealFrequency': mealFrequency,
     };
   }
 
@@ -272,12 +276,15 @@ class UserModel {
 
   // Role helper methods for RBAC
   bool get isAdvisor {
-    return role != null &&
-        (role == 'advisor' || role == 'admin' || role == 'trainer');
+    if (role == null) return false;
+    final r = role!.toLowerCase();
+    return r == 'advisor' || r == 'admin' || r == 'trainer';
   }
 
   bool get isMember {
-    return role != null && (role == 'member' || role == 'user');
+    if (role == null) return false;
+    final r = role!.toLowerCase();
+    return r == 'member' || r == 'user';
   }
 
   bool get hasRole {

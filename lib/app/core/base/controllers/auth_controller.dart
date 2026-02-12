@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,16 +34,22 @@ class AuthController extends GetxController {
         box.write('authToken', user.uid);
       }
     });
+
+    // Handle initial navigation AFTER GetMaterialApp is ready
+    final currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      print("🏠 App start: User already authenticated, bootstrapping...");
+      bootstrapUser(currentUser.uid, isNewSignup: false);
+    }
   }
 
   Future<AuthController> init() async {
     Get.putAsync<ThemeController>(() async => ThemeController());
-    // Check if user is already authenticated on app start
+    // Just sync the current user state, don't navigate yet
     final currentUser = _auth.currentUser;
     if (currentUser != null) {
       firebaseUser.value = currentUser;
-      // Bootstrap user on app start (not a new signup)
-      await bootstrapUser(currentUser.uid, isNewSignup: false);
+      isAuthenticated.value = true;
     }
     return this;
   }
@@ -379,12 +386,102 @@ class AuthController extends GetxController {
     return DummyDataService.getDummyUser();
   }
 
-  void switchRole(String role) {
-    roleStore(role);
-    if (role == "admin") {
-      Get.offAllNamed(Routes.TrainerDashboard);
-    } else {
-      Get.offAllNamed(Routes.ClientDashboard);
+  Future<void> switchRole(String role) async {
+    try {
+      final currentUser = _auth.currentUser;
+      if (currentUser == null) {
+        Get.snackbar(
+          'Error',
+          'No user logged in',
+          backgroundColor: Get.theme.colorScheme.error,
+          colorText: Get.theme.colorScheme.onError,
+        );
+        return;
+      }
+
+      // Get current user profile from Firestore
+      final usersService = UsersFirestoreService();
+      UserModel? profile = await usersService.getUserProfile(currentUser.uid);
+
+      if (profile == null) {
+        Get.snackbar(
+          'Error',
+          'User profile not found',
+          backgroundColor: Get.theme.colorScheme.error,
+          colorText: Get.theme.colorScheme.onError,
+        );
+        return;
+      }
+
+      // Normalize the role
+      String normalizedRole = role == "admin" ? "advisor" : "member";
+
+      // Update profile with new role
+      final updatedProfile = UserModel(
+        id: profile.id,
+        email: profile.email,
+        username: profile.username,
+        phone: profile.phone,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        profileImage: profile.profileImage,
+        age: profile.age,
+        weight: profile.weight,
+        height: profile.height,
+        activityLevel: profile.activityLevel,
+        goals: profile.goals,
+        joinDate: profile.joinDate,
+        targetWeight: profile.targetWeight,
+        planName: profile.planName,
+        planDuration: profile.planDuration,
+        progressPercentage: profile.progressPercentage,
+        initialWeight: profile.initialWeight,
+        fatLost: profile.fatLost,
+        muscleGained: profile.muscleGained,
+        goalDuration: profile.goalDuration,
+        role: normalizedRole, // Update the role
+        roleSetAt:
+            profile.roleSetAt ??
+            DateTime.now(), // Set timestamp if not already set
+        assignedTrainerId: profile.assignedTrainerId,
+        profileCompleted: profile.profileCompleted,
+        createdAt: profile.createdAt,
+        gender: profile.gender,
+        dietType: profile.dietType,
+        allergies: profile.allergies,
+        mealFrequency: profile.mealFrequency,
+      );
+
+      // Update Firestore
+      await usersService.updateUserProfile(updatedProfile);
+
+      // Update local storage
+      await userdataStore(updatedProfile.toJson());
+      roleStore(normalizedRole);
+
+      // Show success message
+      Get.snackbar(
+        'Role Updated',
+        'You are now a ${normalizedRole == "advisor" ? "Advisor" : "Member"}',
+        backgroundColor: const Color(0xFFC2D86A),
+        colorText: Colors.black,
+        duration: const Duration(seconds: 2),
+      );
+
+      // Navigate to appropriate dashboard
+      if (normalizedRole == "advisor") {
+        Get.offAllNamed(Routes.TrainerDashboard);
+      } else {
+        Get.offAllNamed(Routes.ClientDashboard);
+      }
+    } catch (e) {
+      print("❌ Error switching role: $e");
+      Get.snackbar(
+        'Error',
+        'Failed to switch role. Please try again.',
+        backgroundColor: Get.theme.colorScheme.error,
+        colorText: Get.theme.colorScheme.onError,
+      );
     }
   }
 }

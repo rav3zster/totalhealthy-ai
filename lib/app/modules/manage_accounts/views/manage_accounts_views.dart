@@ -4,6 +4,7 @@ import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:totalhealthy/app/data/models/user_model.dart';
 import 'package:totalhealthy/app/data/services/users_firestore_service.dart';
 import 'package:totalhealthy/app/widgets/baseWidget.dart';
+import 'package:totalhealthy/app/controllers/user_controller.dart';
 
 class ManageAccountScreen extends StatefulWidget {
   const ManageAccountScreen({super.key});
@@ -134,11 +135,18 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
           child: Column(
             children: [
               // Profile Picture
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 40,
-                backgroundImage: NetworkImage(
-                  'https://via.placeholder.com/150',
+                backgroundImage: UserController.getImageProvider(
+                  authController.getCurrentUser().profileImage,
                 ),
+                child:
+                    UserController.getImageProvider(
+                          authController.getCurrentUser().profileImage,
+                        ) ==
+                        null
+                    ? const Icon(Icons.person, size: 40, color: Colors.white54)
+                    : null,
               ),
               const SizedBox(height: 8),
               Text(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/models/user_model.dart';
 import '../controllers/group_controller.dart';
+import '../../../controllers/user_controller.dart';
 
 class MemberManagementScreen extends StatefulWidget {
   const MemberManagementScreen({super.key});
@@ -461,11 +462,16 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                         padding: const EdgeInsets.all(3),
                         child: CircleAvatar(
                           radius: 28,
-                          backgroundImage: NetworkImage(
-                            member.profileImage.isNotEmpty
-                                ? member.profileImage
-                                : 'https://via.placeholder.com/150',
+                          backgroundImage: UserController.getImageProvider(
+                            member.profileImage,
                           ),
+                          child:
+                              UserController.getImageProvider(
+                                    member.profileImage,
+                                  ) ==
+                                  null
+                              ? const Icon(Icons.person, color: Colors.white54)
+                              : null,
                         ),
                       ),
                       if (isAdmin)
@@ -684,11 +690,14 @@ class _MemberManagementScreenState extends State<MemberManagementScreen>
                     padding: const EdgeInsets.all(3),
                     child: CircleAvatar(
                       radius: 28,
-                      backgroundImage: NetworkImage(
-                        user.profileImage.isNotEmpty
-                            ? user.profileImage
-                            : 'https://via.placeholder.com/150',
+                      backgroundImage: UserController.getImageProvider(
+                        user.profileImage,
                       ),
+                      child:
+                          UserController.getImageProvider(user.profileImage) ==
+                              null
+                          ? const Icon(Icons.person, color: Colors.white54)
+                          : null,
                     ),
                   ),
                   const SizedBox(width: 16),

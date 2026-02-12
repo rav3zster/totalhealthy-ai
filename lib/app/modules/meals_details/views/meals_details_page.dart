@@ -386,25 +386,32 @@ class _MealsDetailsPageState extends State<MealsDetailsPage> {
             ),
             const SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNutrientCard(
-                  "Protein",
-                  "${recipeData['protein'] ?? '0'}g",
-                  Colors.green,
-                  Icons.fitness_center,
+                Expanded(
+                  child: _buildNutrientCard(
+                    "Protein",
+                    "${recipeData['protein'] ?? '0'}g",
+                    const Color(0xFFC2D86A), // Theme Lime
+                    Icons.fitness_center,
+                  ),
                 ),
-                _buildNutrientCard(
-                  "Fat",
-                  "${recipeData['fat'] ?? '0'}g",
-                  Colors.blue,
-                  Icons.water_drop,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildNutrientCard(
+                    "Fat",
+                    "${recipeData['fat'] ?? '0'}g",
+                    const Color(0xFF4FC3F7), // Sky Blue
+                    Icons.water_drop,
+                  ),
                 ),
-                _buildNutrientCard(
-                  "Carbs",
-                  "${recipeData['carbs'] ?? '0'}g",
-                  Colors.red,
-                  Icons.grain,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildNutrientCard(
+                    "Carbs",
+                    "${recipeData['carbs'] ?? '0'}g",
+                    const Color(0xFFFFB74D), // Soft Orange
+                    Icons.grain,
+                  ),
                 ),
               ],
             ),
@@ -621,33 +628,48 @@ class _MealsDetailsPageState extends State<MealsDetailsPage> {
     IconData icon,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+        color: const Color(0xFF1E1E1E),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(height: 12),
           Text(
             value,
             style: TextStyle(
               color: color,
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
+              color: Colors.white.withValues(alpha: 0.5),
               fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
             ),
           ),
         ],

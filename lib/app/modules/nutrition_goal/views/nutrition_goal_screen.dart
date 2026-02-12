@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../controllers/user_controller.dart';
 import '../../../routes/app_pages.dart';
 
 class NutritionGoalsScreen extends StatefulWidget {
@@ -19,6 +20,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
 
   // Selected options for each screen
   int selectedGoal = -1;
+  int selectedActivityLevel = -1;
   int selectedMealFrequency = -1;
   int selectedDietaryRestriction = -1;
 
@@ -30,10 +32,21 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
 
   // Data for each screen
   final List<String> nutritionGoals = [
-    "Weight loss",
-    "Muscle gain",
-    "Maintaining current weight",
-    "Improved overall health",
+    'Weight Loss',
+    'Muscle Gain',
+    'Maintenance',
+    'Endurance',
+    'Strength',
+    'Flexibility',
+    'Improved Overall Health',
+  ];
+
+  final List<String> activityLevels = [
+    'Sedentary',
+    'Light',
+    'Moderate',
+    'Active',
+    'Very Active',
   ];
 
   final List<String> mealFrequencies = [
@@ -43,10 +56,14 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
   ];
 
   final List<String> dietaryRestrictions = [
-    "Vegetarianism",
-    "Gluten-free diet",
-    "Lactose intolerance",
-    "I don't have",
+    'Vegetarian',
+    'Vegan',
+    'Keto',
+    'Paleo',
+    'Mediterranean',
+    'Gluten-free',
+    'Lactose-free',
+    'Not Specific',
   ];
 
   @override
@@ -86,6 +103,35 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
     Future.delayed(const Duration(milliseconds: 200), () {
       _slideController.forward();
     });
+
+    // Initialize selections from current user data
+    _initializeFromUserData();
+  }
+
+  void _initializeFromUserData() {
+    try {
+      final userController = Get.find<UserController>();
+      final user = userController.currentUser;
+      if (user != null) {
+        // Goal
+        if (user.goals.isNotEmpty) {
+          selectedGoal = nutritionGoals.indexOf(user.goals.first);
+        }
+
+        // Activity Level
+        selectedActivityLevel = activityLevels.indexOf(user.activityLevel);
+
+        // Meal Frequency
+        selectedMealFrequency = mealFrequencies.indexOf(user.mealFrequency);
+
+        // Dietary Restrictions
+        selectedDietaryRestriction = dietaryRestrictions.indexOf(user.dietType);
+
+        setState(() {});
+      }
+    } catch (e) {
+      print('Error initializing goal settings: $e');
+    }
   }
 
   @override
@@ -212,11 +258,11 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
                   vertical: 10,
                 ),
                 child: Row(
-                  children: List.generate(3, (index) {
+                  children: List.generate(4, (index) {
                     return Expanded(
                       child: Container(
                         height: 4,
-                        margin: EdgeInsets.only(right: index < 2 ? 8 : 0),
+                        margin: EdgeInsets.only(right: index < 3 ? 8 : 0),
                         decoration: BoxDecoration(
                           gradient: currentPageIndex >= index
                               ? const LinearGradient(
@@ -249,6 +295,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
                   },
                   children: [
                     _buildNutritionGoalScreen(),
+                    _buildActivityLevelScreen(),
                     _buildMealFrequencyScreen(),
                     _buildDietaryRestrictionsScreen(),
                   ],
@@ -496,6 +543,258 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
                           Icon(
                             Icons.arrow_forward_rounded,
                             color: selectedGoal != -1
+                                ? Colors.black
+                                : Colors.white.withValues(alpha: 0.5),
+                            size: 24,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActivityLevelScreen() {
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+
+              // Decorative icon
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                    ],
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.directions_run_rounded,
+                  size: 40,
+                  color: Color(0xFFC2D86A),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              const Text(
+                "How active is your lifestyle?",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                  letterSpacing: 0.3,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Choose a more suitable option.",
+                style: TextStyle(
+                  color: const Color(0xFFC2D86A).withValues(alpha: 0.8),
+                  fontSize: 16,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(height: 30),
+
+              // Activity Level options
+              Expanded(
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: activityLevels.length,
+                  itemBuilder: (context, index) {
+                    final isSelected = selectedActivityLevel == index;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              selectedActivityLevel = index;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 20,
+                              horizontal: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: isSelected
+                                  ? const LinearGradient(
+                                      colors: [
+                                        Color(0xFF2D2D2D),
+                                        Color(0xFF1D1D1D),
+                                      ],
+                                    )
+                                  : const LinearGradient(
+                                      colors: [
+                                        Color(0xFF2A2A2A),
+                                        Color(0xFF1A1A1A),
+                                      ],
+                                    ),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color(0xFFC2D86A)
+                                    : Colors.white.withValues(alpha: 0.1),
+                                width: isSelected ? 2 : 1,
+                              ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFFC2D86A,
+                                        ).withValues(alpha: 0.3),
+                                        blurRadius: 15,
+                                        offset: const Offset(0, 5),
+                                      ),
+                                    ]
+                                  : [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 5),
+                                      ),
+                                    ],
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    activityLevels[index],
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.white.withValues(alpha: 0.8),
+                                      fontSize: 16,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                      letterSpacing: 0.2,
+                                    ),
+                                  ),
+                                ),
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? const Color(0xFFC2D86A)
+                                        : Colors.transparent,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? const Color(0xFFC2D86A)
+                                          : Colors.white.withValues(alpha: 0.3),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: isSelected
+                                      ? const Icon(
+                                          Icons.check,
+                                          color: Colors.black,
+                                          size: 16,
+                                        )
+                                      : null,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // Save button
+              Container(
+                width: double.infinity,
+                height: 60,
+                margin: const EdgeInsets.only(bottom: 20, top: 10),
+                decoration: BoxDecoration(
+                  gradient: selectedActivityLevel != -1
+                      ? const LinearGradient(
+                          colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+                        )
+                      : LinearGradient(
+                          colors: [Colors.grey.shade800, Colors.grey.shade700],
+                        ),
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: selectedActivityLevel != -1
+                      ? [
+                          BoxShadow(
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.4),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: selectedActivityLevel != -1
+                        ? () {
+                            _pageController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        : null,
+                    borderRadius: BorderRadius.circular(30),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Save',
+                            style: TextStyle(
+                              color: selectedActivityLevel != -1
+                                  ? Colors.black
+                                  : Colors.white.withValues(alpha: 0.5),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: selectedActivityLevel != -1
                                 ? Colors.black
                                 : Colors.white.withValues(alpha: 0.5),
                             size: 24,
@@ -973,9 +1272,40 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: selectedDietaryRestriction != -1
-                        ? () {
-                            // Navigate to client dashboard after completing nutrition goals
-                            Get.offAllNamed(Routes.ClientDashboard);
+                        ? () async {
+                            try {
+                              final userController = Get.find<UserController>();
+                              await userController.updateUserProfile(
+                                goals: [nutritionGoals[selectedGoal]],
+                                activityLevel:
+                                    activityLevels[selectedActivityLevel],
+                                mealFrequency:
+                                    mealFrequencies[selectedMealFrequency],
+                                dietType:
+                                    dietaryRestrictions[selectedDietaryRestriction],
+                              );
+
+                              Get.snackbar(
+                                'Success',
+                                'Nutrition goals updated successfully',
+                                backgroundColor: const Color(0xFFC2D86A),
+                                colorText: Colors.black,
+                                snackPosition: SnackPosition.BOTTOM,
+                                margin: const EdgeInsets.all(20),
+                              );
+
+                              // Navigate to client dashboard after completing nutrition goals
+                              Get.offAllNamed(Routes.ClientDashboard);
+                            } catch (e) {
+                              Get.snackbar(
+                                'Error',
+                                'Failed to update goals: $e',
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white,
+                                snackPosition: SnackPosition.BOTTOM,
+                                margin: const EdgeInsets.all(20),
+                              );
+                            }
                           }
                         : null,
                     borderRadius: BorderRadius.circular(30),

@@ -29,6 +29,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
 
   // Selected values
   String? _selectedActivityLevel;
+  String? _selectedMealFrequency;
   List<String> _selectedGoals = [];
   String _selectedGender = 'Male';
   String _selectedDietType = '';
@@ -51,6 +52,14 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
     'Endurance',
     'Strength',
     'Flexibility',
+    'Improved Overall Health',
+  ];
+
+  // Meal frequency options
+  final List<String> _mealFrequencies = [
+    "3 times a day (breakfast, lunch, dinner)",
+    "4-5 times a day (adding snacks)",
+    "I don't have a specific schedule",
   ];
 
   // Diet types
@@ -60,6 +69,8 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
     'Keto',
     'Paleo',
     'Mediterranean',
+    'Gluten-free',
+    'Lactose-free',
     'Not Specific',
   ];
 
@@ -93,6 +104,8 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
     );
     _ageController = TextEditingController(text: user?.age.toString() ?? '');
     _selectedActivityLevel = user?.activityLevel ?? 'Moderate';
+    _selectedMealFrequency =
+        user?.mealFrequency ?? "I don't have a specific schedule";
     _selectedGoals = List<String>.from(user?.goals ?? []);
     _selectedGender = user?.gender ?? 'Male';
     _selectedDietType = user?.dietType ?? 'Not Specific';
@@ -341,6 +354,13 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
 
                             const SizedBox(height: 30),
 
+                            // Meal Frequency Section
+                            _buildSectionTitle('Meal Frequency'),
+                            const SizedBox(height: 16),
+                            _buildMealFrequencySelector(),
+
+                            const SizedBox(height: 30),
+
                             // Fitness Goals Section
                             _buildSectionTitle('Fitness Goals'),
                             const SizedBox(height: 16),
@@ -569,6 +589,40 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
           onChanged: (value) {
             setState(() {
               _selectedActivityLevel = value;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMealFrequencySelector() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: _selectedMealFrequency,
+          isExpanded: true,
+          dropdownColor: const Color(0xFF2A2A2A),
+          style: const TextStyle(color: Colors.white, fontSize: 16),
+          items: _mealFrequencies.map((freq) {
+            return DropdownMenuItem<String>(value: freq, child: Text(freq));
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              _selectedMealFrequency = value;
             });
           },
         ),
@@ -854,6 +908,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
         weight: double.parse(_weightController.text.trim()),
         height: int.parse(_heightController.text.trim()),
         activityLevel: _selectedActivityLevel!,
+        mealFrequency: _selectedMealFrequency!,
         goals: _selectedGoals,
         gender: _selectedGender,
         dietType: _selectedDietType,

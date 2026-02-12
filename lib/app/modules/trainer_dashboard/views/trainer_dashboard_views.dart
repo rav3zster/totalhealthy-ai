@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:totalhealthy/app/controllers/user_controller.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../data/services/mock_api_service.dart';
 import '../../../data/services/users_firestore_service.dart';
+import '../../../data/services/role_permissions_service.dart';
 import '../../../data/models/user_model.dart';
 import '../../../routes/app_pages.dart';
 
@@ -23,6 +25,7 @@ class TrainerDashboardView extends StatefulWidget {
 
 class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   final UsersFirestoreService _usersService = UsersFirestoreService();
+  final RolePermissionsService _permissionsService = RolePermissionsService();
   final RxString searchQuery = ''.obs;
   bool isLoading = false;
   var userData = {};
@@ -31,9 +34,9 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   List<UserModel> assignedClients = [];
   bool isClientsLoading = true;
 
-  // Search state management
-  bool isSearchActive = false;
-  List<UserModel> filteredClients = [];
+  // Search state management - using Rx for reactive UI without full rebuilds
+  final RxBool isSearchActive = false.obs;
+  final RxList<UserModel> filteredClients = <UserModel>[].obs;
   Future<void> submitUser() async {
     try {
       setState(() {
@@ -181,46 +184,51 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
     OntapStore.index = 0; // Set to Member/Home tab
     getMember();
     _loadAssignedClients();
+
+    // Setup search listener
+    debounce(searchQuery, (String query) {
+      _performSearch(query);
+    }, time: const Duration(milliseconds: 300));
   }
 
   void updateSearchQuery(String query) {
-    searchQuery.value = query;
-    _performSearch(query);
+    // Only update the value, let the listener handle the search
+    // This avoids rebuilding the entire widget tree (preserving focus)
+    if (searchQuery.value != query) {
+      searchQuery.value = query;
+    }
   }
 
   void onSearchFocused() {
-    if (!isSearchActive) {
-      setState(() {
-        isSearchActive = true;
-        filteredClients = [];
-      });
+    if (!isSearchActive.value) {
+      isSearchActive.value = true;
+      // Initialize with all clients instead of empty list for better UX
+      filteredClients.assignAll(assignedClients);
     }
   }
 
   void clearSearch() {
     searchQuery.value = '';
-    setState(() {
-      isSearchActive = false;
-      filteredClients = [];
-    });
+    isSearchActive.value = false;
+    filteredClients.clear();
   }
 
   void _performSearch(String query) {
     final trimmedQuery = query.trim();
 
-    setState(() {
-      if (trimmedQuery.isEmpty) {
-        filteredClients = [];
-      } else {
-        final lowerQuery = trimmedQuery.toLowerCase();
-        filteredClients = assignedClients.where((client) {
-          final nameLower = client.fullName.toLowerCase();
-          final emailLower = client.email.toLowerCase();
-          return nameLower.contains(lowerQuery) ||
-              emailLower.contains(lowerQuery);
-        }).toList();
-      }
-    });
+    if (trimmedQuery.isEmpty) {
+      // If empty query but search active, show all clients
+      filteredClients.assignAll(assignedClients);
+    } else {
+      final lowerQuery = trimmedQuery.toLowerCase();
+      final results = assignedClients.where((client) {
+        final nameLower = client.fullName.toLowerCase();
+        final emailLower = client.email.toLowerCase();
+        return nameLower.contains(lowerQuery) ||
+            emailLower.contains(lowerQuery);
+      }).toList();
+      filteredClients.assignAll(results);
+    }
   }
 
   void _loadAssignedClients() {
@@ -248,76 +256,52 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   String? valueDropDown;
 
   Widget _buildClientList() {
-    // Search mode: show empty state initially, then filtered results
-    if (isSearchActive) {
-      if (searchQuery.value.isEmpty) {
-        // Empty search state - show nothing
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.search,
-                  size: 80,
-                  color: Colors.white.withValues(alpha: 0.3),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Start typing to search',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+    // Search mode: show filtered results
+    if (isSearchActive.value) {
+      // If search query is empty, filteredClients should contain all clients (handled in _performSearch)
+      // So we only show "No results" if filteredClients is truly empty AND we have a query
+
+      if (filteredClients.isEmpty) {
+        if (searchQuery.value.isNotEmpty) {
+          // No results found for the query
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.search_off,
+                    size: 80,
+                    color: Colors.white.withValues(alpha: 0.3),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Search by client name or email',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    fontSize: 14,
+                  const SizedBox(height: 16),
+                  Text(
+                    'No clients found',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Text(
+                    'Try a different search term',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      } else if (filteredClients.isEmpty) {
-        // No results found
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.search_off,
-                  size: 80,
-                  color: Colors.white.withValues(alpha: 0.3),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'No clients found',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Try a different search term',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+          );
+        } else {
+          // This case shouldn't happen often if assignedClients is not empty,
+          // since _performSearch populates filteredClients with all clients when query is empty.
+          // But if assignedClients IS empty, we fall through to the empty state below.
+        }
       } else {
-        // Show filtered results
+        // Show filtered results (or all clients if query is empty)
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -380,8 +364,6 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
   @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-    var userData = Get.find<AuthController>().userdataget();
-
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: Colors.black,
@@ -431,63 +413,86 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                               // Profile Header
                               Row(
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      scaffoldKey.currentState?.openDrawer();
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
-                                          colors: [
-                                            Color(0xFFC2D86A),
-                                            Color(0xFFD4E87C),
-                                          ],
-                                        ),
-                                        shape: BoxShape.circle,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: const Color(
-                                              0xFFC2D86A,
-                                            ).withValues(alpha: 0.4),
-                                            blurRadius: 12,
-                                            offset: const Offset(0, 4),
+                                  GetBuilder<UserController>(
+                                    builder: (userController) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          scaffoldKey.currentState
+                                              ?.openDrawer();
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(0xFFC2D86A),
+                                                Color(0xFFD4E87C),
+                                              ],
+                                            ),
+                                            shape: BoxShape.circle,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: const Color(
+                                                  0xFFC2D86A,
+                                                ).withValues(alpha: 0.4),
+                                                blurRadius: 12,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      padding: const EdgeInsets.all(3),
-                                      child: const CircleAvatar(
-                                        radius: 28,
-                                        backgroundImage: AssetImage(
-                                          "assets/user_avatar.png",
+                                          padding: const EdgeInsets.all(3),
+                                          child: CircleAvatar(
+                                            radius: 28,
+                                            backgroundColor: const Color(
+                                              0xFF2A2A2A,
+                                            ),
+                                            backgroundImage:
+                                                UserController.getImageProvider(
+                                                  userController.profileImage,
+                                                ),
+                                            child:
+                                                userController
+                                                    .profileImage
+                                                    .isEmpty
+                                                ? const Icon(
+                                                    Icons.person,
+                                                    color: Colors.white24,
+                                                    size: 28,
+                                                  )
+                                                : null,
+                                          ),
                                         ),
-                                      ),
-                                    ),
+                                      );
+                                    },
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          "Welcome Back,",
-                                          style: TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          "${userData["name"] ?? "Advisor"}",
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: 0.3,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
+                                    child: GetBuilder<UserController>(
+                                      builder: (userController) {
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              "Welcome Back,",
+                                              style: TextStyle(
+                                                color: Colors.white70,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              userController.fullName,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w700,
+                                                letterSpacing: 0.3,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        );
+                                      },
                                     ),
                                   ),
                                   Container(
@@ -641,6 +646,19 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                 ),
                                 GestureDetector(
                                   onTap: () {
+                                    // RBAC: Check permission before navigation
+                                    if (!_permissionsService
+                                        .canManageClients()) {
+                                      Get.snackbar(
+                                        'Permission Denied',
+                                        'Only Advisors can manage clients',
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                        duration: const Duration(seconds: 3),
+                                      );
+                                      return;
+                                    }
+
                                     Get.toNamed(Routes.CLIENT_LIST);
                                   },
                                   child: Container(
@@ -692,7 +710,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
 
                             const SizedBox(height: 20),
 
-                            // Client List
+                            // Client List - reactive search
                             isClientsLoading
                                 ? const Center(
                                     child: Padding(
@@ -702,7 +720,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                       ),
                                     ),
                                   )
-                                : _buildClientList(),
+                                : Obx(() => _buildClientList()),
                           ],
                         ),
                       ),
@@ -797,22 +815,16 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                     ),
                   ],
                 ),
-                child: client.profileImage.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.asset(
-                          client.profileImage,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              Icons.person,
-                              color: Colors.black,
-                              size: 30,
-                            );
-                          },
-                        ),
-                      )
-                    : const Icon(Icons.person, color: Colors.black, size: 30),
+                child: CircleAvatar(
+                  radius: 28,
+                  backgroundColor: const Color(0xFF2A2A2A),
+                  backgroundImage: UserController.getImageProvider(
+                    client.profileImage,
+                  ),
+                  child: client.profileImage.isEmpty
+                      ? const Icon(Icons.person, color: Colors.black, size: 30)
+                      : null,
+                ),
               ),
               const SizedBox(width: 16),
 

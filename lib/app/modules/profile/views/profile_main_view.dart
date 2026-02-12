@@ -3,10 +3,11 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
+import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import '../../../controllers/user_controller.dart';
 import '../../../widgets/base_screen_wrapper.dart';
 import '../../../widgets/phone_nav_bar.dart';
-import '../../../core/base/controllers/auth_controller.dart';
+import '../../../routes/app_pages.dart';
 
 class ProfileMainView extends StatefulWidget {
   const ProfileMainView({super.key});
@@ -227,6 +228,14 @@ class _ProfileMainViewState extends State<ProfileMainView> {
           title: 'Help & Support',
           onTap: () {
             Get.toNamed('/help-support');
+          },
+        ),
+        const SizedBox(height: 16),
+        _buildMenuOption(
+          icon: Icons.privacy_tip_outlined,
+          title: 'Privacy Policy',
+          onTap: () {
+            Get.toNamed(Routes.PRIVACY_POLICY);
           },
         ),
         const SizedBox(height: 16),

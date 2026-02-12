@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../models/user_model.dart';
 import '../../core/base/controllers/auth_controller.dart';
+import '../../controllers/user_controller.dart';
 
 /// Centralized Role-Based Access Control (RBAC) Service
 /// Enforces strict permission rules for Advisor and Member roles
@@ -10,12 +11,24 @@ class RolePermissionsService {
   factory RolePermissionsService() => _instance;
   RolePermissionsService._internal();
 
-  /// Get current user from AuthController
+  /// Get current user from Controllers (prefers UserController for real-time data)
   UserModel? _getCurrentUser() {
     try {
+      // 1. Try UserController (Real-time stream data)
+      try {
+        final userController = Get.find<UserController>();
+        if (userController.currentUser != null) {
+          return userController.currentUser;
+        }
+      } catch (e) {
+        // UserController not initialized yet
+      }
+
+      // 2. Fallback to AuthController (Local cache data)
       final authController = Get.find<AuthController>();
       return authController.getCurrentUser();
     } catch (e) {
+      print("❌ RolePermissionsService: Failed to get current user: $e");
       return null;
     }
   }
@@ -23,7 +36,11 @@ class RolePermissionsService {
   /// Check if current user is an Advisor
   bool get isAdvisor {
     final user = _getCurrentUser();
-    return user?.isAdvisor ?? false;
+    final advisorStatus = user?.isAdvisor ?? false;
+    print(
+      "🔑 RBAC Check: User: ${user?.fullName}, Role: ${user?.role}, IsAdvisor: $advisorStatus",
+    );
+    return advisorStatus;
   }
 
   /// Check if current user is a Member
@@ -273,7 +290,8 @@ class RolePermissionsService {
       }
 
       // Check if role is excluded (only admin and advisor)
-      final isExcludedRole = user.role == 'admin' || user.role == 'advisor';
+      final roleLower = user.role!.toLowerCase();
+      final isExcludedRole = roleLower == 'admin' || roleLower == 'advisor';
 
       if (isExcludedRole) {
         excludedByRole++;

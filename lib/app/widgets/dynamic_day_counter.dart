@@ -28,24 +28,26 @@ class DynamicDayCounter extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '${controller.dayCountDisplay} (${controller.primaryGoal})',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${controller.dayCountDisplay} (${controller.primaryGoal})',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            Text(
-              controller.planDateRange.isNotEmpty
-                  ? controller.planDateRange
-                  : '23 Oct - 17 Dec',
-              style: TextStyle(color: Colors.white54, fontSize: 14),
-            ),
-          ],
+              Text(
+                controller.planDateRange.isNotEmpty
+                    ? controller.planDateRange
+                    : '23 Oct - 17 Dec',
+                style: TextStyle(color: Colors.white54, fontSize: 14),
+              ),
+            ],
+          ),
         ),
         Container(
           decoration: BoxDecoration(
