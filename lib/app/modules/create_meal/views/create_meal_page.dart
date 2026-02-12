@@ -29,12 +29,17 @@ class _CreateMealPageState extends State<CreateMealPage>
 
     // Check if we are editing or copying an existing meal
     final args = Get.arguments;
+    print("CreateMealPage initialized with args: $args");
     if (args is MealModel) {
+      print("Mode: Edit Normal");
       widget.controller.populateForEdit(args);
     } else if (args is Map &&
         args['mode'] == 'copy' &&
         args['meal'] is MealModel) {
+      print("Mode: Copy");
       widget.controller.populateForCopy(args['meal']);
+    } else {
+      print("Mode: Create New (No args)");
     }
 
     ingredients = List.generate(
@@ -114,6 +119,10 @@ class _CreateMealPageState extends State<CreateMealPage>
                               controller: widget.controller.fullNameController,
                               hint: 'Enter meal name',
                               icon: Icons.restaurant_menu,
+                              validator: (value) =>
+                                  value == null || value.trim().isEmpty
+                                  ? 'Meal name is required'
+                                  : null,
                             ),
 
                             const SizedBox(height: 24),
@@ -406,6 +415,7 @@ class _CreateMealPageState extends State<CreateMealPage>
     required String hint,
     required IconData icon,
     int maxLines = 1,
+    String? Function(String?)? validator,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -439,9 +449,10 @@ class _CreateMealPageState extends State<CreateMealPage>
             ),
           ),
           Expanded(
-            child: TextField(
+            child: TextFormField(
               controller: controller,
               maxLines: maxLines,
+              validator: validator,
               style: const TextStyle(color: Colors.white, fontSize: 16),
               decoration: InputDecoration(
                 hintText: hint,
