@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-
+import 'package:totalhealthy/app/controllers/user_controller.dart';
 import 'package:totalhealthy/app/modules/meal_timing/controllers/meal_timing_controller.dart';
-import 'package:totalhealthy/app/widgets/baseWidget.dart';
-
-import '../../../core/base/constants/appcolor.dart';
 
 class MealTimingPage extends StatefulWidget {
   const MealTimingPage({super.key, required this.id, required this.controller});
@@ -17,251 +15,8 @@ class MealTimingPage extends StatefulWidget {
 }
 
 class _MealTimingPageState extends State<MealTimingPage> {
-  // List to hold meals with time and toggle status
-  List<Map<String, dynamic>> meals = [];
-  TimeOfDay selectedTime = TimeOfDay.now();
-
-  void _selectTime(BuildContext context, int index) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: ColorScheme.dark(
-              primary: Colors.lime,
-              onPrimary: Colors.black,
-              surface: Colors.black,
-              onSurface: Colors.black,
-            ),
-            iconTheme: IconThemeData(color: Colors.white),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(foregroundColor: Colors.white),
-            ),
-            timePickerTheme: TimePickerThemeData(
-              dayPeriodColor: Colors.lime,
-              dialBackgroundColor: Colors.lime[50],
-              dialHandColor: Colors.lime,
-              hourMinuteTextColor: Colors.black,
-              hourMinuteColor: Colors.lime,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null) {
-      setState(() {
-        widget.controller.dataList[index]['time_range'] =
-            picked.format(context); // Update UI
-      });
-
-      // Convert TimeOfDay to DateTime
-      DateTime staticDate = DateTime(2024, 10, 15); // Static date: October 15, 2024
-      DateTime scheduledTime = DateTime(
-        staticDate.year,
-        staticDate.month,
-        staticDate.day,
-        picked.hour,
-        picked.minute,
-      );
-
-      // Schedule the notification
-      // await NotificationService.scheduleNotification(
-      //   index, // Unique ID for each meal notification
-      //   "Meal Reminder",
-      //   "Did you eat your ${widget.controller.dataList[index]['label_name']}?",
-      //   scheduledTime,
-      // );
-
-      print("Scheduled Notification for ${picked.format(context)}");
-    }
-  }
-
-  // Method to show dialog for adding/editing meals
-  void _showAddMealDialog(BuildContext context) {
-    TimeOfDay? startTime;
-    TimeOfDay? endTime;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: AppColors.cardbackground,
-          title: Center(child: Text("Add New Meal")),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                "Meal Title",
-                style: TextStyle(fontSize: 15),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              TextField(
-                controller: widget.controller.title,
-                decoration: const InputDecoration(
-                    filled: true,
-                    fillColor: Colors.black12,
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black12)),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.transparent)),
-                    hintText: "Meal Title",
-                    hintStyle: TextStyle(color: Color(0xff7E7E7E), fontSize: 18)
-                    //  labelText: "Meal Title"
-                    ),
-              ),
-              SizedBox(height: 16),
-
-              Text(
-                "Select Timing",
-                style: TextStyle(fontSize: 15),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              TextFormField(
-                decoration: const InputDecoration(
-                    filled: true,
-                    fillColor: Colors.black12,
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black12)),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.transparent)),
-                    hintText: "Meal Timing",
-                    hintStyle: TextStyle(color: Color(0xff7E7E7E), fontSize: 18)
-                    //  labelText: "Meal Title"
-                    ),
-                controller: widget.controller.time,
-                onTap: () async {
-                  final TimeOfDay? picked = await showTimePicker(
-                      context: context,
-                      initialTime: selectedTime,
-                      builder: (BuildContext context, Widget? child) {
-                        return Theme(
-                            data: ThemeData.dark().copyWith(
-                              colorScheme: ColorScheme.dark(
-                                primary: Colors
-                                    .lime, // Header and selected time color
-                                onPrimary:
-                                    Colors.black, // Text color on selected time
-                                surface:
-                                    Colors.black, // Background of the dialog
-                                onSurface: Colors
-                                    .black, // Text color for labels and numbers
-                              ),
-                              iconTheme: IconThemeData(
-                                color: Colors.white,
-                              ),
-                              textButtonTheme: TextButtonThemeData(
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Colors
-                                      .white, // Text color for Cancel and OK buttons
-                                ),
-                              ),
-                              timePickerTheme: TimePickerThemeData(
-                                dayPeriodColor: Colors.lime,
-                                dialBackgroundColor: Colors.lime[
-                                    50], // Background color of the clock face
-                                dialHandColor:
-                                    Colors.lime, // Color of the clock hand
-                                hourMinuteTextColor: Colors
-                                    .black, // Text color for hour and minute fields
-                                hourMinuteColor: Colors
-                                    .lime, // Background color for selected hour and minute
-                              ),
-                            ),
-                            child: child!);
-                      });
-                  if (picked != null) {
-                    setState(() {
-                      widget.controller.time.text = picked.format(context);
-                    });
-                  }
-                },
-              )
-              // ElevatedButton(
-              //   onPressed: () async {
-              //     final TimeOfDay? picked = await showTimePicker(
-              //       context: context,
-              //       initialTime: selectedTime,
-              //     );
-              //     if (picked != null) {
-              //       setState(() {
-              //         widget.controller.time.text = picked.format(context);
-              //       });
-              //     }
-              //   },
-              //   child: Text("Select Time: ${selectedTime.format(context)}"),
-              // ),
-            ],
-          ),
-          actions: [
-            // TextButton(
-            //   child: Text("Cancel"),
-            //   onPressed: () {
-            //     Navigator.of(context).pop();
-            //   },
-            // ),
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                  color: Color(0xffCDE26D),
-                  borderRadius: BorderRadius.circular(28)),
-              child: TextButton(
-                onPressed: () {
-                  if (widget.controller.title.text.isNotEmpty) {
-                    widget.controller.isLoading.value
-                        ? null
-                        : widget.controller.addMeal(context, widget.id);
-                    // Navigator.of(context).pop();
-                  }
-                },
-                child: Obx(
-                 () {
-                    return widget.controller.isLoading.value
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                  width: 50,
-                                  height: 50,
-                                  child: CircularProgressIndicator()),
-                              Text(
-                                "Loading...",
-                                style: TextStyle(fontSize: 18, color: Colors.black),
-                              ),
-                            ],
-                          )
-                        : Text(
-                            "Add",
-                            style: TextStyle(fontSize: 18, color: Colors.black),
-                          );
-                  }
-                ),
-              ),
-            ),
-            // ElevatedButton(
-            //   child: Text("Add"),
-            //   onPressed: () {
-            //     if (widget.controller.title.text.isNotEmpty) {
-            //       widget.controller.addMeal(context, widget.id);
-            //       // Navigator.of(context).pop();
-            //     }
-            //   },
-            // ),
-          ],
-        );
-      },
-    );
-  }
+  int? expandedIndex;
+  final UserController userController = Get.find<UserController>();
 
   @override
   void initState() {
@@ -269,125 +24,301 @@ class _MealTimingPageState extends State<MealTimingPage> {
     widget.controller.getMeal(context, widget.id);
   }
 
-  TimeOfDay? time;
+  void _onToggleMeal(int index, bool value) {
+    setState(() {
+      widget.controller.dataList[index]['enabled'] = value;
+    });
+    // In a real app, you'd save this to the backend/local storage
+  }
+
+  void _onTimeChanged(int index, DateTime dateTime) {
+    final format = TimeOfDay.fromDateTime(dateTime).format(context);
+    setState(() {
+      widget.controller.dataList[index]['time_range'] = format;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BaseWidget(
-      // appBar: AppBar(
-      //   leading: IconButton(
-      //       onPressed: () {
-      //         Get.back();
-      //       },
-      //       icon: Icon(Icons.arrow_back_ios)),
-      //   title: Text("Set Your Daily Meal & Snack Timings"),
-      //   backgroundColor: Colors.black,
-      // ),
-      title: "Set Your Daily Meal & Snack Timings",
-      backButton: true,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
         child: Column(
           children: [
-            Text(
-              "Choose Suitable Times For Your Meals, Snacks, And Workout Nutrition.",
-              style: TextStyle(color: Colors.white54),
-            ),
-            SizedBox(height: 20),
-            Obx(() {
-              return widget.controller.getLoading.value
-                  ? Center(
-                      child: CircularProgressIndicator(
-                      color: Colors.white,
-                    ))
-                  : widget.controller.dataList.isEmpty
-                      ? Center(
-                          child: Text("Not Found"),
-                        )
-                      : Expanded(
-                          child: ListView.builder(
-                            itemCount: widget.controller.dataList.length,
-                            itemBuilder: (context, index) {
-                              var data = widget.controller.dataList[index];
-                              return Card(
-                                color: Colors.grey[850],
-                                child: ListTile(
-                                  title: Text(
-                                    "${data['label_name']}",
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20),
-                                  ),
-                                  subtitle: Padding(
-                                    padding: EdgeInsets.only(top: 5),
-                                    child: Text(
-                                      "${data['time_range']}",
-                                      style: TextStyle(
-                                          color: Color(0xff7E7E7E),
-                                          fontSize: 15),
-                                    ),
-                                  ),
-                                  // trailing: IconButton(
-                                  //   icon: Icon(Icons.access_time,
-                                  //       color: Colors.greenAccent),
-                                  //   onPressed: () {
-                                  //     _selectTime(context, index);
-                                  //   },
-                                  // ),
-
-                                  trailing: Container(
-                                    width: 110,
-                                    child: Row(
-                                      children: [
-                                        Switch(
-                                          inactiveTrackColor: Color(0xff7E7E7E),
-                                          activeTrackColor: Color(0xffCDE26D),
-                                          thumbColor: WidgetStatePropertyAll(
-                                              Colors.white),
-                                          value: widget.controller
-                                                  .dataList[index]['enabled'] ??
-                                              false, // ✅ Fix applied
-                                          onChanged: (value) {
-                                            setState(() {
-                                              widget.controller.dataList[index]
-                                                  ['enabled'] = value;
-                                            });
-
-                                            if (!value) {
-                                              // NotificationService.cancelNotification(index);
-                                              print(
-                                                  "Cancelled Notification for ${widget.controller.dataList[index]['label_name']}");
-                                            }
-                                          },
-                                        ),
-                                        IconButton(
-                                          icon: Icon(Icons.access_time,
-                                              color: Colors.greenAccent),
-                                          onPressed: () {
-                                            _selectTime(context, index);
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 28,
+                          backgroundColor: Colors.grey[800],
+                          backgroundImage: UserController.getImageProvider(
+                            userController.profileImage,
+                          ),
+                          child: userController.profileImage.isEmpty
+                              ? const Icon(Icons.person, color: Colors.white24)
+                              : null,
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Welcome!',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              );
-                            },
+                              ),
+                              Text(
+                                userController.fullName,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.05),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.notifications_none_rounded,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    const Text(
+                      'Set Your Daily Meal & Snack Timings',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Choose Suitable Times For Your Meals, Snacks, And Workout Nutrition.',
+                      style: TextStyle(color: Colors.white54, fontSize: 14),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Meal List
+                    Obx(() {
+                      if (widget.controller.getLoading.value) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xffCDE26D),
                           ),
                         );
-            }),
+                      }
+                      if (widget.controller.dataList.isEmpty) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 50),
+                            child: Text(
+                              "No meal timings found",
+                              style: TextStyle(color: Colors.white54),
+                            ),
+                          ),
+                        );
+                      }
+
+                      return Column(
+                        children: List.generate(
+                          widget.controller.dataList.length,
+                          (index) {
+                            final data = widget.controller.dataList[index];
+                            final isExpanded = expandedIndex == index;
+                            final isEnabled = data['enabled'] ?? false;
+
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: Column(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        expandedIndex = isExpanded
+                                            ? null
+                                            : index;
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF1A1A1A),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: isExpanded
+                                            ? Border.all(
+                                                color: const Color(
+                                                  0xffCDE26D,
+                                                ).withOpacity(0.3),
+                                              )
+                                            : null,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  data['label_name'] ?? "",
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  data['time_range'] ?? "--:--",
+                                                  style: TextStyle(
+                                                    color: isEnabled
+                                                        ? const Color(
+                                                            0xffCDE26D,
+                                                          )
+                                                        : Colors.white38,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          CupertinoSwitch(
+                                            activeColor: const Color(
+                                              0xffCDE26D,
+                                            ),
+                                            value: isEnabled,
+                                            onChanged: (val) =>
+                                                _onToggleMeal(index, val),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  if (isExpanded) ...[
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 10),
+                                      height: 200,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF1A1A1A),
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Expanded(
+                                            child: CupertinoTheme(
+                                              data: const CupertinoThemeData(
+                                                brightness: Brightness.dark,
+                                                textTheme:
+                                                    CupertinoTextThemeData(
+                                                      dateTimePickerTextStyle:
+                                                          TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 18,
+                                                          ),
+                                                    ),
+                                              ),
+                                              child: CupertinoDatePicker(
+                                                mode: CupertinoDatePickerMode
+                                                    .time,
+                                                initialDateTime: DateTime.now(),
+                                                onDateTimeChanged: (dt) =>
+                                                    _onTimeChanged(index, dt),
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(12),
+                                            child: Container(
+                                              width: double.infinity,
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xffCDE26D),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: TextButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    expandedIndex = null;
+                                                  });
+                                                },
+                                                child: const Text(
+                                                  "Done",
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ),
+
+            // Bottom Continue Button
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Container(
+                width: double.infinity,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: const Color(0xffCDE26D),
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xffCDE26D).withOpacity(0.2),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  child: const Text(
+                    "Continue",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        shape: RoundedRectangleBorder(
-          // Make the FAB rounded
-          borderRadius: BorderRadius.circular(
-              30.0), // Adjust the radius for more roundness
-        ),
-        onPressed: () {
-          _showAddMealDialog(context);
-        },
-        backgroundColor: Color(0xffCDE26D),
-        child: Icon(Icons.add, color: Colors.black),
       ),
     );
   }

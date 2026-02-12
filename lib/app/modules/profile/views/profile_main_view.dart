@@ -216,6 +216,16 @@ class _ProfileMainViewState extends State<ProfileMainView> {
         ),
         const SizedBox(height: 16),
         _buildMenuOption(
+          icon: Icons.access_time_outlined,
+          title: 'Meal Timing',
+          onTap: () {
+            final userController = Get.find<UserController>();
+            final userId = userController.currentUser?.id ?? "";
+            Get.toNamed('/meal-timing?id=$userId');
+          },
+        ),
+        const SizedBox(height: 16),
+        _buildMenuOption(
           icon: Icons.settings_outlined,
           title: 'Setting',
           onTap: () {

@@ -161,6 +161,18 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                   },
                                 ),
                                 _buildModernMenuItem(
+                                  icon: Icons.access_time_outlined,
+                                  title: "Meal Timing",
+                                  onTap: () {
+                                    Get.back();
+                                    final userController =
+                                        Get.find<UserController>();
+                                    final userId =
+                                        userController.currentUser?.id ?? "";
+                                    Get.toNamed('/meal-timing?id=$userId');
+                                  },
+                                ),
+                                _buildModernMenuItem(
                                   icon: Icons.settings_outlined,
                                   title: "Settings",
                                   onTap: () {

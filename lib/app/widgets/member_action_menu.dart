@@ -176,6 +176,14 @@ class _MemberActionSheet extends StatelessWidget {
 
             // Action Items
             _buildActionItem(
+              icon: Icons.access_time_outlined,
+              label: 'Set Meal Timing',
+              onTap: () {
+                Get.back();
+                Get.toNamed('/meal-timing?id=${member.id}');
+              },
+            ),
+            _buildActionItem(
               icon: Icons.person_outline,
               label: 'View Profile',
               onTap: () {
