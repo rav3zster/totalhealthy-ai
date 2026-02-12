@@ -98,6 +98,37 @@ class CreateMealController extends GetxController {
     // Note: Creating separate controllers for these if needed in future
   }
 
+  // Populate controller with existing meal data for copying (creates new meal)
+  void populateForCopy(MealModel meal) {
+    print("Populating form for copy from: ${meal.name}");
+    isEditing.value = false;
+    editingMealId = null;
+
+    // Populate text controllers
+    fullNameController.text = "${meal.name} (Copy)"; // Append copy
+    descriptionController.text = meal.description;
+    kcalController.text = meal.kcal;
+    carbsController.text = meal.carbs;
+    proteinController.text = meal.protein;
+    fatsController.text = meal.fat;
+
+    // Populate image
+    mealImage.value = meal.imageUrl;
+
+    // Populate categories
+    selectedCategories.assignAll(meal.categories);
+
+    // Populate ingredients
+    ingredientControllers.clear();
+    for (var ingredient in meal.ingredients) {
+      ingredientControllers.add({
+        'name': TextEditingController(text: ingredient.name),
+        'amount': TextEditingController(text: ingredient.amount),
+        'unit': TextEditingController(text: ingredient.unit),
+      });
+    }
+  }
+
   //  {"name": "string", "amount": "string", "unit": "string"}
   submitUser(context, userId) async {
     try {

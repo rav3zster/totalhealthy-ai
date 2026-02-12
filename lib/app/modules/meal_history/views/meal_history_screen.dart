@@ -9,7 +9,6 @@ class MealHistoryScreen extends GetView<MealHistoryController> {
   const MealHistoryScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    String id = Get.parameters["id"] ?? '';
-    return MealHistoryPage(id: id, controller: controller);
+    return const MealHistoryPage();
   }
 }

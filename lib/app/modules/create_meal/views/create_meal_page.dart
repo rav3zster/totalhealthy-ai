@@ -27,10 +27,14 @@ class _CreateMealPageState extends State<CreateMealPage>
   void initState() {
     super.initState();
 
-    // Check if we are editing an existing meal
+    // Check if we are editing or copying an existing meal
     final args = Get.arguments;
     if (args is MealModel) {
       widget.controller.populateForEdit(args);
+    } else if (args is Map &&
+        args['mode'] == 'copy' &&
+        args['meal'] is MealModel) {
+      widget.controller.populateForCopy(args['meal']);
     }
 
     ingredients = List.generate(
