@@ -663,15 +663,6 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     ClientDashboardControllers controller,
     BuildContext context,
   ) {
-    // Different gradient combinations for variety
-    List<List<Color>> gradients = [
-      [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-      [Color(0xFF2D2D2D), Color(0xFF1D1D1D)],
-      [Color(0xFF252525), Color(0xFF151515)],
-    ];
-
-    List<Color> cardGradient = gradients[index % gradients.length];
-
     return GestureDetector(
       onTap: () {
         final box = GetStorage();
@@ -682,64 +673,47 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       },
       onLongPress: () => _showDeleteMealDialog(context, meal, controller),
       child: Container(
-        margin: EdgeInsets.only(bottom: 20),
+        margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: cardGradient,
+            colors: [Color(0xFF2A2A2A), Color(0xFF1F1F1F)],
           ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Color(0xFFC2D86A).withValues(alpha: 0.2),
-            width: 1,
+            color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+            width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 15,
-              offset: Offset(0, 8),
+              color: Colors.black.withValues(alpha: 0.4),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
-        child: Stack(
+        child: Column(
           children: [
-            // Subtle pattern overlay
-            Positioned(
-              top: -30,
-              right: -30,
-              child: Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    colors: [
-                      Color(0xFFC2D86A).withValues(alpha: 0.1),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
+            // Top Section: Image, Title, and Calories
             Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   // Meal Image
                   Container(
-                    width: 70,
-                    height: 70,
+                    width: 80,
+                    height: 80,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
+                      gradient: const LinearGradient(
                         colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
                       ),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Color(0xFFC2D86A).withValues(alpha: 0.3),
-                          blurRadius: 10,
-                          offset: Offset(0, 5),
+                          color: const Color(0xFFC2D86A).withValues(alpha: 0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
                         ),
                       ],
                     ),
@@ -755,115 +729,148 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                             const Icon(
                               Icons.restaurant,
                               color: Colors.black,
-                              size: 35,
+                              size: 40,
                             ),
                       ),
                     ),
                   ),
-                  SizedBox(width: 20),
+                  const SizedBox(width: 16),
 
                   // Meal Info
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Meal Name
                         Text(
                           meal.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.3,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 10),
+
+                        // Calories and Weight Row
                         Row(
                           children: [
+                            // Calories Badge
                             Container(
-                              padding: EdgeInsets.all(4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    Colors.orange.withValues(alpha: 0.2),
-                                    Colors.orange.withValues(alpha: 0.1),
+                                    Colors.orange.withValues(alpha: 0.3),
+                                    Colors.orange.withValues(alpha: 0.15),
                                   ],
                                 ),
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.orange.withValues(alpha: 0.4),
+                                  width: 1,
+                                ),
                               ),
-                              child: Icon(
-                                Icons.local_fire_department,
-                                color: Colors.orange,
-                                size: 16,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.local_fire_department,
+                                    color: Colors.orange,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${meal.kcal}',
+                                    style: const TextStyle(
+                                      color: Colors.orange,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const Text(
+                                    ' Kcal',
+                                    style: TextStyle(
+                                      color: Colors.orange,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            SizedBox(width: 6),
-                            Text(
-                              '${meal.kcal} Kcal',
-                              style: TextStyle(
-                                color: Colors.orange,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            Text(
-                              '• 100g',
-                              style: TextStyle(
-                                color: Colors.white54,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 12),
+                            const SizedBox(width: 10),
 
-                        // Nutritional Info
-                        Row(
-                          children: [
-                            _buildModernNutrientBar(
-                              '${meal.protein}g',
-                              'Protein',
-                              Colors.green,
-                            ),
-                            SizedBox(width: 12),
-                            _buildModernNutrientBar(
-                              '${meal.fat}g',
-                              'Fat',
-                              Colors.blue,
-                            ),
-                            SizedBox(width: 12),
-                            _buildModernNutrientBar(
-                              '${meal.carbs}g',
-                              'Carbs',
-                              Colors.red,
+                            // Weight Badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  width: 1,
+                                ),
+                              ),
+                              child: const Text(
+                                '100g',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       ],
                     ),
                   ),
+                ],
+              ),
+            ),
 
-                  // More Options
-                  Container(
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-                      ),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xFFC2D86A).withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      Icons.more_horiz,
-                      color: Colors.black,
-                      size: 20,
-                    ),
+            // Divider
+            Container(
+              height: 1,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+
+            // Bottom Section: Nutritional Info
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  _buildModernNutrientBar(
+                    '${meal.protein}g',
+                    'Protein',
+                    Colors.green,
+                  ),
+                  const SizedBox(width: 10),
+                  _buildModernNutrientBar('${meal.fat}g', 'Fat', Colors.blue),
+                  const SizedBox(width: 10),
+                  _buildModernNutrientBar(
+                    '${meal.carbs}g',
+                    'Carbs',
+                    Colors.red,
                   ),
                 ],
               ),
@@ -875,26 +882,47 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   }
 
   Widget _buildModernNutrientBar(String value, String label, Color color) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
-        ),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              color.withValues(alpha: 0.25),
+              color.withValues(alpha: 0.1),
+            ],
           ),
-          Text(label, style: TextStyle(color: Colors.white54, fontSize: 10)),
-        ],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.4), width: 1.5),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.3,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.8),
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.2,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

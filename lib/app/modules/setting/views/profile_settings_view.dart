@@ -103,9 +103,19 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
       text: user?.height.toString() ?? '',
     );
     _ageController = TextEditingController(text: user?.age.toString() ?? '');
-    _selectedActivityLevel = user?.activityLevel ?? 'Moderate';
-    _selectedMealFrequency =
-        user?.mealFrequency ?? "I don't have a specific schedule";
+
+    // Ensure activity level is valid
+    final activityLevel = user?.activityLevel ?? 'Moderate';
+    _selectedActivityLevel = _activityLevels.contains(activityLevel)
+        ? activityLevel
+        : 'Moderate';
+
+    // Ensure meal frequency is valid
+    final mealFreq = user?.mealFrequency ?? "I don't have a specific schedule";
+    _selectedMealFrequency = _mealFrequencies.contains(mealFreq)
+        ? mealFreq
+        : "I don't have a specific schedule";
+
     _selectedGoals = List<String>.from(user?.goals ?? []);
     _selectedGender = user?.gender ?? 'Male';
     _selectedDietType = user?.dietType ?? 'Not Specific';
@@ -614,6 +624,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedMealFrequency,
+          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
           isExpanded: true,
           dropdownColor: const Color(0xFF2A2A2A),
           style: const TextStyle(color: Colors.white, fontSize: 16),
