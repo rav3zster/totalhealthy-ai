@@ -61,6 +61,43 @@ class CreateMealController extends GetxController {
     }
   }
 
+  var isEditing = false.obs;
+  String? editingMealId;
+
+  // Initialize controller with existing meal data for editing
+  void populateForEdit(MealModel meal) {
+    print("Populating form for edit: ${meal.name} (${meal.id})");
+    isEditing.value = true;
+    editingMealId = meal.id;
+
+    // Populate text controllers
+    fullNameController.text = meal.name;
+    descriptionController.text = meal.description;
+    kcalController.text = meal.kcal;
+    carbsController.text = meal.carbs;
+    proteinController.text = meal.protein;
+    fatsController.text = meal.fat;
+
+    // Populate image
+    mealImage.value = meal.imageUrl;
+
+    // Populate categories
+    selectedCategories.assignAll(meal.categories);
+
+    // Populate ingredients
+    ingredientControllers.clear();
+    for (var ingredient in meal.ingredients) {
+      ingredientControllers.add({
+        'name': TextEditingController(text: ingredient.name),
+        'amount': TextEditingController(text: ingredient.amount),
+        'unit': TextEditingController(text: ingredient.unit),
+      });
+    }
+
+    // Use existing prep time and difficulty if available (or defaults)
+    // Note: Creating separate controllers for these if needed in future
+  }
+
   //  {"name": "string", "amount": "string", "unit": "string"}
   submitUser(context, userId) async {
     try {
@@ -95,6 +132,7 @@ class CreateMealController extends GetxController {
             .toList();
 
         final meal = MealModel(
+          id: isEditing.value ? editingMealId : null,
           userId: finalUserId,
           groupId: groupId,
           name: fullNameController.text.trim(),
@@ -117,30 +155,42 @@ class CreateMealController extends GetxController {
               : mealImage.value,
           ingredients: cleanIngredients,
           instructions: "No instructions provided", // Default or empty
-          createdAt: DateTime.now(),
+          createdAt:
+              DateTime.now(), // For updates, this might need to be preserved ideally
           prepTime: "15 min", // Default value
           difficulty: "Easy", // Default value
         );
 
-        print("Submitting Meal to Firestore: ${meal.toJson()}");
+        if (isEditing.value) {
+          print("Updating Meal in Firestore: ${meal.toJson()}");
+          await _mealsService.updateMeal(meal);
 
-        await _mealsService.addMeal(meal);
+          Get.back(); // Go back
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Meal Updated Successfully!'),
+              backgroundColor: Colors.blue,
+            ),
+          );
+        } else {
+          print("Creating New Meal in Firestore: ${meal.toJson()}");
+          await _mealsService.addMeal(meal);
 
-        Get.back(); // Go back to the previous screen
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Meal Created Successfully in Firestore!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+          Get.back(); // Go back
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Meal Created Successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       }
     } catch (e) {
       print("Error in submitUser: $e");
-      String errorMessage = 'Error creating meal: $e';
+      String errorMessage = 'Error: $e';
 
       if (e.toString().contains('permission-denied')) {
-        errorMessage =
-            'Permission Denied: Please check your Firestore Security Rules in the Firebase Console and ensure you have write access to the "meals" collection.';
+        errorMessage = 'Permission Denied: Check Firestore Security Rules.';
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -148,20 +198,6 @@ class CreateMealController extends GetxController {
           content: Text(errorMessage),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 5),
-          action: SnackBarAction(
-            label: 'HELP',
-            textColor: Colors.white,
-            onPressed: () {
-              Get.defaultDialog(
-                title: "Permission Error",
-                middleText:
-                    "This error usually means your Firebase Firestore rules are blocking the save operation. Please ensure authenticated users have write access to the 'meals' collection.",
-                textConfirm: "OK",
-                confirmTextColor: Colors.white,
-                onConfirm: () => Get.back(),
-              );
-            },
-          ),
         ),
       );
     } finally {

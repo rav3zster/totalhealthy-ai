@@ -5,6 +5,7 @@ import 'package:totalhealthy/app/modules/create_meal/controllers/create_meal_con
 import '../../../controllers/user_controller.dart';
 
 import '../../../widgets/ingredient_input.dart';
+import '../../../data/models/meal_model.dart';
 
 class CreateMealPage extends StatefulWidget {
   final CreateMealController controller;
@@ -25,6 +26,13 @@ class _CreateMealPageState extends State<CreateMealPage>
   @override
   void initState() {
     super.initState();
+
+    // Check if we are editing an existing meal
+    final args = Get.arguments;
+    if (args is MealModel) {
+      widget.controller.populateForEdit(args);
+    }
+
     ingredients = List.generate(
       widget.controller.ingredientControllers.length,
       (index) => index,
@@ -210,13 +218,17 @@ class _CreateMealPageState extends State<CreateMealPage>
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'Create Meal',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
+                  Obx(
+                    () => Text(
+                      widget.controller.isEditing.value
+                          ? 'Edit Meal'
+                          : 'Create Meal',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
                 ],
@@ -871,14 +883,20 @@ class _CreateMealPageState extends State<CreateMealPage>
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                       ),
                     )
-                  : const Row(
+                  : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.check_circle, color: Colors.black, size: 24),
-                        SizedBox(width: 12),
+                        const Icon(
+                          Icons.check_circle,
+                          color: Colors.black,
+                          size: 24,
+                        ),
+                        const SizedBox(width: 12),
                         Text(
-                          'Create Meal',
-                          style: TextStyle(
+                          widget.controller.isEditing.value
+                              ? 'Update Meal'
+                              : 'Create Meal',
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

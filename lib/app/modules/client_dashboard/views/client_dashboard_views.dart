@@ -857,20 +857,129 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
             // Bottom Section: Nutritional Info
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Row(
+              child: Column(
                 children: [
-                  _buildModernNutrientBar(
-                    '${meal.protein}g',
-                    'Protein',
-                    Colors.green,
+                  Row(
+                    children: [
+                      _buildModernNutrientBar(
+                        '${meal.protein}g',
+                        'Protein',
+                        Colors.green,
+                      ),
+                      const SizedBox(width: 10),
+                      _buildModernNutrientBar(
+                        '${meal.fat}g',
+                        'Fat',
+                        Colors.blue,
+                      ),
+                      const SizedBox(width: 10),
+                      _buildModernNutrientBar(
+                        '${meal.carbs}g',
+                        'Carbs',
+                        Colors.red,
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  _buildModernNutrientBar('${meal.fat}g', 'Fat', Colors.blue),
-                  const SizedBox(width: 10),
-                  _buildModernNutrientBar(
-                    '${meal.carbs}g',
-                    'Carbs',
-                    Colors.red,
+                  const SizedBox(height: 12),
+                  // Edit and Delete Buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(8),
+                            onTap: () {
+                              final userData = Get.find<AuthController>()
+                                  .userdataget();
+                              Get.toNamed(
+                                "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
+                                arguments: meal,
+                              );
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.edit_outlined,
+                                    size: 16,
+                                    color: Color(0xFFC2D86A),
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Edit',
+                                    style: TextStyle(
+                                      color: Color(0xFFC2D86A),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Colors.red.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(8),
+                            onTap: () => _showDeleteMealDialog(
+                              context,
+                              meal,
+                              controller,
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.delete_outline,
+                                    size: 16,
+                                    color: Colors.red,
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Delete',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
