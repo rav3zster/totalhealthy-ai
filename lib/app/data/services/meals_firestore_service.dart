@@ -32,12 +32,14 @@ class MealsFirestoreService {
     return _firestore
         .collection(_collection)
         .where('groupId', isEqualTo: groupId)
-        .orderBy('created_at', descending: true)
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs
+          final list = snapshot.docs
               .map((doc) => MealModel.fromJson(doc.data(), docId: doc.id))
               .toList();
+          // Sort in-memory to avoid index requirement during development
+          list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return list;
         })
         .handleError((error) {
           print('Error fetching group meals for $groupId: $error');

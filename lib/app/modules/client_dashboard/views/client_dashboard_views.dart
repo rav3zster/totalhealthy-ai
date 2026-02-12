@@ -141,7 +141,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                   final userData = Get.find<AuthController>()
                                       .userdataget();
                                   Get.toNamed(
-                                    "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
+                                    "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
                                   );
                                 },
                               ),
@@ -465,7 +465,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                                   Get.find<AuthController>()
                                                       .userdataget();
                                               Get.toNamed(
-                                                "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
+                                                "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
                                               );
                                             },
                                           ),
@@ -668,7 +668,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
         final box = GetStorage();
         box.write("mealdetails", meal.toJson());
         Get.toNamed(
-          '/meals-details?id=${Get.find<AuthController>().userdataget()["_id"] ?? ""}',
+          '/meals-details?id=${Get.find<AuthController>().userdataget()["id"] ?? Get.find<AuthController>().userdataget()["_id"] ?? ""}',
         );
       },
       onLongPress: () => _showDeleteMealDialog(context, meal, controller),

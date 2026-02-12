@@ -205,8 +205,13 @@ class ClientDashboardControllers extends GetxController {
           .listen(
             (userMeals) {
               print(
-                "ClientDashboardControllers: Received ${userMeals.length} meals from stream",
+                "ClientDashboardControllers: Received ${userMeals.length} meals from stream for UID: $userId",
               );
+              for (var meal in userMeals.take(3)) {
+                print(
+                  " - Meal: ${meal.name} (ID: ${meal.id}, CreatedAt: ${meal.createdAt})",
+                );
+              }
 
               meals.value = userMeals;
               _cacheMeals(userMeals);

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../routes/app_pages.dart';
 
 import '../../../core/base/controllers/auth_controller.dart';
 import '../../../data/models/meal_model.dart';
@@ -64,6 +65,11 @@ class CreateMealController extends GetxController {
   var isEditing = false.obs;
   String? editingMealId;
 
+  // Track hidden fields from source meal when editing/copying
+  String _instructions = "No instructions provided";
+  String _prepTime = "15 min";
+  String _difficulty = "Easy";
+
   // Initialize controller with existing meal data for editing
   void populateForEdit(MealModel meal) {
     print("Populating form for edit: ${meal.name} (${meal.id})");
@@ -80,6 +86,11 @@ class CreateMealController extends GetxController {
 
     // Populate image
     mealImage.value = meal.imageUrl;
+
+    // Populate hidden fields
+    _instructions = meal.instructions;
+    _prepTime = meal.prepTime;
+    _difficulty = meal.difficulty;
 
     // Populate categories
     selectedCategories.assignAll(meal.categories);
@@ -115,6 +126,11 @@ class CreateMealController extends GetxController {
     // Populate image
     mealImage.value = meal.imageUrl;
 
+    // Populate hidden fields
+    _instructions = meal.instructions;
+    _prepTime = meal.prepTime;
+    _difficulty = meal.difficulty;
+
     // Populate categories
     selectedCategories.assignAll(meal.categories);
 
@@ -141,9 +157,18 @@ class CreateMealController extends GetxController {
 
         final authController = Get.find<AuthController>();
         final groupId = authController.groupgetId();
-        final finalUserId = (userId == null || userId.toString().isEmpty)
-            ? (authController.firebaseUser.value?.uid ?? "unknown_user")
-            : userId.toString();
+
+        // Extract userId from various possible locations
+        final firebaseUid = authController.firebaseUser.value?.uid;
+        final storageUserId = userId?.toString() ?? "";
+
+        final finalUserId = storageUserId.isNotEmpty
+            ? storageUserId
+            : (firebaseUid ?? "unknown_user");
+
+        print("DEBUG: Final UserID for upload: $finalUserId");
+        print("DEBUG: Firebase UID: $firebaseUid");
+        print("DEBUG: Argument UserID: $userId");
 
         // Clean ingredients: Extract text from controllers and convert to plain list
         final List<IngredientModel> cleanIngredients = ingredientControllers
@@ -185,18 +210,17 @@ class CreateMealController extends GetxController {
               ? "https://example.com/meal_placeholder.png"
               : mealImage.value,
           ingredients: cleanIngredients,
-          instructions: "No instructions provided", // Default or empty
-          createdAt:
-              DateTime.now(), // For updates, this might need to be preserved ideally
-          prepTime: "15 min", // Default value
-          difficulty: "Easy", // Default value
+          instructions: _instructions,
+          createdAt: DateTime.now(),
+          prepTime: _prepTime,
+          difficulty: _difficulty,
         );
 
         if (isEditing.value) {
           print("Updating Meal in Firestore: ${meal.toJson()}");
           await _mealsService.updateMeal(meal);
 
-          Get.back(); // Go back
+          Get.offAllNamed("${Routes.ClientDashboard}?id=$finalUserId");
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Meal Updated Successfully!'),
@@ -207,7 +231,7 @@ class CreateMealController extends GetxController {
           print("Creating New Meal in Firestore: ${meal.toJson()}");
           await _mealsService.addMeal(meal);
 
-          Get.back(); // Go back
+          Get.offAllNamed("${Routes.ClientDashboard}?id=$finalUserId");
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Meal Created Successfully!'),
