@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:totalhealthy/app/controllers/user_controller.dart';
+import 'package:totalhealthy/app/widgets/drawer_menu.dart';
 import '../controllers/planner_controller.dart';
 
-class PlannerPage extends GetView<PlannerController> {
+class PlannerPage extends StatefulWidget {
   const PlannerPage({super.key});
+
+  @override
+  State<PlannerPage> createState() => _PlannerPageState();
+}
+
+class _PlannerPageState extends State<PlannerPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final PlannerController controller = Get.find<PlannerController>();
+  final UserController userController = Get.find<UserController>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: const DrawerMenu(),
       backgroundColor: Colors.black,
       body: SafeArea(
         child: Obx(() {
@@ -50,29 +63,58 @@ class PlannerPage extends GetView<PlannerController> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              const Text(
-                'Planner',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+              GestureDetector(
+                onTap: () => _scaffoldKey.currentState?.openDrawer(),
+                child: GetBuilder<UserController>(
+                  builder: (uController) {
+                    return CircleAvatar(
+                      radius: 24,
+                      backgroundColor: Colors.grey[800],
+                      backgroundImage: UserController.getImageProvider(
+                        uController.profileImage,
+                      ),
+                      child: uController.profileImage.isEmpty
+                          ? const Icon(
+                              Icons.person,
+                              color: Colors.white24,
+                              size: 22,
+                            )
+                          : null,
+                    );
+                  },
                 ),
               ),
-              const SizedBox(height: 4),
-              Row(
+              const SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
-                    Icons.calendar_today_outlined,
-                    color: Colors.grey,
-                    size: 14,
+                  const Text(
+                    'Planner',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    DateFormat('d MMM yyyy').format(DateTime.now()),
-                    style: const TextStyle(color: Colors.grey, fontSize: 13),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today_outlined,
+                        color: Colors.grey,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        DateFormat('d MMM yyyy').format(DateTime.now()),
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -213,19 +255,21 @@ class PlannerPage extends GetView<PlannerController> {
         ),
         const SizedBox(height: 12),
         Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              controller.recipes.length,
-              (index) => Container(
-                width: 8,
-                height: 8,
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: controller.currentRecipeIndex.value == index
-                      ? const Color(0xFFCDE26D)
-                      : Colors.grey[800],
+          child: Obx(
+            () => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                controller.recipes.length,
+                (index) => Container(
+                  width: 8,
+                  height: 8,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: controller.currentRecipeIndex.value == index
+                        ? const Color(0xFFCDE26D)
+                        : Colors.grey[800],
+                  ),
                 ),
               ),
             ),
@@ -251,26 +295,28 @@ class PlannerPage extends GetView<PlannerController> {
             (index) => Expanded(
               child: GestureDetector(
                 onTap: () => controller.setTab(index),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: controller.selectedTab.value == index
-                        ? const Color(0xFF2A2A2A)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12),
-                    border: controller.selectedTab.value == index
-                        ? Border.all(color: Colors.white24)
-                        : null,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    tabs[index],
-                    style: TextStyle(
+                child: Obx(
+                  () => Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
                       color: controller.selectedTab.value == index
-                          ? Colors.white
-                          : Colors.grey,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
+                          ? const Color(0xFF2A2A2A)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                      border: controller.selectedTab.value == index
+                          ? Border.all(color: Colors.white24)
+                          : null,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      tabs[index],
+                      style: TextStyle(
+                        color: controller.selectedTab.value == index
+                            ? Colors.white
+                            : Colors.grey,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -283,15 +329,17 @@ class PlannerPage extends GetView<PlannerController> {
   }
 
   Widget _buildWeeklyList() {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: controller.weeklyPlan.length,
-      itemBuilder: (context, index) {
-        final dayPlan = controller.weeklyPlan[index];
-        final isExpanded = controller.expandedDays.contains(index);
-        return _buildDayCard(index, dayPlan, isExpanded);
-      },
+    return Obx(
+      () => ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: controller.weeklyPlan.length,
+        itemBuilder: (context, index) {
+          final dayPlan = controller.weeklyPlan[index];
+          final isExpanded = controller.expandedDays.contains(index);
+          return _buildDayCard(index, dayPlan, isExpanded);
+        },
+      ),
     );
   }
 

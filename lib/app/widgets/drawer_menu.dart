@@ -254,22 +254,28 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                 ),
                                 const SizedBox(height: 8),
 
-                                _buildModernMenuItem(
-                                  icon: Icons.supervisor_account_outlined,
-                                  title: "Switch as Advisor",
-                                  onTap: () {
-                                    Get.back();
-                                    authController.switchRole("admin");
-                                  },
-                                ),
-                                _buildModernMenuItem(
-                                  icon: Icons.person_outline,
-                                  title: "Switch as Member",
-                                  onTap: () {
-                                    Get.back();
-                                    authController.switchRole("user");
-                                  },
-                                ),
+                                if (userController.currentUser?.role ==
+                                        "member" ||
+                                    userController.currentUser?.role == "user")
+                                  _buildModernMenuItem(
+                                    icon: Icons.supervisor_account_outlined,
+                                    title: "Switch as Advisor",
+                                    onTap: () {
+                                      Get.back();
+                                      authController.switchRole("admin");
+                                    },
+                                  ),
+                                if (userController.currentUser?.role ==
+                                        "advisor" ||
+                                    userController.currentUser?.role == "admin")
+                                  _buildModernMenuItem(
+                                    icon: Icons.person_outline,
+                                    title: "Switch as Member",
+                                    onTap: () {
+                                      Get.back();
+                                      authController.switchRole("user");
+                                    },
+                                  ),
 
                                 // Divider
                                 Container(

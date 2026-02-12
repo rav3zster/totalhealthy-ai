@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/controllers/user_controller.dart';
 import 'package:totalhealthy/app/modules/meal_timing/controllers/meal_timing_controller.dart';
+import 'package:totalhealthy/app/widgets/drawer_menu.dart';
 
 class MealTimingPage extends StatefulWidget {
   const MealTimingPage({super.key, required this.id, required this.controller});
@@ -15,6 +16,7 @@ class MealTimingPage extends StatefulWidget {
 }
 
 class _MealTimingPageState extends State<MealTimingPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int? expandedIndex;
   final UserController userController = Get.find<UserController>();
 
@@ -41,6 +43,8 @@ class _MealTimingPageState extends State<MealTimingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: const DrawerMenu(),
       backgroundColor: Colors.black,
       body: SafeArea(
         child: Column(
@@ -54,15 +58,21 @@ class _MealTimingPageState extends State<MealTimingPage> {
                     // Header
                     Row(
                       children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundColor: Colors.grey[800],
-                          backgroundImage: UserController.getImageProvider(
-                            userController.profileImage,
+                        GestureDetector(
+                          onTap: () => _scaffoldKey.currentState?.openDrawer(),
+                          child: CircleAvatar(
+                            radius: 28,
+                            backgroundColor: Colors.grey[800],
+                            backgroundImage: UserController.getImageProvider(
+                              userController.profileImage,
+                            ),
+                            child: userController.profileImage.isEmpty
+                                ? const Icon(
+                                    Icons.person,
+                                    color: Colors.white24,
+                                  )
+                                : null,
                           ),
-                          child: userController.profileImage.isEmpty
-                              ? const Icon(Icons.person, color: Colors.white24)
-                              : null,
                         ),
                         const SizedBox(width: 14),
                         Expanded(
