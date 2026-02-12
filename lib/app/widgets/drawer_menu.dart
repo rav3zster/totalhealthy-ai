@@ -181,13 +181,39 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                   },
                                 ),
                                 _buildModernMenuItem(
-                                  icon: Icons.history_rounded,
-                                  title: "Diet History",
+                                  icon: Icons.calendar_month,
+                                  title: 'Weekly Planner',
                                   onTap: () {
                                     Get.back();
-                                    Get.toNamed(Routes.MEAL_HISTORY);
+                                    final userData = Get.find<AuthController>()
+                                        .userdataget();
+                                    Get.toNamed(
+                                      Routes.PLANNER +
+                                          "?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                    );
                                   },
                                 ),
+                                // _buildModernMenuItem(
+                                //   icon: Icons.access_time,
+                                //   title: 'Meal Timing',
+                                //   onTap: () {
+                                //     Get.back();
+                                //     final userData = Get.find<AuthController>()
+                                //         .userdataget();
+                                //     Get.toNamed(
+                                //       Routes.MEAL_TIMING +
+                                //           "?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                //     );
+                                //   },
+                                // ),
+                                // _buildModernMenuItem(
+                                //   icon: Icons.history_rounded,
+                                //   title: "Diet History",
+                                //   onTap: () {
+                                //     Get.back();
+                                //     Get.toNamed(Routes.MEAL_HISTORY);
+                                //   },
+                                // ),
 
                                 // Divider
                                 Container(

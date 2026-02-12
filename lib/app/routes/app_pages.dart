@@ -55,6 +55,8 @@ import '../modules/welcom_screen/views/welcome-screen-views.dart';
 import '../modules/manage_accounts/views/manage_accounts_views.dart';
 import '../modules/Help_and_support/views/helpAndSuportPage.dart';
 import '../widgets/switch_role_screen.dart';
+import '../modules/planner/bindings/planner_binding.dart';
+import '../modules/planner/views/planner_view.dart';
 
 part 'app_routes.dart';
 
@@ -334,6 +336,14 @@ class AppPages {
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 350),
       popGesture: true,
+    ),
+    GetPage(
+      name: _Paths.PLANNER,
+      page: () => const PlannerPage(),
+      binding: PlannerBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 300),
+      middlewares: [AuthCheckMiddleware()],
     ),
   ];
 }
