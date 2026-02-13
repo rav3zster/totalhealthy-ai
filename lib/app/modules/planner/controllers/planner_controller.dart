@@ -123,11 +123,20 @@ class PlannerController extends GetxController {
   }
 
   void toggleDay(int index) {
+    print(
+      '🖱️ CONTROLLER - Toggling day $index. Current state: ${expandedDays.contains(index)}',
+    );
     if (expandedDays.contains(index)) {
       expandedDays.remove(index);
     } else {
       expandedDays.add(index);
     }
+    // Force update just in case RxSet doesn't trigger outer Obx correctly
+    expandedDays.refresh();
+    update();
+    print(
+      '🖱️ CONTROLLER - Toggle complete. New state: ${expandedDays.contains(index)}',
+    );
   }
 
   void setTab(int index) {
