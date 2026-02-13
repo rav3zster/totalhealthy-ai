@@ -41,6 +41,7 @@ import '../modules/setting/views/notification_settings_view.dart';
 import '../modules/setting/views/account_password_settings_view.dart';
 import '../modules/profile/views/profile_main_view.dart';
 import '../modules/profile/views/privacy_policy_view.dart';
+import '../modules/profile/views/member_profile_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/signup/bindings/signup_binding.dart';
 import '../modules/signup/views/signup_screen.dart';
@@ -336,6 +337,15 @@ class AppPages {
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 350),
       popGesture: true,
+    ),
+    GetPage(
+      name: '/member-profile',
+      page: () => const MemberProfileView(),
+      binding: ProfileBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350),
+      popGesture: true,
+      middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
       name: _Paths.PLANNER,

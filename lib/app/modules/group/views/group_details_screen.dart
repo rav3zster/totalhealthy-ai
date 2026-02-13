@@ -15,17 +15,25 @@ class GroupDetailsScreen extends StatefulWidget {
 class _GroupDetailsScreenState extends State<GroupDetailsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late Map<String, dynamic> _groupData;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
 
+    // Store group data from arguments once during initialization
+    final arguments = Get.arguments;
+    if (arguments is Map<String, dynamic>) {
+      _groupData = arguments;
+    } else {
+      _groupData = {};
+    }
+
     // Load group members when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final Map<String, dynamic> group = Get.arguments ?? {};
-      print('🔍 GROUP DETAILS DEBUG - Received arguments: $group');
-      final groupId = group['id'] ?? '';
+      print('🔍 GROUP DETAILS DEBUG - Received arguments: $_groupData');
+      final groupId = _groupData['id'] ?? '';
       print('🔍 GROUP DETAILS DEBUG - Group ID: $groupId');
       if (groupId.isNotEmpty) {
         final controller = Get.find<GroupController>();
@@ -47,8 +55,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Get group data from arguments
-    final Map<String, dynamic> group = Get.arguments ?? {};
+    // Use stored group data instead of Get.arguments
+    final Map<String, dynamic> group = _groupData;
     final controller = Get.find<GroupController>();
 
     return Scaffold(

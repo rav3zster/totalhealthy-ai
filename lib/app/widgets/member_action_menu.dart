@@ -188,7 +188,7 @@ class _MemberActionSheet extends StatelessWidget {
               label: 'View Profile',
               onTap: () {
                 Get.back();
-                Get.toNamed('/profile-settings', arguments: member);
+                Get.toNamed('/member-profile', arguments: member);
               },
             ),
             _buildActionItem(
