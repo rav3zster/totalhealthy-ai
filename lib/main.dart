@@ -8,6 +8,7 @@ import 'app/routes/app_pages.dart';
 import 'app/widgets/notification_services.dart';
 import 'app/bindings/app_bindings.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 
 final NotificationService _notificationService = NotificationService();
@@ -20,7 +21,26 @@ void main() async {
   await GetStorage.init();
   await initializeControllers();
 
-  runApp(const MyApp());
+  // Determine initial route before running the app
+  final auth = FirebaseAuth.instance;
+  final box = GetStorage();
+  String initialRoute = AppPages.INITIAL;
+
+  if (auth.currentUser != null) {
+    // User is logged in, skip onboarding
+    final role = box.read('role');
+    if (role == 'advisor' || role == 'admin') {
+      initialRoute = Routes.TrainerDashboard;
+    } else {
+      // Default to Client Dashboard if logged in
+      initialRoute = Routes.ClientDashboard;
+    }
+    print("🚀 App Launch: Logged in as $role, starting at $initialRoute");
+  } else {
+    print("👋 App Launch: No user found, starting at Onboarding");
+  }
+
+  runApp(MyApp(initialRoute: initialRoute));
 }
 
 Future<void> initializeControllers() async {
@@ -39,14 +59,10 @@ Future<void> initializeControllers() async {
   );
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class MyApp extends StatelessWidget {
+  final String initialRoute;
+  const MyApp({super.key, required this.initialRoute});
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -54,7 +70,7 @@ class _MyAppState extends State<MyApp> {
         data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
         child: child!,
       ),
-      initialRoute: AppPages.INITIAL,
+      initialRoute: initialRoute,
       getPages: AppPages.routes,
       initialBinding: AppBindings(), // Add our app bindings
       title: 'Total Healthy',
