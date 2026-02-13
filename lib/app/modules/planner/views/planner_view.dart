@@ -329,18 +329,24 @@ class _PlannerPageState extends State<PlannerPage> {
   }
 
   Widget _buildWeeklyList() {
-    return Obx(
-      () => ListView.builder(
+    return Obx(() {
+      print(
+        '🔄 LIST DEBUG - Rebuilding Weekly List, expanded: ${controller.expandedDays}',
+      );
+      return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: controller.weeklyPlan.length,
         itemBuilder: (context, index) {
           final dayPlan = controller.weeklyPlan[index];
-          final isExpanded = controller.expandedDays.contains(index);
-          return _buildDayCard(index, dayPlan, isExpanded);
+          // Use another Obx or ensure this one reacts to expandedDays
+          return Obx(() {
+            final isExpanded = controller.expandedDays.contains(index);
+            return _buildDayCard(index, dayPlan, isExpanded);
+          });
         },
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildDayCard(int index, Map<String, dynamic> plan, bool isExpanded) {
@@ -423,91 +429,111 @@ class _PlannerPageState extends State<PlannerPage> {
   }
 
   Widget _buildExpandedMeals(Map<String, dynamic> meals) {
-    return Container(
-      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 0),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: meals.entries.map<Widget>((entry) {
-            return _buildMealCategoryCard(
-              entry.key,
-              entry.value as List<String>,
-            );
-          }).toList(),
-        ),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      padding: const EdgeInsets.only(left: 15, right: 15, bottom: 20, top: 0),
+      child: Column(
+        children: meals.entries.map<Widget>((entry) {
+          return _buildMealCategorySection(
+            entry.key,
+            entry.value as List<String>,
+          );
+        }).toList(),
       ),
     );
   }
 
-  Widget _buildMealCategoryCard(String title, List<String> dishes) {
+  Widget _buildMealCategorySection(String title, List<String> dishes) {
     return Container(
-      width: 160,
-      margin: const EdgeInsets.only(right: 12),
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF262626),
         borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: const Color(0xFFCDE26D).withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(
-                title.toLowerCase().contains('breakfast')
-                    ? Icons.restaurant_menu
-                    : title.toLowerCase().contains('lunch')
-                    ? Icons.lunch_dining
-                    : Icons.dinner_dining,
-                color: const Color(0xFFCDE26D),
-                size: 18,
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFCDE26D).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  title.toLowerCase().contains('breakfast')
+                      ? Icons.restaurant_menu
+                      : title.toLowerCase().contains('lunch')
+                      ? Icons.lunch_dining
+                      : Icons.dinner_dining,
+                  color: const Color(0xFFCDE26D),
+                  size: 18,
+                ),
               ),
-              const SizedBox(width: 8),
-              Flexible(
+              const SizedBox(width: 12),
+              Expanded(
                 child: Text(
                   title,
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 17,
                   ),
-                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                '${dishes.length} items',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 12,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          ...dishes
-              .take(3)
-              .map(
-                (dish) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Row(
-                    children: [
-                      const Text('• ', style: TextStyle(color: Colors.grey)),
-                      Expanded(
-                        child: Text(
-                          dish,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+          const SizedBox(height: 16),
+          ...dishes.map(
+            (dish) => Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
               ),
-          if (dishes.length > 3)
-            Text(
-              '+${dishes.length - 3} Dishes',
-              style: const TextStyle(
-                color: Color(0xFFCDE26D),
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.check_circle_outline,
+                    color: Color(0xFFCDE26D),
+                    size: 16,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      dish,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white24,
+                    size: 12,
+                  ),
+                ],
               ),
             ),
+          ),
         ],
       ),
     );
