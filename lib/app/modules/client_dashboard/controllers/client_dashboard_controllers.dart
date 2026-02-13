@@ -426,19 +426,12 @@ class ClientDashboardControllers extends GetxController {
   // Enhanced search with immediate update
   void updateSearchQuery(String query) {
     print('📝 CONTROLLER DEBUG - updateSearchQuery called with: "$query"');
-    // Don't trim here - let the value pass through as-is
-    // Trimming will be done in the view when checking isEmpty
-    if (searchQuery.value != query) {
-      print(
-        '📝 CONTROLLER DEBUG - Updating searchQuery from "${searchQuery.value}" to "$query"',
-      );
-      searchQuery.value = query;
-      print('📝 CONTROLLER DEBUG - Calling update() to rebuild UI');
-      update(); // Force immediate UI update
-      print('📝 CONTROLLER DEBUG - update() called successfully');
-    } else {
-      print('📝 CONTROLLER DEBUG - Query unchanged, skipping update');
-    }
+    // Ensure the query is updated and UI is rebuilt
+    // We update even if values match because SimpleRealTimeSearchBar might have already
+    // updated the RxString directly, but we still need to trigger GetBuilder's update()
+    searchQuery.value = query;
+    print('📝 CONTROLLER DEBUG - Calling update() to rebuild UI');
+    update();
   }
 
   // Called when search field is focused/activated
@@ -544,11 +537,10 @@ class ClientDashboardControllers extends GetxController {
   // Get search result count
   int get searchResultCount => filteredMeals.length;
 
-  // Check if search is active
-  bool get isSearchActive =>
-      isSearchFocused.value || searchQuery.value.isNotEmpty;
+  // Check if search is active (only true when user has actually entered text)
+  bool get isSearchActive => searchQuery.value.trim().isNotEmpty;
 
-  // Check if category buttons should be visible
+  // Check if category buttons should be visible (show them unless user is actively searching with text)
   bool get shouldShowCategoryButtons => !isSearchActive;
 
   // Check if we should show meals (only when not in search mode OR when search has text)

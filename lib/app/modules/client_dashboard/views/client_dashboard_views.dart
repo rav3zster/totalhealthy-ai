@@ -370,53 +370,6 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                     );
                                   }
 
-                                  // CRITICAL: When search is focused but empty, show blank/prompt state
-                                  if (controller.isSearchFocused.value &&
-                                      controller.searchQuery.value
-                                          .trim()
-                                          .isEmpty) {
-                                    return Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(32.0),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.search,
-                                              size: 80,
-                                              color: Colors.white.withValues(
-                                                alpha: 0.3,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 16),
-                                            Text(
-                                              'Start typing to search',
-                                              style: TextStyle(
-                                                color: Colors.white.withValues(
-                                                  alpha: 0.8,
-                                                ),
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Text(
-                                              'Search by meal name, ingredients, or nutrition info',
-                                              style: TextStyle(
-                                                color: Colors.white.withValues(
-                                                  alpha: 0.5,
-                                                ),
-                                                fontSize: 14,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }
-
                                   // Get meals to display
                                   final meals = controller.displayMeals;
                                   print(
