@@ -236,12 +236,13 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(16),
                 onTap: () {
-                  // Navigate to meal details
-                  // Pass meal data via arguments or GetStorage as done in dashboard
-                  Get.toNamed(
-                    '/meals-details',
-                    arguments: meal.toJson(), // Or however details expects it
+                  // Store meal details for the next screen
+                  Get.find<AuthController>().box.write(
+                    'mealdetails',
+                    meal.toJson(),
                   );
+
+                  Get.toNamed("${Routes.MEALS_DETAILS}?id=${meal.id ?? ''}");
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(12),
