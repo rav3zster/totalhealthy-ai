@@ -29,6 +29,35 @@ class MealsFirestoreService {
 
   /// Stream of meals filtered by group (existing method enhanced)
   Stream<List<MealModel>> getMealsStream(String groupId) {
+    print('getMealsStream called for groupId: $groupId');
+    return _firestore
+        .collection(_collection)
+        .where('groupId', isEqualTo: groupId)
+        .snapshots()
+        .map((snapshot) {
+          print(
+            'getMealsStream snapshot received: ${snapshot.docs.length} documents',
+          );
+          final list = snapshot.docs.map((doc) {
+            final data = doc.data();
+            print(
+              '  - Meal doc ${doc.id}: name=${data['name']}, groupId=${data['groupId']}',
+            );
+            return MealModel.fromJson(data, docId: doc.id);
+          }).toList();
+          // Sort in-memory to avoid index requirement during development
+          list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          print('getMealsStream returning ${list.length} meals');
+          return list;
+        })
+        .handleError((error) {
+          print('Error fetching group meals for $groupId: $error');
+          return <MealModel>[];
+        });
+  }
+
+  /// Stream of meals filtered by group and category
+  Stream<List<MealModel>> getMealsByCategory(String groupId, String category) {
     return _firestore
         .collection(_collection)
         .where('groupId', isEqualTo: groupId)
@@ -36,13 +65,20 @@ class MealsFirestoreService {
         .map((snapshot) {
           final list = snapshot.docs
               .map((doc) => MealModel.fromJson(doc.data(), docId: doc.id))
+              .where(
+                (meal) => meal.categories.any(
+                  (cat) => cat.toLowerCase() == category.toLowerCase(),
+                ),
+              )
               .toList();
-          // Sort in-memory to avoid index requirement during development
+          // Sort in-memory
           list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
           return list;
         })
         .handleError((error) {
-          print('Error fetching group meals for $groupId: $error');
+          print(
+            'Error fetching group meals for $groupId with category $category: $error',
+          );
           return <MealModel>[];
         });
   }
@@ -83,13 +119,19 @@ class MealsFirestoreService {
     }
   }
 
-  /// Add a new meal to Firestore
-  Future<void> addMeal(MealModel meal) async {
+  /// Add a new meal to Firestore and return the document ID
+  Future<String> addMeal(MealModel meal) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception('User not authenticated');
 
-      await _firestore.collection(_collection).add(meal.toJson());
+      final docRef = await _firestore
+          .collection(_collection)
+          .add(meal.toJson());
+
+      print('addMeal success: docId = ${docRef.id}, groupId = ${meal.groupId}');
+
+      return docRef.id;
     } catch (e) {
       print('Error adding meal: $e');
       rethrow;

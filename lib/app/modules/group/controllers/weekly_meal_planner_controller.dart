@@ -12,8 +12,17 @@ class WeeklyMealPlannerController extends GetxController {
   final MealsFirestoreService _mealsService = MealsFirestoreService();
 
   final mealPlans = <GroupMealPlanModel>[].obs;
-  final availableMeals = <MealModel>[].obs;
+  final availableMeals =
+      <MealModel>[].obs; // For meal selection (admin's personal + group)
+  final assignedMeals =
+      <MealModel>[].obs; // For displaying in planner (group only)
   final isLoading = false.obs;
+
+  // Track which days are expanded (by date string)
+  final expandedDays = <String>{}.obs;
+
+  // Available meal categories from group meals
+  final availableCategories = <String>[].obs;
 
   String? groupId;
   String? groupName;
@@ -34,6 +43,9 @@ class WeeklyMealPlannerController extends GetxController {
 
     currentWeekStart.value = _getWeekStart(DateTime.now());
 
+    // Initialize categories immediately with standard categories
+    _updateAvailableCategories();
+
     if (groupId != null) {
       _loadAvailableMeals();
       _loadMealPlans();
@@ -44,9 +56,71 @@ class WeeklyMealPlannerController extends GetxController {
     final authController = Get.find<AuthController>();
     final userId = authController.firebaseUser.value?.uid;
 
-    if (userId != null) {
-      availableMeals.bindStream(_mealsService.getUserMealsStream(userId));
+    if (userId != null && groupId != null) {
+      if (isAdmin) {
+        // Admin: Load their personal meals for selection
+        // These are the meals they can choose from to assign
+        print('Admin loading personal meals for user: $userId');
+        availableMeals.bindStream(_mealsService.getUserMealsStream(userId));
+      } else {
+        // Member: Load group meals for viewing
+        // These are meals that have been assigned to the group
+        print('Member loading group meals for group: $groupId');
+        availableMeals.bindStream(_mealsService.getMealsStream(groupId!));
+      }
+
+      // BOTH admin and members load assigned meals from the group
+      // This is what shows up in the planner itself
+      print('Loading assigned meals from group: $groupId');
+      assignedMeals.bindStream(_mealsService.getMealsStream(groupId!));
+
+      // Extract unique categories from available meals
+      ever(availableMeals, (_) {
+        print('Available meals updated: ${availableMeals.length} meals');
+        _updateAvailableCategories();
+      });
+
+      // Track assigned meals updates
+      ever(assignedMeals, (_) {
+        print('Assigned meals updated: ${assignedMeals.length} meals');
+      });
     }
+  }
+
+  void _updateAvailableCategories() {
+    // Use the SAME categories as Create Meal screen
+    // These are the standard categories available in the app
+    final standardCategories = [
+      'Breakfast',
+      'Morning Snacks',
+      'Lunch',
+      'Preworkout',
+      'Post Workout',
+      'Dinner',
+    ];
+
+    // Also include any custom categories from existing meals
+    final allCategories = <String>{};
+    allCategories.addAll(standardCategories);
+
+    // Add any additional categories from user's meals
+    for (var meal in availableMeals) {
+      allCategories.addAll(meal.categories);
+    }
+
+    // Sort: standard categories first (in order), then alphabetically
+    final sortedCategories = <String>[];
+    for (var category in standardCategories) {
+      if (allCategories.contains(category)) {
+        sortedCategories.add(category);
+        allCategories.remove(category);
+      }
+    }
+
+    // Add remaining custom categories alphabetically
+    sortedCategories.addAll(allCategories.toList()..sort());
+
+    availableCategories.value = sortedCategories;
   }
 
   void _loadMealPlans() {
@@ -55,9 +129,24 @@ class WeeklyMealPlannerController extends GetxController {
     final startDate = currentWeekStart.value;
     final endDate = startDate.add(const Duration(days: 6));
 
+    print('Loading meal plans for group: $groupId');
+    print('  - Date range: ${startDate.toString()} to ${endDate.toString()}');
+
+    // CRITICAL: Load meal plans from group_meal_plans collection
+    // Data path: group_meal_plans where groupId == currentGroupId
+    // Both admin and members load from the SAME collection
+    // Real-time updates via snapshots() ensure UI stays in sync
     mealPlans.bindStream(
       _mealPlansService.getGroupMealPlansStream(groupId!, startDate, endDate),
     );
+
+    // Track meal plan updates
+    ever(mealPlans, (plans) {
+      print('Meal plans updated: ${plans.length} plans loaded');
+      for (var plan in plans) {
+        print('  - Date: ${plan.date}, Slots: ${plan.mealSlots}');
+      }
+    });
   }
 
   DateTime _getWeekStart(DateTime date) {
@@ -75,8 +164,36 @@ class WeeklyMealPlannerController extends GetxController {
   }
 
   MealModel? getMealById(String? mealId) {
-    if (mealId == null) return null;
-    return availableMeals.firstWhereOrNull((meal) => meal.id == mealId);
+    if (mealId == null) {
+      print('getMealById: mealId is null');
+      return null;
+    }
+    print('getMealById: Looking for meal $mealId');
+    print('  - assignedMeals count: ${assignedMeals.length}');
+    print('  - availableMeals count: ${availableMeals.length}');
+
+    // First check assigned meals (what's in the planner)
+    var meal = assignedMeals.firstWhereOrNull((meal) => meal.id == mealId);
+    if (meal != null) {
+      print('  - Found in assignedMeals: ${meal.name}');
+      return meal;
+    }
+
+    // Fallback to available meals (for admin's personal meals)
+    meal = availableMeals.firstWhereOrNull((meal) => meal.id == mealId);
+    if (meal != null) {
+      print('  - Found in availableMeals: ${meal.name}');
+      return meal;
+    }
+
+    print('  - Meal NOT FOUND in either list!');
+    print(
+      '  - assignedMeals IDs: ${assignedMeals.map((m) => m.id).join(", ")}',
+    );
+    print(
+      '  - availableMeals IDs: ${availableMeals.map((m) => m.id).join(", ")}',
+    );
+    return null;
   }
 
   Future<void> updateMealSlot(
@@ -94,27 +211,83 @@ class WeeklyMealPlannerController extends GetxController {
       final userName =
           '${userData['firstName'] ?? ''} ${userData['lastName'] ?? ''}'.trim();
 
+      String? finalMealId = mealId;
+
+      // If assigning a meal (not removing), ALWAYS copy it to ensure it's in the group
+      if (mealId != null) {
+        print('=== ASSIGNING MEAL ===');
+        print('Original meal ID: $mealId');
+        print('Target groupId: $groupId');
+
+        final originalMeal = getMealById(mealId);
+        if (originalMeal != null) {
+          print('Original meal: ${originalMeal.name}');
+          print('Original meal groupId: ${originalMeal.groupId}');
+
+          // ALWAYS create a new copy for the group to ensure members can see it
+          // This prevents issues with personal vs group meals
+          final copiedMeal = MealModel(
+            userId: userId, // Admin who assigned it
+            groupId: groupId!, // Target group
+            name: originalMeal.name,
+            description: originalMeal.description,
+            kcal: originalMeal.kcal,
+            protein: originalMeal.protein,
+            carbs: originalMeal.carbs,
+            fat: originalMeal.fat,
+            categories: originalMeal.categories,
+            imageUrl: originalMeal.imageUrl,
+            ingredients: originalMeal.ingredients,
+            instructions: originalMeal.instructions,
+            createdAt: DateTime.now(),
+            prepTime: originalMeal.prepTime,
+            difficulty: originalMeal.difficulty,
+          );
+
+          print('Copying meal to group...');
+          final newMealId = await _mealsService.addMeal(copiedMeal);
+          finalMealId = newMealId;
+
+          print('✓ Meal copied successfully!');
+          print('New meal ID: $newMealId');
+          print('New meal groupId: $groupId');
+        } else {
+          print('✗ ERROR: Original meal not found!');
+          throw Exception('Meal not found');
+        }
+      }
+
+      print('Saving to meal plan...');
+      print('  groupId: $groupId');
+      print('  date: $date');
+      print('  mealType: $mealType');
+      print('  mealId: $finalMealId');
+
       await _mealPlansService.updateMealSlot(
         groupId!,
         date,
         mealType,
-        mealId,
+        finalMealId,
         userId,
         userName.isEmpty ? 'Admin' : userName,
       );
 
+      print('✓ Meal plan updated successfully!');
+      print('=== END ASSIGNMENT ===');
+
       Get.snackbar(
         'Success',
         'Meal updated successfully',
-        backgroundColor: const Color(0xFFC2D86A).withOpacity(0.8),
+        backgroundColor: const Color(0xFFC2D86A).withValues(alpha: 0.8),
         colorText: Colors.black,
         duration: const Duration(seconds: 2),
       );
     } catch (e) {
+      print('✗ ERROR in updateMealSlot: $e');
       Get.snackbar(
         'Error',
         'Failed to update meal: $e',
-        backgroundColor: Colors.red.withOpacity(0.8),
+        backgroundColor: Colors.red.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
     } finally {
@@ -127,6 +300,10 @@ class WeeklyMealPlannerController extends GetxController {
 
     try {
       isLoading.value = true;
+      print('Controller: duplicateDay called');
+      print('  - sourceDate: $sourceDate');
+      print('  - targetDate: $targetDate');
+
       final authController = Get.find<AuthController>();
       final userId = authController.firebaseUser.value?.uid ?? '';
       final userData = authController.userdataget();
@@ -146,15 +323,16 @@ class WeeklyMealPlannerController extends GetxController {
       Get.snackbar(
         'Success',
         'Day duplicated successfully',
-        backgroundColor: const Color(0xFFC2D86A).withOpacity(0.8),
+        backgroundColor: const Color(0xFFC2D86A).withValues(alpha: 0.8),
         colorText: Colors.black,
         duration: const Duration(seconds: 2),
       );
     } catch (e) {
+      print('✗ Controller error in duplicateDay: $e');
       Get.snackbar(
         'Error',
         'Failed to duplicate day: $e',
-        backgroundColor: Colors.red.withOpacity(0.8),
+        backgroundColor: Colors.red.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
     } finally {
@@ -204,7 +382,7 @@ class WeeklyMealPlannerController extends GetxController {
       Get.snackbar(
         'Success',
         'Meals applied to entire week',
-        backgroundColor: const Color(0xFFC2D86A).withOpacity(0.8),
+        backgroundColor: const Color(0xFFC2D86A).withValues(alpha: 0.8),
         colorText: Colors.black,
         duration: const Duration(seconds: 2),
       );
@@ -212,7 +390,7 @@ class WeeklyMealPlannerController extends GetxController {
       Get.snackbar(
         'Error',
         'Failed to duplicate to week: $e',
-        backgroundColor: Colors.red.withOpacity(0.8),
+        backgroundColor: Colors.red.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
     } finally {
@@ -231,11 +409,9 @@ class WeeklyMealPlannerController extends GetxController {
     double totalCarbs = 0;
     double totalFat = 0;
 
-    final breakfast = getMealById(plan.breakfastMealId);
-    final lunch = getMealById(plan.lunchMealId);
-    final dinner = getMealById(plan.dinnerMealId);
-
-    for (final meal in [breakfast, lunch, dinner]) {
+    // Iterate through all meal slots dynamically
+    for (var mealId in plan.mealSlots.values) {
+      final meal = getMealById(mealId);
       if (meal != null) {
         totalCalories += double.tryParse(meal.kcal) ?? 0;
         totalProtein += double.tryParse(meal.protein) ?? 0;
@@ -269,5 +445,22 @@ class WeeklyMealPlannerController extends GetxController {
   void goToCurrentWeek() {
     currentWeekStart.value = _getWeekStart(DateTime.now());
     _loadMealPlans();
+  }
+
+  void toggleDayExpansion(DateTime date) {
+    final dateKey = _formatDateKey(date);
+    if (expandedDays.contains(dateKey)) {
+      expandedDays.remove(dateKey);
+    } else {
+      expandedDays.add(dateKey);
+    }
+  }
+
+  bool isDayExpanded(DateTime date) {
+    return expandedDays.contains(_formatDateKey(date));
+  }
+
+  String _formatDateKey(DateTime date) {
+    return '${date.year}-${date.month}-${date.day}';
   }
 }

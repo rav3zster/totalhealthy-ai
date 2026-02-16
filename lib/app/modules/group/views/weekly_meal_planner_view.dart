@@ -42,45 +42,85 @@ class WeeklyMealPlannerView extends GetView<WeeklyMealPlannerController> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Row(
+        child: Column(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF2A2A2A),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Color(0xFFC2D86A),
-                  size: 20,
+            Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2A2A2A),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: Color(0xFFC2D86A),
+                      size: 20,
+                    ),
+                    onPressed: () => Get.back(),
+                  ),
                 ),
-                onPressed: () => Get.back(),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Weekly Meal Planner',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Weekly Meal Planner',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        controller.groupName ?? 'Group',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    controller.groupName ?? 'Group',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
+            // View-only indicator for members
+            if (!controller.isAdmin)
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.blue.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.visibility_outlined,
+                      color: Colors.blue,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'View Only - Only admin can edit meals',
+                      style: TextStyle(
+                        color: Colors.blue.withOpacity(0.9),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
@@ -165,202 +205,267 @@ class WeeklyMealPlannerView extends GetView<WeeklyMealPlannerController> {
 
   Widget _buildDayCard(DateTime date) {
     final isToday = _isToday(date);
-    final plan = controller.getMealPlanForDate(date);
-    final nutrition = controller.getDailyNutrition(date);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isToday
-              ? [const Color(0xFF2A2A2A), const Color(0xFF252525)]
-              : [const Color(0xFF1E1E1E), const Color(0xFF1A1A1A)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isToday
-              ? const Color(0xFFC2D86A).withOpacity(0.4)
-              : Colors.white.withOpacity(0.05),
-          width: isToday ? 2 : 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: isToday
-                ? const Color(0xFFC2D86A).withOpacity(0.15)
-                : Colors.black.withOpacity(0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+    return Obx(() {
+      // Get plan and nutrition INSIDE Obx so they're reactive
+      final plan = controller.getMealPlanForDate(date);
+      final nutrition = controller.getDailyNutrition(date);
+      final isExpanded = controller.isDayExpanded(date);
+
+      return Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isToday
+                ? [const Color(0xFF2A2A2A), const Color(0xFF252525)]
+                : [const Color(0xFF1E1E1E), const Color(0xFF1A1A1A)],
           ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Day Header
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    gradient: isToday
-                        ? const LinearGradient(
-                            colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                          )
-                        : null,
-                    color: isToday ? null : const Color(0xFF2A2A2A),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        DateFormat('EEE').format(date),
-                        style: TextStyle(
-                          color: isToday
-                              ? Colors.black
-                              : const Color(0xFFC2D86A),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        DateFormat('d').format(date),
-                        style: TextStyle(
-                          color: isToday ? Colors.black : Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        DateFormat('MMMM d, yyyy').format(date),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      if (isToday)
-                        Container(
-                          margin: const EdgeInsets.only(top: 4),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFC2D86A).withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            'TODAY',
-                            style: TextStyle(
-                              color: Color(0xFFC2D86A),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                if (controller.isAdmin)
-                  IconButton(
-                    icon: const Icon(
-                      Icons.copy_all_rounded,
-                      color: Color(0xFFC2D86A),
-                      size: 20,
-                    ),
-                    onPressed: () => _showDuplicateDayDialog(date),
-                    tooltip: 'Duplicate Day',
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Meal Slots
-            _buildMealSlot(date, 'Breakfast', '🍳', plan?.breakfastMealId),
-            const SizedBox(height: 12),
-            _buildMealSlot(date, 'Lunch', '🥗', plan?.lunchMealId),
-            const SizedBox(height: 12),
-            _buildMealSlot(date, 'Dinner', '🍽️', plan?.dinnerMealId),
-
-            const SizedBox(height: 16),
-
-            // Daily Nutrition Summary
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2A2A2A),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: const Color(0xFFC2D86A).withOpacity(0.2),
-                  width: 1,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.analytics_outlined,
-                        color: Color(0xFFC2D86A),
-                        size: 16,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Daily Total',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildNutritionBadge(
-                        '${nutrition['calories']?.toInt() ?? 0}',
-                        'kcal',
-                        Colors.orange,
-                      ),
-                      _buildNutritionBadge(
-                        '${nutrition['protein']?.toInt() ?? 0}g',
-                        'Protein',
-                        Colors.red,
-                      ),
-                      _buildNutritionBadge(
-                        '${nutrition['carbs']?.toInt() ?? 0}g',
-                        'Carbs',
-                        Colors.yellow,
-                      ),
-                      _buildNutritionBadge(
-                        '${nutrition['fat']?.toInt() ?? 0}g',
-                        'Fat',
-                        Colors.blue,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isToday
+                ? const Color(0xFFC2D86A).withOpacity(0.4)
+                : Colors.white.withOpacity(0.05),
+            width: isToday ? 2 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isToday
+                  ? const Color(0xFFC2D86A).withOpacity(0.15)
+                  : Colors.black.withOpacity(0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
-      ),
-    );
+        child: Column(
+          children: [
+            // Tappable header
+            InkWell(
+              onTap: () => controller.toggleDayExpansion(date),
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Day Header
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            gradient: isToday
+                                ? const LinearGradient(
+                                    colors: [
+                                      Color(0xFFC2D86A),
+                                      Color(0xFFD4E87C),
+                                    ],
+                                  )
+                                : null,
+                            color: isToday ? null : const Color(0xFF2A2A2A),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                DateFormat('EEE').format(date),
+                                style: TextStyle(
+                                  color: isToday
+                                      ? Colors.black
+                                      : const Color(0xFFC2D86A),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                DateFormat('d').format(date),
+                                style: TextStyle(
+                                  color: isToday ? Colors.black : Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                DateFormat('MMMM d, yyyy').format(date),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              if (isToday)
+                                Container(
+                                  margin: const EdgeInsets.only(top: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(
+                                      0xFFC2D86A,
+                                    ).withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: const Text(
+                                    'TODAY',
+                                    style: TextStyle(
+                                      color: Color(0xFFC2D86A),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        if (controller.isAdmin && isExpanded)
+                          IconButton(
+                            icon: const Icon(
+                              Icons.copy_all_rounded,
+                              color: Color(0xFFC2D86A),
+                              size: 20,
+                            ),
+                            onPressed: () => _showDuplicateDayDialog(date),
+                            tooltip: 'Duplicate Day',
+                          ),
+                        Icon(
+                          isExpanded
+                              ? Icons.keyboard_arrow_up_rounded
+                              : Icons.keyboard_arrow_down_rounded,
+                          color: const Color(0xFFC2D86A),
+                          size: 28,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Daily Nutrition Summary (Always visible)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2A2A2A),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFFC2D86A).withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.analytics_outlined,
+                                color: Color(0xFFC2D86A),
+                                size: 16,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Daily Total',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.8),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _buildNutritionBadge(
+                                '${nutrition['calories']?.toInt() ?? 0}',
+                                'kcal',
+                                Colors.orange,
+                              ),
+                              _buildNutritionBadge(
+                                '${nutrition['protein']?.toInt() ?? 0}g',
+                                'Protein',
+                                Colors.red,
+                              ),
+                              _buildNutritionBadge(
+                                '${nutrition['carbs']?.toInt() ?? 0}g',
+                                'Carbs',
+                                Colors.yellow,
+                              ),
+                              _buildNutritionBadge(
+                                '${nutrition['fat']?.toInt() ?? 0}g',
+                                'Fat',
+                                Colors.blue,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Expandable meal slots section
+            if (isExpanded)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: Obx(() {
+                  final categories = controller.availableCategories;
+
+                  if (categories.isEmpty) {
+                    return Column(
+                      children: [
+                        const Divider(color: Color(0xFF3A3A3A), height: 1),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No meal categories available',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.5),
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Create meals with categories to see them here',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.4),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+
+                  return Column(
+                    children: [
+                      const Divider(color: Color(0xFF3A3A3A), height: 1),
+                      const SizedBox(height: 16),
+                      ...categories.map((category) {
+                        final emoji = _getEmojiForCategory(category);
+                        final mealId = plan?.getMealIdForCategory(category);
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _buildMealSlot(date, category, emoji, mealId),
+                        );
+                      }).toList(),
+                    ],
+                  );
+                }),
+              ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildMealSlot(
@@ -374,7 +479,8 @@ class WeeklyMealPlannerView extends GetView<WeeklyMealPlannerController> {
 
     return GestureDetector(
       onTap: hasPermission
-          ? () => _showMealSlotSheet(date, mealType.toLowerCase(), mealId)
+          ? () =>
+                _showMealSlotSheet(date, mealType, mealId) // Don't lowercase!
           : null,
       child: Container(
         padding: const EdgeInsets.all(12),
@@ -517,5 +623,35 @@ class WeeklyMealPlannerView extends GetView<WeeklyMealPlannerController> {
       builder: (context) =>
           DuplicateDayDialog(sourceDate: date, controller: controller),
     );
+  }
+
+  String _getEmojiForCategory(String category) {
+    switch (category.toLowerCase()) {
+      case 'breakfast':
+        return '🍳';
+      case 'morning snacks':
+        return '🍎';
+      case 'lunch':
+        return '🥗';
+      case 'preworkout':
+      case 'pre-workout':
+      case 'pre workout':
+        return '💪';
+      case 'post workout':
+      case 'post-workout':
+        return '🥤';
+      case 'dinner':
+        return '🍽️';
+      case 'afternoon snack':
+        return '🥤';
+      case 'evening snack':
+        return '🍪';
+      case 'snack':
+        return '🍿';
+      case 'dessert':
+        return '🍰';
+      default:
+        return '🍴';
+    }
   }
 }

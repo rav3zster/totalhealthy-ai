@@ -32,73 +32,72 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
 
     return Column(
       children: [
-        // Header with Calendar Icon (Admin Only)
-        if (widget.isAdmin)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFC2D86A).withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+        // Header with Weekly Planner Button (Visible to All)
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
                   ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () {
-                        Get.toNamed(
-                          '/weekly-meal-planner',
-                          arguments: {
-                            'id': widget.groupId,
-                            'groupId': widget.groupId,
-                            'name': 'Group',
-                            'isAdmin': widget.isAdmin,
-                          },
-                        );
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.calendar_view_week_rounded,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFC2D86A).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () {
+                      Get.toNamed(
+                        '/weekly-meal-planner',
+                        arguments: {
+                          'id': widget.groupId,
+                          'groupId': widget.groupId,
+                          'name': 'Group',
+                          'isAdmin': widget.isAdmin,
+                        },
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.calendar_view_week_rounded,
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            widget.isAdmin ? 'Weekly Planner' : 'View Planner',
+                            style: const TextStyle(
                               color: Colors.black,
-                              size: 20,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
                             ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Weekly Planner',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
 
         // Chat Area
         Expanded(

@@ -22,6 +22,9 @@ class WeeklyMealSlotSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Determine the category filter based on meal type
+    final categoryFilter = _getCategoryForMealType(mealType);
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
       decoration: const BoxDecoration(
@@ -86,9 +89,9 @@ class WeeklyMealSlotSheet extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // Available meals
-                  const Text(
-                    'Select Meal',
-                    style: TextStyle(
+                  Text(
+                    'Select ${_capitalize(mealType)} Meal',
+                    style: const TextStyle(
                       color: Color(0xFFC2D86A),
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -96,12 +99,23 @@ class WeeklyMealSlotSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Obx(() {
-                    if (controller.availableMeals.isEmpty) {
-                      return _buildEmptyState(context);
+                    // Filter meals by category
+                    final filteredMeals = controller.availableMeals
+                        .where(
+                          (meal) => meal.categories.any(
+                            (cat) =>
+                                cat.toLowerCase() ==
+                                categoryFilter.toLowerCase(),
+                          ),
+                        )
+                        .toList();
+
+                    if (filteredMeals.isEmpty) {
+                      return _buildEmptyState(context, categoryFilter);
                     }
 
                     return Column(
-                      children: controller.availableMeals.map((meal) {
+                      children: filteredMeals.map((meal) {
                         final isSelected = meal.id == currentMealId;
                         return _buildMealCard(meal, isSelected);
                       }).toList(),
@@ -117,6 +131,19 @@ class WeeklyMealSlotSheet extends StatelessWidget {
     );
   }
 
+  String _getCategoryForMealType(String mealType) {
+    switch (mealType.toLowerCase()) {
+      case 'breakfast':
+        return 'Breakfast';
+      case 'lunch':
+        return 'Lunch';
+      case 'dinner':
+        return 'Dinner';
+      default:
+        return mealType;
+    }
+  }
+
   Widget _buildQuickActions(BuildContext context) {
     return Column(
       children: [
@@ -124,11 +151,18 @@ class WeeklyMealSlotSheet extends StatelessWidget {
           'Create New Meal',
           Icons.add_circle_outline,
           const Color(0xFFC2D86A),
-          () {
+          () async {
             Get.back();
-            final userData = Get.find<AuthController>().userdataget();
+
+            // Store groupId so the meal is created with it
+            final authController = Get.find<AuthController>();
+            if (controller.groupId != null) {
+              await authController.groupIdStore(controller.groupId!);
+            }
+
+            final userData = authController.userdataget();
             Get.toNamed(
-              "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
+              "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}&from=weekly_planner",
             );
           },
         ),
@@ -293,7 +327,7 @@ class WeeklyMealSlotSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context, String category) {
     return Container(
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -305,7 +339,7 @@ class WeeklyMealSlotSheet extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No meals available',
+            'No $category meals available',
             style: TextStyle(
               color: Colors.white.withOpacity(0.6),
               fontSize: 16,
@@ -313,7 +347,7 @@ class WeeklyMealSlotSheet extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Create a meal first to assign it',
+            'Create a $category meal first to assign it',
             style: TextStyle(
               color: Colors.white.withOpacity(0.4),
               fontSize: 14,

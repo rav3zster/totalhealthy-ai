@@ -65,6 +65,11 @@ class GroupMealPlansFirestoreService {
   /// Create or update meal plan for a specific date
   Future<void> setMealPlan(GroupMealPlanModel mealPlan) async {
     try {
+      print('setMealPlan called:');
+      print('  - groupId: ${mealPlan.groupId}');
+      print('  - date: ${mealPlan.date}');
+      print('  - mealSlots: ${mealPlan.mealSlots}');
+
       // Check if plan exists for this date
       final existingPlan = await getMealPlanForDate(
         mealPlan.groupId,
@@ -72,19 +77,25 @@ class GroupMealPlansFirestoreService {
       );
 
       if (existingPlan != null && existingPlan.id != null) {
-        // Update existing plan
+        print('Updating existing plan: ${existingPlan.id}');
+        // Update existing plan with ALL fields including mealSlots
         await _firestore.collection(_collection).doc(existingPlan.id).update({
+          'mealSlots': mealPlan.mealSlots,
+          // Backward compatibility
           'breakfastMealId': mealPlan.breakfastMealId,
           'lunchMealId': mealPlan.lunchMealId,
           'dinnerMealId': mealPlan.dinnerMealId,
           'updatedAt': DateTime.now().toIso8601String(),
         });
+        print('✓ Plan updated successfully');
       } else {
+        print('Creating new plan');
         // Create new plan
         await _firestore.collection(_collection).add(mealPlan.toJson());
+        print('✓ Plan created successfully');
       }
     } catch (e) {
-      print('Error setting meal plan: $e');
+      print('✗ Error setting meal plan: $e');
       rethrow;
     }
   }
@@ -93,7 +104,8 @@ class GroupMealPlansFirestoreService {
   Future<void> updateMealSlot(
     String groupId,
     DateTime date,
-    String mealType, // 'breakfast', 'lunch', or 'dinner'
+    String
+    mealType, // Any category name like 'Breakfast', 'Morning Snack', etc.
     String? mealId,
     String adminId,
     String adminName,
@@ -102,9 +114,16 @@ class GroupMealPlansFirestoreService {
       final existingPlan = await getMealPlanForDate(groupId, date);
 
       if (existingPlan != null && existingPlan.id != null) {
-        // Update existing plan
+        // Update existing plan - update the mealSlots map
+        final updatedSlots = Map<String, String?>.from(existingPlan.mealSlots);
+        updatedSlots[mealType] = mealId;
+
         final updates = <String, dynamic>{
-          '${mealType}MealId': mealId,
+          'mealSlots': updatedSlots,
+          // Backward compatibility
+          if (mealType == 'Breakfast') 'breakfastMealId': mealId,
+          if (mealType == 'Lunch') 'lunchMealId': mealId,
+          if (mealType == 'Dinner') 'dinnerMealId': mealId,
           'updatedAt': DateTime.now().toIso8601String(),
         };
         await _firestore
@@ -116,9 +135,7 @@ class GroupMealPlansFirestoreService {
         final newPlan = GroupMealPlanModel(
           groupId: groupId,
           date: date,
-          breakfastMealId: mealType == 'breakfast' ? mealId : null,
-          lunchMealId: mealType == 'lunch' ? mealId : null,
-          dinnerMealId: mealType == 'dinner' ? mealId : null,
+          mealSlots: {mealType: mealId},
           createdBy: adminId,
           createdByName: adminName,
           createdAt: DateTime.now(),
@@ -140,26 +157,37 @@ class GroupMealPlansFirestoreService {
     String adminName,
   ) async {
     try {
+      print('=== DUPLICATING DAY ===');
+      print('Source date: $sourceDate');
+      print('Target date: $targetDate');
+      print('GroupId: $groupId');
+
       final sourcePlan = await getMealPlanForDate(groupId, sourceDate);
 
       if (sourcePlan == null) {
+        print('✗ No meal plan found for source date');
         throw Exception('No meal plan found for source date');
       }
+
+      print('Source plan found:');
+      print('  - mealSlots: ${sourcePlan.mealSlots}');
+      print('  - meal count: ${sourcePlan.mealCount}');
 
       final newPlan = GroupMealPlanModel(
         groupId: groupId,
         date: targetDate,
-        breakfastMealId: sourcePlan.breakfastMealId,
-        lunchMealId: sourcePlan.lunchMealId,
-        dinnerMealId: sourcePlan.dinnerMealId,
+        mealSlots: Map.from(sourcePlan.mealSlots),
         createdBy: adminId,
         createdByName: adminName,
         createdAt: DateTime.now(),
       );
 
+      print('Creating new plan for target date...');
       await setMealPlan(newPlan);
+      print('✓ Day duplicated successfully');
+      print('=== END DUPLICATION ===');
     } catch (e) {
-      print('Error duplicating day meals: $e');
+      print('✗ Error duplicating day meals: $e');
       rethrow;
     }
   }
@@ -178,12 +206,15 @@ class GroupMealPlansFirestoreService {
       // Apply to 7 days starting from weekStart
       for (int i = 0; i < 7; i++) {
         final date = weekStart.add(Duration(days: i));
+        final mealSlots = <String, String?>{};
+        if (breakfastMealId != null) mealSlots['Breakfast'] = breakfastMealId;
+        if (lunchMealId != null) mealSlots['Lunch'] = lunchMealId;
+        if (dinnerMealId != null) mealSlots['Dinner'] = dinnerMealId;
+
         final plan = GroupMealPlanModel(
           groupId: groupId,
           date: date,
-          breakfastMealId: breakfastMealId,
-          lunchMealId: lunchMealId,
-          dinnerMealId: dinnerMealId,
+          mealSlots: mealSlots,
           createdBy: adminId,
           createdByName: adminName,
           createdAt: DateTime.now(),
