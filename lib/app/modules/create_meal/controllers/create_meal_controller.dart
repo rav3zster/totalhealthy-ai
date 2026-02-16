@@ -231,7 +231,17 @@ class CreateMealController extends GetxController {
           print("Creating New Meal in Firestore: ${meal.toJson()}");
           await _mealsService.addMeal(meal);
 
-          Get.offAllNamed("${Routes.ClientDashboard}?id=$finalUserId");
+          // Check for 'from' parameter to determine navigation
+          final fromRoute = Get.parameters['from'];
+
+          if (fromRoute == 'group_details') {
+            // Navigate back to group details
+            Get.back();
+          } else {
+            // Default behavior
+            Get.offAllNamed("${Routes.ClientDashboard}?id=$finalUserId");
+          }
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Meal Created Successfully!'),

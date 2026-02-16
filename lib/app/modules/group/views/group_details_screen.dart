@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/models/user_model.dart';
+import '../../../core/base/controllers/auth_controller.dart';
 import '../../../widgets/member_action_menu.dart';
+import 'group_meal_chat_view.dart';
 import '../controllers/group_controller.dart';
 import '../../../controllers/user_controller.dart';
 
@@ -20,7 +22,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
 
     // Store group data from arguments once during initialization
     final arguments = Get.arguments;
@@ -160,26 +162,9 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                           fontWeight: FontWeight.w600,
                         ),
                         tabs: const [
-                          Tab(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.info_rounded, size: 18),
-                                SizedBox(width: 6),
-                                Text('Overview'),
-                              ],
-                            ),
-                          ),
-                          Tab(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.people_rounded, size: 18),
-                                SizedBox(width: 6),
-                                Text('Members'),
-                              ],
-                            ),
-                          ),
+                          Tab(child: Text('Overview')),
+                          Tab(child: Text('Members')),
+                          Tab(child: Text('Meal Plan')),
                         ],
                       ),
                     ),
@@ -200,6 +185,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
 
                   // Members Tab
                   _buildMembersTab(group, controller),
+
+                  // Meal Plan Tab
+                  GroupMealChatView(
+                    groupId: group['id'] ?? '',
+                    isAdmin:
+                        group['created_by'] ==
+                        Get.find<AuthController>().userdataget()['id'],
+                  ),
                 ],
               ),
             ),
