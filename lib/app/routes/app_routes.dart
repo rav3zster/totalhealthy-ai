@@ -36,6 +36,8 @@ abstract class Routes {
   static const CLIENT_LIST = _Paths.CLIENT_LIST;
   static const PRIVACY_POLICY = _Paths.PRIVACY_POLICY;
   static const PLANNER = _Paths.PLANNER;
+  static const GROUP_MEAL_CALENDAR = _Paths.GROUP_MEAL_CALENDAR;
+  static const WEEKLY_MEAL_PLANNER = _Paths.WEEKLY_MEAL_PLANNER;
 }
 
 abstract class _Paths {
@@ -72,4 +74,6 @@ abstract class _Paths {
   static const CLIENT_LIST = '/client-list';
   static const PRIVACY_POLICY = '/privacy-policy';
   static const PLANNER = '/planner';
+  static const GROUP_MEAL_CALENDAR = '/group-meal-calendar';
+  static const WEEKLY_MEAL_PLANNER = '/weekly-meal-planner';
 }

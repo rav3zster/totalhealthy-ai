@@ -27,8 +27,79 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
 
   @override
   Widget build(BuildContext context) {
+    final authController = Get.find<AuthController>();
+    final userId = authController.firebaseUser.value?.uid ?? '';
+
     return Column(
       children: [
+        // Header with Calendar Icon (Admin Only)
+        if (widget.isAdmin)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFC2D86A).withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        Get.toNamed(
+                          '/weekly-meal-planner',
+                          arguments: {
+                            'id': widget.groupId,
+                            'groupId': widget.groupId,
+                            'name': 'Group',
+                            'isAdmin': widget.isAdmin,
+                          },
+                        );
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.calendar_view_week_rounded,
+                              color: Colors.black,
+                              size: 20,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'Weekly Planner',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
         // Chat Area
         Expanded(
           child: StreamBuilder<List<MealModel>>(

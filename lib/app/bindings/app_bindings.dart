@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../controllers/user_controller.dart';
 import '../data/services/users_firestore_service.dart';
 import '../data/services/meals_firestore_service.dart';
+import '../data/services/group_meal_plans_firestore_service.dart';
 import '../modules/client_dashboard/controllers/client_dashboard_controllers.dart';
 import '../modules/group/controllers/group_controller.dart';
 
@@ -16,6 +17,12 @@ class AppBindings extends Bindings {
     }
     if (!Get.isRegistered<MealsFirestoreService>()) {
       Get.put<MealsFirestoreService>(MealsFirestoreService(), permanent: true);
+    }
+    if (!Get.isRegistered<GroupMealPlansFirestoreService>()) {
+      Get.put<GroupMealPlansFirestoreService>(
+        GroupMealPlansFirestoreService(),
+        permanent: true,
+      );
     }
     if (!Get.isRegistered<StorageService>()) {
       Get.put<StorageService>(StorageService(), permanent: true);
@@ -47,6 +54,10 @@ class InitialBindings extends Bindings {
     // Essential services that need to be available immediately
     Get.put<UsersFirestoreService>(UsersFirestoreService(), permanent: true);
     Get.put<MealsFirestoreService>(MealsFirestoreService(), permanent: true);
+    Get.put<GroupMealPlansFirestoreService>(
+      GroupMealPlansFirestoreService(),
+      permanent: true,
+    );
     Get.put<StorageService>(StorageService(), permanent: true);
     Get.put<UserController>(UserController(), permanent: true);
   }

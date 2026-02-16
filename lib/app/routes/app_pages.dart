@@ -58,6 +58,10 @@ import '../modules/Help_and_support/views/helpAndSuportPage.dart';
 import '../widgets/switch_role_screen.dart';
 import '../modules/planner/bindings/planner_binding.dart';
 import '../modules/planner/views/planner_view.dart';
+import '../modules/group/controllers/group_meal_calendar_controller.dart';
+import '../modules/group/views/group_meal_calendar_view.dart';
+import '../modules/group/controllers/weekly_meal_planner_controller.dart';
+import '../modules/group/views/weekly_meal_planner_view.dart';
 
 part 'app_routes.dart';
 
@@ -353,6 +357,34 @@ class AppPages {
       binding: PlannerBinding(),
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 300),
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.GROUP_MEAL_CALENDAR,
+      page: () => const GroupMealCalendarView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<GroupMealCalendarController>(
+          () => GroupMealCalendarController(),
+        );
+      }),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350),
+      popGesture: true,
+      preventDuplicates: true,
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.WEEKLY_MEAL_PLANNER,
+      page: () => const WeeklyMealPlannerView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<WeeklyMealPlannerController>(
+          () => WeeklyMealPlannerController(),
+        );
+      }),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350),
+      popGesture: true,
+      preventDuplicates: true,
       middlewares: [AuthCheckMiddleware()],
     ),
   ];
