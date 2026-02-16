@@ -78,6 +78,16 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
                             fontSize: 14,
                           ),
                         ),
+                      ] else ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          'Only the group admin can add meals.',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.4),
+                            fontSize: 14,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
                       ],
                     ],
                   ),
