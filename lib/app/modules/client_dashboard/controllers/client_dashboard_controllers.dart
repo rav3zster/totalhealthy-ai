@@ -6,6 +6,7 @@ import 'package:get_storage/get_storage.dart';
 import '../../../data/models/meal_model.dart';
 import '../../../data/services/dummy_data_service.dart';
 import '../../../data/services/meals_firestore_service.dart';
+import '../../../data/services/groups_firestore_service.dart';
 
 class ClientDashboardControllers extends GetxController {
   final MealsFirestoreService _mealsService = MealsFirestoreService();
@@ -190,61 +191,102 @@ class ClientDashboardControllers extends GetxController {
     }
   }
 
+  final GroupsFirestoreService _groupsService = GroupsFirestoreService();
+  final Map<String, List<MealModel>> _mealsMap = {};
+  final List<StreamSubscription> _subscriptions = [];
+
   Future<void> _setupMealsStream(String userId) async {
     try {
       print(
         "ClientDashboardControllers: Setting up meals stream for user: $userId",
       );
 
-      // Cancel existing subscription if any
-      await _mealsSubscription?.cancel();
+      // Cancel existing subscriptions
+      for (var sub in _subscriptions) {
+        sub.cancel();
+      }
+      _subscriptions.clear();
+      _mealsMap.clear();
 
-      // Subscribe to user-specific meals stream
-      _mealsSubscription = _mealsService
-          .getUserMealsStream(userId)
-          .listen(
-            (userMeals) {
-              print(
-                "ClientDashboardControllers: Received ${userMeals.length} meals from stream for UID: $userId",
-              );
-              for (var meal in userMeals.take(3)) {
-                print(
-                  " - Meal: ${meal.name} (ID: ${meal.id}, CreatedAt: ${meal.createdAt})",
-                );
-              }
+      // 1. Subscribe to User's Personal Meals
+      _subscribeToStream(
+        'user_$userId',
+        _mealsService.getUserMealsStream(userId),
+      );
 
-              meals.value = userMeals;
-              _cacheMeals(userMeals);
+      // 2. Fetch User's Groups and Subscribe to Group Meals
+      try {
+        final userGroups = await _groupsService.getUserGroups(userId);
+        print(
+          "ClientDashboardControllers: Found ${userGroups.length} groups for user",
+        );
 
-              // Clear loading and error states
-              isLoading.value = false;
-              isRefreshing.value = false;
-              error.value = '';
-
-              // Force UI update
-              update();
-            },
-            onError: (error) {
-              print("ClientDashboardControllers: Stream error: $error");
-
-              // Only show error if we don't have cached data
-              if (meals.isEmpty) {
-                this.error.value = 'Failed to load meals - check connection';
-              }
-
-              isLoading.value = false;
-              isRefreshing.value = false;
-              update();
-            },
-          );
+        for (var group in userGroups) {
+          if (group.id != null) {
+            _subscribeToStream(
+              'group_${group.id}',
+              _mealsService.getMealsStream(group.id!),
+            );
+          }
+        }
+      } catch (e) {
+        print("ClientDashboardControllers: Error fetching user groups: $e");
+      }
 
       print("ClientDashboardControllers: Meals stream setup completed");
     } catch (e) {
       print("ClientDashboardControllers: Failed to setup meals stream: $e");
-
       // Fallback to one-time fetch if stream fails
       await _tryFallbackQuery(userId);
     }
+  }
+
+  void _subscribeToStream(String sourceKey, Stream<List<MealModel>> stream) {
+    final subscription = stream.listen(
+      (newMeals) {
+        _mealsMap[sourceKey] = newMeals;
+        _mergeAndUpdateMeals();
+      },
+      onError: (error) {
+        print(
+          "ClientDashboardControllers: Stream error for $sourceKey: $error",
+        );
+        // Don't fail everything, just log
+      },
+    );
+    _subscriptions.add(subscription);
+  }
+
+  void _mergeAndUpdateMeals() {
+    final allMeals = <MealModel>[];
+
+    // Merge all meals from different sources
+    for (var mealList in _mealsMap.values) {
+      allMeals.addAll(mealList);
+    }
+
+    // Remove duplicates based on ID (just in case)
+    final uniqueMeals = <String, MealModel>{};
+    for (var meal in allMeals) {
+      if (meal.id != null) {
+        uniqueMeals[meal.id!] = meal;
+      }
+    }
+
+    // Convert back to list and sort
+    final sortedMeals = uniqueMeals.values.toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    meals.value = sortedMeals;
+    _cacheMeals(sortedMeals);
+
+    // Clear loading and error states
+    isLoading.value = false;
+    isRefreshing.value = false;
+    error.value = '';
+
+    // Force UI update
+    update();
   }
 
   Future<void> _tryFallbackQuery(String userId) async {
