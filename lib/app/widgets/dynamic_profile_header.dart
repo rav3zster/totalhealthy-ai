@@ -5,6 +5,7 @@ import '../data/services/groups_firestore_service.dart';
 import '../data/models/group_model.dart';
 import '../routes/app_pages.dart';
 import '../core/base/controllers/auth_controller.dart';
+import '../modules/client_dashboard/controllers/client_dashboard_controllers.dart';
 
 class DynamicProfileHeader extends StatelessWidget {
   final VoidCallback? onProfileTap;
@@ -369,18 +370,27 @@ class _GroupDropdown extends StatelessWidget {
             }).toList();
           },
           onSelected: (GroupModel group) {
-            // Navigate to weekly meal planner for this group
+            // Enter Group Mode in the dashboard
             final isAdmin = group.createdBy == userId;
 
-            Get.toNamed(
-              Routes.WEEKLY_MEAL_PLANNER,
-              arguments: {
-                'id': group.id,
-                'groupId': group.id,
-                'name': group.name,
-                'isAdmin': isAdmin,
-              },
-            );
+            // Get the dashboard controller and enter group mode
+            try {
+              final dashboardController =
+                  Get.find<ClientDashboardControllers>();
+              dashboardController.enterGroupMode(group.id!, group.name);
+            } catch (e) {
+              print('Error entering group mode: $e');
+              // Fallback: Navigate to weekly planner
+              Get.toNamed(
+                Routes.WEEKLY_MEAL_PLANNER,
+                arguments: {
+                  'id': group.id,
+                  'groupId': group.id,
+                  'name': group.name,
+                  'isAdmin': isAdmin,
+                },
+              );
+            }
           },
         );
       },

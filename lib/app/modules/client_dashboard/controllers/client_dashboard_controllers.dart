@@ -26,6 +26,13 @@ class ClientDashboardControllers extends GetxController {
   final error = ''.obs;
   final isSearchFocused = false.obs; // Track if search field is focused/active
 
+  // Group Mode properties
+  final isGroupMode = false.obs;
+  final selectedGroupId = Rxn<String>();
+  final selectedGroupName = ''.obs;
+  final groupMeals = <MealModel>[].obs;
+  StreamSubscription<List<MealModel>>? _groupMealsSubscription;
+
   // Stream subscription for cleanup
   StreamSubscription<List<MealModel>>? _mealsSubscription;
   StreamSubscription<User?>? _authSubscription;
@@ -448,8 +455,23 @@ class ClientDashboardControllers extends GetxController {
   }
 
   // Display meals (computed property for UI) - ensures consistent results
+  // Now supports both normal mode and group mode
   List<MealModel> get displayMeals {
-    final result = filteredMeals;
+    List<MealModel> result;
+
+    if (isGroupMode.value) {
+      // In group mode, use group meals (no category filtering)
+      result = groupMeals.where((meal) {
+        if (searchQuery.value.trim().isEmpty) return true;
+        final query = searchQuery.value.toLowerCase();
+        return meal.name.toLowerCase().contains(query) ||
+            meal.description.toLowerCase().contains(query);
+      }).toList();
+    } else {
+      // In normal mode, use filtered meals (with category filtering)
+      result = filteredMeals;
+    }
+
     // Ensure deterministic ordering by sorting by name
     result.sort((a, b) => a.name.compareTo(b.name));
     return result;
@@ -625,4 +647,108 @@ class ClientDashboardControllers extends GetxController {
     'hasData': hasData,
     'isSearchActive': isSearchActive,
   };
+
+  // ========== GROUP MODE METHODS ==========
+
+  /// Enter Group Mode - Switch dashboard to show only group meals
+  void enterGroupMode(String groupId, String groupName) {
+    print('=== ENTERING GROUP MODE ===');
+    print('Group ID: $groupId');
+    print('Group Name: $groupName');
+
+    selectedGroupId.value = groupId;
+    selectedGroupName.value = groupName;
+    isGroupMode.value = true;
+
+    // Clear search when entering group mode
+    searchQuery.value = '';
+    isSearchFocused.value = false;
+
+    // Fetch group meals
+    fetchGroupMeals(groupId);
+  }
+
+  /// Exit Group Mode - Restore normal dashboard
+  void exitGroupMode() {
+    print('=== EXITING GROUP MODE ===');
+
+    // Cancel group meals subscription
+    _groupMealsSubscription?.cancel();
+    _groupMealsSubscription = null;
+
+    // Clear group state
+    isGroupMode.value = false;
+    selectedGroupId.value = null;
+    selectedGroupName.value = '';
+    groupMeals.clear();
+
+    // Clear search
+    searchQuery.value = '';
+    isSearchFocused.value = false;
+
+    print('Group mode exited, restored to normal dashboard');
+  }
+
+  /// Fetch meals for a specific group
+  void fetchGroupMeals(String groupId) {
+    print('Fetching meals for group: $groupId');
+
+    // Cancel existing subscription
+    _groupMealsSubscription?.cancel();
+
+    // Subscribe to group meals stream
+    _groupMealsSubscription = _mealsService
+        .getMealsStream(groupId)
+        .listen(
+          (meals) {
+            print('Group meals updated: ${meals.length} meals');
+            groupMeals.value = meals;
+          },
+          onError: (error) {
+            print('Error fetching group meals: $error');
+            groupMeals.clear();
+          },
+        );
+  }
+
+  /// Get filtered meals based on current mode
+  List<MealModel> get displayedMeals {
+    if (isGroupMode.value) {
+      // In group mode, use group meals
+      return _filterMeals(groupMeals);
+    } else {
+      // In normal mode, use personal meals
+      return _filterMeals(meals);
+    }
+  }
+
+  /// Filter meals by category and search query
+  List<MealModel> _filterMeals(List<MealModel> mealsList) {
+    var filtered = mealsList;
+
+    // Filter by category (only in normal mode)
+    if (!isGroupMode.value) {
+      filtered = filtered.where((meal) {
+        return meal.categories.any(
+          (cat) => cat.toLowerCase() == selectedCategory.value.toLowerCase(),
+        );
+      }).toList();
+    }
+
+    // Filter by search query
+    if (searchQuery.value.isNotEmpty) {
+      final query = searchQuery.value.toLowerCase();
+      filtered = filtered.where((meal) {
+        return meal.name.toLowerCase().contains(query) ||
+            meal.description.toLowerCase().contains(query);
+      }).toList();
+    }
+
+    return filtered;
+  }
+
+  /// Get meal count for current view
+  int get displayedMealCount {
+    return displayedMeals.length;
+  }
 }

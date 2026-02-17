@@ -93,80 +93,192 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                   },
                                 ),
 
-                                const SizedBox(height: 24),
-
-                                // Dynamic Live Stats Card
-                                const DynamicLiveStatsCard(),
-
-                                const SizedBox(height: 20),
-
-                                // Weekly Planner Entry Card
-                                GestureDetector(
-                                  onTap: () {
-                                    final userData = Get.find<AuthController>()
-                                        .userdataget();
-                                    Get.toNamed(
-                                      Routes.PLANNER +
-                                          "?id=${userData["id"] ?? userData["_id"] ?? ""}",
-                                    );
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFCDE26D),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Row(
+                                // Group Mode Header (shown when in group mode)
+                                Obx(() {
+                                  if (controller.isGroupMode.value) {
+                                    return Column(
                                       children: [
+                                        const SizedBox(height: 16),
                                         Container(
-                                          padding: const EdgeInsets.all(10),
+                                          padding: const EdgeInsets.all(16),
                                           decoration: BoxDecoration(
-                                            color: Colors.black.withOpacity(
-                                              0.1,
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Color(
+                                                  0xFFC2D86A,
+                                                ).withValues(alpha: 0.2),
+                                                Color(
+                                                  0xFFC2D86A,
+                                                ).withValues(alpha: 0.1),
+                                              ],
                                             ),
-                                            shape: BoxShape.circle,
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                            border: Border.all(
+                                              color: Color(
+                                                0xFFC2D86A,
+                                              ).withValues(alpha: 0.3),
+                                              width: 1,
+                                            ),
                                           ),
-                                          child: const Icon(
-                                            Icons.calendar_month,
-                                            color: Colors.black,
-                                            size: 28,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 16),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                          child: Row(
                                             children: [
-                                              const Text(
-                                                'View Weekly Planner',
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
+                                              Container(
+                                                padding: EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                  color: Color(
+                                                    0xFFC2D86A,
+                                                  ).withValues(alpha: 0.3),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  Icons.group,
+                                                  color: Color(0xFFC2D86A),
+                                                  size: 20,
                                                 ),
                                               ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                'Manage your daily meal schedule',
-                                                style: TextStyle(
-                                                  color: Colors.black
-                                                      .withOpacity(0.6),
-                                                  fontSize: 14,
+                                              SizedBox(width: 12),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Group Mode',
+                                                      style: TextStyle(
+                                                        color: Color(
+                                                          0xFFC2D86A,
+                                                        ),
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 2),
+                                                    Text(
+                                                      controller
+                                                          .selectedGroupName
+                                                          .value,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
+                                              ),
+                                              IconButton(
+                                                onPressed:
+                                                    controller.exitGroupMode,
+                                                icon: Icon(
+                                                  Icons.close,
+                                                  color: Colors.white70,
+                                                ),
+                                                tooltip: 'Exit Group Mode',
                                               ),
                                             ],
                                           ),
                                         ),
-                                        const Icon(
-                                          Icons.arrow_forward_ios,
-                                          color: Colors.black,
-                                          size: 18,
-                                        ),
                                       ],
-                                    ),
-                                  ),
-                                ),
+                                    );
+                                  }
+                                  return SizedBox.shrink();
+                                }),
+
+                                const SizedBox(height: 24),
+
+                                // Dynamic Live Stats Card (hidden in group mode)
+                                Obx(() {
+                                  if (!controller.isGroupMode.value) {
+                                    return Column(
+                                      children: [
+                                        const DynamicLiveStatsCard(),
+                                        const SizedBox(height: 20),
+                                      ],
+                                    );
+                                  }
+                                  return SizedBox.shrink();
+                                }),
+
+                                // Weekly Planner Entry Card (hidden in group mode)
+                                Obx(() {
+                                  if (!controller.isGroupMode.value) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        final userData =
+                                            Get.find<AuthController>()
+                                                .userdataget();
+                                        Get.toNamed(
+                                          Routes.PLANNER +
+                                              "?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                        );
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFCDE26D),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black.withOpacity(
+                                                  0.1,
+                                                ),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.calendar_month,
+                                                color: Colors.black,
+                                                size: 28,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  const Text(
+                                                    'View Weekly Planner',
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    'Manage your daily meal schedule',
+                                                    style: TextStyle(
+                                                      color: Colors.black
+                                                          .withOpacity(0.6),
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const Icon(
+                                              Icons.arrow_forward_ios,
+                                              color: Colors.black,
+                                              size: 18,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  return SizedBox.shrink();
+                                }),
                               ],
                             ),
                           ),
@@ -205,23 +317,33 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
 
                               const SizedBox(height: 24),
 
-                              // Dynamic Day Counter with Add Meal Button
-                              DynamicDayCounter(
-                                onAddMealTap: () {
-                                  final userData = Get.find<AuthController>()
-                                      .userdataget();
-                                  Get.toNamed(
-                                    "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
-                                  );
-                                },
-                              ),
-
-                              const SizedBox(height: 20),
-
-                              // Meal Type Tabs - Conditionally visible based on search state
+                              // Dynamic Day Counter with Add Meal Button (hidden in group mode)
                               Obx(() {
-                                // Only show category buttons when search is empty
-                                if (controller.shouldShowCategoryButtons) {
+                                if (!controller.isGroupMode.value) {
+                                  return Column(
+                                    children: [
+                                      DynamicDayCounter(
+                                        onAddMealTap: () {
+                                          final userData =
+                                              Get.find<AuthController>()
+                                                  .userdataget();
+                                          Get.toNamed(
+                                            "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                          );
+                                        },
+                                      ),
+                                      const SizedBox(height: 20),
+                                    ],
+                                  );
+                                }
+                                return SizedBox.shrink();
+                              }),
+
+                              // Meal Type Tabs - Conditionally visible based on search state and group mode
+                              Obx(() {
+                                // Only show category buttons when search is empty AND not in group mode
+                                if (controller.shouldShowCategoryButtons &&
+                                    !controller.isGroupMode.value) {
                                   return Column(
                                     children: [
                                       // Horizontally scrollable category buttons
