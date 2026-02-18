@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../data/models/meal_model.dart';
 import '../../../data/services/dummy_data_service.dart';
 import '../../../data/services/meals_firestore_service.dart';
@@ -11,6 +12,7 @@ import '../../../data/services/groups_firestore_service.dart';
 class ClientDashboardControllers extends GetxController {
   final MealsFirestoreService _mealsService = MealsFirestoreService();
   final GetStorage _storage = GetStorage();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Cache keys
   static const String _mealsCacheKey = 'cached_meals_data';
@@ -31,7 +33,7 @@ class ClientDashboardControllers extends GetxController {
   final selectedGroupId = Rxn<String>();
   final selectedGroupName = ''.obs;
   final groupMeals = <MealModel>[].obs;
-  StreamSubscription<List<MealModel>>? _groupMealsSubscription;
+  StreamSubscription? _groupMealsSubscription;
 
   // Stream subscription for cleanup
   StreamSubscription<List<MealModel>>? _mealsSubscription;
@@ -664,8 +666,8 @@ class ClientDashboardControllers extends GetxController {
     searchQuery.value = '';
     isSearchFocused.value = false;
 
-    // Fetch group meals
-    fetchGroupMeals(groupId);
+    // Fetch TODAY's group meal plan
+    fetchTodayGroupPlan(groupId);
   }
 
   /// Exit Group Mode - Restore normal dashboard
@@ -689,23 +691,96 @@ class ClientDashboardControllers extends GetxController {
     print('Group mode exited, restored to normal dashboard');
   }
 
-  /// Fetch meals for a specific group
-  void fetchGroupMeals(String groupId) {
-    print('Fetching meals for group: $groupId');
+  /// Fetch TODAY's meal plan for a specific group
+  /// This loads only the meals assigned for today's date
+  void fetchTodayGroupPlan(String groupId) {
+    print('=== FETCHING TODAY\'S GROUP PLAN ===');
+
+    // Get today's date in yyyy-MM-dd format
+    final today = DateTime.now();
+    final todayStr =
+        '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+
+    print('[GROUP MODE] Date: $todayStr');
+    print('[GROUP MODE] Group ID: $groupId');
 
     // Cancel existing subscription
     _groupMealsSubscription?.cancel();
 
-    // Subscribe to group meals stream
-    _groupMealsSubscription = _mealsService
-        .getMealsStream(groupId)
+    // Subscribe to today's meal plan document
+    _groupMealsSubscription = _firestore
+        .collection('group_meal_plans')
+        .where('groupId', isEqualTo: groupId)
+        .where('date', isEqualTo: todayStr)
+        .limit(1)
+        .snapshots()
         .listen(
-          (meals) {
-            print('Group meals updated: ${meals.length} meals');
-            groupMeals.value = meals;
+          (snapshot) async {
+            print(
+              '[GROUP MODE] Plan snapshot received: ${snapshot.docs.length} documents',
+            );
+
+            if (snapshot.docs.isEmpty) {
+              print('[GROUP MODE] No meal plan for today');
+              groupMeals.clear();
+              return;
+            }
+
+            final planDoc = snapshot.docs.first;
+            final planData = planDoc.data();
+            final mealSlots = planData['mealSlots'] as Map<String, dynamic>?;
+
+            if (mealSlots == null || mealSlots.isEmpty) {
+              print('[GROUP MODE] Meal slots empty');
+              groupMeals.clear();
+              return;
+            }
+
+            // Extract all meal IDs from mealSlots
+            final mealIds = mealSlots.values
+                .where((id) => id != null && id.toString().isNotEmpty)
+                .map((id) => id.toString())
+                .toList();
+
+            print('[GROUP MODE] Meal IDs: $mealIds');
+
+            if (mealIds.isEmpty) {
+              print('[GROUP MODE] No meals assigned');
+              groupMeals.clear();
+              return;
+            }
+
+            // Fetch meals from groups/{groupId}/meals where documentId IN mealIds
+            try {
+              final mealsSnapshot = await _firestore
+                  .collection('meals')
+                  .where('groupId', isEqualTo: groupId)
+                  .where(FieldPath.documentId, whereIn: mealIds)
+                  .get();
+
+              print('[GROUP MODE] Meals fetched: ${mealsSnapshot.docs.length}');
+
+              final meals = mealsSnapshot.docs
+                  .map((doc) => MealModel.fromJson(doc.data(), docId: doc.id))
+                  .toList();
+
+              for (var meal in meals) {
+                print(
+                  '[GROUP MODE]   - ${meal.name} (id: ${meal.id}, groupId: ${meal.groupId})',
+                );
+              }
+
+              groupMeals.value = meals;
+              print(
+                '[GROUP MODE] ✓ Group meals updated: ${groupMeals.length} meals',
+              );
+            } catch (e) {
+              print('[GROUP MODE] ✗ Error fetching meals: $e');
+              groupMeals.clear();
+            }
           },
           onError: (error) {
-            print('Error fetching group meals: $error');
+            print('[GROUP MODE] ✗ Stream error: $error');
             groupMeals.clear();
           },
         );

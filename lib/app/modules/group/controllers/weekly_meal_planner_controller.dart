@@ -211,68 +211,45 @@ class WeeklyMealPlannerController extends GetxController {
       final userName =
           '${userData['firstName'] ?? ''} ${userData['lastName'] ?? ''}'.trim();
 
-      String? finalMealId = mealId;
+      print('=== ASSIGNING MEAL TO PLANNER ===');
+      print('Date: $date');
+      print('Meal Type: $mealType');
+      print('Meal ID: $mealId');
+      print('Group ID: $groupId');
 
-      // If assigning a meal (not removing), ALWAYS copy it to ensure it's in the group
+      // IMPORTANT: We only store the mealId reference, NOT the meal document
+      // The meal must already exist in groups/{groupId}/meals
+      // We do NOT copy or duplicate meals here
+
       if (mealId != null) {
-        print('=== ASSIGNING MEAL ===');
-        print('Original meal ID: $mealId');
-        print('Target groupId: $groupId');
-
-        final originalMeal = getMealById(mealId);
-        if (originalMeal != null) {
-          print('Original meal: ${originalMeal.name}');
-          print('Original meal groupId: ${originalMeal.groupId}');
-
-          // ALWAYS create a new copy for the group to ensure members can see it
-          // This prevents issues with personal vs group meals
-          final copiedMeal = MealModel(
-            userId: userId, // Admin who assigned it
-            groupId: groupId!, // Target group
-            name: originalMeal.name,
-            description: originalMeal.description,
-            kcal: originalMeal.kcal,
-            protein: originalMeal.protein,
-            carbs: originalMeal.carbs,
-            fat: originalMeal.fat,
-            categories: originalMeal.categories,
-            imageUrl: originalMeal.imageUrl,
-            ingredients: originalMeal.ingredients,
-            instructions: originalMeal.instructions,
-            createdAt: DateTime.now(),
-            prepTime: originalMeal.prepTime,
-            difficulty: originalMeal.difficulty,
+        // Verify the meal exists in the group
+        final meal = getMealById(mealId);
+        if (meal == null) {
+          throw Exception(
+            'Meal not found. Please ensure the meal exists in the group.',
           );
-
-          print('Copying meal to group...');
-          final newMealId = await _mealsService.addMeal(copiedMeal);
-          finalMealId = newMealId;
-
-          print('✓ Meal copied successfully!');
-          print('New meal ID: $newMealId');
-          print('New meal groupId: $groupId');
-        } else {
-          print('✗ ERROR: Original meal not found!');
-          throw Exception('Meal not found');
         }
+
+        if (meal.groupId != groupId) {
+          throw Exception(
+            'Meal does not belong to this group. GroupId mismatch.',
+          );
+        }
+
+        print('✓ Meal verified: ${meal.name} (groupId: ${meal.groupId})');
       }
 
-      print('Saving to meal plan...');
-      print('  groupId: $groupId');
-      print('  date: $date');
-      print('  mealType: $mealType');
-      print('  mealId: $finalMealId');
-
+      // Save only the mealId reference to the planner
       await _mealPlansService.updateMealSlot(
         groupId!,
         date,
         mealType,
-        finalMealId,
+        mealId, // Just the ID reference
         userId,
         userName.isEmpty ? 'Admin' : userName,
       );
 
-      print('✓ Meal plan updated successfully!');
+      print('✓ Meal slot updated successfully');
       print('=== END ASSIGNMENT ===');
 
       Get.snackbar(

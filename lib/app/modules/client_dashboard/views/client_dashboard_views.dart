@@ -504,7 +504,53 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                 );
 
                                 if (meals.isEmpty) {
-                                  // Show different empty states for search vs category
+                                  // Show different empty states for group mode, search, or category
+
+                                  // Group Mode: No meals assigned for today
+                                  if (controller.isGroupMode.value) {
+                                    return Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(32.0),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.calendar_today_outlined,
+                                              size: 80,
+                                              color: Colors.white.withValues(
+                                                alpha: 0.3,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 16),
+                                            Text(
+                                              'No meal plan assigned for today',
+                                              style: TextStyle(
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.8,
+                                                ),
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Check back later or contact your admin',
+                                              style: TextStyle(
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.5,
+                                                ),
+                                                fontSize: 14,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  // Search: No results
                                   if (controller.searchQuery.value
                                       .trim()
                                       .isNotEmpty) {
