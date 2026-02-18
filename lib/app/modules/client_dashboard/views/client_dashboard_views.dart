@@ -441,225 +441,226 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                               }),
 
                               // Meals List - Firebase-backed with modern styling
-                              GetBuilder<ClientDashboardControllers>(
-                                builder: (controller) {
-                                  // DEBUG: Log the state
-                                  print(
-                                    '🎨 VIEW DEBUG - shouldShowLoading: ${controller.shouldShowLoading}',
-                                  );
-                                  print(
-                                    '🎨 VIEW DEBUG - shouldShowError: ${controller.shouldShowError}',
-                                  );
-                                  print(
-                                    '🎨 VIEW DEBUG - isSearchFocused: ${controller.isSearchFocused.value}',
-                                  );
-                                  print(
-                                    '🎨 VIEW DEBUG - searchQuery: "${controller.searchQuery.value}"',
-                                  );
-                                  print(
-                                    '🎨 VIEW DEBUG - searchQuery trimmed: "${controller.searchQuery.value.trim()}"',
-                                  );
+                              Obx(() {
+                                // DEBUG: Log the state
+                                print(
+                                  '🎨 VIEW DEBUG - isGroupMode: ${controller.isGroupMode.value}',
+                                );
+                                print(
+                                  '🎨 VIEW DEBUG - groupMeals count: ${controller.groupMeals.length}',
+                                );
+                                print(
+                                  '🎨 VIEW DEBUG - shouldShowLoading: ${controller.shouldShowLoading}',
+                                );
+                                print(
+                                  '🎨 VIEW DEBUG - shouldShowError: ${controller.shouldShowError}',
+                                );
+                                print(
+                                  '🎨 VIEW DEBUG - isSearchFocused: ${controller.isSearchFocused.value}',
+                                );
+                                print(
+                                  '🎨 VIEW DEBUG - searchQuery: "${controller.searchQuery.value}"',
+                                );
+                                print(
+                                  '🎨 VIEW DEBUG - searchQuery trimmed: "${controller.searchQuery.value.trim()}"',
+                                );
 
-                                  if (controller.shouldShowLoading) {
-                                    return const Center(
-                                      child: CircularProgressIndicator(
-                                        color: Color(0xFFC2D86A),
-                                      ),
-                                    );
-                                  }
-
-                                  if (controller.shouldShowError) {
-                                    return Container(
-                                      padding: const EdgeInsets.all(32),
-                                      child: Column(
-                                        children: [
-                                          const Icon(
-                                            Icons.error_outline,
-                                            color: Colors.red,
-                                            size: 64,
-                                          ),
-                                          const SizedBox(height: 16),
-                                          Text(
-                                            controller.error.value,
-                                            style: const TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 16,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }
-
-                                  // Get meals to display
-                                  final meals = controller.displayMeals;
-                                  print(
-                                    '🎨 VIEW DEBUG - displayMeals count: ${meals.length}',
+                                if (controller.shouldShowLoading) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Color(0xFFC2D86A),
+                                    ),
                                   );
+                                }
 
-                                  if (meals.isEmpty) {
-                                    // Show different empty states for search vs category
-                                    if (controller.searchQuery.value
-                                        .trim()
-                                        .isNotEmpty) {
-                                      return Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(32.0),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                Icons.search_off_rounded,
-                                                size: 80,
-                                                color: Colors.white.withValues(
-                                                  alpha: 0.3,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 16),
-                                              Text(
-                                                'No meals found',
-                                                style: TextStyle(
-                                                  color: Colors.white
-                                                      .withValues(alpha: 0.8),
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Text(
-                                                'Try searching with different keywords',
-                                                style: TextStyle(
-                                                  color: Colors.white
-                                                      .withValues(alpha: 0.5),
-                                                  fontSize: 14,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                              const SizedBox(height: 16),
-                                              ElevatedButton.icon(
-                                                onPressed:
-                                                    controller.clearSearch,
-                                                icon: const Icon(
-                                                  Icons.clear,
-                                                  size: 18,
-                                                ),
-                                                label: const Text(
-                                                  'Clear Search',
-                                                ),
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: const Color(
-                                                    0xFFC2D86A,
-                                                  ),
-                                                  foregroundColor: Colors.black,
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 24,
-                                                        vertical: 12,
-                                                      ),
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          12,
-                                                        ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                if (controller.shouldShowError) {
+                                  return Container(
+                                    padding: const EdgeInsets.all(32),
+                                    child: Column(
+                                      children: [
+                                        const Icon(
+                                          Icons.error_outline,
+                                          color: Colors.red,
+                                          size: 64,
                                         ),
-                                      );
-                                    }
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          controller.error.value,
+                                          style: const TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 16,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
 
-                                    // Empty state for category with no meals
+                                // Get meals to display
+                                final meals = controller.displayMeals;
+                                print(
+                                  '🎨 VIEW DEBUG - displayMeals count: ${meals.length}',
+                                );
+
+                                if (meals.isEmpty) {
+                                  // Show different empty states for search vs category
+                                  if (controller.searchQuery.value
+                                      .trim()
+                                      .isNotEmpty) {
                                     return Center(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Image.asset(
-                                            'assets/no_diet.png',
-                                            height: 180,
-                                            width: 180,
-                                            fit: BoxFit.cover,
-                                          ),
-                                          // const SizedBox(height: 12),
-                                          // Text(
-                                          //   'No Diet Plan\nFound!',
-                                          //   style: TextStyle(
-                                          //     color: const Color(0xFFC2D86A),
-                                          //     fontSize: 24,
-                                          //     fontWeight: FontWeight.bold,
-                                          //     letterSpacing: 0.5,
-                                          //     height: 1.2,
-                                          //   ),
-                                          //   textAlign: TextAlign.center,
-                                          // ),
-                                          const SizedBox(height: 32),
-
-                                          // Action Cards
-                                          _buildActionCard(
-                                            title: 'Create Manually',
-                                            buttonText: 'Create',
-                                            iconEmoji: '📋',
-                                            iconBgColor: Colors.orange
-                                                .withValues(alpha: 0.2),
-                                            onTap: () {
-                                              final userData =
-                                                  Get.find<AuthController>()
-                                                      .userdataget();
-                                              Get.toNamed(
-                                                "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
-                                              );
-                                            },
-                                          ),
-                                          _buildActionCard(
-                                            title: 'Generate Using AI',
-                                            buttonText: 'Generate',
-                                            iconEmoji: '✨',
-                                            iconBgColor: Colors.purple
-                                                .withValues(alpha: 0.2),
-                                            onTap: () =>
-                                                Get.toNamed(Routes.GENERATE_AI),
-                                          ),
-                                          _buildActionCard(
-                                            title: 'Copy From Existing',
-                                            buttonText: 'Copy',
-                                            iconEmoji: '📄',
-                                            iconBgColor: Colors.blue.withValues(
-                                              alpha: 0.2,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(32.0),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.search_off_rounded,
+                                              size: 80,
+                                              color: Colors.white.withValues(
+                                                alpha: 0.3,
+                                              ),
                                             ),
-                                            onTap: () => Get.toNamed(
-                                              Routes.MEAL_HISTORY,
+                                            const SizedBox(height: 16),
+                                            Text(
+                                              'No meals found',
+                                              style: TextStyle(
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.8,
+                                                ),
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Try searching with different keywords',
+                                              style: TextStyle(
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.5,
+                                                ),
+                                                fontSize: 14,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            const SizedBox(height: 16),
+                                            ElevatedButton.icon(
+                                              onPressed: controller.clearSearch,
+                                              icon: const Icon(
+                                                Icons.clear,
+                                                size: 18,
+                                              ),
+                                              label: const Text('Clear Search'),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: const Color(
+                                                  0xFFC2D86A,
+                                                ),
+                                                foregroundColor: Colors.black,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 24,
+                                                      vertical: 12,
+                                                    ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     );
                                   }
 
-                                  // Show meals list
-                                  print(
-                                    '🎨 VIEW DEBUG - Rendering ${meals.length} meals',
+                                  // Empty state for category with no meals
+                                  return Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Image.asset(
+                                          'assets/no_diet.png',
+                                          height: 180,
+                                          width: 180,
+                                          fit: BoxFit.cover,
+                                        ),
+                                        // const SizedBox(height: 12),
+                                        // Text(
+                                        //   'No Diet Plan\nFound!',
+                                        //   style: TextStyle(
+                                        //     color: const Color(0xFFC2D86A),
+                                        //     fontSize: 24,
+                                        //     fontWeight: FontWeight.bold,
+                                        //     letterSpacing: 0.5,
+                                        //     height: 1.2,
+                                        //   ),
+                                        //   textAlign: TextAlign.center,
+                                        // ),
+                                        const SizedBox(height: 32),
+
+                                        // Action Cards
+                                        _buildActionCard(
+                                          title: 'Create Manually',
+                                          buttonText: 'Create',
+                                          iconEmoji: '📋',
+                                          iconBgColor: Colors.orange.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          onTap: () {
+                                            final userData =
+                                                Get.find<AuthController>()
+                                                    .userdataget();
+                                            Get.toNamed(
+                                              "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                            );
+                                          },
+                                        ),
+                                        _buildActionCard(
+                                          title: 'Generate Using AI',
+                                          buttonText: 'Generate',
+                                          iconEmoji: '✨',
+                                          iconBgColor: Colors.purple.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          onTap: () =>
+                                              Get.toNamed(Routes.GENERATE_AI),
+                                        ),
+                                        _buildActionCard(
+                                          title: 'Copy From Existing',
+                                          buttonText: 'Copy',
+                                          iconEmoji: '📄',
+                                          iconBgColor: Colors.blue.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          onTap: () =>
+                                              Get.toNamed(Routes.MEAL_HISTORY),
+                                        ),
+                                      ],
+                                    ),
                                   );
-                                  return ListView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: meals.length,
-                                    itemBuilder: (context, index) {
-                                      final meal = meals[index];
-                                      return _buildModernMealCard(
-                                        meal,
-                                        index,
-                                        controller,
-                                        context,
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
+                                }
+
+                                // Show meals list
+                                print(
+                                  '🎨 VIEW DEBUG - Rendering ${meals.length} meals',
+                                );
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: meals.length,
+                                  itemBuilder: (context, index) {
+                                    final meal = meals[index];
+                                    return _buildModernMealCard(
+                                      meal,
+                                      index,
+                                      controller,
+                                      context,
+                                    );
+                                  },
+                                );
+                              }),
                             ],
                           ),
                         ),
