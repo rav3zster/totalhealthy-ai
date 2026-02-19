@@ -33,6 +33,7 @@ class ClientDashboardControllers extends GetxController {
   final selectedGroupId = Rxn<String>();
   final selectedGroupName = ''.obs;
   final groupMeals = <MealModel>[].obs;
+  final todayMealSlots = <String, String?>{}.obs; // Category → MealId mapping
   StreamSubscription? _groupMealsSubscription;
 
   // Stream subscription for cleanup
@@ -722,6 +723,7 @@ class ClientDashboardControllers extends GetxController {
 
             if (snapshot.docs.isEmpty) {
               print('[GROUP MODE] No meal plan for today');
+              todayMealSlots.clear();
               groupMeals.clear();
               return;
             }
@@ -732,9 +734,17 @@ class ClientDashboardControllers extends GetxController {
 
             if (mealSlots == null || mealSlots.isEmpty) {
               print('[GROUP MODE] Meal slots empty');
+              todayMealSlots.clear();
               groupMeals.clear();
               return;
             }
+
+            // Store the mealSlots structure (category → mealId)
+            todayMealSlots.value = Map<String, String?>.from(
+              mealSlots.map((key, value) => MapEntry(key, value?.toString())),
+            );
+
+            print('[GROUP MODE] Meal Slots: $todayMealSlots');
 
             // Extract all meal IDs from mealSlots
             final mealIds = mealSlots.values
@@ -781,6 +791,7 @@ class ClientDashboardControllers extends GetxController {
           },
           onError: (error) {
             print('[GROUP MODE] ✗ Stream error: $error');
+            todayMealSlots.clear();
             groupMeals.clear();
           },
         );
@@ -826,4 +837,20 @@ class ClientDashboardControllers extends GetxController {
   int get displayedMealCount {
     return displayedMeals.length;
   }
+
+  /// Get meal by ID from groupMeals list
+  MealModel? getMealByIdFromGroup(String? mealId) {
+    if (mealId == null || mealId.isEmpty) return null;
+    return groupMeals.firstWhereOrNull((meal) => meal.id == mealId);
+  }
+
+  /// Get standard meal categories in order
+  List<String> get mealCategories => [
+    'Breakfast',
+    'Morning Snacks',
+    'Lunch',
+    'Preworkout',
+    'Post Workout',
+    'Dinner',
+  ];
 }

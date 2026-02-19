@@ -692,6 +692,13 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                 print(
                                   '🎨 VIEW DEBUG - Rendering ${meals.length} meals',
                                 );
+
+                                // GROUP MODE: Show categorized meal plan
+                                if (controller.isGroupMode.value) {
+                                  return _buildGroupModeMealPlan(controller);
+                                }
+
+                                // NORMAL MODE: Show flat meal list
                                 return ListView.builder(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
@@ -1428,5 +1435,264 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
         ),
       ),
     );
+  }
+
+  // Group Mode: Categorized Meal Plan Display
+  Widget _buildGroupModeMealPlan(ClientDashboardControllers controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: controller.mealCategories.map((category) {
+        final emoji = _getCategoryEmoji(category);
+        final mealId = controller.todayMealSlots[category];
+        final meal = controller.getMealByIdFromGroup(mealId);
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF2A2A2A), Color(0xFF1F1F1F)],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: meal != null
+                  ? const Color(0xFFC2D86A).withValues(alpha: 0.3)
+                  : Colors.white.withValues(alpha: 0.1),
+              width: 1.5,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Category Header
+                Row(
+                  children: [
+                    Text(emoji, style: const TextStyle(fontSize: 24)),
+                    const SizedBox(width: 12),
+                    Text(
+                      category,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Meal Content or Not Assigned
+                if (meal != null) ...[
+                  // Meal Card
+                  GestureDetector(
+                    onTap: () {
+                      final box = GetStorage();
+                      box.write("mealdetails", meal.toJson());
+                      Get.toNamed(
+                        '/meals-details?id=${Get.find<AuthController>().userdataget()["id"] ?? Get.find<AuthController>().userdataget()["_id"] ?? ""}',
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1A1A1A),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          // Meal Image
+                          Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image(
+                                image:
+                                    UserController.getImageProvider(
+                                      meal.imageUrl,
+                                    ) ??
+                                    const AssetImage(
+                                          'assets/meal_placeholder.png',
+                                        )
+                                        as ImageProvider,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(
+                                      Icons.restaurant,
+                                      color: Colors.black,
+                                      size: 30,
+                                    ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+
+                          // Meal Info
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  meal.name,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.withValues(
+                                          alpha: 0.2,
+                                        ),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(
+                                          color: Colors.orange.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        '${meal.kcal} kcal',
+                                        style: const TextStyle(
+                                          color: Colors.orange,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'P: ${meal.protein}g',
+                                      style: TextStyle(
+                                        color: Colors.green.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'C: ${meal.carbs}g',
+                                      style: TextStyle(
+                                        color: Colors.red.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'F: ${meal.fat}g',
+                                      style: TextStyle(
+                                        color: Colors.blue.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Arrow Icon
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: const Color(
+                              0xFFC2D86A,
+                            ).withValues(alpha: 0.6),
+                            size: 16,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ] else ...[
+                  // Not Assigned Placeholder
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.remove_circle_outline,
+                          color: Colors.white.withValues(alpha: 0.3),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Not Assigned',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.4),
+                            fontSize: 14,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  String _getCategoryEmoji(String category) {
+    switch (category.toLowerCase()) {
+      case 'breakfast':
+        return '🍳';
+      case 'morning snacks':
+        return '🥐';
+      case 'lunch':
+        return '🥗';
+      case 'preworkout':
+      case 'pre-workout':
+      case 'pre workout':
+        return '💪';
+      case 'post workout':
+      case 'post-workout':
+        return '🥤';
+      case 'dinner':
+        return '🍽️';
+      default:
+        return '🍴';
+    }
   }
 }
