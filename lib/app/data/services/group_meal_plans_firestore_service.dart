@@ -63,12 +63,16 @@ class GroupMealPlansFirestoreService {
   }
 
   /// Create or update meal plan for a specific date
+  /// IMPORTANT: This method MERGES mealSlots instead of replacing them
   Future<void> setMealPlan(GroupMealPlanModel mealPlan) async {
     try {
-      print('setMealPlan called:');
-      print('  - groupId: ${mealPlan.groupId}');
-      print('  - date: ${mealPlan.date}');
-      print('  - mealSlots: ${mealPlan.mealSlots}');
+      print('=== SET MEAL PLAN ===');
+      print('📅 Date: ${_formatDateOnly(mealPlan.date)}');
+      print('🏢 Group ID: ${mealPlan.groupId}');
+      print('📊 Incoming mealSlots:');
+      mealPlan.mealSlots.forEach((key, value) {
+        print('   - $key: $value');
+      });
 
       // Check if plan exists for this date
       final existingPlan = await getMealPlanForDate(
@@ -77,25 +81,45 @@ class GroupMealPlansFirestoreService {
       );
 
       if (existingPlan != null && existingPlan.id != null) {
-        print('Updating existing plan: ${existingPlan.id}');
-        // Update existing plan with ALL fields including mealSlots
+        print('📄 Existing plan found: ${existingPlan.id}');
+        print('📊 Existing mealSlots:');
+        existingPlan.mealSlots.forEach((key, value) {
+          print('   - $key: $value');
+        });
+
+        // CRITICAL FIX: MERGE mealSlots instead of replacing
+        final mergedSlots = Map<String, String?>.from(existingPlan.mealSlots);
+        mergedSlots.addAll(mealPlan.mealSlots);
+
+        print('📊 Merged mealSlots (BEFORE save):');
+        mergedSlots.forEach((key, value) {
+          print('   - $key: $value');
+        });
+
+        // Update existing plan with MERGED mealSlots
         await _firestore.collection(_collection).doc(existingPlan.id).update({
-          'mealSlots': mealPlan.mealSlots,
+          'mealSlots': mergedSlots, // ✅ Use merged map
           // Backward compatibility
-          'breakfastMealId': mealPlan.breakfastMealId,
-          'lunchMealId': mealPlan.lunchMealId,
-          'dinnerMealId': mealPlan.dinnerMealId,
+          'breakfastMealId': mergedSlots['Breakfast'],
+          'lunchMealId': mergedSlots['Lunch'],
+          'dinnerMealId': mergedSlots['Dinner'],
           'updatedAt': DateTime.now().toIso8601String(),
         });
-        print('✓ Plan updated successfully');
+        print('✅ Plan updated successfully with merged mealSlots');
       } else {
-        print('Creating new plan');
+        print('📄 No existing plan, creating new plan');
+        print('📊 New plan mealSlots:');
+        mealPlan.mealSlots.forEach((key, value) {
+          print('   - $key: $value');
+        });
+
         // Create new plan
         await _firestore.collection(_collection).add(mealPlan.toJson());
-        print('✓ Plan created successfully');
+        print('✅ New plan created successfully');
       }
+      print('=== END SET MEAL PLAN ===');
     } catch (e) {
-      print('✗ Error setting meal plan: $e');
+      print('❌ Error setting meal plan: $e');
       rethrow;
     }
   }
@@ -111,12 +135,29 @@ class GroupMealPlansFirestoreService {
     String adminName,
   ) async {
     try {
+      print('=== UPDATE MEAL SLOT ===');
+      print('📅 Date: ${_formatDateOnly(date)}');
+      print('🏢 Group ID: $groupId');
+      print('🍽️ Meal Type: $mealType');
+      print('🆔 Meal ID: $mealId');
+
       final existingPlan = await getMealPlanForDate(groupId, date);
 
       if (existingPlan != null && existingPlan.id != null) {
-        // Update existing plan - update the mealSlots map
+        print('📄 Existing plan found: ${existingPlan.id}');
+        print('📊 Current mealSlots BEFORE update:');
+        existingPlan.mealSlots.forEach((key, value) {
+          print('   - $key: $value');
+        });
+
+        // Update existing plan - MERGE with existing mealSlots map
         final updatedSlots = Map<String, String?>.from(existingPlan.mealSlots);
         updatedSlots[mealType] = mealId;
+
+        print('📊 Updated mealSlots AFTER merge (BEFORE save):');
+        updatedSlots.forEach((key, value) {
+          print('   - $key: $value');
+        });
 
         final updates = <String, dynamic>{
           'mealSlots': updatedSlots,
@@ -126,11 +167,16 @@ class GroupMealPlansFirestoreService {
           if (mealType == 'Dinner') 'dinnerMealId': mealId,
           'updatedAt': DateTime.now().toIso8601String(),
         };
+
+        print('💾 Saving to Firestore...');
         await _firestore
             .collection(_collection)
             .doc(existingPlan.id)
             .update(updates);
+        print('✅ Meal slot updated successfully');
+        print('=== END UPDATE ===');
       } else {
+        print('📄 No existing plan found, creating new plan');
         // Create new plan with this meal
         final newPlan = GroupMealPlanModel(
           groupId: groupId,
@@ -140,10 +186,19 @@ class GroupMealPlansFirestoreService {
           createdByName: adminName,
           createdAt: DateTime.now(),
         );
+
+        print('📊 New plan mealSlots:');
+        newPlan.mealSlots.forEach((key, value) {
+          print('   - $key: $value');
+        });
+
+        print('💾 Creating new document in Firestore...');
         await _firestore.collection(_collection).add(newPlan.toJson());
+        print('✅ New meal plan created successfully');
+        print('=== END UPDATE ===');
       }
     } catch (e) {
-      print('Error updating meal slot: $e');
+      print('❌ Error updating meal slot: $e');
       rethrow;
     }
   }

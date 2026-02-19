@@ -702,8 +702,9 @@ class ClientDashboardControllers extends GetxController {
     final todayStr =
         '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
 
-    print('[GROUP MODE] Date: $todayStr');
-    print('[GROUP MODE] Group ID: $groupId');
+    print('[GROUP MODE] 📅 Date formatted: $todayStr');
+    print('[GROUP MODE] 🏢 Group ID: $groupId');
+    print('[GROUP MODE] 🕐 Raw DateTime: $today');
 
     // Cancel existing subscription
     _groupMealsSubscription?.cancel();
@@ -718,11 +719,15 @@ class ClientDashboardControllers extends GetxController {
         .listen(
           (snapshot) async {
             print(
-              '[GROUP MODE] Plan snapshot received: ${snapshot.docs.length} documents',
+              '[GROUP MODE] 📦 Plan snapshot received: ${snapshot.docs.length} documents',
             );
 
             if (snapshot.docs.isEmpty) {
-              print('[GROUP MODE] No meal plan for today');
+              print('[GROUP MODE] ❌ No meal plan document found for today');
+              print('[GROUP MODE] 🔍 Query used:');
+              print('   - collection: group_meal_plans');
+              print('   - groupId: $groupId');
+              print('   - date: $todayStr');
               todayMealSlots.clear();
               groupMeals.clear();
               return;
@@ -730,21 +735,41 @@ class ClientDashboardControllers extends GetxController {
 
             final planDoc = snapshot.docs.first;
             final planData = planDoc.data();
+
+            print('[GROUP MODE] 📄 Plan document found:');
+            print('   - Document ID: ${planDoc.id}');
+            print('   - Full data: $planData');
+
             final mealSlots = planData['mealSlots'] as Map<String, dynamic>?;
 
-            if (mealSlots == null || mealSlots.isEmpty) {
-              print('[GROUP MODE] Meal slots empty');
+            if (mealSlots == null) {
+              print('[GROUP MODE] ⚠️ mealSlots field is NULL');
               todayMealSlots.clear();
               groupMeals.clear();
               return;
             }
+
+            if (mealSlots.isEmpty) {
+              print('[GROUP MODE] ⚠️ mealSlots map is EMPTY');
+              todayMealSlots.clear();
+              groupMeals.clear();
+              return;
+            }
+
+            print('[GROUP MODE] 🗂️ Raw mealSlots from Firestore:');
+            mealSlots.forEach((key, value) {
+              print('   - $key: $value (type: ${value.runtimeType})');
+            });
 
             // Store the mealSlots structure (category → mealId)
             todayMealSlots.value = Map<String, String?>.from(
               mealSlots.map((key, value) => MapEntry(key, value?.toString())),
             );
 
-            print('[GROUP MODE] Meal Slots: $todayMealSlots');
+            print('[GROUP MODE] 🗂️ Processed todayMealSlots:');
+            todayMealSlots.forEach((key, value) {
+              print('   - $key: $value');
+            });
 
             // Extract all meal IDs from mealSlots
             final mealIds = mealSlots.values
@@ -752,40 +777,113 @@ class ClientDashboardControllers extends GetxController {
                 .map((id) => id.toString())
                 .toList();
 
-            print('[GROUP MODE] Meal IDs: $mealIds');
+            print(
+              '[GROUP MODE] 🆔 Extracted Meal IDs (${mealIds.length} total):',
+            );
+            for (int i = 0; i < mealIds.length; i++) {
+              print('   [$i] ${mealIds[i]}');
+            }
 
             if (mealIds.isEmpty) {
-              print('[GROUP MODE] No meals assigned');
+              print('[GROUP MODE] ❌ No valid meal IDs found after filtering');
               groupMeals.clear();
               return;
             }
 
-            // Fetch meals from groups/{groupId}/meals where documentId IN mealIds
+            // Check Firestore whereIn limit
+            if (mealIds.length > 10) {
+              print(
+                '[GROUP MODE] ⚠️ WARNING: ${mealIds.length} meal IDs exceed Firestore whereIn limit of 10!',
+              );
+              print('[GROUP MODE] 🔧 Using chunked query approach...');
+            }
+
+            // Fetch meals from meals collection where documentId IN mealIds
             try {
-              final mealsSnapshot = await _firestore
-                  .collection('meals')
-                  .where('groupId', isEqualTo: groupId)
-                  .where(FieldPath.documentId, whereIn: mealIds)
-                  .get();
+              print('[GROUP MODE] 🔍 Querying meals collection:');
+              print('   - collection: meals');
+              print('   - groupId filter: $groupId');
+              print('   - documentId whereIn: $mealIds');
 
-              print('[GROUP MODE] Meals fetched: ${mealsSnapshot.docs.length}');
+              // Handle Firestore whereIn limit (max 10 items)
+              List<MealModel> allMeals = [];
 
-              final meals = mealsSnapshot.docs
-                  .map((doc) => MealModel.fromJson(doc.data(), docId: doc.id))
-                  .toList();
+              if (mealIds.length <= 10) {
+                // Single query for 10 or fewer IDs
+                final mealsSnapshot = await _firestore
+                    .collection('meals')
+                    .where('groupId', isEqualTo: groupId)
+                    .where(FieldPath.documentId, whereIn: mealIds)
+                    .get();
 
-              for (var meal in meals) {
                 print(
-                  '[GROUP MODE]   - ${meal.name} (id: ${meal.id}, groupId: ${meal.groupId})',
+                  '[GROUP MODE] 📦 Query returned ${mealsSnapshot.docs.length} documents',
+                );
+
+                allMeals = mealsSnapshot.docs.map((doc) {
+                  print('[GROUP MODE]   - Found doc: ${doc.id}');
+                  return MealModel.fromJson(doc.data(), docId: doc.id);
+                }).toList();
+              } else {
+                // Chunked queries for more than 10 IDs
+                for (int i = 0; i < mealIds.length; i += 10) {
+                  final chunk = mealIds.sublist(
+                    i,
+                    (i + 10 < mealIds.length) ? i + 10 : mealIds.length,
+                  );
+
+                  print(
+                    '[GROUP MODE] 🔍 Chunk ${(i ~/ 10) + 1}: Querying ${chunk.length} IDs',
+                  );
+
+                  final mealsSnapshot = await _firestore
+                      .collection('meals')
+                      .where('groupId', isEqualTo: groupId)
+                      .where(FieldPath.documentId, whereIn: chunk)
+                      .get();
+
+                  print(
+                    '[GROUP MODE]   - Chunk returned ${mealsSnapshot.docs.length} documents',
+                  );
+
+                  final chunkMeals = mealsSnapshot.docs.map((doc) {
+                    print('[GROUP MODE]     - Found doc: ${doc.id}');
+                    return MealModel.fromJson(doc.data(), docId: doc.id);
+                  }).toList();
+
+                  allMeals.addAll(chunkMeals);
+                }
+              }
+
+              print('[GROUP MODE] 📊 Total meals fetched: ${allMeals.length}');
+              print('[GROUP MODE] 📊 Expected meals: ${mealIds.length}');
+
+              if (allMeals.length < mealIds.length) {
+                print('[GROUP MODE] ⚠️ MISMATCH: Some meals were not found!');
+                print('[GROUP MODE] 🔍 Missing meal IDs:');
+                final foundIds = allMeals.map((m) => m.id).toSet();
+                final missingIds = mealIds.where(
+                  (id) => !foundIds.contains(id),
+                );
+                for (var missingId in missingIds) {
+                  print('   - $missingId');
+                }
+              }
+
+              for (var meal in allMeals) {
+                print(
+                  '[GROUP MODE] ✅ Meal loaded: ${meal.name} (id: ${meal.id}, groupId: ${meal.groupId})',
                 );
               }
 
-              groupMeals.value = meals;
+              groupMeals.value = allMeals;
               print(
-                '[GROUP MODE] ✓ Group meals updated: ${groupMeals.length} meals',
+                '[GROUP MODE] ✓ Group meals updated: ${groupMeals.length} meals loaded',
               );
-            } catch (e) {
+              print('=== END FETCH ===');
+            } catch (e, stackTrace) {
               print('[GROUP MODE] ✗ Error fetching meals: $e');
+              print('[GROUP MODE] ✗ Stack trace: $stackTrace');
               groupMeals.clear();
             }
           },
