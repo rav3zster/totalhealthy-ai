@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../data/models/meal_model.dart';
+import '../../../data/models/group_model.dart';
 import '../../../data/services/dummy_data_service.dart';
 import '../../../data/services/meals_firestore_service.dart';
 import '../../../data/services/groups_firestore_service.dart';
@@ -34,6 +35,8 @@ class ClientDashboardControllers extends GetxController {
   final selectedGroupName = ''.obs;
   final groupMeals = <MealModel>[].obs;
   final todayMealSlots = <String, String?>{}.obs; // Category → MealId mapping
+  final userGroups =
+      <GroupModel>[].obs; // Store user's groups for role checking
   StreamSubscription? _groupMealsSubscription;
 
   // Stream subscription for cleanup
@@ -226,12 +229,15 @@ class ClientDashboardControllers extends GetxController {
 
       // 2. Fetch User's Groups and Subscribe to Group Meals
       try {
-        final userGroups = await _groupsService.getUserGroups(userId);
+        final fetchedGroups = await _groupsService.getUserGroups(userId);
         print(
-          "ClientDashboardControllers: Found ${userGroups.length} groups for user",
+          "ClientDashboardControllers: Found ${fetchedGroups.length} groups for user",
         );
 
-        for (var group in userGroups) {
+        // Store user groups for role checking
+        userGroups.value = fetchedGroups;
+
+        for (var group in fetchedGroups) {
           if (group.id != null) {
             _subscribeToStream(
               'group_${group.id}',
@@ -458,26 +464,80 @@ class ClientDashboardControllers extends GetxController {
   }
 
   // Display meals (computed property for UI) - ensures consistent results
-  // Now supports both normal mode and group mode
+  // Switches data source based on selectedGroupId, but UI remains the same
   List<MealModel> get displayMeals {
-    List<MealModel> result;
+    // Determine which meal list to use based on group selection
+    final sourceMeals = selectedGroupId.value != null ? groupMeals : meals;
 
-    if (isGroupMode.value) {
-      // In group mode, use group meals (no category filtering)
-      result = groupMeals.where((meal) {
-        if (searchQuery.value.trim().isEmpty) return true;
-        final query = searchQuery.value.toLowerCase();
-        return meal.name.toLowerCase().contains(query) ||
-            meal.description.toLowerCase().contains(query);
+    // Apply the same filtering logic regardless of source
+    var filtered = List<MealModel>.from(sourceMeals);
+
+    // Check if search query has actual content (after trimming)
+    final trimmedQuery = searchQuery.value.trim();
+
+    if (trimmedQuery.isNotEmpty) {
+      // SEARCH MODE: Search across ALL meals, ignore category
+      final query = trimmedQuery.toLowerCase();
+
+      filtered = filtered.where((meal) {
+        // Search in meal name
+        final nameMatch = meal.name.toLowerCase().contains(query);
+
+        // Search in description
+        final descriptionMatch = meal.description.toLowerCase().contains(query);
+
+        // Search in calories (kcal)
+        final calorieMatch = meal.kcal.toLowerCase().contains(query);
+
+        // Search in macros (protein, fat, carbs)
+        final proteinMatch = meal.protein.toLowerCase().contains(query);
+        final fatMatch = meal.fat.toLowerCase().contains(query);
+        final carbsMatch = meal.carbs.toLowerCase().contains(query);
+
+        // Search in categories
+        final categoryMatch = meal.categories.any(
+          (cat) => cat.toLowerCase().contains(query),
+        );
+
+        // Search in ingredients
+        final ingredientMatch = meal.ingredients.any(
+          (ingredient) =>
+              ingredient.name.toLowerCase().contains(query) ||
+              ingredient.amount.toLowerCase().contains(query) ||
+              ingredient.unit.toLowerCase().contains(query),
+        );
+
+        // Search in instructions
+        final instructionsMatch = meal.instructions.toLowerCase().contains(
+          query,
+        );
+
+        // Search in prep time and difficulty
+        final prepTimeMatch = meal.prepTime.toLowerCase().contains(query);
+        final difficultyMatch = meal.difficulty.toLowerCase().contains(query);
+
+        return nameMatch ||
+            descriptionMatch ||
+            calorieMatch ||
+            proteinMatch ||
+            fatMatch ||
+            carbsMatch ||
+            categoryMatch ||
+            ingredientMatch ||
+            instructionsMatch ||
+            prepTimeMatch ||
+            difficultyMatch;
       }).toList();
     } else {
-      // In normal mode, use filtered meals (with category filtering)
-      result = filteredMeals;
+      // CATEGORY MODE: Filter by selected category only
+      filtered = filtered.where((meal) {
+        return meal.categories.contains(selectedCategory.value);
+      }).toList();
     }
 
     // Ensure deterministic ordering by sorting by name
-    result.sort((a, b) => a.name.compareTo(b.name));
-    return result;
+    filtered.sort((a, b) => a.name.compareTo(b.name));
+    return filtered;
   }
 
   // Enhanced category change with immediate UI update
@@ -684,10 +744,14 @@ class ClientDashboardControllers extends GetxController {
     selectedGroupId.value = null;
     selectedGroupName.value = '';
     groupMeals.clear();
+    todayMealSlots.clear();
 
     // Clear search
     searchQuery.value = '';
     isSearchFocused.value = false;
+
+    // Force UI update to reload personal meals
+    update();
 
     print('Group mode exited, restored to normal dashboard');
   }
@@ -895,60 +959,64 @@ class ClientDashboardControllers extends GetxController {
         );
   }
 
-  /// Get filtered meals based on current mode
-  List<MealModel> get displayedMeals {
-    if (isGroupMode.value) {
-      // In group mode, use group meals
-      return _filterMeals(groupMeals);
-    } else {
-      // In normal mode, use personal meals
-      return _filterMeals(meals);
-    }
-  }
-
-  /// Filter meals by category and search query
-  List<MealModel> _filterMeals(List<MealModel> mealsList) {
-    var filtered = mealsList;
-
-    // Filter by category (only in normal mode)
-    if (!isGroupMode.value) {
-      filtered = filtered.where((meal) {
-        return meal.categories.any(
-          (cat) => cat.toLowerCase() == selectedCategory.value.toLowerCase(),
-        );
-      }).toList();
-    }
-
-    // Filter by search query
-    if (searchQuery.value.isNotEmpty) {
-      final query = searchQuery.value.toLowerCase();
-      filtered = filtered.where((meal) {
-        return meal.name.toLowerCase().contains(query) ||
-            meal.description.toLowerCase().contains(query);
-      }).toList();
-    }
-
-    return filtered;
-  }
-
-  /// Get meal count for current view
-  int get displayedMealCount {
-    return displayedMeals.length;
-  }
-
   /// Get meal by ID from groupMeals list
   MealModel? getMealByIdFromGroup(String? mealId) {
     if (mealId == null || mealId.isEmpty) return null;
     return groupMeals.firstWhereOrNull((meal) => meal.id == mealId);
   }
 
-  /// Get standard meal categories in order
-  List<String> get mealCategories => [
-    'Breakfast',
-    'Morning Snacks',
-    'Lunch',
-    'Preworkout',
-    'Post Workout',
-    'Dinner',
-  ];
+  /// Check if current user is admin of the selected group
+  /// Returns true if:
+  /// - No group is selected (personal mode)
+  /// - User is the admin (createdBy) of the selected group
+  /// Returns false if:
+  /// - User is only a member of the selected group
+  bool isCurrentUserAdminOfSelectedGroup() {
+    // If no group selected, user is in personal mode (allow Add Meal)
+    if (selectedGroupId.value == null) {
+      return true;
+    }
+
+    // Get current user ID
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return false;
+    }
+
+    final userId = user.uid;
+
+    // Find the selected group in user's groups
+    final selectedGroup = userGroups.firstWhereOrNull(
+      (group) => group.id == selectedGroupId.value,
+    );
+
+    // If group not found, deny access
+    if (selectedGroup == null) {
+      print(
+        'isCurrentUserAdminOfSelectedGroup: Group ${selectedGroupId.value} not found in userGroups',
+      );
+      return false;
+    }
+
+    // Check if user is admin using the group's isAdmin method
+    final isAdmin = selectedGroup.isAdmin(userId);
+
+    print('=== ADMIN CHECK ===');
+    print('Selected Group ID: ${selectedGroupId.value}');
+    print('Selected Group Name: ${selectedGroup.name}');
+    print('Current User ID: $userId');
+    print('Group Created By: ${selectedGroup.createdBy}');
+    print('Is Admin: $isAdmin');
+    print('===================');
+
+    return isAdmin;
+  }
+
+  /// Check if Add Meal button should be visible
+  /// Visible when:
+  /// - In personal mode (no group selected), OR
+  /// - In group mode AND user is admin of the group
+  bool get shouldShowAddMealButton {
+    return isCurrentUserAdminOfSelectedGroup();
+  }
 }

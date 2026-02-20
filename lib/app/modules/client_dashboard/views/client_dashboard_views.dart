@@ -190,95 +190,77 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
 
                                 const SizedBox(height: 24),
 
-                                // Dynamic Live Stats Card (hidden in group mode)
-                                Obx(() {
-                                  if (!controller.isGroupMode.value) {
-                                    return Column(
-                                      children: [
-                                        const DynamicLiveStatsCard(),
-                                        const SizedBox(height: 20),
-                                      ],
-                                    );
-                                  }
-                                  return SizedBox.shrink();
-                                }),
+                                // Dynamic Live Stats Card
+                                const DynamicLiveStatsCard(),
+                                const SizedBox(height: 20),
 
-                                // Weekly Planner Entry Card (hidden in group mode)
-                                Obx(() {
-                                  if (!controller.isGroupMode.value) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        final userData =
-                                            Get.find<AuthController>()
-                                                .userdataget();
-                                        Get.toNamed(
-                                          Routes.PLANNER +
-                                              "?id=${userData["id"] ?? userData["_id"] ?? ""}",
-                                        );
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.all(16),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFCDE26D),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
+                                // Weekly Planner Entry Card
+                                GestureDetector(
+                                  onTap: () {
+                                    final userData = Get.find<AuthController>()
+                                        .userdataget();
+                                    Get.toNamed(
+                                      Routes.PLANNER +
+                                          "?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFCDE26D),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black.withOpacity(
+                                              0.1,
+                                            ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Icons.calendar_month,
+                                            color: Colors.black,
+                                            size: 28,
                                           ),
                                         ),
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                color: Colors.black.withOpacity(
-                                                  0.1,
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text(
+                                                'View Weekly Planner',
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                                shape: BoxShape.circle,
                                               ),
-                                              child: const Icon(
-                                                Icons.calendar_month,
-                                                color: Colors.black,
-                                                size: 28,
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                'Manage your daily meal schedule',
+                                                style: TextStyle(
+                                                  color: Colors.black
+                                                      .withOpacity(0.6),
+                                                  fontSize: 14,
+                                                ),
                                               ),
-                                            ),
-                                            const SizedBox(width: 16),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const Text(
-                                                    'View Weekly Planner',
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  Text(
-                                                    'Manage your daily meal schedule',
-                                                    style: TextStyle(
-                                                      color: Colors.black
-                                                          .withOpacity(0.6),
-                                                      fontSize: 14,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            const Icon(
-                                              Icons.arrow_forward_ios,
-                                              color: Colors.black,
-                                              size: 18,
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  }
-                                  return SizedBox.shrink();
-                                }),
+                                        const Icon(
+                                          Icons.arrow_forward_ios,
+                                          color: Colors.black,
+                                          size: 18,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -317,33 +299,29 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
 
                               const SizedBox(height: 24),
 
-                              // Dynamic Day Counter with Add Meal Button (hidden in group mode)
-                              Obx(() {
-                                if (!controller.isGroupMode.value) {
-                                  return Column(
-                                    children: [
-                                      DynamicDayCounter(
-                                        onAddMealTap: () {
-                                          final userData =
-                                              Get.find<AuthController>()
-                                                  .userdataget();
-                                          Get.toNamed(
-                                            "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
-                                          );
-                                        },
-                                      ),
-                                      const SizedBox(height: 20),
-                                    ],
-                                  );
-                                }
-                                return SizedBox.shrink();
-                              }),
+                              // Dynamic Day Counter with Add Meal Button
+                              // Add Meal button visibility based on user role:
+                              // - Personal mode: Always visible
+                              // - Group mode: Visible only if user is admin
+                              Obx(
+                                () => DynamicDayCounter(
+                                  showAddButton:
+                                      controller.shouldShowAddMealButton,
+                                  onAddMealTap: () {
+                                    final userData = Get.find<AuthController>()
+                                        .userdataget();
+                                    Get.toNamed(
+                                      "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                    );
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 20),
 
-                              // Meal Type Tabs - Conditionally visible based on search state and group mode
+                              // Meal Type Tabs - Conditionally visible based on search state
                               Obx(() {
-                                // Only show category buttons when search is empty AND not in group mode
-                                if (controller.shouldShowCategoryButtons &&
-                                    !controller.isGroupMode.value) {
+                                // Only show category buttons when search is empty
+                                if (controller.shouldShowCategoryButtons) {
                                   return Column(
                                     children: [
                                       // Horizontally scrollable category buttons
@@ -504,51 +482,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                 );
 
                                 if (meals.isEmpty) {
-                                  // Show different empty states for group mode, search, or category
-
-                                  // Group Mode: No meals assigned for today
-                                  if (controller.isGroupMode.value) {
-                                    return Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(32.0),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.calendar_today_outlined,
-                                              size: 80,
-                                              color: Colors.white.withValues(
-                                                alpha: 0.3,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 16),
-                                            Text(
-                                              'No meal plan assigned for today',
-                                              style: TextStyle(
-                                                color: Colors.white.withValues(
-                                                  alpha: 0.8,
-                                                ),
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Text(
-                                              'Check back later or contact your admin',
-                                              style: TextStyle(
-                                                color: Colors.white.withValues(
-                                                  alpha: 0.5,
-                                                ),
-                                                fontSize: 14,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }
+                                  // Show different empty states for search or category
 
                                   // Search: No results
                                   if (controller.searchQuery.value
@@ -693,12 +627,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                   '🎨 VIEW DEBUG - Rendering ${meals.length} meals',
                                 );
 
-                                // GROUP MODE: Show categorized meal plan
-                                if (controller.isGroupMode.value) {
-                                  return _buildGroupModeMealPlan(controller);
-                                }
-
-                                // NORMAL MODE: Show flat meal list
+                                // Show flat meal list (same UI for personal and group meals)
                                 return ListView.builder(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
@@ -1435,264 +1364,5 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
         ),
       ),
     );
-  }
-
-  // Group Mode: Categorized Meal Plan Display
-  Widget _buildGroupModeMealPlan(ClientDashboardControllers controller) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: controller.mealCategories.map((category) {
-        final emoji = _getCategoryEmoji(category);
-        final mealId = controller.todayMealSlots[category];
-        final meal = controller.getMealByIdFromGroup(mealId);
-
-        return Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF2A2A2A), Color(0xFF1F1F1F)],
-            ),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: meal != null
-                  ? const Color(0xFFC2D86A).withValues(alpha: 0.3)
-                  : Colors.white.withValues(alpha: 0.1),
-              width: 1.5,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Category Header
-                Row(
-                  children: [
-                    Text(emoji, style: const TextStyle(fontSize: 24)),
-                    const SizedBox(width: 12),
-                    Text(
-                      category,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                // Meal Content or Not Assigned
-                if (meal != null) ...[
-                  // Meal Card
-                  GestureDetector(
-                    onTap: () {
-                      final box = GetStorage();
-                      box.write("mealdetails", meal.toJson());
-                      Get.toNamed(
-                        '/meals-details?id=${Get.find<AuthController>().userdataget()["id"] ?? Get.find<AuthController>().userdataget()["_id"] ?? ""}',
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1A1A1A),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          // Meal Image
-                          Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image(
-                                image:
-                                    UserController.getImageProvider(
-                                      meal.imageUrl,
-                                    ) ??
-                                    const AssetImage(
-                                          'assets/meal_placeholder.png',
-                                        )
-                                        as ImageProvider,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const Icon(
-                                      Icons.restaurant,
-                                      color: Colors.black,
-                                      size: 30,
-                                    ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-
-                          // Meal Info
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  meal.name,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 6),
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.orange.withValues(
-                                          alpha: 0.2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(
-                                          color: Colors.orange.withValues(
-                                            alpha: 0.3,
-                                          ),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        '${meal.kcal} kcal',
-                                        style: const TextStyle(
-                                          color: Colors.orange,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'P: ${meal.protein}g',
-                                      style: TextStyle(
-                                        color: Colors.green.withValues(
-                                          alpha: 0.8,
-                                        ),
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      'C: ${meal.carbs}g',
-                                      style: TextStyle(
-                                        color: Colors.red.withValues(
-                                          alpha: 0.8,
-                                        ),
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      'F: ${meal.fat}g',
-                                      style: TextStyle(
-                                        color: Colors.blue.withValues(
-                                          alpha: 0.8,
-                                        ),
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // Arrow Icon
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            color: const Color(
-                              0xFFC2D86A,
-                            ).withValues(alpha: 0.6),
-                            size: 16,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ] else ...[
-                  // Not Assigned Placeholder
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.remove_circle_outline,
-                          color: Colors.white.withValues(alpha: 0.3),
-                          size: 20,
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Not Assigned',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.4),
-                            fontSize: 14,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  String _getCategoryEmoji(String category) {
-    switch (category.toLowerCase()) {
-      case 'breakfast':
-        return '🍳';
-      case 'morning snacks':
-        return '🥐';
-      case 'lunch':
-        return '🥗';
-      case 'preworkout':
-      case 'pre-workout':
-      case 'pre workout':
-        return '💪';
-      case 'post workout':
-      case 'post-workout':
-        return '🥤';
-      case 'dinner':
-        return '🍽️';
-      default:
-        return '🍴';
-    }
   }
 }
