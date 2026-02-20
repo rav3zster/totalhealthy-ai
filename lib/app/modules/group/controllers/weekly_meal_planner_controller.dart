@@ -41,6 +41,13 @@ class WeeklyMealPlannerController extends GetxController {
       isAdmin = args['isAdmin'] ?? false;
     }
 
+    print('=== WEEKLY MEAL PLANNER INIT ===');
+    print('👤 User Role: ${isAdmin ? "ADMIN" : "MEMBER"}');
+    print('🏢 Group ID: $groupId');
+    print('📛 Group Name: $groupName');
+    print('📦 Arguments received: $args');
+    print('=================================');
+
     currentWeekStart.value = _getWeekStart(DateTime.now());
 
     // Initialize categories immediately with standard categories
@@ -49,6 +56,8 @@ class WeeklyMealPlannerController extends GetxController {
     if (groupId != null) {
       _loadAvailableMeals();
       _loadMealPlans();
+    } else {
+      print('⚠️ WARNING: groupId is NULL! Cannot load meal plans.');
     }
   }
 
@@ -129,8 +138,18 @@ class WeeklyMealPlannerController extends GetxController {
     final startDate = currentWeekStart.value;
     final endDate = startDate.add(const Duration(days: 6));
 
-    print('Loading meal plans for group: $groupId');
-    print('  - Date range: ${startDate.toString()} to ${endDate.toString()}');
+    print('=== LOADING MEAL PLANS ===');
+    print('👤 User Role: ${isAdmin ? "ADMIN" : "MEMBER"}');
+    print('🏢 Group ID for query: $groupId');
+    print(
+      '📅 Date range: ${_formatDateOnly(startDate)} to ${_formatDateOnly(endDate)}',
+    );
+    print('🔍 Firestore Query:');
+    print('   - Collection: group_meal_plans');
+    print('   - WHERE groupId == $groupId');
+    print('   - WHERE date >= ${_formatDateOnly(startDate)}');
+    print('   - WHERE date <= ${_formatDateOnly(endDate)}');
+    print('==========================');
 
     // CRITICAL: Load meal plans from group_meal_plans collection
     // Data path: group_meal_plans where groupId == currentGroupId
@@ -142,11 +161,23 @@ class WeeklyMealPlannerController extends GetxController {
 
     // Track meal plan updates
     ever(mealPlans, (plans) {
-      print('Meal plans updated: ${plans.length} plans loaded');
+      print('=== MEAL PLANS STREAM UPDATE ===');
+      print('👤 User Role: ${isAdmin ? "ADMIN" : "MEMBER"}');
+      print('📊 Plans loaded: ${plans.length}');
       for (var plan in plans) {
-        print('  - Date: ${plan.date}, Slots: ${plan.mealSlots}');
+        print('📄 Plan Document:');
+        print('   - ID: ${plan.id}');
+        print('   - Date: ${_formatDateOnly(plan.date)}');
+        print('   - GroupId: ${plan.groupId}');
+        print('   - MealSlots: ${plan.mealSlots}');
+        print('   - Meal Count: ${plan.mealCount}');
       }
+      print('================================');
     });
+  }
+
+  String _formatDateOnly(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
   DateTime _getWeekStart(DateTime date) {
@@ -217,26 +248,54 @@ class WeeklyMealPlannerController extends GetxController {
       print('Meal ID: $mealId');
       print('Group ID: $groupId');
 
-      // IMPORTANT: We only store the mealId reference, NOT the meal document
-      // The meal must already exist in groups/{groupId}/meals
-      // We do NOT copy or duplicate meals here
-
       if (mealId != null) {
-        // Verify the meal exists in the group
+        // Verify the meal exists
         final meal = getMealById(mealId);
         if (meal == null) {
-          throw Exception(
-            'Meal not found. Please ensure the meal exists in the group.',
-          );
+          throw Exception('Meal not found. Please ensure the meal exists.');
         }
 
+        print('✓ Meal found: ${meal.name}');
+        print('  - Meal groupId: ${meal.groupId}');
+        print('  - Target groupId: $groupId');
+
+        // CRITICAL FIX: If meal doesn't have correct groupId, update it
         if (meal.groupId != groupId) {
-          throw Exception(
-            'Meal does not belong to this group. GroupId mismatch.',
-          );
+          print('⚠️ Meal groupId mismatch, updating meal document...');
+
+          try {
+            // Create updated meal with correct groupId
+            final updatedMeal = MealModel(
+              id: meal.id,
+              userId: meal.userId,
+              groupId: groupId!, // Update to target group
+              name: meal.name,
+              description: meal.description,
+              kcal: meal.kcal,
+              protein: meal.protein,
+              carbs: meal.carbs,
+              fat: meal.fat,
+              categories: meal.categories,
+              imageUrl: meal.imageUrl,
+              ingredients: meal.ingredients,
+              instructions: meal.instructions,
+              createdAt: meal.createdAt,
+              prepTime: meal.prepTime,
+              difficulty: meal.difficulty,
+            );
+
+            // Update the meal's groupId to match the group
+            await _mealsService.updateMeal(updatedMeal);
+            print('✓ Meal groupId updated to: $groupId');
+          } catch (e) {
+            print('✗ Failed to update meal groupId: $e');
+            throw Exception(
+              'Failed to assign meal to group. Please try again.',
+            );
+          }
         }
 
-        print('✓ Meal verified: ${meal.name} (groupId: ${meal.groupId})');
+        print('✓ Meal verified: ${meal.name} (groupId: $groupId)');
       }
 
       // Save only the mealId reference to the planner

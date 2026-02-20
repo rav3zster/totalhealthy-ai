@@ -5,117 +5,181 @@ class GroupMealPlansFirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _collection = 'group_meal_plans';
 
+  /// Generate deterministic document ID from groupId and date
+  /// Format: {groupId}_{yyyy-MM-dd}
+  /// Example: "group123_2026-02-20"
+  String _generateDocId(String groupId, DateTime date) {
+    final dateStr = _formatDateOnly(date);
+    return '${groupId}_$dateStr';
+  }
+
   /// Get meal plans for a specific group and date range
+  /// Uses deterministic document IDs for direct access
   Stream<List<GroupMealPlanModel>> getGroupMealPlansStream(
     String groupId,
     DateTime startDate,
     DateTime endDate,
   ) {
-    final startDateStr = _formatDateOnly(startDate);
-    final endDateStr = _formatDateOnly(endDate);
+    print('=== FIRESTORE QUERY: getGroupMealPlansStream ===');
+    print('🔍 Query Parameters:');
+    print('   - groupId: $groupId');
+    print('   - startDate: ${_formatDateOnly(startDate)}');
+    print('   - endDate: ${_formatDateOnly(endDate)}');
+    print('🆔 Using deterministic document IDs');
+    print('===============================================');
 
-    return _firestore
-        .collection(_collection)
-        .where('groupId', isEqualTo: groupId)
-        .where('date', isGreaterThanOrEqualTo: startDateStr)
-        .where('date', isLessThanOrEqualTo: endDateStr)
-        .snapshots()
-        .map((snapshot) {
-          return snapshot.docs
-              .map(
-                (doc) => GroupMealPlanModel.fromJson(doc.data(), docId: doc.id),
-              )
-              .toList()
-            ..sort((a, b) => a.date.compareTo(b.date));
+    // Generate list of document IDs for the date range
+    final docIds = <String>[];
+    DateTime currentDate = startDate;
+    while (currentDate.isBefore(endDate.add(const Duration(days: 1)))) {
+      docIds.add(_generateDocId(groupId, currentDate));
+      currentDate = currentDate.add(const Duration(days: 1));
+    }
+
+    print('📄 Document IDs to fetch: $docIds');
+
+    // Create a stream that fetches all documents by ID
+    return Stream.periodic(const Duration(seconds: 1))
+        .asyncMap((_) async {
+          final plans = <GroupMealPlanModel>[];
+
+          for (final docId in docIds) {
+            try {
+              final docSnapshot = await _firestore
+                  .collection(_collection)
+                  .doc(docId)
+                  .get();
+
+              if (docSnapshot.exists) {
+                final data = docSnapshot.data();
+                if (data != null) {
+                  print('📄 Document $docId found');
+                  plans.add(
+                    GroupMealPlanModel.fromJson(data, docId: docSnapshot.id),
+                  );
+                }
+              } else {
+                print('📄 Document $docId does not exist');
+              }
+            } catch (e) {
+              print('❌ Error fetching document $docId: $e');
+            }
+          }
+
+          print('=== FIRESTORE FETCH COMPLETE ===');
+          print('📦 Documents found: ${plans.length}');
+          for (var plan in plans) {
+            print('📄 Plan:');
+            print('   - ID: ${plan.id}');
+            print('   - groupId: ${plan.groupId}');
+            print('   - date: ${_formatDateOnly(plan.date)}');
+            print('   - mealSlots: ${plan.mealSlots}');
+          }
+          print('================================');
+
+          return plans..sort((a, b) => a.date.compareTo(b.date));
         })
         .handleError((error) {
-          print('Error fetching group meal plans: $error');
+          print('❌ Error in stream: $error');
           return <GroupMealPlanModel>[];
         });
   }
 
-  /// Get meal plan for a specific date
+  /// Get meal plan for a specific date using deterministic document ID
   Future<GroupMealPlanModel?> getMealPlanForDate(
     String groupId,
     DateTime date,
   ) async {
     try {
-      final dateStr = _formatDateOnly(date);
-      final querySnapshot = await _firestore
+      final docId = _generateDocId(groupId, date);
+      print('🔍 Fetching meal plan by document ID: $docId');
+
+      final docSnapshot = await _firestore
           .collection(_collection)
-          .where('groupId', isEqualTo: groupId)
-          .where('date', isEqualTo: dateStr)
-          .limit(1)
+          .doc(docId)
           .get();
 
-      if (querySnapshot.docs.isEmpty) {
+      if (!docSnapshot.exists) {
+        print('📄 Document $docId does not exist');
         return null;
       }
 
-      return GroupMealPlanModel.fromJson(
-        querySnapshot.docs.first.data(),
-        docId: querySnapshot.docs.first.id,
-      );
+      final data = docSnapshot.data();
+      if (data == null) {
+        print('📄 Document $docId has no data');
+        return null;
+      }
+
+      print('✅ Document $docId found');
+      return GroupMealPlanModel.fromJson(data, docId: docSnapshot.id);
     } catch (e) {
-      print('Error getting meal plan for date: $e');
+      print('❌ Error getting meal plan for date: $e');
       return null;
     }
   }
 
   /// Create or update meal plan for a specific date
-  /// IMPORTANT: This method MERGES mealSlots instead of replacing them
+  /// Uses deterministic document ID: {groupId}_{yyyy-MM-dd}
   Future<void> setMealPlan(GroupMealPlanModel mealPlan) async {
     try {
+      final docId = _generateDocId(mealPlan.groupId, mealPlan.date);
+
       print('=== SET MEAL PLAN ===');
       print('📅 Date: ${_formatDateOnly(mealPlan.date)}');
       print('🏢 Group ID: ${mealPlan.groupId}');
+      print('🆔 Document ID: $docId');
       print('📊 Incoming mealSlots:');
       mealPlan.mealSlots.forEach((key, value) {
         print('   - $key: $value');
       });
 
-      // Check if plan exists for this date
-      final existingPlan = await getMealPlanForDate(
-        mealPlan.groupId,
-        mealPlan.date,
-      );
+      // Check if document exists
+      final docSnapshot = await _firestore
+          .collection(_collection)
+          .doc(docId)
+          .get();
 
-      if (existingPlan != null && existingPlan.id != null) {
-        print('📄 Existing plan found: ${existingPlan.id}');
-        print('📊 Existing mealSlots:');
-        existingPlan.mealSlots.forEach((key, value) {
-          print('   - $key: $value');
-        });
+      if (docSnapshot.exists) {
+        print('📄 Existing document found, merging mealSlots');
+        final existingData = docSnapshot.data();
+        if (existingData != null) {
+          final existingPlan = GroupMealPlanModel.fromJson(
+            existingData,
+            docId: docSnapshot.id,
+          );
 
-        // CRITICAL FIX: MERGE mealSlots instead of replacing
-        final mergedSlots = Map<String, String?>.from(existingPlan.mealSlots);
-        mergedSlots.addAll(mealPlan.mealSlots);
+          print('📊 Existing mealSlots:');
+          existingPlan.mealSlots.forEach((key, value) {
+            print('   - $key: $value');
+          });
 
-        print('📊 Merged mealSlots (BEFORE save):');
-        mergedSlots.forEach((key, value) {
-          print('   - $key: $value');
-        });
+          // MERGE mealSlots
+          final mergedSlots = Map<String, String?>.from(existingPlan.mealSlots);
+          mergedSlots.addAll(mealPlan.mealSlots);
 
-        // Update existing plan with MERGED mealSlots
-        await _firestore.collection(_collection).doc(existingPlan.id).update({
-          'mealSlots': mergedSlots, // ✅ Use merged map
-          // Backward compatibility
-          'breakfastMealId': mergedSlots['Breakfast'],
-          'lunchMealId': mergedSlots['Lunch'],
-          'dinnerMealId': mergedSlots['Dinner'],
-          'updatedAt': DateTime.now().toIso8601String(),
-        });
-        print('✅ Plan updated successfully with merged mealSlots');
+          print('📊 Merged mealSlots (BEFORE save):');
+          mergedSlots.forEach((key, value) {
+            print('   - $key: $value');
+          });
+
+          // Update with merged data
+          await _firestore.collection(_collection).doc(docId).update({
+            'mealSlots': mergedSlots,
+            'breakfastMealId': mergedSlots['Breakfast'],
+            'lunchMealId': mergedSlots['Lunch'],
+            'dinnerMealId': mergedSlots['Dinner'],
+            'updatedAt': DateTime.now().toIso8601String(),
+          });
+          print('✅ Document updated with merged mealSlots');
+        }
       } else {
-        print('📄 No existing plan, creating new plan');
-        print('📊 New plan mealSlots:');
-        mealPlan.mealSlots.forEach((key, value) {
-          print('   - $key: $value');
-        });
-
-        // Create new plan
-        await _firestore.collection(_collection).add(mealPlan.toJson());
-        print('✅ New plan created successfully');
+        print('📄 No existing document, creating new one');
+        // Create new document with deterministic ID
+        await _firestore
+            .collection(_collection)
+            .doc(docId)
+            .set(mealPlan.toJson());
+        print('✅ New document created with ID: $docId');
       }
       print('=== END SET MEAL PLAN ===');
     } catch (e) {
@@ -124,60 +188,71 @@ class GroupMealPlansFirestoreService {
     }
   }
 
-  /// Update specific meal slot
+  /// Update specific meal slot using deterministic document ID
   Future<void> updateMealSlot(
     String groupId,
     DateTime date,
-    String
-    mealType, // Any category name like 'Breakfast', 'Morning Snack', etc.
+    String mealType,
     String? mealId,
     String adminId,
     String adminName,
   ) async {
     try {
+      final docId = _generateDocId(groupId, date);
+
       print('=== UPDATE MEAL SLOT ===');
       print('📅 Date: ${_formatDateOnly(date)}');
       print('🏢 Group ID: $groupId');
+      print('🆔 Document ID: $docId');
       print('🍽️ Meal Type: $mealType');
       print('🆔 Meal ID: $mealId');
 
-      final existingPlan = await getMealPlanForDate(groupId, date);
+      // Check if document exists
+      final docSnapshot = await _firestore
+          .collection(_collection)
+          .doc(docId)
+          .get();
 
-      if (existingPlan != null && existingPlan.id != null) {
-        print('📄 Existing plan found: ${existingPlan.id}');
-        print('📊 Current mealSlots BEFORE update:');
-        existingPlan.mealSlots.forEach((key, value) {
-          print('   - $key: $value');
-        });
+      if (docSnapshot.exists) {
+        print('📄 Existing document found');
+        final existingData = docSnapshot.data();
+        if (existingData != null) {
+          final existingPlan = GroupMealPlanModel.fromJson(
+            existingData,
+            docId: docSnapshot.id,
+          );
 
-        // Update existing plan - MERGE with existing mealSlots map
-        final updatedSlots = Map<String, String?>.from(existingPlan.mealSlots);
-        updatedSlots[mealType] = mealId;
+          print('📊 Current mealSlots BEFORE update:');
+          existingPlan.mealSlots.forEach((key, value) {
+            print('   - $key: $value');
+          });
 
-        print('📊 Updated mealSlots AFTER merge (BEFORE save):');
-        updatedSlots.forEach((key, value) {
-          print('   - $key: $value');
-        });
+          // MERGE with existing mealSlots
+          final updatedSlots = Map<String, String?>.from(
+            existingPlan.mealSlots,
+          );
+          updatedSlots[mealType] = mealId;
 
-        final updates = <String, dynamic>{
-          'mealSlots': updatedSlots,
-          // Backward compatibility
-          if (mealType == 'Breakfast') 'breakfastMealId': mealId,
-          if (mealType == 'Lunch') 'lunchMealId': mealId,
-          if (mealType == 'Dinner') 'dinnerMealId': mealId,
-          'updatedAt': DateTime.now().toIso8601String(),
-        };
+          print('📊 Updated mealSlots AFTER merge (BEFORE save):');
+          updatedSlots.forEach((key, value) {
+            print('   - $key: $value');
+          });
 
-        print('💾 Saving to Firestore...');
-        await _firestore
-            .collection(_collection)
-            .doc(existingPlan.id)
-            .update(updates);
-        print('✅ Meal slot updated successfully');
-        print('=== END UPDATE ===');
+          final updates = <String, dynamic>{
+            'mealSlots': updatedSlots,
+            if (mealType == 'Breakfast') 'breakfastMealId': mealId,
+            if (mealType == 'Lunch') 'lunchMealId': mealId,
+            if (mealType == 'Dinner') 'dinnerMealId': mealId,
+            'updatedAt': DateTime.now().toIso8601String(),
+          };
+
+          print('💾 Updating document...');
+          await _firestore.collection(_collection).doc(docId).update(updates);
+          print('✅ Meal slot updated successfully');
+        }
       } else {
-        print('📄 No existing plan found, creating new plan');
-        // Create new plan with this meal
+        print('📄 No existing document, creating new one');
+        // Create new document with deterministic ID
         final newPlan = GroupMealPlanModel(
           groupId: groupId,
           date: date,
@@ -192,11 +267,14 @@ class GroupMealPlansFirestoreService {
           print('   - $key: $value');
         });
 
-        print('💾 Creating new document in Firestore...');
-        await _firestore.collection(_collection).add(newPlan.toJson());
+        print('💾 Creating new document with ID: $docId');
+        await _firestore
+            .collection(_collection)
+            .doc(docId)
+            .set(newPlan.toJson());
         print('✅ New meal plan created successfully');
-        print('=== END UPDATE ===');
       }
+      print('=== END UPDATE ===');
     } catch (e) {
       print('❌ Error updating meal slot: $e');
       rethrow;
@@ -204,6 +282,7 @@ class GroupMealPlansFirestoreService {
   }
 
   /// Duplicate a day's meals to another date
+  /// Uses deterministic document IDs
   Future<void> duplicateDayMeals(
     String groupId,
     DateTime sourceDate,
@@ -212,9 +291,14 @@ class GroupMealPlansFirestoreService {
     String adminName,
   ) async {
     try {
+      final sourceDocId = _generateDocId(groupId, sourceDate);
+      final targetDocId = _generateDocId(groupId, targetDate);
+
       print('=== DUPLICATING DAY ===');
-      print('Source date: $sourceDate');
-      print('Target date: $targetDate');
+      print('Source date: ${_formatDateOnly(sourceDate)}');
+      print('Target date: ${_formatDateOnly(targetDate)}');
+      print('Source doc ID: $sourceDocId');
+      print('Target doc ID: $targetDocId');
       print('GroupId: $groupId');
 
       final sourcePlan = await getMealPlanForDate(groupId, sourceDate);
@@ -237,7 +321,7 @@ class GroupMealPlansFirestoreService {
         createdAt: DateTime.now(),
       );
 
-      print('Creating new plan for target date...');
+      print('Creating new plan for target date with ID: $targetDocId');
       await setMealPlan(newPlan);
       print('✓ Day duplicated successfully');
       print('=== END DUPLICATION ===');
@@ -282,15 +366,16 @@ class GroupMealPlansFirestoreService {
     }
   }
 
-  /// Delete meal plan for a specific date
+  /// Delete meal plan for a specific date using deterministic document ID
   Future<void> deleteMealPlan(String groupId, DateTime date) async {
     try {
-      final plan = await getMealPlanForDate(groupId, date);
-      if (plan != null && plan.id != null) {
-        await _firestore.collection(_collection).doc(plan.id).delete();
-      }
+      final docId = _generateDocId(groupId, date);
+      print('🗑️ Deleting meal plan document: $docId');
+
+      await _firestore.collection(_collection).doc(docId).delete();
+      print('✅ Meal plan deleted successfully');
     } catch (e) {
-      print('Error deleting meal plan: $e');
+      print('❌ Error deleting meal plan: $e');
       rethrow;
     }
   }
