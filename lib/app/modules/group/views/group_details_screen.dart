@@ -105,13 +105,49 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                           ),
                         ),
                         const SizedBox(width: 16),
-                        const Text(
-                          'Group Details',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.5,
+                        const Expanded(
+                          child: Text(
+                            'Group Details',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ),
+                        // Leave Group Button
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.orange.withValues(alpha: 0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.exit_to_app_rounded,
+                              color: Colors.orange,
+                              size: 22,
+                            ),
+                            onPressed: () {
+                              final authController = Get.find<AuthController>();
+                              final currentUserId =
+                                  authController.firebaseUser.value?.uid;
+                              final groupId = group['id'] ?? '';
+                              final groupName = group['name'] ?? 'Group';
+                              final adminId = group['created_by'] ?? '';
+                              final isAdmin = currentUserId == adminId;
+
+                              if (isAdmin) {
+                                controller.adminLeaveGroup(groupId, groupName);
+                              } else {
+                                controller.memberLeaveGroup(groupId, groupName);
+                              }
+                            },
+                            tooltip: 'Leave Group',
                           ),
                         ),
                       ],

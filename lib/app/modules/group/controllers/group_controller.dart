@@ -278,6 +278,782 @@ class GroupController extends GetxController {
     }
   }
 
+  /// Delete a group (admin only)
+  /// Only the group creator can delete the group
+  Future<void> deleteGroup(GroupModel group) async {
+    try {
+      // Verify user is admin of the group
+      final authController = Get.find<AuthController>();
+      final currentUser = authController.firebaseUser.value;
+      final currentUserId = currentUser?.uid;
+
+      if (currentUserId == null) {
+        Get.snackbar(
+          "Error",
+          "You must be logged in to delete a group",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      // Check if user is the creator (admin)
+      if (!group.isAdmin(currentUserId)) {
+        Get.snackbar(
+          "Permission Denied",
+          "Only the group admin can delete this group",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      if (group.id == null) {
+        Get.snackbar(
+          "Error",
+          "Invalid group ID",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      // Show confirmation dialog
+      final confirmed = await Get.dialog<bool>(
+        AlertDialog(
+          backgroundColor: const Color(0xFF2A2A2A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.warning_rounded, color: Colors.orange, size: 28),
+              SizedBox(width: 12),
+              Text(
+                'Delete Group?',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Are you sure you want to delete "${group.name}"?',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.red.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.red, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'This action cannot be undone. All group data will be permanently deleted.',
+                        style: TextStyle(color: Colors.red, fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(result: false),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70, fontSize: 15),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Get.back(result: true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Delete',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true) {
+        return; // User cancelled
+      }
+
+      isLoading.value = true;
+
+      // Delete the group
+      await _groupsService.deleteGroup(group.id!);
+
+      Get.snackbar(
+        'Success',
+        'Group "${group.name}" deleted successfully',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 3),
+      );
+
+      print('Group ${group.id} deleted successfully');
+    } catch (e) {
+      print("Error deleting group: $e");
+      Get.snackbar(
+        'Error',
+        'Failed to delete group: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Member leaves group (simple confirmation)
+  /// Only for non-admin members
+  Future<void> memberLeaveGroup(String groupId, String groupName) async {
+    try {
+      final authController = Get.find<AuthController>();
+      final currentUserId = authController.firebaseUser.value?.uid;
+
+      if (currentUserId == null) {
+        Get.snackbar(
+          "Error",
+          "You must be logged in to leave a group",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      // Show confirmation dialog
+      final confirmed = await Get.dialog<bool>(
+        AlertDialog(
+          backgroundColor: const Color(0xFF2A2A2A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.exit_to_app_rounded, color: Colors.orange, size: 28),
+              SizedBox(width: 12),
+              Text(
+                'Leave Group?',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Are you sure you want to leave "$groupName"?',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.orange.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.orange, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'You will lose access to group meals and plans.',
+                        style: TextStyle(color: Colors.orange, fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(result: false),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70, fontSize: 15),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Get.back(result: true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Leave',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true) {
+        return; // User cancelled
+      }
+
+      isLoading.value = true;
+
+      // Leave the group
+      await _groupsService.memberLeaveGroup(groupId, currentUserId);
+
+      Get.snackbar(
+        'Success',
+        'You have left "$groupName"',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 3),
+      );
+
+      // Navigate back to groups list
+      Get.back();
+
+      print('Member $currentUserId left group $groupId');
+    } catch (e) {
+      print("Error leaving group: $e");
+      Get.snackbar(
+        'Error',
+        'Failed to leave group: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Admin leaves group with ownership transfer
+  /// Shows dialog to select new admin from members
+  Future<void> adminLeaveGroup(String groupId, String groupName) async {
+    try {
+      final authController = Get.find<AuthController>();
+      final currentUserId = authController.firebaseUser.value?.uid;
+
+      if (currentUserId == null) {
+        Get.snackbar(
+          "Error",
+          "You must be logged in to leave a group",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      isLoading.value = true;
+
+      print('=== ADMIN LEAVE VALIDATION ===');
+      print('Group ID: $groupId');
+      print('Current Admin ID: $currentUserId');
+      print('Querying Firestore: groups/$groupId/members');
+
+      // Fetch ALL members from Firestore subcollection
+      // Auto-healing will create admin membership if missing
+      final allMemberIds = await _groupsService.getGroupMembers(groupId);
+
+      print('Total members in subcollection: ${allMemberIds.length}');
+      print('All member IDs: $allMemberIds');
+
+      // Filter out current admin to get OTHER members
+      final otherMemberIds = allMemberIds
+          .where((id) => id != currentUserId)
+          .toList();
+
+      print('Other members (excluding admin): ${otherMemberIds.length}');
+      print('Other member IDs: $otherMemberIds');
+      print('==============================');
+
+      // Check if there are other members besides the admin
+      if (otherMemberIds.isEmpty) {
+        isLoading.value = false;
+        print('❌ No other members - admin cannot leave');
+
+        // Show dialog suggesting to delete group instead
+        await Get.dialog(
+          AlertDialog(
+            backgroundColor: const Color(0xFF2A2A2A),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Row(
+              children: [
+                Icon(Icons.info_outline, color: Colors.orange, size: 28),
+                SizedBox(width: 12),
+                Text(
+                  'Cannot Leave Group',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'You are the only member of this group.',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(
+                        Icons.lightbulb_outline,
+                        color: Color(0xFFC2D86A),
+                        size: 20,
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Invite members first, or delete the group instead.',
+                          style: TextStyle(
+                            color: Color(0xFFC2D86A),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: const Text(
+                  'OK',
+                  style: TextStyle(
+                    color: Color(0xFFC2D86A),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      print('✓ ${otherMemberIds.length} other members available for transfer');
+
+      // Get member details for display
+      final memberUsers = <UserModel>[];
+      for (final memberId in otherMemberIds) {
+        final user = users.firstWhereOrNull((u) => u.id == memberId);
+        if (user != null) {
+          memberUsers.add(user);
+          print('  - ${user.username} (${user.id})');
+        } else {
+          print('  - Warning: User $memberId not found in users list');
+        }
+      }
+
+      isLoading.value = false;
+
+      if (memberUsers.isEmpty) {
+        print('❌ No valid user details found');
+        Get.snackbar(
+          "Cannot Leave",
+          "No valid members found to transfer ownership",
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      print('✓ ${memberUsers.length} valid users for selection');
+
+      // Show confirmation dialog first
+      final shouldProceed = await Get.dialog<bool>(
+        AlertDialog(
+          backgroundColor: const Color(0xFF2A2A2A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Row(
+            children: [
+              Icon(
+                Icons.admin_panel_settings_rounded,
+                color: Color(0xFFC2D86A),
+                size: 28,
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'You are the Admin',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'As the admin, you must assign a new admin before leaving.',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: Color(0xFFC2D86A),
+                      size: 20,
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Select a member to become the new admin.',
+                        style: TextStyle(
+                          color: Color(0xFFC2D86A),
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(result: false),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70, fontSize: 15),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Get.back(result: true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFC2D86A),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Assign New Admin',
+                style: TextStyle(
+                  color: Color(0xFF121212),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldProceed != true) {
+        return; // User cancelled
+      }
+
+      // Show member selection dialog
+      final selectedUser = await Get.dialog<UserModel>(
+        AlertDialog(
+          backgroundColor: const Color(0xFF2A2A2A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Row(
+            children: [
+              Icon(
+                Icons.person_add_alt_1_rounded,
+                color: Color(0xFFC2D86A),
+                size: 28,
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Select New Admin',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Choose a member to transfer admin rights:',
+                style: TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                constraints: const BoxConstraints(maxHeight: 300),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: memberUsers.map((user) {
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E1E),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.1),
+                            width: 1,
+                          ),
+                        ),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: user.profileImage != null
+                                ? NetworkImage(user.profileImage!)
+                                : null,
+                            child: user.profileImage == null
+                                ? const Icon(
+                                    Icons.person,
+                                    color: Colors.white54,
+                                  )
+                                : null,
+                          ),
+                          title: Text(
+                            user.username,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          subtitle: Text(
+                            user.email,
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 12,
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: Color(0xFFC2D86A),
+                            size: 16,
+                          ),
+                          onTap: () => Get.back(result: user),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(result: null),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70, fontSize: 15),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      if (selectedUser == null) {
+        return; // User cancelled
+      }
+
+      // Final confirmation
+      final confirmed = await Get.dialog<bool>(
+        AlertDialog(
+          backgroundColor: const Color(0xFF2A2A2A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.warning_rounded, color: Colors.orange, size: 28),
+              SizedBox(width: 12),
+              Text(
+                'Confirm Transfer',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Transfer admin rights to ${selectedUser.username} and leave "$groupName"?',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.orange.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.orange, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'This action cannot be undone. The new admin will have full control.',
+                        style: TextStyle(color: Colors.orange, fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(result: false),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70, fontSize: 15),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Get.back(result: true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Transfer & Leave',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true) {
+        return; // User cancelled
+      }
+
+      isLoading.value = true;
+
+      // Transfer ownership and leave
+      await _groupsService.adminLeaveGroup(
+        groupId,
+        currentUserId,
+        selectedUser.id,
+      );
+
+      Get.snackbar(
+        'Success',
+        'Ownership transferred to ${selectedUser.username}. You have left "$groupName".',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 4),
+      );
+
+      // Navigate back to groups list
+      Get.back();
+
+      print(
+        'Admin $currentUserId left group $groupId, new admin: ${selectedUser.id}',
+      );
+    } catch (e) {
+      print("Error leaving group as admin: $e");
+      Get.snackbar(
+        'Error',
+        'Failed to leave group: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   /// Get only active members of a specific group from Firebase
   Future<List<UserModel>> getGroupMembers(String groupId) async {
     try {

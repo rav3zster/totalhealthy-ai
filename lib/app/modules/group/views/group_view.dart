@@ -7,6 +7,7 @@ import '../../../data/models/user_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../../widgets/phone_nav_bar.dart';
 import '../../../controllers/user_controller.dart';
+import '../../../core/base/controllers/auth_controller.dart';
 
 class GroupView extends StatefulWidget {
   const GroupView({super.key});
@@ -581,6 +582,11 @@ class _GroupViewState extends State<GroupView>
   }
 
   Widget _buildGroupCard(GroupModel group) {
+    // Check if current user is admin of this group
+    final authController = Get.find<AuthController>();
+    final currentUserId = authController.firebaseUser.value?.uid;
+    final isAdmin = currentUserId != null && group.isAdmin(currentUserId);
+
     return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 300),
       tween: Tween(begin: 0.0, end: 1.0),
@@ -627,15 +633,49 @@ class _GroupViewState extends State<GroupView>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Group Name
-                    Text(
-                      group.name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
-                      ),
+                    // Header Row with Group Name and Delete Button
+                    Row(
+                      children: [
+                        // Group Name
+                        Expanded(
+                          child: Text(
+                            group.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                        ),
+
+                        // Delete Button (Admin Only)
+                        if (isAdmin)
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Colors.red.withValues(alpha: 0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline_rounded,
+                                color: Colors.red,
+                                size: 20,
+                              ),
+                              onPressed: () {
+                                // Prevent card tap when deleting
+                                controller.deleteGroup(group);
+                              },
+                              padding: const EdgeInsets.all(8),
+                              constraints: const BoxConstraints(),
+                              tooltip: 'Delete Group',
+                            ),
+                          ),
+                      ],
                     ),
                     const SizedBox(height: 8),
 
