@@ -345,6 +345,34 @@ class GroupsFirestoreService {
     print('Current Admin: $currentAdminId');
     print('New Admin: $newAdminId');
 
+    // IMPORTANT: Validate members BEFORE transaction
+    // Cannot do collection queries inside Firestore transactions
+    final membersSnapshot = await _firestore
+        .collection(_collection)
+        .doc(groupId)
+        .collection('members')
+        .get();
+
+    final memberIds = membersSnapshot.docs.map((doc) => doc.id).toList();
+    print('All members before transfer: $memberIds');
+
+    // Remove current admin from member list
+    final otherMemberIds = List<String>.from(memberIds)..remove(currentAdminId);
+
+    if (otherMemberIds.isEmpty) {
+      throw Exception(
+        'Cannot leave group: No other members available. Delete the group instead.',
+      );
+    }
+
+    // Verify new admin is in the remaining members
+    if (!otherMemberIds.contains(newAdminId)) {
+      throw Exception('Selected user is not a valid member');
+    }
+
+    print('Other members available: $otherMemberIds');
+    print('Transferring admin rights to: $newAdminId');
+
     // Use transaction to ensure atomic operation
     await _firestore.runTransaction((transaction) async {
       // 1. Get group document
@@ -375,45 +403,17 @@ class GroupsFirestoreService {
         throw Exception('New admin must be a member of the group');
       }
 
-      // 4. Get all members to verify group won't be empty
-      final membersSnapshot = await _firestore
-          .collection(_collection)
-          .doc(groupId)
-          .collection('members')
-          .get();
-
-      final memberIds = membersSnapshot.docs.map((doc) => doc.id).toList();
-
-      print('All members before transfer: $memberIds');
-
-      // Remove current admin from member list
-      memberIds.remove(currentAdminId);
-
-      if (memberIds.isEmpty) {
-        throw Exception(
-          'Cannot leave group: No other members available. Delete the group instead.',
-        );
-      }
-
-      // Verify new admin is in the remaining members
-      if (!memberIds.contains(newAdminId)) {
-        throw Exception('Selected user is not a valid member');
-      }
-
-      print('Other members available: $memberIds');
-      print('Transferring admin rights to: $newAdminId');
-
-      // 5. Update group admin (atomic operation)
+      // 4. Update group admin (atomic operation)
       transaction.update(groupRef, {'created_by': newAdminId});
 
-      // 6. Update new admin's role in membership document
+      // 5. Update new admin's role in membership document
       transaction.update(newAdminMemberRef, {
         'role': 'admin',
         'promotedAt': FieldValue.serverTimestamp(),
         'promotedBy': currentAdminId,
       });
 
-      // 7. Delete old admin's membership document
+      // 6. Delete old admin's membership document
       final oldAdminMemberRef = _firestore
           .collection(_collection)
           .doc(groupId)
@@ -421,7 +421,7 @@ class GroupsFirestoreService {
           .doc(currentAdminId);
       transaction.delete(oldAdminMemberRef);
 
-      // 8. Update members_list array
+      // 7. Update members_list array
       transaction.update(groupRef, {
         'members_list': FieldValue.arrayRemove([currentAdminId]),
         'member_count': FieldValue.increment(-1),

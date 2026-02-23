@@ -543,6 +543,8 @@ class GroupController extends GetxController {
       // Leave the group
       await _groupsService.memberLeaveGroup(groupId, currentUserId);
 
+      isLoading.value = false;
+
       Get.snackbar(
         'Success',
         'You have left "$groupName"',
@@ -551,8 +553,8 @@ class GroupController extends GetxController {
         duration: const Duration(seconds: 3),
       );
 
-      // Navigate back to groups list
-      Get.back();
+      // Navigate back to groups list (pop all group-related screens)
+      Get.until((route) => route.settings.name == '/groups' || route.isFirst);
 
       print('Member $currentUserId left group $groupId');
     } catch (e) {
@@ -1027,16 +1029,19 @@ class GroupController extends GetxController {
         selectedUser.id,
       );
 
+      isLoading.value = false;
+
       Get.snackbar(
         'Success',
         'Ownership transferred to ${selectedUser.username}. You have left "$groupName".',
         backgroundColor: Colors.green,
         colorText: Colors.white,
-        duration: const Duration(seconds: 4),
+        duration: const Duration(seconds: 3),
       );
 
-      // Navigate back to groups list
-      Get.back();
+      // Navigate back to groups list (pop all group-related screens)
+      // This ensures we go back to the groups list, not just one screen back
+      Get.until((route) => route.settings.name == '/groups' || route.isFirst);
 
       print(
         'Admin $currentUserId left group $groupId, new admin: ${selectedUser.id}',
@@ -1342,14 +1347,22 @@ class GroupController extends GetxController {
   Future<void> setCurrentGroup(String groupId) async {
     try {
       isMemberLoading.value = true;
-      final group = groupData.firstWhereOrNull((g) => g.id == groupId);
-      if (group != null) {
-        print("DEBUG: Setting current group: ${group.name} (${group.id})");
+
+      // Force refresh group data from Firestore
+      print("DEBUG: Refreshing group data from Firestore for: $groupId");
+      final freshGroup = await _groupsService.getGroupById(groupId);
+
+      if (freshGroup != null) {
+        print(
+          "DEBUG: Setting current group: ${freshGroup.name} (${freshGroup.id})",
+        );
+        print("DEBUG: Group members_list: ${freshGroup.membersList}");
+        print("DEBUG: Group admin (created_by): ${freshGroup.createdBy}");
 
         // Ensure creator is in members list for existing groups
         await ensureCreatorIsMember(groupId);
 
-        currentGroup.value = group;
+        currentGroup.value = freshGroup;
 
         // Load members and available users
         final members = await getGroupMembers(groupId);
@@ -1367,10 +1380,15 @@ class GroupController extends GetxController {
         filteredGroupMembers.value = members;
         groupMembersSearchQuery.value = '';
 
+        // Initialize filtered available users (LEVEL 4 search)
+        filteredAvailableUsers.value = available;
+        availableUsersSearchQuery.value = '';
+
         // Force UI update
         groupMembers.refresh();
         availableUsers.refresh();
         filteredGroupMembers.refresh();
+        filteredAvailableUsers.refresh();
       }
     } catch (e) {
       print("Error in setCurrentGroup: $e");
