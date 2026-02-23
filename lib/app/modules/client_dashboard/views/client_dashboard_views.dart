@@ -566,57 +566,50 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                           width: 180,
                                           fit: BoxFit.cover,
                                         ),
-                                        // const SizedBox(height: 12),
-                                        // Text(
-                                        //   'No Diet Plan\nFound!',
-                                        //   style: TextStyle(
-                                        //     color: const Color(0xFFC2D86A),
-                                        //     fontSize: 24,
-                                        //     fontWeight: FontWeight.bold,
-                                        //     letterSpacing: 0.5,
-                                        //     height: 1.2,
-                                        //   ),
-                                        //   textAlign: TextAlign.center,
-                                        // ),
                                         const SizedBox(height: 32),
 
-                                        // Action Cards
-                                        _buildActionCard(
-                                          title: 'Create Manually',
-                                          buttonText: 'Create',
-                                          iconEmoji: '📋',
-                                          iconBgColor: Colors.orange.withValues(
-                                            alpha: 0.2,
+                                        // Action Cards - Only show if user has permission
+                                        // Personal Mode: Always show
+                                        // Group Mode + Admin: Show
+                                        // Group Mode + Member: Hide
+                                        if (controller
+                                            .isCurrentUserAdminOfSelectedGroup()) ...[
+                                          _buildActionCard(
+                                            title: 'Create Manually',
+                                            buttonText: 'Create',
+                                            iconEmoji: '📋',
+                                            iconBgColor: Colors.orange
+                                                .withValues(alpha: 0.2),
+                                            onTap: () {
+                                              final userData =
+                                                  Get.find<AuthController>()
+                                                      .userdataget();
+                                              Get.toNamed(
+                                                "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                              );
+                                            },
                                           ),
-                                          onTap: () {
-                                            final userData =
-                                                Get.find<AuthController>()
-                                                    .userdataget();
-                                            Get.toNamed(
-                                              "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
-                                            );
-                                          },
-                                        ),
-                                        _buildActionCard(
-                                          title: 'Generate Using AI',
-                                          buttonText: 'Generate',
-                                          iconEmoji: '✨',
-                                          iconBgColor: Colors.purple.withValues(
-                                            alpha: 0.2,
+                                          _buildActionCard(
+                                            title: 'Generate Using AI',
+                                            buttonText: 'Generate',
+                                            iconEmoji: '✨',
+                                            iconBgColor: Colors.purple
+                                                .withValues(alpha: 0.2),
+                                            onTap: () =>
+                                                Get.toNamed(Routes.GENERATE_AI),
                                           ),
-                                          onTap: () =>
-                                              Get.toNamed(Routes.GENERATE_AI),
-                                        ),
-                                        _buildActionCard(
-                                          title: 'Copy From Existing',
-                                          buttonText: 'Copy',
-                                          iconEmoji: '📄',
-                                          iconBgColor: Colors.blue.withValues(
-                                            alpha: 0.2,
+                                          _buildActionCard(
+                                            title: 'Copy From Existing',
+                                            buttonText: 'Copy',
+                                            iconEmoji: '📄',
+                                            iconBgColor: Colors.blue.withValues(
+                                              alpha: 0.2,
+                                            ),
+                                            onTap: () => Get.toNamed(
+                                              Routes.MEAL_HISTORY,
+                                            ),
                                           ),
-                                          onTap: () =>
-                                              Get.toNamed(Routes.MEAL_HISTORY),
-                                        ),
+                                        ],
                                       ],
                                     ),
                                   );
