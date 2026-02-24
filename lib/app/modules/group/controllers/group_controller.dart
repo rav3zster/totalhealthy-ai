@@ -4,9 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:totalhealthy/app/data/models/user_model.dart';
 import 'package:totalhealthy/app/data/models/group_model.dart';
+import 'package:totalhealthy/app/data/models/group_category_model.dart';
 import 'package:totalhealthy/app/data/services/groups_firestore_service.dart';
 import 'package:totalhealthy/app/data/services/users_firestore_service.dart';
 import 'package:totalhealthy/app/data/services/notifications_firestore_service.dart';
+import 'package:totalhealthy/app/data/services/group_categories_firestore_service.dart';
 import 'package:totalhealthy/app/data/models/notification_model.dart';
 import 'package:totalhealthy/app/data/services/role_permissions_service.dart';
 
@@ -15,6 +17,8 @@ class GroupController extends GetxController {
   final UsersFirestoreService _usersService = UsersFirestoreService();
   final NotificationsFirestoreService _notificationsService =
       NotificationsFirestoreService();
+  final GroupCategoriesFirestoreService _groupCategoriesService =
+      GroupCategoriesFirestoreService();
   final RolePermissionsService _permissionsService = RolePermissionsService();
 
   final groupData = <GroupModel>[].obs;
@@ -23,6 +27,11 @@ class GroupController extends GetxController {
       <AppNotification>[].obs; // Invitations sent by current user
   final isLoading = true.obs;
   final totalUsers = 0.obs;
+
+  // Group categories for create dialog
+  final groupCategories = <GroupCategoryModel>[].obs;
+  final selectedGroupCategory = Rxn<GroupCategoryModel>();
+  final isLoadingCategories = false.obs;
 
   // New reactive state for member management
   final Rx<GroupModel?> currentGroup = Rx<GroupModel?>(null);
@@ -218,7 +227,11 @@ class GroupController extends GetxController {
     });
   }
 
-  Future<void> createGroup(String name, String description) async {
+  Future<void> createGroup(
+    String name,
+    String description, {
+    String? groupCategoryId,
+  }) async {
     try {
       // RBAC: Validate permission to create group
       final validationError = _permissionsService.validateGroupCreation();
@@ -250,6 +263,7 @@ class GroupController extends GetxController {
       final newGroup = GroupModel(
         name: name.trim(),
         description: description.trim(),
+        groupCategoryId: groupCategoryId, // Add category reference
         createdBy: currentUserId,
         membersList: [
           currentUserId, // Admin is automatically a member
@@ -276,6 +290,32 @@ class GroupController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  /// Load group categories for the create dialog
+  Future<void> loadGroupCategories() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+
+    try {
+      isLoadingCategories.value = true;
+      final categories = await _groupCategoriesService.getGroupCategories(
+        userId,
+      );
+      groupCategories.value = categories;
+
+      // Don't auto-select - let user choose explicitly
+      selectedGroupCategory.value = null;
+    } catch (e) {
+      print('Error loading group categories: $e');
+    } finally {
+      isLoadingCategories.value = false;
+    }
+  }
+
+  /// Select a group category
+  void selectGroupCategory(GroupCategoryModel? category) {
+    selectedGroupCategory.value = category;
   }
 
   /// Delete a group (admin only)

@@ -12,6 +12,7 @@ import '../modules/forget_passowrd_screen/views/forget_password_screen_views.dar
 import '../modules/generate_ai/bindings/generate_ai_binding.dart';
 import '../modules/generate_ai/views/generate_ai_view.dart';
 import '../modules/group/bindings/group_binding.dart';
+import '../modules/group/bindings/create_group_binding.dart';
 import '../modules/group/views/group_view.dart';
 import '../modules/group/views/create_group_screen.dart';
 import '../modules/group/views/group_details_screen.dart';
@@ -25,6 +26,12 @@ import '../modules/meal_history/bindings/meal_history_binding.dart';
 import '../modules/meal_history/views/meal_history_view.dart';
 import '../modules/meal_timing/bindings/meal_timing_binding.dart';
 import '../modules/meal_timing/views/meal_timing_view.dart';
+import '../modules/meal_categories/bindings/meal_categories_binding.dart';
+import '../modules/meal_categories/views/meal_categories_view.dart';
+import '../modules/meal_categories_management/bindings/meal_categories_management_binding.dart';
+import '../modules/meal_categories_management/views/meal_categories_management_view.dart';
+import '../modules/group_categories/bindings/group_categories_binding.dart';
+import '../modules/group_categories/views/group_categories_view.dart';
 import '../modules/meals_details/bindings/meals_details_binding.dart';
 import '../modules/meals_details/views/meals_details_view.dart';
 import '../modules/notification/bindings/notification_binding.dart';
@@ -163,6 +170,36 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
+      name: _Paths.MEAL_CATEGORIES,
+      page: () => const MealCategoriesView(),
+      binding: MealCategoriesBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350),
+      popGesture: true,
+      preventDuplicates: true,
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.MEAL_CATEGORIES_MANAGEMENT,
+      page: () => const MealCategoriesManagementView(),
+      binding: MealCategoriesManagementBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350),
+      popGesture: true,
+      preventDuplicates: true,
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
+      name: _Paths.GROUP_CATEGORIES,
+      page: () => const GroupCategoriesView(),
+      binding: GroupCategoriesBinding(),
+      customTransition: SmoothPageTransition(),
+      transitionDuration: const Duration(milliseconds: 350),
+      popGesture: true,
+      preventDuplicates: true,
+      middlewares: [AuthCheckMiddleware()],
+    ),
+    GetPage(
       name: _Paths.TrainerDashboard,
       page: () => TrainerDashboardView(),
       binding: TrainerDashboardBindings(),
@@ -219,8 +256,8 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.CREATE_GROUP,
-      page: () => CreateGroupScreen(),
-      binding: GroupBinding(),
+      page: () => const CreateGroupScreen(),
+      binding: CreateGroupBinding(),
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 350), // iOS-style timing
       popGesture: true, // Enable iOS-style swipe-back

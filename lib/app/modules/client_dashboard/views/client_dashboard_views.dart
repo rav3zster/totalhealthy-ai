@@ -334,79 +334,28 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                           physics:
                                               const BouncingScrollPhysics(),
                                           child: Row(
-                                            children: [
-                                              _buildModernMealTab(
-                                                '🍳',
-                                                'Breakfast',
-                                                controller
-                                                        .selectedCategory
-                                                        .value ==
-                                                    'Breakfast',
-                                                () => controller.changeCategory(
-                                                  'Breakfast',
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              _buildModernMealTab(
-                                                '🥗',
-                                                'Lunch',
-                                                controller
-                                                        .selectedCategory
-                                                        .value ==
-                                                    'Lunch',
-                                                () => controller.changeCategory(
-                                                  'Lunch',
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              _buildModernMealTab(
-                                                '🍽️',
-                                                'Dinner',
-                                                controller
-                                                        .selectedCategory
-                                                        .value ==
-                                                    'Dinner',
-                                                () => controller.changeCategory(
-                                                  'Dinner',
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              _buildModernMealTab(
-                                                '🥐',
-                                                'Morning Snacks',
-                                                controller
-                                                        .selectedCategory
-                                                        .value ==
-                                                    'Morning Snacks',
-                                                () => controller.changeCategory(
-                                                  'Morning Snacks',
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              _buildModernMealTab(
-                                                '💪',
-                                                'Preworkout',
-                                                controller
-                                                        .selectedCategory
-                                                        .value ==
-                                                    'Preworkout',
-                                                () => controller.changeCategory(
-                                                  'Preworkout',
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              _buildModernMealTab(
-                                                '🏋️',
-                                                'Post Workout',
-                                                controller
-                                                        .selectedCategory
-                                                        .value ==
-                                                    'Post Workout',
-                                                () => controller.changeCategory(
-                                                  'Post Workout',
-                                                ),
-                                              ),
-                                            ],
+                                            children: controller.categories.map(
+                                              (category) {
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                        right: 12,
+                                                      ),
+                                                  child: _buildModernMealTab(
+                                                    _getCategoryIcon(category),
+                                                    category,
+                                                    controller
+                                                            .selectedCategory
+                                                            .value ==
+                                                        category,
+                                                    () => controller
+                                                        .changeCategory(
+                                                          category,
+                                                        ),
+                                                  ),
+                                                );
+                                              },
+                                            ).toList(),
                                           ),
                                         ),
                                       ),
@@ -720,6 +669,25 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
         ],
       ),
     );
+  }
+
+  // Helper method to get icon for category
+  String _getCategoryIcon(String category) {
+    final iconMap = {
+      'Breakfast': '🍳',
+      'Lunch': '🥗',
+      'Dinner': '🍽️',
+      'Morning Snacks': '🥐',
+      'Preworkout': '💪',
+      'Post Workout': '🏋️',
+      'Snacks': '🍿',
+      'Workout': '💪',
+      'Medicine': '💊',
+      'Supplements': '💊',
+    };
+
+    // Return mapped icon or default icon for custom categories
+    return iconMap[category] ?? '🍴';
   }
 
   Widget _buildModernMealTab(

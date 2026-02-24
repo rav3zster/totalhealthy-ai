@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,9 +9,15 @@ import '../../../routes/app_pages.dart';
 import '../../../core/base/controllers/auth_controller.dart';
 import '../../../data/models/meal_model.dart';
 import '../../../data/services/meals_firestore_service.dart';
+import '../../../data/services/meal_categories_firestore_service.dart';
+import '../../../data/services/groups_firestore_service.dart';
 
 class CreateMealController extends GetxController {
   final MealsFirestoreService _mealsService = MealsFirestoreService();
+  final MealCategoriesFirestoreService _categoriesService =
+      MealCategoriesFirestoreService();
+  final GroupsFirestoreService _groupsService = GroupsFirestoreService();
+
   final fullNameController = TextEditingController();
   final descriptionController = TextEditingController();
   final kcalController = TextEditingController();
@@ -23,9 +30,10 @@ class CreateMealController extends GetxController {
   var ingredientControllers = <Map<String, dynamic>>[].obs;
   var selectedCategories = <String>[].obs;
   var calculateAutomatically = false.obs;
-  var categoryError = ''.obs; // Add category error tracking
+  var categoryError = ''.obs;
 
-  final List<String> categories = [
+  // Default categories (always available)
+  final List<String> defaultCategories = [
     "Breakfast",
     "Lunch",
     "Morning Snacks",
@@ -34,9 +42,105 @@ class CreateMealController extends GetxController {
     "Dinner",
   ];
 
+  // Dynamic categories loaded from Firestore (add-on feature)
+  var groupCategories = <String>[].obs;
+  var isLoadingCategories = false.obs;
+  StreamSubscription? _categoriesSubscription;
+
+  // Combined categories (default + group custom categories)
+  List<String> get categories {
+    // Create a set to avoid duplicates
+    final allCategories = <String>{};
+
+    // Add default categories first
+    allCategories.addAll(defaultCategories);
+
+    // Add group custom categories (excluding defaults to avoid duplicates)
+    for (var category in groupCategories) {
+      if (!defaultCategories.contains(category)) {
+        allCategories.add(category);
+      }
+    }
+
+    return allCategories.toList();
+  }
+
   GlobalKey<FormState> key = GlobalKey<FormState>();
 
   var isLoading = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadGroupCategories();
+  }
+
+  @override
+  void onClose() {
+    _categoriesSubscription?.cancel();
+    super.onClose();
+  }
+
+  // Load additional categories from user's group (add-on feature)
+  Future<void> _loadGroupCategories() async {
+    try {
+      isLoadingCategories.value = true;
+
+      final authController = Get.find<AuthController>();
+      final userId = authController.firebaseUser.value?.uid ?? '';
+
+      if (userId.isEmpty) {
+        print('No user ID found, using default categories only');
+        groupCategories.value = [];
+        isLoadingCategories.value = false;
+        return;
+      }
+
+      // Get user's groups
+      final groups = await _groupsService.getUserGroups(userId);
+
+      if (groups.isEmpty) {
+        print('No groups found for user, using default categories only');
+        groupCategories.value = [];
+        isLoadingCategories.value = false;
+        return;
+      }
+
+      // Use first group's categories
+      final groupId = groups.first.id;
+      if (groupId == null) {
+        print('Group ID is null, using default categories only');
+        groupCategories.value = [];
+        isLoadingCategories.value = false;
+        return;
+      }
+
+      // Subscribe to categories stream
+      _categoriesSubscription = _categoriesService
+          .getCategoriesStream(groupId)
+          .listen(
+            (categoryModels) {
+              groupCategories.value = categoryModels
+                  .map((c) => c.name)
+                  .toList();
+              isLoadingCategories.value = false;
+              print(
+                'Loaded ${groupCategories.length} group categories: $groupCategories',
+              );
+              print('Total categories available: ${categories.length}');
+            },
+            onError: (error) {
+              print('Error loading group categories: $error');
+              groupCategories.value = [];
+              isLoadingCategories.value = false;
+            },
+          );
+    } catch (e) {
+      print('Error in _loadGroupCategories: $e');
+      groupCategories.value = [];
+      isLoadingCategories.value = false;
+    }
+  }
 
   // Validate categories selection
   bool validateCategories() {

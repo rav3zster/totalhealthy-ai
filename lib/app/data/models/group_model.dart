@@ -2,6 +2,7 @@ class GroupModel {
   final String? id;
   final String name;
   final String description;
+  final String? groupCategoryId; // Reference to group category
   final String createdBy; // Keep existing field name for Firebase compatibility
   final List<String> membersList; // Use existing Firebase field name
   final DateTime createdAt;
@@ -13,6 +14,7 @@ class GroupModel {
     this.id,
     required this.name,
     required this.description,
+    this.groupCategoryId,
     required this.createdBy,
     this.membersList = const [],
     required this.createdAt,
@@ -31,6 +33,7 @@ class GroupModel {
       id: docId ?? json['id'],
       name: json['name'] ?? '',
       description: json['description'] ?? '',
+      groupCategoryId: json['group_category_id'],
       createdBy: json['created_by'] ?? '',
       membersList: List<String>.from(json['members_list'] ?? []),
       createdAt: json['created_at'] != null
@@ -47,6 +50,7 @@ class GroupModel {
       'id': id, // Include the id field
       'name': name,
       'description': description,
+      'group_category_id': groupCategoryId,
       'created_by': createdBy,
       'members_list': membersList,
       'created_at': createdAt.toIso8601String(),
@@ -61,6 +65,7 @@ class GroupModel {
     String? id,
     String? name,
     String? description,
+    String? groupCategoryId,
     String? createdBy,
     List<String>? membersList,
     DateTime? createdAt,
@@ -72,6 +77,7 @@ class GroupModel {
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
+      groupCategoryId: groupCategoryId ?? this.groupCategoryId,
       createdBy: createdBy ?? this.createdBy,
       membersList: membersList ?? this.membersList,
       createdAt: createdAt ?? this.createdAt,

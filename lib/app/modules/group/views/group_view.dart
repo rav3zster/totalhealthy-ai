@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../controllers/group_controller.dart';
 import '../../../data/models/group_model.dart';
+import '../../../data/models/group_category_model.dart';
 import '../../../data/models/user_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../../widgets/phone_nav_bar.dart';
@@ -796,6 +797,9 @@ class _GroupViewState extends State<GroupView>
     final nameController = TextEditingController();
     final descriptionController = TextEditingController();
 
+    // Load group categories when dialog opens
+    controller.loadGroupCategories();
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -809,62 +813,212 @@ class _GroupViewState extends State<GroupView>
             fontWeight: FontWeight.w600,
           ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                labelText: 'Group Name',
-                labelStyle: const TextStyle(color: Colors.white70),
-                filled: true,
-                fillColor: const Color(0xFF1E252D),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Group Category Dropdown
+              const Text(
+                'Group Category',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: Color(0xFFC2D86A),
-                    width: 2,
+              ),
+              const SizedBox(height: 8),
+              Obx(() {
+                if (controller.isLoadingCategories.value) {
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E252D),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Color(0xFFC2D86A),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'Loading...',
+                          style: TextStyle(color: Colors.white54, fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                if (controller.groupCategories.isEmpty) {
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E252D),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.warning,
+                          color: Colors.orange,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'No categories. Create one first.',
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            Get.toNamed('/group-categories');
+                          },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Text(
+                            'Create',
+                            style: TextStyle(
+                              color: Color(0xFFC2D86A),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E252D),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<GroupCategoryModel>(
+                      value: controller.selectedGroupCategory.value,
+                      hint: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          'Select a category',
+                          style: TextStyle(color: Colors.white54, fontSize: 14),
+                        ),
+                      ),
+                      isExpanded: true,
+                      dropdownColor: const Color(0xFF1E252D),
+                      icon: const Icon(
+                        Icons.arrow_drop_down,
+                        color: Color(0xFFC2D86A),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      items: controller.groupCategories.map((category) {
+                        return DropdownMenuItem<GroupCategoryModel>(
+                          value: category,
+                          child: Row(
+                            children: [
+                              Text(
+                                category.icon,
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  category.name,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: controller.selectGroupCategory,
+                    ),
+                  ),
+                );
+              }),
+              const SizedBox(height: 16),
+
+              // Group Name Field
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'Group Name',
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  filled: true,
+                  fillColor: const Color(0xFF1E252D),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Color(0xFFC2D86A),
+                      width: 2,
+                    ),
                   ),
                 ),
-              ),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: descriptionController,
-              decoration: InputDecoration(
-                labelText: 'Description',
-                labelStyle: const TextStyle(color: Colors.white70),
-                filled: true,
-                fillColor: const Color(0xFF1E252D),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: Color(0xFFC2D86A),
-                    width: 2,
+              ),
+              const SizedBox(height: 16),
+
+              // Description Field
+              TextField(
+                controller: descriptionController,
+                decoration: InputDecoration(
+                  labelText: 'Description',
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  filled: true,
+                  fillColor: const Color(0xFF1E252D),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Color(0xFFC2D86A),
+                      width: 2,
+                    ),
                   ),
                 ),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 3,
               ),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-              maxLines: 3,
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -878,18 +1032,30 @@ class _GroupViewState extends State<GroupView>
             onPressed: () {
               final name = nameController.text.trim();
               final desc = descriptionController.text.trim();
+              final categoryId = controller.selectedGroupCategory.value?.id;
 
-              if (name.isNotEmpty) {
-                controller.createGroup(name, desc);
-                Navigator.of(context).pop();
-              } else {
+              if (name.isEmpty) {
                 Get.snackbar(
                   "Error",
                   "Group name is required",
                   backgroundColor: Colors.red,
                   colorText: Colors.white,
                 );
+                return;
               }
+
+              if (categoryId == null) {
+                Get.snackbar(
+                  "Error",
+                  "Please select a group category",
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+                return;
+              }
+
+              controller.createGroup(name, desc, groupCategoryId: categoryId);
+              Navigator.of(context).pop();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFC2D86A),

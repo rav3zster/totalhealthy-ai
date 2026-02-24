@@ -1,207 +1,296 @@
-# Trainer-Client Management Architecture
+# Group Categories System - Architecture Diagram
 
 ## System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         FIREBASE FIRESTORE                       │
-│                                                                  │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │  User Collection                                        │    │
-│  │  ┌──────────────────────────────────────────────────┐  │    │
-│  │  │  Document: user_uid_1                            │  │    │
-│  │  │  {                                                │  │    │
-│  │  │    id: "user_uid_1",                             │  │    │
-│  │  │    email: "member@example.com",                  │  │    │
-│  │  │    role: "member",                    ◄─────────┐│  │    │
-│  │  │    assignedTrainerId: "trainer_uid"  ◄─────────┐││  │    │
-│  │  │    ...other fields                              │││  │    │
-│  │  │  }                                               │││  │    │
-│  │  └──────────────────────────────────────────────────┘││  │    │
-│  │                                                       ││  │    │
-│  │  ┌──────────────────────────────────────────────────┐││  │    │
-│  │  │  Document: trainer_uid                           │││  │    │
-│  │  │  {                                                │││  │    │
-│  │  │    id: "trainer_uid",                            │││  │    │
-│  │  │    email: "trainer@example.com",                 │││  │    │
-│  │  │    role: "trainer",               ◄──────────────┘│  │    │
-│  │  │    assignedTrainerId: null                        │  │    │
-│  │  │    ...other fields                                │  │    │
-│  │  │  }                                                 │  │    │
-│  │  └──────────────────────────────────────────────────┘  │    │
-│  └────────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────────┘
-                              ▲
-                              │
-                              │ Real-time Streams
-                              │
-┌─────────────────────────────┴───────────────────────────────────┐
-│                    FLUTTER APPLICATION                           │
-│                                                                  │
-│  ┌────────────────────────────────────────────────────────┐    │
-│  │  UsersFirestoreService                                  │    │
-│  │  ┌──────────────────────────────────────────────────┐  │    │
-│  │  │  getUsersByRoleStream('member')                   │  │    │
-│  │  │  ├─ Filters users where role == 'member'         │  │    │
-│  │  │  └─ Returns Stream<List<UserModel>>              │  │    │
-│  │  │                                                    │  │    │
-│  │  │  getTrainerClientsStream(trainerId)              │  │    │
-│  │  │  ├─ Filters users where assignedTrainerId ==     │  │    │
-│  │  │  │  trainerId                                     │  │    │
-│  │  │  └─ Returns Stream<List<UserModel>>              │  │    │
-│  │  │                                                    │  │    │
-│  │  │  assignClientToTrainer(clientId, trainerId)      │  │    │
-│  │  │  ├─ Updates user document                        │  │    │
-│  │  │  └─ Sets assignedTrainerId field                 │  │    │
-│  │  └──────────────────────────────────────────────────┘  │    │
-│  └────────────────────────────────────────────────────────┘    │
-│                              │                                   │
-│                              │                                   │
-│  ┌───────────────────────────┴──────────────────────────────┐  │
-│  │                                                            │  │
-│  │  ┌──────────────────────┐    ┌──────────────────────┐   │  │
-│  │  │  Client List Screen  │    │  Trainer Dashboard   │   │  │
-│  │  │                      │    │                      │   │  │
-│  │  │  Shows:              │    │  Shows:              │   │  │
-│  │  │  • Members only      │    │  • "Your Clients"    │   │  │
-│  │  │  • Not assigned yet  │    │  • Assigned clients  │   │  │
-│  │  │  • Search bar        │    │  • Live stats        │   │  │
-│  │  │  • Add Client button │    │  • Add Client button │   │  │
-│  │  │                      │    │                      │   │  │
-│  │  │  Actions:            │    │  Actions:            │   │  │
-│  │  │  • Search members    │    │  • View clients      │   │  │
-│  │  │  • Add client        │    │  • Navigate to diet  │   │  │
-│  │  │  • Contact member    │    │  • Contact client    │   │  │
-│  │  └──────────────────────┘    └──────────────────────┘   │  │
-│  │                                                            │  │
-│  └────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                           UI LAYER                                  │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌─────────────────┐  │
+│  │ Profile Settings │  │ Meal Categories  │  │ Client Dashboard│  │
+│  │      View        │──│      View        │  │      View       │  │
+│  │                  │  │                  │  │                 │  │
+│  │ • Navigation     │  │ • Admin: CRUD    │  │ • Dynamic Tabs  │  │
+│  │ • Menu Items     │  │ • Member: View   │  │ • Category      │  │
+│  │                  │  │ • Reorder        │  │   Filtering     │  │
+│  └──────────────────┘  └──────────────────┘  └─────────────────┘  │
+│           │                     │                      │            │
+└───────────┼─────────────────────┼──────────────────────┼────────────┘
+            │                     │                      │
+            ▼                     ▼                      ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                        CONTROLLER LAYER                             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌──────────────────────┐  ┌────────────────────────────────────┐  │
+│  │ MealCategories       │  │ ClientDashboard                    │  │
+│  │    Controller        │  │    Controller                      │  │
+│  │                      │  │                                    │  │
+│  │ • Load Categories    │  │ • Subscribe to Categories          │  │
+│  │ • Create/Edit/Delete │  │ • Filter Meals by CategoryId       │  │
+│  │ • Reorder            │  │ • Handle Category Changes          │  │
+│  │ • Validate           │  │ • Cache Management                 │  │
+│  │ • Admin Check        │  │                                    │  │
+│  └──────────────────────┘  └────────────────────────────────────┘  │
+│           │                              │                          │
+│           │         ┌────────────────────┴──────────┐               │
+│           │         │                               │               │
+│           ▼         ▼                               ▼               │
+│  ┌──────────────────────┐  ┌──────────────┐  ┌──────────────────┐  │
+│  │ RolePermissions      │  │   Planner    │  │   Migration      │  │
+│  │    Service           │  │  Controller  │  │    Service       │  │
+│  │                      │  │              │  │                  │  │
+│  │ • isAdmin()          │  │ • Dynamic    │  │ • Lazy Migration │  │
+│  │ • canModifyCategory()│  │   Categories │  │ • Name→ID Lookup │  │
+│  └──────────────────────┘  └──────────────┘  └──────────────────┘  │
+│                                    │                  │              │
+└────────────────────────────────────┼──────────────────┼──────────────┘
+                                     │                  │
+                                     ▼                  ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                        SERVICE LAYER                                │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌────────────────────────────────────────────────────────────┐    │
+│  │         MealCategoriesFirestoreService                     │    │
+│  │                                                            │    │
+│  │  • getCategoriesStream(groupId)                           │    │
+│  │  • createCategory(groupId, name, userId)                  │    │
+│  │  • renameCategory(groupId, categoryId, newName)           │    │
+│  │  • reorderCategories(groupId, categoryIds)                │    │
+│  │  • deleteCategory(groupId, categoryId)                    │    │
+│  │  • canDeleteCategory(groupId, categoryId)                 │    │
+│  │  • initializeDefaultCategories(groupId, userId)           │    │
+│  └────────────────────────────────────────────────────────────┘    │
+│                                    │                                │
+│  ┌─────────────────────┐  ┌────────┴──────────┐  ┌──────────────┐  │
+│  │ MealsFirestore      │  │ GroupMealPlans    │  │ Groups       │  │
+│  │    Service          │  │ FirestoreService  │  │ Firestore    │  │
+│  │                     │  │                   │  │ Service      │  │
+│  │ • getMealsStream()  │  │ • setMealFor      │  │              │  │
+│  │ • updateMeal()      │  │   Category()      │  │ • addGroup() │  │
+│  │ • Filter by         │  │ • Validate        │  │   (init cats)│  │
+│  │   categoryId        │  │   categoryId      │  │              │  │
+│  └─────────────────────┘  └───────────────────┘  └──────────────┘  │
+│           │                        │                      │          │
+└───────────┼────────────────────────┼──────────────────────┼──────────┘
+            │                        │                      │
+            ▼                        ▼                      ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                        DATA LAYER                                   │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌─────────────────┐  │
+│  │ MealCategory     │  │ Meal             │  │ GroupMealPlan   │  │
+│  │    Model         │  │ Model            │  │    Model        │  │
+│  │                  │  │                  │  │                 │  │
+│  │ • id             │  │ • id             │  │ • id            │  │
+│  │ • groupId        │  │ • name           │  │ • groupId       │  │
+│  │ • name           │  │ • categoryIds ✨ │  │ • date          │  │
+│  │ • order          │  │ • categories     │  │ • mealSlots     │  │
+│  │ • isDefault      │  │   (deprecated)   │  │   Map<catId,    │  │
+│  │ • createdAt      │  │ • nutrition      │  │   mealId> ✨    │  │
+│  │ • createdBy      │  │ • ingredients    │  │                 │  │
+│  └──────────────────┘  └──────────────────┘  └─────────────────┘  │
+│           │                     │                      │            │
+└───────────┼─────────────────────┼──────────────────────┼────────────┘
+            │                     │                      │
+            ▼                     ▼                      ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                      FIRESTORE DATABASE                             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  groups/{groupId}                                                   │
+│  ├── name, description, created_by, members_list                    │
+│  │                                                                   │
+│  └── categories/{categoryId} ✨ NEW                                 │
+│      ├── name: "Breakfast"                                          │
+│      ├── order: 0                                                   │
+│      ├── isDefault: true                                            │
+│      ├── createdAt: timestamp                                       │
+│      └── createdBy: userId                                          │
+│                                                                     │
+│  meals/{mealId}                                                     │
+│  ├── name, description, nutrition                                   │
+│  ├── categoryIds: ["category_abc123"] ✨ NEW                        │
+│  ├── categories: ["Breakfast"] (deprecated)                         │
+│  ├── groupId                                                        │
+│  └── userId                                                         │
+│                                                                     │
+│  group_meal_plans/{groupId}_{date}                                  │
+│  ├── groupId                                                        │
+│  ├── date                                                           │
+│  ├── mealSlots: {                                                   │
+│  │     "category_abc123": "meal_xyz789" ✨ UPDATED                  │
+│  │   }                                                              │
+│  ├── breakfastMealId (deprecated)                                   │
+│  └── lunchMealId (deprecated)                                       │
+│                                                                     │
+│  ✨ = New or Updated                                                │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
----
+## Data Flow Diagrams
 
-## Data Flow Diagram
-
-### Add Client Flow
+### 1. Category Creation Flow (Admin)
 
 ```
-┌─────────────┐
-│   Trainer   │
-│  Dashboard  │
-└──────┬──────┘
-       │
-       │ 1. Clicks "Add Client"
-       ▼
-┌─────────────┐
-│   Client    │
-│  List Screen│
-└──────┬──────┘
-       │
-       │ 2. Loads members
-       │    (role == "member")
-       │    (not assigned to this trainer)
-       ▼
-┌─────────────────────────────────┐
-│  Firebase Query:                │
-│  getUsersByRoleStream('member') │
-│  ├─ WHERE role == 'member'      │
-│  └─ EXCLUDE assignedTrainerId   │
-│     == current_trainer_uid      │
-└──────┬──────────────────────────┘
-       │
-       │ 3. Displays members
-       ▼
-┌─────────────┐
-│  Member     │
-│  Cards      │
-│  ┌────────┐ │
-│  │ Member │ │
-│  │  Card  │ │
-│  │ [Add]  │ │
-│  └────────┘ │
-└──────┬──────┘
-       │
-       │ 4. Trainer clicks "Add Client"
-       ▼
-┌─────────────────────────────────┐
-│  assignClientToTrainer()        │
-│  ├─ clientId: member_uid        │
-│  └─ trainerId: trainer_uid      │
-└──────┬──────────────────────────┘
-       │
-       │ 5. Updates Firebase
-       ▼
-┌─────────────────────────────────┐
-│  Firebase Update:               │
-│  user/member_uid                │
-│  {                              │
-│    assignedTrainerId:           │
-│      "trainer_uid"              │
-│  }                              │
-└──────┬──────────────────────────┘
-       │
-       │ 6. Real-time update
-       ▼
-┌─────────────────────────────────┐
-│  All Listening Screens Update:  │
-│  ├─ Client List: Remove member  │
-│  └─ Trainer Dashboard: Add      │
-│     client to "Your Clients"    │
-└─────────────────────────────────┘
+User (Admin)                Controller              Service              Firestore
+    │                           │                      │                    │
+    │ Click "Add Category"      │                      │                    │
+    ├──────────────────────────>│                      │                    │
+    │                           │                      │                    │
+    │ Enter "Pre-Workout"       │                      │                    │
+    ├──────────────────────────>│                      │                    │
+    │                           │                      │                    │
+    │                           │ Validate Unique      │                    │
+    │                           │ Name                 │                    │
+    │                           ├─────────────────────>│                    │
+    │                           │                      │ Query Existing     │
+    │                           │                      ├───────────────────>│
+    │                           │                      │<───────────────────┤
+    │                           │<─────────────────────┤                    │
+    │                           │                      │                    │
+    │                           │ Create Category      │                    │
+    │                           ├─────────────────────>│                    │
+    │                           │                      │ Add Document       │
+    │                           │                      ├───────────────────>│
+    │                           │                      │<───────────────────┤
+    │                           │<─────────────────────┤                    │
+    │                           │                      │                    │
+    │<──────────────────────────┤ Success              │                    │
+    │ Show Success Message      │                      │                    │
+    │                           │                      │                    │
+    │                           │ Stream Update        │                    │
+    │<──────────────────────────┼──────────────────────┼────────────────────┤
+    │ UI Refreshes              │                      │                    │
 ```
 
----
-
-## Component Interaction
+### 2. Dashboard Category Filtering Flow
 
 ```
-┌────────────────────────────────────────────────────────────────┐
-│                      TRAINER DASHBOARD                          │
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐ │
-│  │  Header                                                   │ │
-│  │  ┌────────────┐  ┌────────────────────────────────────┐ │ │
-│  │  │  Profile   │  │  Live Stats                        │ │ │
-│  │  │  Avatar    │  │  ┌──────┐ ┌──────┐ ┌──────┐       │ │ │
-│  │  │            │  │  │  03  │ │  05  │ │  07  │       │ │ │
-│  │  │            │  │  │Clients│ │Plans │ │Pending│      │ │ │
-│  │  └────────────┘  │  └──────┘ └──────┘ └──────┘       │ │ │
-│  │                  └────────────────────────────────────┘ │ │
-│  └──────────────────────────────────────────────────────────┘ │
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐ │
-│  │  Search Bar                                              │ │
-│  │  ┌────────────────────────────────┐  ┌──────────┐      │ │
-│  │  │  Search here...                │  │  Search  │      │ │
-│  │  └────────────────────────────────┘  └──────────┘      │ │
-│  └──────────────────────────────────────────────────────────┘ │
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐ │
-│  │  Your Clients                    [+ Add Client]          │ │
-│  │  ┌────────────────────────────────────────────────────┐ │ │
-│  │  │  ┌────┐  John Doe                    ┌────┐        │ │ │
-│  │  │  │ 👤 │  john@example.com            │ 📧 │        │ │ │
-│  │  │  └────┘  ████████░░ 85%              └────┘        │ │ │
-│  │  │                                       ┌────┐        │ │ │
-│  │  │                                       │ 📞 │        │ │ │
-│  │  │                                       └────┘        │ │ │
-│  │  └────────────────────────────────────────────────────┘ │ │
-│  │  ┌────────────────────────────────────────────────────┐ │ │
-│  │  │  ┌────┐  Jane Smith                  ┌────┐        │ │ │
-│  │  │  │ 👤 │  jane@example.com            │ 📧 │        │ │ │
-│  │  │  └────┘  ██████████ 100%             └────┘        │ │ │
-│  │  │                                       ┌────┐        │ │ │
-│  │  │                                       │ 📞 │        │ │ │
-│  │  │                                       └────┘        │ │ │
-│  │  └────────────────────────────────────────────────────┘ │ │
-│  └──────────────────────────────────────────────────────────┘ │
-└────────────────────────────────────────────────────────────────┘
-                              │
-                              │ Click "Add Client"
-                              ▼
-┌────────────────────────────────────────────────────────────────┐
-│                      CLIENT LIST SCREEN                         │
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐ │
-│  │  [←]  Client List                                        │ │
-│  │     
+User                    Dashboard Controller      Categories Service      Meals Service
+ │                              │                         │                     │
+ │ Select Group                 │                         │                     │
+ ├─────────────────────────────>│                         │                     │
+ │                              │                         │                     │
+ │                              │ Load Categories         │                     │
+ │                              ├────────────────────────>│                     │
+ │                              │<────────────────────────┤                     │
+ │                              │ [Breakfast, Lunch, ...] │                     │
+ │                              │                         │                     │
+ │                              │ Load Meals              │                     │
+ │                              ├─────────────────────────┼────────────────────>│
+ │                              │<────────────────────────┼─────────────────────┤
+ │                              │ [Meal1, Meal2, ...]     │                     │
+ │                              │                         │                     │
+ │<─────────────────────────────┤ Render Category Tabs    │                     │
+ │ Display: [Breakfast|Lunch|..]│                         │                     │
+ │                              │                         │                     │
+ │ Click "Lunch" Tab            │                         │                     │
+ ├─────────────────────────────>│                         │                     │
+ │                              │                         │                     │
+ │                              │ Filter Meals            │                     │
+ │                              │ where categoryIds       │                     │
+ │                              │ contains "lunch_id"     │                     │
+ │                              │                         │                     │
+ │<─────────────────────────────┤ Display Filtered Meals  │                     │
+ │ Show only Lunch meals        │                         │                     │
+```
+
+### 3. Category Deletion Validation Flow
+
+```
+Admin                   Controller              Service              Firestore
+  │                         │                      │                    │
+  │ Click Delete "Snacks"   │                      │                    │
+  ├────────────────────────>│                      │                    │
+  │                         │                      │                    │
+  │                         │ Check if Default     │                    │
+  │                         ├─────────────────────>│                    │
+  │                         │<─────────────────────┤                    │
+  │                         │ isDefault = false ✓  │                    │
+  │                         │                      │                    │
+  │                         │ Check Meals          │                    │
+  │                         ├─────────────────────>│                    │
+  │                         │                      │ Query meals        │
+  │                         │                      │ WHERE categoryIds  │
+  │                         │                      │ CONTAINS snacks_id │
+  │                         │                      ├───────────────────>│
+  │                         │                      │<───────────────────┤
+  │                         │<─────────────────────┤ Found 3 meals ✗    │
+  │                         │                      │                    │
+  │<────────────────────────┤ Show Error           │                    │
+  │ "Cannot delete - 3      │                      │                    │
+  │  meals use this         │                      │                    │
+  │  category"              │                      │                    │
+```
+
+## Migration Flow
+
+```
+App Startup
+    │
+    ▼
+┌─────────────────────────┐
+│ User Authenticates      │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│ MigrationService.       │
+│ migrateUserData()       │
+└───────────┬─────────────┘
+            │
+            ├──────────────────────────────────┐
+            │                                  │
+            ▼                                  ▼
+┌─────────────────────────┐      ┌─────────────────────────┐
+│ For Each User Group:    │      │ Background Process      │
+│                         │      │ (Non-blocking)          │
+│ 1. Check if categories  │      └─────────────────────────┘
+│    exist                │
+│                         │
+│ 2. If not, initialize   │
+│    default categories   │
+│                         │
+│ 3. Migrate meals:       │
+│    - Read category names│
+│    - Lookup category IDs│
+│    - Update categoryIds │
+│                         │
+│ 4. Migrate planner:     │
+│    - Read mealSlots     │
+│    - Convert name keys  │
+│      to ID keys         │
+│    - Update document    │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│ App Ready               │
+│ (Uses new system)       │
+└─────────────────────────┘
+```
+
+## Permission Matrix
+
+```
+┌──────────────────────┬─────────┬─────────┐
+│ Action               │ Admin   │ Member  │
+├──────────────────────┼─────────┼─────────┤
+│ View Categories      │   ✓     │   ✓     │
+│ Create Category      │   ✓     │   ✗     │
+│ Rename Category      │   ✓     │   ✗     │
+│ Reorder Categories   │   ✓     │   ✗     │
+│ Delete Category      │   ✓*    │   ✗     │
+│ Assign Meal to Cat   │   ✓     │   ✗     │
+└──────────────────────┴─────────┴─────────┘
+
+* Admin can delete only if:
+  - Not a default category
+  - No meals reference it
+  - No planner references it
+  - At least 1 other category exists
+```

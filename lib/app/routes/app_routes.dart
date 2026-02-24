@@ -14,6 +14,9 @@ abstract class Routes {
   static const MEAL_HISTORY = _Paths.MEAL_HISTORY;
   static const MEALS_DETAILS = _Paths.MEALS_DETAILS;
   static const MEAL_TIMING = _Paths.MEAL_TIMING;
+  static const MEAL_CATEGORIES = _Paths.MEAL_CATEGORIES;
+  static const MEAL_CATEGORIES_MANAGEMENT = _Paths.MEAL_CATEGORIES_MANAGEMENT;
+  static const GROUP_CATEGORIES = _Paths.GROUP_CATEGORIES;
   static const LoginView = _Paths.MEAL_TIMING;
   static const FORGETPASSWORD = _Paths.FORGETPASSWORD;
   static const UserDiet = _Paths.UserDiet;
@@ -54,6 +57,9 @@ abstract class _Paths {
   static const MEAL_HISTORY = '/meal-history';
   static const MEALS_DETAILS = '/meals-details';
   static const MEAL_TIMING = '/meal-timing';
+  static const MEAL_CATEGORIES = '/meal-categories';
+  static const MEAL_CATEGORIES_MANAGEMENT = '/meal-categories-management';
+  static const GROUP_CATEGORIES = '/group-categories';
   static const UserDiet = '/userdiet';
   static const TrainerDashboard = '/trainerdashboard';
   static const ClientDashboard = '/clientdashboard';

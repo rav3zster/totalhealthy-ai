@@ -75,6 +75,11 @@ class GroupsFirestoreService {
         });
 
     print('✓ Admin added to members subcollection');
+
+    // NOTE: Category initialization removed - groups now reference group categories
+    // Categories are managed at the user level under group categories
+    // When creating a group, select a group category that already has meal categories
+
     print('======================');
   }
 

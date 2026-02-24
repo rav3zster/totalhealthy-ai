@@ -8,6 +8,8 @@ import '../../../controllers/user_controller.dart';
 import '../../../widgets/base_screen_wrapper.dart';
 import '../../../widgets/phone_nav_bar.dart';
 import '../../../routes/app_pages.dart';
+import '../../../data/services/groups_firestore_service.dart';
+import '../../meal_categories/controllers/meal_categories_controller.dart';
 
 class ProfileMainView extends StatefulWidget {
   const ProfileMainView({super.key});
@@ -216,12 +218,10 @@ class _ProfileMainViewState extends State<ProfileMainView> {
         ),
         const SizedBox(height: 16),
         _buildMenuOption(
-          icon: Icons.access_time_outlined,
-          title: 'Meal Timing',
+          icon: Icons.category_outlined,
+          title: 'Group Categories',
           onTap: () {
-            final userController = Get.find<UserController>();
-            final userId = userController.currentUser?.id ?? "";
-            Get.toNamed('/meal-timing?id=$userId');
+            Get.toNamed(Routes.GROUP_CATEGORIES);
           },
         ),
         const SizedBox(height: 16),

@@ -9,9 +9,12 @@ import '../../../data/models/group_model.dart';
 import '../../../data/services/dummy_data_service.dart';
 import '../../../data/services/meals_firestore_service.dart';
 import '../../../data/services/groups_firestore_service.dart';
+import '../../../data/services/meal_categories_firestore_service.dart';
 
 class ClientDashboardControllers extends GetxController {
   final MealsFirestoreService _mealsService = MealsFirestoreService();
+  final MealCategoriesFirestoreService _categoriesService =
+      MealCategoriesFirestoreService();
   final GetStorage _storage = GetStorage();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -27,10 +30,40 @@ class ClientDashboardControllers extends GetxController {
   final selectedCategory = 'Breakfast'.obs;
   final searchQuery = ''.obs;
   final error = ''.obs;
-  final isSearchFocused = false.obs; // Track if search field is focused/active
+  final isSearchFocused = false.obs;
+
+  // Default categories (always available)
+  final List<String> defaultCategories = [
+    'Breakfast',
+    'Lunch',
+    'Morning Snacks',
+    'Preworkout',
+    'Post Workout',
+    'Dinner',
+  ];
+
+  // Dynamic categories from selected group
+  var groupCategories = <String>[].obs;
+  StreamSubscription? _categoriesSubscription;
+
+  // Combined categories (default + group custom categories)
+  List<String> get categories {
+    final allCategories = <String>{};
+    allCategories.addAll(defaultCategories);
+
+    // Add group custom categories (excluding defaults to avoid duplicates)
+    for (var category in groupCategories) {
+      if (!defaultCategories.contains(category)) {
+        allCategories.add(category);
+      }
+    }
+
+    return allCategories.toList();
+  }
 
   // Group Mode properties
   final isGroupMode = false.obs;
+  final isGroupModeLoading = false.obs; // Loading state for smooth transitions
   final selectedGroupId = Rxn<String>();
   final selectedGroupName = ''.obs;
   final groupMeals = <MealModel>[].obs;
@@ -77,6 +110,7 @@ class ClientDashboardControllers extends GetxController {
   void onClose() {
     _mealsSubscription?.cancel();
     _authSubscription?.cancel();
+    _categoriesSubscription?.cancel();
     super.onClose();
   }
 
@@ -715,10 +749,13 @@ class ClientDashboardControllers extends GetxController {
 
   /// Enter Group Mode - Switch dashboard to show only group meals
   void enterGroupMode(String groupId, String groupName) {
-    print('=== ENTERING GROUP MODE ===');
-    print('Group ID: $groupId');
-    print('Group Name: $groupName');
+    // Prevent rapid switching
+    if (isGroupModeLoading.value) return;
 
+    // Set loading state
+    isGroupModeLoading.value = true;
+
+    // Set group mode immediately for instant UI feedback
     selectedGroupId.value = groupId;
     selectedGroupName.value = groupName;
     isGroupMode.value = true;
@@ -727,24 +764,68 @@ class ClientDashboardControllers extends GetxController {
     searchQuery.value = '';
     isSearchFocused.value = false;
 
-    // Fetch TODAY's group meal plan
+    // Clear previous group data immediately
+    groupMeals.clear();
+    todayMealSlots.clear();
+
+    // Load categories for this group (async, non-blocking)
+    _loadGroupCategories(groupId);
+
+    // Fetch TODAY's group meal plan (async, non-blocking)
     fetchTodayGroupPlan(groupId);
+
+    // Clear loading state after a short delay
+    Future.delayed(const Duration(milliseconds: 300), () {
+      isGroupModeLoading.value = false;
+    });
+  }
+
+  /// Load categories for the selected group
+  void _loadGroupCategories(String groupId) {
+    // Cancel existing subscription
+    _categoriesSubscription?.cancel();
+
+    // Subscribe to categories stream
+    _categoriesSubscription = _categoriesService
+        .getCategoriesStream(groupId)
+        .listen(
+          (categoryModels) {
+            groupCategories.value = categoryModels.map((c) => c.name).toList();
+
+            // If selected category doesn't exist in new categories, reset to first
+            if (!categories.contains(selectedCategory.value)) {
+              selectedCategory.value = categories.isNotEmpty
+                  ? categories.first
+                  : 'Breakfast';
+            }
+          },
+          onError: (error) {
+            print('Error loading group categories: $error');
+            groupCategories.value = [];
+          },
+        );
   }
 
   /// Exit Group Mode - Restore normal dashboard
   void exitGroupMode() {
-    print('=== EXITING GROUP MODE ===');
-
     // Cancel group meals subscription
     _groupMealsSubscription?.cancel();
     _groupMealsSubscription = null;
 
-    // Clear group state
+    // Cancel categories subscription
+    _categoriesSubscription?.cancel();
+    _categoriesSubscription = null;
+
+    // Clear group state immediately
     isGroupMode.value = false;
     selectedGroupId.value = null;
     selectedGroupName.value = '';
     groupMeals.clear();
     todayMealSlots.clear();
+    groupCategories.clear();
+
+    // Reset to default category
+    selectedCategory.value = 'Breakfast';
 
     // Clear search
     searchQuery.value = '';
@@ -752,23 +833,15 @@ class ClientDashboardControllers extends GetxController {
 
     // Force UI update to reload personal meals
     update();
-
-    print('Group mode exited, restored to normal dashboard');
   }
 
   /// Fetch TODAY's meal plan for a specific group
   /// This loads only the meals assigned for today's date
   void fetchTodayGroupPlan(String groupId) {
-    print('=== FETCHING TODAY\'S GROUP PLAN ===');
-
     // Get today's date in yyyy-MM-dd format
     final today = DateTime.now();
     final todayStr =
         '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
-
-    print('[GROUP MODE] 📅 Date formatted: $todayStr');
-    print('[GROUP MODE] 🏢 Group ID: $groupId');
-    print('[GROUP MODE] 🕐 Raw DateTime: $today');
 
     // Cancel existing subscription
     _groupMealsSubscription?.cancel();
@@ -782,16 +855,7 @@ class ClientDashboardControllers extends GetxController {
         .snapshots()
         .listen(
           (snapshot) async {
-            print(
-              '[GROUP MODE] 📦 Plan snapshot received: ${snapshot.docs.length} documents',
-            );
-
             if (snapshot.docs.isEmpty) {
-              print('[GROUP MODE] ❌ No meal plan document found for today');
-              print('[GROUP MODE] 🔍 Query used:');
-              print('   - collection: group_meal_plans');
-              print('   - groupId: $groupId');
-              print('   - date: $todayStr');
               todayMealSlots.clear();
               groupMeals.clear();
               return;
@@ -799,41 +863,18 @@ class ClientDashboardControllers extends GetxController {
 
             final planDoc = snapshot.docs.first;
             final planData = planDoc.data();
-
-            print('[GROUP MODE] 📄 Plan document found:');
-            print('   - Document ID: ${planDoc.id}');
-            print('   - Full data: $planData');
-
             final mealSlots = planData['mealSlots'] as Map<String, dynamic>?;
 
-            if (mealSlots == null) {
-              print('[GROUP MODE] ⚠️ mealSlots field is NULL');
+            if (mealSlots == null || mealSlots.isEmpty) {
               todayMealSlots.clear();
               groupMeals.clear();
               return;
             }
-
-            if (mealSlots.isEmpty) {
-              print('[GROUP MODE] ⚠️ mealSlots map is EMPTY');
-              todayMealSlots.clear();
-              groupMeals.clear();
-              return;
-            }
-
-            print('[GROUP MODE] 🗂️ Raw mealSlots from Firestore:');
-            mealSlots.forEach((key, value) {
-              print('   - $key: $value (type: ${value.runtimeType})');
-            });
 
             // Store the mealSlots structure (category → mealId)
             todayMealSlots.value = Map<String, String?>.from(
               mealSlots.map((key, value) => MapEntry(key, value?.toString())),
             );
-
-            print('[GROUP MODE] 🗂️ Processed todayMealSlots:');
-            todayMealSlots.forEach((key, value) {
-              print('   - $key: $value');
-            });
 
             // Extract all meal IDs from mealSlots
             final mealIds = mealSlots.values
@@ -841,37 +882,16 @@ class ClientDashboardControllers extends GetxController {
                 .map((id) => id.toString())
                 .toList();
 
-            print(
-              '[GROUP MODE] 🆔 Extracted Meal IDs (${mealIds.length} total):',
-            );
-            for (int i = 0; i < mealIds.length; i++) {
-              print('   [$i] ${mealIds[i]}');
-            }
-
             if (mealIds.isEmpty) {
-              print('[GROUP MODE] ❌ No valid meal IDs found after filtering');
               groupMeals.clear();
               return;
             }
 
-            // Check Firestore whereIn limit
-            if (mealIds.length > 10) {
-              print(
-                '[GROUP MODE] ⚠️ WARNING: ${mealIds.length} meal IDs exceed Firestore whereIn limit of 10!',
-              );
-              print('[GROUP MODE] 🔧 Using chunked query approach...');
-            }
-
             // Fetch meals from meals collection where documentId IN mealIds
             try {
-              print('[GROUP MODE] 🔍 Querying meals collection:');
-              print('   - collection: meals');
-              print('   - groupId filter: $groupId');
-              print('   - documentId whereIn: $mealIds');
-
-              // Handle Firestore whereIn limit (max 10 items)
               List<MealModel> allMeals = [];
 
+              // Handle Firestore whereIn limit (max 10 items)
               if (mealIds.length <= 10) {
                 // Single query for 10 or fewer IDs
                 final mealsSnapshot = await _firestore
@@ -880,14 +900,9 @@ class ClientDashboardControllers extends GetxController {
                     .where(FieldPath.documentId, whereIn: mealIds)
                     .get();
 
-                print(
-                  '[GROUP MODE] 📦 Query returned ${mealsSnapshot.docs.length} documents',
-                );
-
-                allMeals = mealsSnapshot.docs.map((doc) {
-                  print('[GROUP MODE]   - Found doc: ${doc.id}');
-                  return MealModel.fromJson(doc.data(), docId: doc.id);
-                }).toList();
+                allMeals = mealsSnapshot.docs
+                    .map((doc) => MealModel.fromJson(doc.data(), docId: doc.id))
+                    .toList();
               } else {
                 // Chunked queries for more than 10 IDs
                 for (int i = 0; i < mealIds.length; i += 10) {
@@ -896,63 +911,30 @@ class ClientDashboardControllers extends GetxController {
                     (i + 10 < mealIds.length) ? i + 10 : mealIds.length,
                   );
 
-                  print(
-                    '[GROUP MODE] 🔍 Chunk ${(i ~/ 10) + 1}: Querying ${chunk.length} IDs',
-                  );
-
                   final mealsSnapshot = await _firestore
                       .collection('meals')
                       .where('groupId', isEqualTo: groupId)
                       .where(FieldPath.documentId, whereIn: chunk)
                       .get();
 
-                  print(
-                    '[GROUP MODE]   - Chunk returned ${mealsSnapshot.docs.length} documents',
-                  );
-
-                  final chunkMeals = mealsSnapshot.docs.map((doc) {
-                    print('[GROUP MODE]     - Found doc: ${doc.id}');
-                    return MealModel.fromJson(doc.data(), docId: doc.id);
-                  }).toList();
+                  final chunkMeals = mealsSnapshot.docs
+                      .map(
+                        (doc) => MealModel.fromJson(doc.data(), docId: doc.id),
+                      )
+                      .toList();
 
                   allMeals.addAll(chunkMeals);
                 }
               }
 
-              print('[GROUP MODE] 📊 Total meals fetched: ${allMeals.length}');
-              print('[GROUP MODE] 📊 Expected meals: ${mealIds.length}');
-
-              if (allMeals.length < mealIds.length) {
-                print('[GROUP MODE] ⚠️ MISMATCH: Some meals were not found!');
-                print('[GROUP MODE] 🔍 Missing meal IDs:');
-                final foundIds = allMeals.map((m) => m.id).toSet();
-                final missingIds = mealIds.where(
-                  (id) => !foundIds.contains(id),
-                );
-                for (var missingId in missingIds) {
-                  print('   - $missingId');
-                }
-              }
-
-              for (var meal in allMeals) {
-                print(
-                  '[GROUP MODE] ✅ Meal loaded: ${meal.name} (id: ${meal.id}, groupId: ${meal.groupId})',
-                );
-              }
-
               groupMeals.value = allMeals;
-              print(
-                '[GROUP MODE] ✓ Group meals updated: ${groupMeals.length} meals loaded',
-              );
-              print('=== END FETCH ===');
-            } catch (e, stackTrace) {
-              print('[GROUP MODE] ✗ Error fetching meals: $e');
-              print('[GROUP MODE] ✗ Stack trace: $stackTrace');
+            } catch (e) {
+              print('Error fetching group meals: $e');
               groupMeals.clear();
             }
           },
           onError: (error) {
-            print('[GROUP MODE] ✗ Stream error: $error');
+            print('Stream error: $error');
             todayMealSlots.clear();
             groupMeals.clear();
           },
@@ -992,24 +974,11 @@ class ClientDashboardControllers extends GetxController {
 
     // If group not found, deny access
     if (selectedGroup == null) {
-      print(
-        'isCurrentUserAdminOfSelectedGroup: Group ${selectedGroupId.value} not found in userGroups',
-      );
       return false;
     }
 
     // Check if user is admin using the group's isAdmin method
-    final isAdmin = selectedGroup.isAdmin(userId);
-
-    print('=== ADMIN CHECK ===');
-    print('Selected Group ID: ${selectedGroupId.value}');
-    print('Selected Group Name: ${selectedGroup.name}');
-    print('Current User ID: $userId');
-    print('Group Created By: ${selectedGroup.createdBy}');
-    print('Is Admin: $isAdmin');
-    print('===================');
-
-    return isAdmin;
+    return selectedGroup.isAdmin(userId);
   }
 
   /// Check if Add Meal button should be visible
