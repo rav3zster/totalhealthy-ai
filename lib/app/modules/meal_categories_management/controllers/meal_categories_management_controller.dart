@@ -130,6 +130,27 @@ class MealCategoriesManagementController extends GetxController {
     }
   }
 
+  Future<void> toggleAlarm(MealCategoryModel category, bool enabled) async {
+    if (userId == null || groupCategoryId == null) return;
+
+    try {
+      await _categoriesService.updateMealCategory(
+        userId!,
+        groupCategoryId!,
+        category.id!,
+        {'isAlarmEnabled': enabled},
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to update alarm: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
   Future<void> deleteMealCategory(MealCategoryModel category) async {
     if (userId == null || groupCategoryId == null) return;
 

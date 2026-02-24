@@ -3,6 +3,7 @@ class MealCategoryModel {
   final String groupCategoryId; // Reference to parent group category
   final String name;
   final String? time; // e.g., "07:00"
+  final bool isAlarmEnabled; // Whether alarm/notification is enabled
   final int order;
   final bool isDefault;
   final DateTime createdAt;
@@ -20,6 +21,7 @@ class MealCategoryModel {
     required this.groupCategoryId,
     required this.name,
     this.time,
+    this.isAlarmEnabled = false,
     required this.order,
     required this.isDefault,
     required this.createdAt,
@@ -35,6 +37,7 @@ class MealCategoryModel {
       groupCategoryId: json['groupCategoryId'] ?? '',
       name: json['name'] ?? '',
       time: json['time'],
+      isAlarmEnabled: json['isAlarmEnabled'] ?? false,
       order: json['order'] ?? 0,
       isDefault: json['isDefault'] ?? false,
       createdAt: json['createdAt'] != null
@@ -49,6 +52,7 @@ class MealCategoryModel {
       'groupCategoryId': groupCategoryId,
       'name': name,
       'time': time,
+      'isAlarmEnabled': isAlarmEnabled,
       'order': order,
       'isDefault': isDefault,
       'createdAt': createdAt.toIso8601String(),
@@ -66,6 +70,7 @@ class MealCategoryModel {
     String? groupCategoryId,
     String? name,
     String? time,
+    bool? isAlarmEnabled,
     int? order,
     bool? isDefault,
     DateTime? createdAt,
@@ -76,6 +81,7 @@ class MealCategoryModel {
       groupCategoryId: groupCategoryId ?? this.groupCategoryId,
       name: name ?? this.name,
       time: time ?? this.time,
+      isAlarmEnabled: isAlarmEnabled ?? this.isAlarmEnabled,
       order: order ?? this.order,
       isDefault: isDefault ?? this.isDefault,
       createdAt: createdAt ?? this.createdAt,

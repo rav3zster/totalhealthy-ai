@@ -11,245 +11,405 @@ class MealCategoriesManagementView
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Get.back(),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Meal Categories',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            if (controller.groupCategoryName != null)
-              Text(
-                controller.groupCategoryName!,
-                style: const TextStyle(color: Colors.white54, fontSize: 12),
-              ),
-          ],
-        ),
-      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.black, const Color(0xFF1A1A1A), Colors.black],
+            colors: [const Color(0xFF1A1A1A), Colors.black, Colors.black],
             stops: const [0.0, 0.3, 1.0],
           ),
         ),
-        child: Obx(() {
-          if (controller.isLoading.value && controller.mealCategories.isEmpty) {
-            return const Center(
-              child: CircularProgressIndicator(color: Color(0xFFC2D86A)),
-            );
-          }
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Modern Header
+              _buildModernHeader(context),
 
-          if (controller.error.value.isNotEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, color: Colors.red, size: 64),
-                  const SizedBox(height: 16),
-                  Text(
-                    controller.error.value,
-                    style: const TextStyle(color: Colors.red, fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+              // Content
+              Expanded(
+                child: Obx(() {
+                  if (controller.isLoading.value &&
+                      controller.mealCategories.isEmpty) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFC2D86A),
+                      ),
+                    );
+                  }
+
+                  if (controller.error.value.isNotEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.error_outline,
+                              color: Colors.red,
+                              size: 48,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            controller.error.value,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (controller.mealCategories.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFFC2D86A,
+                              ).withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.restaurant_menu,
+                              size: 64,
+                              color: Color(0xFFC2D86A),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          const Text(
+                            'No Meal Categories',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Add meal categories to organize\nyour daily meals',
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 15,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 32),
+                          ElevatedButton.icon(
+                            onPressed: () => _showCreateCategoryDialog(context),
+                            icon: const Icon(Icons.add, color: Colors.black),
+                            label: const Text(
+                              'Add Category',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFC2D86A),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
+                    itemCount: controller.mealCategories.length,
+                    itemBuilder: (context, index) {
+                      final category = controller.mealCategories[index];
+                      return _buildCategoryCard(context, category, index);
+                    },
+                  );
+                }),
               ),
-            );
-          }
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: Obx(() {
+        if (controller.mealCategories.isEmpty) return const SizedBox.shrink();
 
-          if (controller.mealCategories.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.restaurant_menu,
-                    size: 80,
-                    color: Colors.white38,
+        return FloatingActionButton.extended(
+          onPressed: () => _showCreateCategoryDialog(context),
+          backgroundColor: const Color(0xFFC2D86A),
+          elevation: 8,
+          icon: const Icon(Icons.add_rounded, color: Colors.black, size: 24),
+          label: const Text(
+            'Add Category',
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildModernHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [const Color(0xFF2A2A2A), const Color(0xFF1F1F1F)],
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Back button and title row
+          Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.white,
+                    size: 20,
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'No meal categories yet',
+                  onPressed: () => Get.back(),
+                  padding: const EdgeInsets.all(8),
+                  constraints: const BoxConstraints(),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Meal Categories',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    if (controller.groupCategoryName != null)
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFFC2D86A,
+                              ).withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(
+                                  0xFFC2D86A,
+                                ).withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Text(
+                              controller.groupCategoryName!,
+                              style: TextStyle(
+                                color: const Color(
+                                  0xFFC2D86A,
+                                ).withValues(alpha: 0.9),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Obx(
+                            () => Text(
+                              '${controller.mealCategories.length} ${controller.mealCategories.length == 1 ? 'category' : 'categories'}',
+                              style: const TextStyle(
+                                color: Colors.white54,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          // Info card
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.schedule_rounded,
+                  color: const Color(0xFFC2D86A).withValues(alpha: 0.8),
+                  size: 18,
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Set meal times and enable alarms',
                     style: TextStyle(
                       color: Colors.white70,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      height: 1.4,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Add your first meal category',
-                    style: TextStyle(color: Colors.white54, fontSize: 14),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(20),
-            itemCount: controller.mealCategories.length,
-            itemBuilder: (context, index) {
-              final category = controller.mealCategories[index];
-              return _buildCategoryCard(context, category);
-            },
-          );
-        }),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreateCategoryDialog(context),
-        backgroundColor: const Color(0xFFC2D86A),
-        icon: const Icon(Icons.add, color: Colors.black),
-        label: const Text(
-          'Add Category',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildCategoryCard(BuildContext context, category) {
-    return ExpandableCategoryCard(
-      category: category,
-      controller: controller,
-      onDelete: () => _showDeleteDialog(context, category),
+  Widget _buildCategoryCard(BuildContext context, category, int index) {
+    return TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 300 + (index * 50)),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 20 * (1 - value)),
+          child: Opacity(opacity: value, child: child),
+        );
+      },
+      child: ExpandableCategoryCard(
+        category: category,
+        controller: controller,
+        onDelete: () => _showDeleteDialog(context, category),
+      ),
     );
   }
 
   void _showCreateCategoryDialog(BuildContext context) {
     final nameController = TextEditingController();
-    DateTime selectedDateTime = DateTime.now().copyWith(hour: 7, minute: 0);
 
     Get.dialog(
-      StatefulBuilder(
-        builder: (context, setState) => Dialog(
-          backgroundColor: const Color(0xFF2A2A2A),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+      Dialog(
+        backgroundColor: const Color(0xFF2A2A2A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Add Meal Category',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 24),
+              TextField(
+                controller: nameController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Category Name',
+                  labelStyle: const TextStyle(color: Colors.white54),
+                  hintText: 'e.g., Snacks, Pre-workout',
+                  hintStyle: const TextStyle(color: Colors.white38),
+                  filled: true,
+                  fillColor: Colors.white.withValues(alpha: 0.1),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Text(
-                    'Add Meal Category',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  TextButton(
+                    onPressed: () => Get.back(),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.white54),
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  TextField(
-                    controller: nameController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      labelText: 'Category Name',
-                      labelStyle: const TextStyle(color: Colors.white54),
-                      hintText: 'e.g., Snacks, Pre-workout',
-                      hintStyle: const TextStyle(color: Colors.white38),
-                      filled: true,
-                      fillColor: Colors.white.withValues(alpha: 0.1),
-                      border: OutlineInputBorder(
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (nameController.text.trim().isEmpty) {
+                        Get.snackbar('Error', 'Please enter a category name');
+                        return;
+                      }
+                      controller.createMealCategory(
+                        nameController.text.trim(),
+                        null,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFC2D86A),
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Set Time (Optional)',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                    child: const Text(
+                      'Create',
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    height: 150,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1A1A1A),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: CupertinoDatePicker(
-                      mode: CupertinoDatePickerMode.time,
-                      initialDateTime: selectedDateTime,
-                      use24hFormat: false,
-                      onDateTimeChanged: (DateTime newDateTime) {
-                        setState(() {
-                          selectedDateTime = newDateTime;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => Get.back(),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(color: Colors.white54),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (nameController.text.trim().isEmpty) {
-                            Get.snackbar(
-                              'Error',
-                              'Please enter a category name',
-                            );
-                            return;
-                          }
-                          final time = TimeOfDay.fromDateTime(selectedDateTime);
-                          controller.createMealCategory(
-                            nameController.text.trim(),
-                            time,
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFC2D86A),
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Create',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),
-            ),
+            ],
           ),
         ),
       ),
@@ -377,110 +537,106 @@ class _ExpandableCategoryCardState extends State<ExpandableCategoryCard> {
             borderRadius: BorderRadius.circular(20),
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.category.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      if (widget.category.isDefault)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(
-                              0xFFC2D86A,
-                            ).withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Text(
-                            'Default',
-                            style: TextStyle(
-                              color: Color(0xFFC2D86A),
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF1A1A1A),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.3),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.access_time,
-                                color: Color(0xFFC2D86A),
-                                size: 20,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                widget.category.name,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  time != null
-                                      ? time.format(context)
-                                      : 'Set time',
+                            ),
+                            if (widget.category.isDefault)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFFC2D86A,
+                                  ).withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Text(
+                                  'Default',
                                   style: TextStyle(
-                                    color: time != null
-                                        ? Colors.white
-                                        : Colors.white54,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFFC2D86A),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
-                              Icon(
-                                isExpanded
-                                    ? Icons.expand_less
-                                    : Icons.expand_more,
-                                color: const Color(0xFFC2D86A),
-                                size: 24,
-                              ),
-                            ],
-                          ),
+                          ],
                         ),
-                      ),
-                      if (!widget.category.isDefault) ...[
-                        const SizedBox(width: 12),
-                        IconButton(
-                          onPressed: widget.onDelete,
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: Colors.red,
-                          ),
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.red.withValues(alpha: 0.1),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.access_time,
+                              color: Color(0xFFC2D86A),
+                              size: 18,
                             ),
-                          ),
+                            const SizedBox(width: 8),
+                            Text(
+                              time != null ? time.format(context) : 'Set time',
+                              style: TextStyle(
+                                color: time != null
+                                    ? Colors.white70
+                                    : Colors.white38,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
-                    ],
+                    ),
                   ),
+                  const SizedBox(width: 12),
+                  // Alarm Toggle Switch
+                  Transform.scale(
+                    scale: 0.9,
+                    child: Switch(
+                      value: widget.category.isAlarmEnabled,
+                      onChanged: (value) {
+                        widget.controller.toggleAlarm(widget.category, value);
+                      },
+                      activeThumbColor: const Color(0xFFC2D86A),
+                      activeTrackColor: const Color(
+                        0xFFC2D86A,
+                      ).withValues(alpha: 0.5),
+                      inactiveThumbColor: Colors.white38,
+                      inactiveTrackColor: Colors.white12,
+                    ),
+                  ),
+                  if (!widget.category.isDefault) ...[
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: widget.onDelete,
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.red,
+                        size: 20,
+                      ),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.red.withValues(alpha: 0.1),
+                        padding: const EdgeInsets.all(8),
+                        minimumSize: const Size(36, 36),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -509,26 +665,28 @@ class _ExpandableCategoryCardState extends State<ExpandableCategoryCard> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      Container(
+                      SizedBox(
                         height: 150,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A1A1A),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: const Color(
-                              0xFFC2D86A,
-                            ).withValues(alpha: 0.3),
+                        child: CupertinoTheme(
+                          data: const CupertinoThemeData(
+                            textTheme: CupertinoTextThemeData(
+                              dateTimePickerTextStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                              ),
+                            ),
                           ),
-                        ),
-                        child: CupertinoDatePicker(
-                          mode: CupertinoDatePickerMode.time,
-                          initialDateTime: selectedDateTime,
-                          use24hFormat: false,
-                          onDateTimeChanged: (DateTime newDateTime) {
-                            setState(() {
-                              selectedDateTime = newDateTime;
-                            });
-                          },
+                          child: CupertinoDatePicker(
+                            mode: CupertinoDatePickerMode.time,
+                            initialDateTime: selectedDateTime,
+                            use24hFormat: false,
+                            backgroundColor: Colors.transparent,
+                            onDateTimeChanged: (DateTime newDateTime) {
+                              setState(() {
+                                selectedDateTime = newDateTime;
+                              });
+                            },
+                          ),
                         ),
                       ),
                     ],

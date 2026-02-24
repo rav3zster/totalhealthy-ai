@@ -9,218 +9,454 @@ class GroupCategoriesView extends GetView<GroupCategoriesController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Get.back(),
-        ),
-        title: const Text(
-          'Group Categories',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.black, const Color(0xFF1A1A1A), Colors.black],
+            colors: [const Color(0xFF1A1A1A), Colors.black, Colors.black],
             stops: const [0.0, 0.3, 1.0],
           ),
         ),
-        child: Obx(() {
-          if (controller.isLoading.value &&
-              controller.groupCategories.isEmpty) {
-            return const Center(
-              child: CircularProgressIndicator(color: Color(0xFFC2D86A)),
-            );
-          }
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Modern Header
+              _buildModernHeader(context),
 
-          if (controller.error.value.isNotEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, color: Colors.red, size: 64),
-                  const SizedBox(height: 16),
-                  Text(
-                    controller.error.value,
-                    style: const TextStyle(color: Colors.red, fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+              // Content
+              Expanded(
+                child: Obx(() {
+                  if (controller.isLoading.value &&
+                      controller.groupCategories.isEmpty) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFC2D86A),
+                      ),
+                    );
+                  }
+
+                  if (controller.error.value.isNotEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.error_outline,
+                              color: Colors.red,
+                              size: 48,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            controller.error.value,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (controller.groupCategories.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFFC2D86A,
+                              ).withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.category_outlined,
+                              size: 64,
+                              color: Color(0xFFC2D86A),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          const Text(
+                            'No Categories Yet',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Create your first group category\nto get started',
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 15,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 32),
+                          ElevatedButton.icon(
+                            onPressed: () => _showCreateCategoryDialog(context),
+                            icon: const Icon(Icons.add, color: Colors.black),
+                            label: const Text(
+                              'Create Category',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFC2D86A),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                                vertical: 16,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
+                    itemCount: controller.groupCategories.length,
+                    itemBuilder: (context, index) {
+                      final category = controller.groupCategories[index];
+                      return _buildCategoryCard(category, index);
+                    },
+                  );
+                }),
               ),
-            );
-          }
-
-          if (controller.groupCategories.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.category_outlined,
-                    size: 80,
-                    color: Colors.white38,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'No group categories yet',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Create your first category',
-                    style: TextStyle(color: Colors.white54, fontSize: 14),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(20),
-            itemCount: controller.groupCategories.length,
-            itemBuilder: (context, index) {
-              final category = controller.groupCategories[index];
-              return _buildCategoryCard(category);
-            },
-          );
-        }),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreateCategoryDialog(context),
-        backgroundColor: const Color(0xFFC2D86A),
-        icon: const Icon(Icons.add, color: Colors.black),
-        label: const Text(
-          'Add Category',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            ],
+          ),
         ),
       ),
+      floatingActionButton: Obx(() {
+        if (controller.groupCategories.isEmpty) return const SizedBox.shrink();
+
+        return FloatingActionButton.extended(
+          onPressed: () => _showCreateCategoryDialog(context),
+          backgroundColor: const Color(0xFFC2D86A),
+          elevation: 8,
+          icon: const Icon(Icons.add_rounded, color: Colors.black, size: 24),
+          label: const Text(
+            'Add Category',
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+            ),
+          ),
+        );
+      }),
     );
   }
 
-  Widget _buildCategoryCard(category) {
-    return GestureDetector(
-      onTap: () => controller.navigateToMealCategories(category),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF2A2A2A), Color(0xFF1F1F1F)],
-          ),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
-            width: 1.5,
-          ),
+  Widget _buildModernHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [const Color(0xFF2A2A2A), const Color(0xFF1F1F1F)],
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Back button and title row
+          Row(
             children: [
-              // Icon
               Container(
-                width: 60,
-                height: 60,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Center(
-                  child: Text(
-                    category.icon,
-                    style: const TextStyle(fontSize: 32),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.white,
+                    size: 20,
                   ),
+                  onPressed: () => Get.back(),
+                  padding: const EdgeInsets.all(8),
+                  constraints: const BoxConstraints(),
                 ),
               ),
               const SizedBox(width: 16),
-
-              // Category Info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            category.name,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                    const Text(
+                      'Group Categories',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Obx(
+                      () => Text(
+                        '${controller.groupCategories.length} ${controller.groupCategories.length == 1 ? 'category' : 'categories'}',
+                        style: TextStyle(
+                          color: const Color(0xFFC2D86A).withValues(alpha: 0.8),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
                         ),
-                        if (category.isDefault)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              'Default',
-                              style: TextStyle(
-                                color: Color(0xFFC2D86A),
-                                fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          // Subtitle
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  color: const Color(0xFFC2D86A).withValues(alpha: 0.8),
+                  size: 18,
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Organize your groups with custom categories',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard(category, int index) {
+    return TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 300 + (index * 50)),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 20 * (1 - value)),
+          child: Opacity(opacity: value, child: child),
+        );
+      },
+      child: GestureDetector(
+        onTap: () => controller.navigateToMealCategories(category),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [const Color(0xFF2A2A2A), const Color(0xFF1F1F1F)],
+            ),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                // Icon with glow effect
+                Container(
+                  width: 68,
+                  height: 68,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                        const Color(0xFFC2D86A).withValues(alpha: 0.15),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        spreadRadius: 0,
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      category.icon,
+                      style: const TextStyle(fontSize: 36),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 18),
+
+                // Category Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              category.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
+                                letterSpacing: -0.3,
                               ),
                             ),
                           ),
+                          if (category.isDefault)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color(
+                                      0xFFC2D86A,
+                                    ).withValues(alpha: 0.3),
+                                    const Color(
+                                      0xFFC2D86A,
+                                    ).withValues(alpha: 0.2),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: const Color(
+                                    0xFFC2D86A,
+                                  ).withValues(alpha: 0.5),
+                                ),
+                              ),
+                              child: const Text(
+                                'Default',
+                                style: TextStyle(
+                                  color: Color(0xFFC2D86A),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      if (category.description != null) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          category.description!,
+                          style: const TextStyle(
+                            color: Colors.white60,
+                            fontSize: 14,
+                            height: 1.4,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+
+                // Actions
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFC2D86A).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: Color(0xFFC2D86A),
+                        size: 16,
+                      ),
                     ),
-                    if (category.description != null) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        category.description!,
-                        style: const TextStyle(
-                          color: Colors.white54,
-                          fontSize: 14,
+                    if (!category.isDefault) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: IconButton(
+                          onPressed: () => _showDeleteDialog(category),
+                          icon: const Icon(
+                            Icons.delete_outline_rounded,
+                            color: Colors.red,
+                            size: 20,
+                          ),
+                          padding: const EdgeInsets.all(8),
+                          constraints: const BoxConstraints(),
                         ),
                       ),
                     ],
                   ],
                 ),
-              ),
-
-              // Actions
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.arrow_forward_ios,
-                    color: Color(0xFFC2D86A),
-                    size: 18,
-                  ),
-                  if (!category.isDefault) ...[
-                    const SizedBox(width: 8),
-                    IconButton(
-                      onPressed: () => _showDeleteDialog(category),
-                      icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    ),
-                  ],
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

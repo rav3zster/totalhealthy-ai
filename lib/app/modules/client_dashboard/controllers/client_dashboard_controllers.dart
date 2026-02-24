@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../data/models/meal_model.dart';
+import '../../../data/models/meal_category_model.dart';
 import '../../../data/models/group_model.dart';
 import '../../../data/services/dummy_data_service.dart';
 import '../../../data/services/meals_firestore_service.dart';
@@ -47,7 +48,14 @@ class ClientDashboardControllers extends GetxController {
   StreamSubscription? _categoriesSubscription;
 
   // Combined categories (default + group custom categories)
+  /// OPTIMIZED: Removed excessive logging for better performance
   List<String> get categories {
+    // In group mode, ALWAYS show group categories (even if empty during load)
+    if (isGroupMode.value) {
+      return groupCategories;
+    }
+
+    // In personal mode, show default categories
     final allCategories = <String>{};
     allCategories.addAll(defaultCategories);
 
@@ -748,12 +756,12 @@ class ClientDashboardControllers extends GetxController {
   // ========== GROUP MODE METHODS ==========
 
   /// Enter Group Mode - Switch dashboard to show only group meals
+  /// OPTIMIZED: Reduced loading time and improved state management
   void enterGroupMode(String groupId, String groupName) {
     // Prevent rapid switching
     if (isGroupModeLoading.value) return;
 
-    // Set loading state
-    isGroupModeLoading.value = true;
+    print('🔵 ENTERING GROUP MODE: $groupName (ID: $groupId)');
 
     // Set group mode immediately for instant UI feedback
     selectedGroupId.value = groupId;
@@ -767,43 +775,82 @@ class ClientDashboardControllers extends GetxController {
     // Clear previous group data immediately
     groupMeals.clear();
     todayMealSlots.clear();
+    groupCategories.clear(); // Clear old categories
 
-    // Load categories for this group (async, non-blocking)
+    // Load categories and meal plan in parallel for faster loading
     _loadGroupCategories(groupId);
-
-    // Fetch TODAY's group meal plan (async, non-blocking)
     fetchTodayGroupPlan(groupId);
 
-    // Clear loading state after a short delay
-    Future.delayed(const Duration(milliseconds: 300), () {
-      isGroupModeLoading.value = false;
-    });
+    print('🔵 Group mode activated');
   }
 
   /// Load categories for the selected group
-  void _loadGroupCategories(String groupId) {
+  /// OPTIMIZED: Reduced logging, faster execution
+  Future<void> _loadGroupCategories(String groupId) async {
     // Cancel existing subscription
     _categoriesSubscription?.cancel();
 
-    // Subscribe to categories stream
-    _categoriesSubscription = _categoriesService
-        .getCategoriesStream(groupId)
-        .listen(
-          (categoryModels) {
-            groupCategories.value = categoryModels.map((c) => c.name).toList();
+    try {
+      // Get the group to find its groupCategoryId
+      final groupDoc = await _firestore.collection('groups').doc(groupId).get();
 
-            // If selected category doesn't exist in new categories, reset to first
-            if (!categories.contains(selectedCategory.value)) {
-              selectedCategory.value = categories.isNotEmpty
-                  ? categories.first
-                  : 'Breakfast';
-            }
-          },
-          onError: (error) {
-            print('Error loading group categories: $error');
-            groupCategories.value = [];
-          },
-        );
+      if (!groupDoc.exists) {
+        groupCategories.assignAll([]);
+        return;
+      }
+
+      final groupData = groupDoc.data();
+      final groupCategoryId = groupData?['group_category_id'] as String?;
+
+      if (groupCategoryId == null) {
+        groupCategories.assignAll([]);
+        return;
+      }
+
+      // Get the current user ID
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        groupCategories.assignAll([]);
+        return;
+      }
+
+      // Subscribe to meal categories stream
+      _categoriesSubscription = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('group_categories')
+          .doc(groupCategoryId)
+          .collection('meal_categories')
+          .orderBy('order')
+          .snapshots()
+          .map((snapshot) {
+            return snapshot.docs.map((doc) {
+              final data = doc.data();
+              return MealCategoryModel.fromJson(data, docId: doc.id);
+            }).toList();
+          })
+          .listen(
+            (categoryModels) {
+              final categoryNames = categoryModels.map((c) => c.name).toList();
+
+              // Use assignAll for proper reactive update
+              groupCategories.assignAll(categoryNames);
+
+              // If selected category doesn't exist in new categories, reset to first
+              if (groupCategories.isNotEmpty &&
+                  !groupCategories.contains(selectedCategory.value)) {
+                selectedCategory.value = groupCategories.first;
+              }
+            },
+            onError: (error) {
+              print('❌ ERROR loading categories: $error');
+              groupCategories.assignAll([]);
+            },
+          );
+    } catch (e) {
+      print('❌ EXCEPTION in _loadGroupCategories: $e');
+      groupCategories.assignAll([]);
+    }
   }
 
   /// Exit Group Mode - Restore normal dashboard

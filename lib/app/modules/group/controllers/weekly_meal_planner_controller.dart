@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../data/models/group_meal_plan_model.dart';
 import '../../../data/models/meal_model.dart';
 import '../../../data/services/group_meal_plans_firestore_service.dart';
@@ -10,6 +12,7 @@ class WeeklyMealPlannerController extends GetxController {
   final GroupMealPlansFirestoreService _mealPlansService =
       GroupMealPlansFirestoreService();
   final MealsFirestoreService _mealsService = MealsFirestoreService();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final mealPlans = <GroupMealPlanModel>[].obs;
   final availableMeals =
@@ -21,7 +24,7 @@ class WeeklyMealPlannerController extends GetxController {
   // Track which days are expanded (by date string)
   final expandedDays = <String>{}.obs;
 
-  // Available meal categories from group meals
+  // Available meal categories from group's category
   final availableCategories = <String>[].obs;
 
   String? groupId;
@@ -50,10 +53,9 @@ class WeeklyMealPlannerController extends GetxController {
 
     currentWeekStart.value = _getWeekStart(DateTime.now());
 
-    // Initialize categories immediately with standard categories
-    _updateAvailableCategories();
-
     if (groupId != null) {
+      // Load meal categories from group's category
+      _loadGroupMealCategories();
       _loadAvailableMeals();
       _loadMealPlans();
     } else {
@@ -83,12 +85,6 @@ class WeeklyMealPlannerController extends GetxController {
       print('Loading assigned meals from group: $groupId');
       assignedMeals.bindStream(_mealsService.getMealsStream(groupId!));
 
-      // Extract unique categories from available meals
-      ever(availableMeals, (_) {
-        print('Available meals updated: ${availableMeals.length} meals');
-        _updateAvailableCategories();
-      });
-
       // Track assigned meals updates
       ever(assignedMeals, (_) {
         print('Assigned meals updated: ${assignedMeals.length} meals');
@@ -96,40 +92,57 @@ class WeeklyMealPlannerController extends GetxController {
     }
   }
 
-  void _updateAvailableCategories() {
-    // Use the SAME categories as Create Meal screen
-    // These are the standard categories available in the app
-    final standardCategories = [
-      'Breakfast',
-      'Morning Snacks',
-      'Lunch',
-      'Preworkout',
-      'Post Workout',
-      'Dinner',
-    ];
+  /// Load meal categories from the group's category
+  Future<void> _loadGroupMealCategories() async {
+    if (groupId == null) return;
 
-    // Also include any custom categories from existing meals
-    final allCategories = <String>{};
-    allCategories.addAll(standardCategories);
+    try {
+      // Get the group to find its groupCategoryId
+      final groupDoc = await _firestore.collection('groups').doc(groupId).get();
 
-    // Add any additional categories from user's meals
-    for (var meal in availableMeals) {
-      allCategories.addAll(meal.categories);
-    }
-
-    // Sort: standard categories first (in order), then alphabetically
-    final sortedCategories = <String>[];
-    for (var category in standardCategories) {
-      if (allCategories.contains(category)) {
-        sortedCategories.add(category);
-        allCategories.remove(category);
+      if (!groupDoc.exists) {
+        availableCategories.value = [];
+        return;
       }
+
+      final groupData = groupDoc.data();
+      final groupCategoryId = groupData?['group_category_id'] as String?;
+
+      if (groupCategoryId == null) {
+        availableCategories.value = [];
+        return;
+      }
+
+      // Get the current user ID
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        availableCategories.value = [];
+        return;
+      }
+
+      // Load meal categories from Firestore
+      final categoriesSnapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('group_categories')
+          .doc(groupCategoryId)
+          .collection('meal_categories')
+          .orderBy('order')
+          .get();
+
+      final categoryNames = categoriesSnapshot.docs
+          .map((doc) {
+            final data = doc.data();
+            return data['name'] as String? ?? '';
+          })
+          .where((name) => name.isNotEmpty)
+          .toList();
+
+      availableCategories.value = categoryNames;
+    } catch (e) {
+      print('❌ PLANNER: Error loading meal categories: $e');
+      availableCategories.value = [];
     }
-
-    // Add remaining custom categories alphabetically
-    sortedCategories.addAll(allCategories.toList()..sort());
-
-    availableCategories.value = sortedCategories;
   }
 
   void _loadMealPlans() {
