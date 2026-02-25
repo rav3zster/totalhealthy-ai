@@ -538,84 +538,99 @@ class _CreateMealPageState extends State<CreateMealPage>
             }),
             children: [
               // Show loading indicator while group categories are loading
-              if (widget.controller.isLoadingCategories.value)
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            color: Color(0xFFC2D86A),
-                            strokeWidth: 2,
+              Obx(() {
+                if (widget.controller.isLoadingCategories.value) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              color: Color(0xFFC2D86A),
+                              strokeWidth: 2,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 12),
-                        Text(
-                          'Loading custom categories...',
-                          style: TextStyle(color: Colors.white70, fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              // Show category list (always available - default + custom)
-              ...widget.controller.categories.map<Widget>((category) {
-                return Obx(() {
-                  final isSelected = widget.controller.selectedCategories
-                      .contains(category);
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: isSelected
-                          ? LinearGradient(
-                              colors: [
-                                const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                                const Color(0xFFC2D86A).withValues(alpha: 0.1),
-                              ],
-                            )
-                          : null,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: CheckboxListTile(
-                      title: Text(
-                        category,
-                        style: TextStyle(
-                          color: isSelected
-                              ? const Color(0xFFC2D86A)
-                              : Colors.white70,
-                          fontWeight: isSelected
-                              ? FontWeight.w600
-                              : FontWeight.normal,
-                        ),
+                          SizedBox(width: 12),
+                          Text(
+                            'Loading custom categories...',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
-                      value: isSelected,
-                      onChanged: (selected) {
-                        widget.controller.onCategoryChanged(
-                          category,
-                          selected ?? false,
-                        );
-                      },
-                      controlAffinity: ListTileControlAffinity.leading,
-                      checkColor: Colors.black,
-                      fillColor: WidgetStateProperty.resolveWith<Color?>((
-                        states,
-                      ) {
-                        if (states.contains(WidgetState.selected)) {
-                          return const Color(0xFFC2D86A);
-                        }
-                        return Colors.white24;
-                      }),
                     ),
                   );
-                });
+                }
+
+                // Show category list (reactive to changes)
+                return Column(
+                  children: widget.controller.availableCategories.map<Widget>((
+                    category,
+                  ) {
+                    return Obx(() {
+                      final isSelected = widget.controller.selectedCategories
+                          .contains(category);
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: isSelected
+                              ? LinearGradient(
+                                  colors: [
+                                    const Color(
+                                      0xFFC2D86A,
+                                    ).withValues(alpha: 0.2),
+                                    const Color(
+                                      0xFFC2D86A,
+                                    ).withValues(alpha: 0.1),
+                                  ],
+                                )
+                              : null,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: CheckboxListTile(
+                          title: Text(
+                            category,
+                            style: TextStyle(
+                              color: isSelected
+                                  ? const Color(0xFFC2D86A)
+                                  : Colors.white70,
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                          value: isSelected,
+                          onChanged: (selected) {
+                            widget.controller.onCategoryChanged(
+                              category,
+                              selected ?? false,
+                            );
+                          },
+                          controlAffinity: ListTileControlAffinity.leading,
+                          checkColor: Colors.black,
+                          fillColor: WidgetStateProperty.resolveWith<Color?>((
+                            states,
+                          ) {
+                            if (states.contains(WidgetState.selected)) {
+                              return const Color(0xFFC2D86A);
+                            }
+                            return Colors.white24;
+                          }),
+                        ),
+                      );
+                    });
+                  }).toList(),
+                );
               }),
             ],
           ),

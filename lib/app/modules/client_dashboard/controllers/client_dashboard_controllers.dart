@@ -74,6 +74,7 @@ class ClientDashboardControllers extends GetxController {
   final isGroupModeLoading = false.obs; // Loading state for smooth transitions
   final selectedGroupId = Rxn<String>();
   final selectedGroupName = ''.obs;
+  final selectedGroupCategoryId = Rxn<String>(); // Track group category ID
   final groupMeals = <MealModel>[].obs;
   final todayMealSlots = <String, String?>{}.obs; // Category → MealId mapping
   final userGroups =
@@ -791,26 +792,42 @@ class ClientDashboardControllers extends GetxController {
     _categoriesSubscription?.cancel();
 
     try {
+      print('🔵 Dashboard: Loading categories for group: $groupId');
+
       // Get the group to find its groupCategoryId
       final groupDoc = await _firestore.collection('groups').doc(groupId).get();
 
       if (!groupDoc.exists) {
+        print('❌ Dashboard: Group document does not exist');
         groupCategories.assignAll([]);
+        selectedGroupCategoryId.value = null;
         return;
       }
 
       final groupData = groupDoc.data();
       final groupCategoryId = groupData?['group_category_id'] as String?;
 
+      print('🔵 Dashboard: Group category ID from Firestore: $groupCategoryId');
+
       if (groupCategoryId == null) {
+        print('❌ Dashboard: Group category ID is null');
         groupCategories.assignAll([]);
+        selectedGroupCategoryId.value = null;
         return;
       }
+
+      // Store the group category ID for use in Create Meal
+      selectedGroupCategoryId.value = groupCategoryId;
+      print(
+        '🟢 Dashboard: Stored group category ID: ${selectedGroupCategoryId.value}',
+      );
 
       // Get the current user ID
       final userId = FirebaseAuth.instance.currentUser?.uid;
       if (userId == null) {
+        print('❌ Dashboard: User ID is null');
         groupCategories.assignAll([]);
+        selectedGroupCategoryId.value = null;
         return;
       }
 

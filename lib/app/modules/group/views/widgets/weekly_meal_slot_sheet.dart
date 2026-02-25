@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../controllers/weekly_meal_planner_controller.dart';
 import '../../../../data/models/meal_model.dart';
 import '../../../../routes/app_pages.dart';
@@ -160,9 +161,33 @@ class WeeklyMealSlotSheet extends StatelessWidget {
               await authController.groupIdStore(controller.groupId!);
             }
 
+            // Get the group's category ID to pass to Create Meal
+            String? groupCategoryId;
+            if (controller.groupId != null) {
+              try {
+                final groupDoc = await FirebaseFirestore.instance
+                    .collection('groups')
+                    .doc(controller.groupId!)
+                    .get();
+
+                if (groupDoc.exists) {
+                  final groupData = groupDoc.data();
+                  groupCategoryId = groupData?['group_category_id'] as String?;
+                }
+                print(
+                  '🚀 Weekly Planner: Navigating with groupCategoryId: $groupCategoryId',
+                );
+              } catch (e) {
+                print('❌ Error getting group category ID: $e');
+              }
+            }
+
             final userData = authController.userdataget();
             Get.toNamed(
               "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}&from=weekly_planner",
+              arguments: groupCategoryId != null
+                  ? {'groupCategoryId': groupCategoryId}
+                  : null,
             );
           },
         ),

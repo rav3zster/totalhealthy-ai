@@ -41,3 +41,38 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Documentation/debug files (keep only README.md)
+*_FIX*.md
+*_SUMMARY*.md
+*_GUIDE*.md
+*_IMPLEMENTATION*.md
+*_COMPLETE*.md
+*_ANALYSIS*.md
+*_DEBUG*.md
+*_TESTING*.md
+*_INSTRUCTIONS*.md
+*_CHECKLIST*.md
+*_RESULTS*.md
+*_DIAGRAM*.md
+*_FLOW*.md
+*_ARCHITECTURE*.md
+*_DESIGN*.md
+*_SPECIFICATIONS*.md
+*_UPDATE*.md
+*_MODERNIZATION*.md
+*_REFACTOR*.md
+*_OPTIMIZATION*.md
+QUICK_*.md
+READY_*.md
+TEST_*.md
+LIVE_*.md
+
+# Temporary files
+*_input.txt
+flutter_input.txt
+temp_input.txt
+temp_module/
+
+# Keep these markdown files
+!README.md

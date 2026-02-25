@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../controllers/group_meal_calendar_controller.dart';
 import '../../../../data/models/meal_model.dart';
 import '../../../../routes/app_pages.dart';
@@ -124,11 +125,36 @@ class MealSlotBottomSheet extends StatelessWidget {
           'Create New Meal',
           Icons.add_circle_outline,
           const Color(0xFFC2D86A),
-          () {
+          () async {
             Get.back();
+
+            // Get the group's category ID to pass to Create Meal
+            String? groupCategoryId;
+            if (controller.groupId != null) {
+              try {
+                final groupDoc = await FirebaseFirestore.instance
+                    .collection('groups')
+                    .doc(controller.groupId!)
+                    .get();
+
+                if (groupDoc.exists) {
+                  final groupData = groupDoc.data();
+                  groupCategoryId = groupData?['group_category_id'] as String?;
+                }
+                print(
+                  '🚀 Meal Slot: Navigating with groupCategoryId: $groupCategoryId',
+                );
+              } catch (e) {
+                print('❌ Error getting group category ID: $e');
+              }
+            }
+
             final userData = Get.find<AuthController>().userdataget();
             Get.toNamed(
               "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
+              arguments: groupCategoryId != null
+                  ? {'groupCategoryId': groupCategoryId}
+                  : null,
             );
           },
         ),

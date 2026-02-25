@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../routes/app_pages.dart';
 
 import '../../../core/base/controllers/auth_controller.dart';
@@ -32,7 +33,10 @@ class CreateMealController extends GetxController {
   var calculateAutomatically = false.obs;
   var categoryError = ''.obs;
 
-  // Default categories (always available)
+  // Group category tracking for filtering meal categories
+  String? groupCategoryId;
+
+  // Default categories (fallback for personal mode)
   final List<String> defaultCategories = [
     "Breakfast",
     "Lunch",
@@ -42,28 +46,10 @@ class CreateMealController extends GetxController {
     "Dinner",
   ];
 
-  // Dynamic categories loaded from Firestore (add-on feature)
-  var groupCategories = <String>[].obs;
-  var isLoadingCategories = false.obs;
+  // Single reactive source of truth for available categories
+  var availableCategories = <String>[].obs;
+  var isLoadingCategories = true.obs;
   StreamSubscription? _categoriesSubscription;
-
-  // Combined categories (default + group custom categories)
-  List<String> get categories {
-    // Create a set to avoid duplicates
-    final allCategories = <String>{};
-
-    // Add default categories first
-    allCategories.addAll(defaultCategories);
-
-    // Add group custom categories (excluding defaults to avoid duplicates)
-    for (var category in groupCategories) {
-      if (!defaultCategories.contains(category)) {
-        allCategories.add(category);
-      }
-    }
-
-    return allCategories.toList();
-  }
 
   GlobalKey<FormState> key = GlobalKey<FormState>();
 
@@ -72,7 +58,47 @@ class CreateMealController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadGroupCategories();
+
+    print('═══════════════════════════════════════');
+    print('🚀 CREATE MEAL CONTROLLER INITIALIZED');
+    print('═══════════════════════════════════════');
+
+    // Get group category ID from arguments if passed
+    final arguments = Get.arguments;
+    print('🔵 CreateMealController onInit - Arguments: $arguments');
+    print('🔵 Arguments type: ${arguments.runtimeType}');
+
+    if (arguments is Map<String, dynamic>) {
+      groupCategoryId = arguments['groupCategoryId'] as String?;
+      print('🔵 Received groupCategoryId: $groupCategoryId');
+
+      // If editing a meal, extract it from the arguments
+      final meal = arguments['meal'] as MealModel?;
+      if (meal != null) {
+        print('🔵 Editing meal: ${meal.name}');
+        populateForEdit(meal);
+      }
+    } else if (arguments is MealModel) {
+      // Legacy support: arguments is directly a MealModel
+      print('🔵 Legacy: Editing meal: ${arguments.name}');
+      populateForEdit(arguments);
+    } else {
+      print('⚠️ No arguments or unexpected argument type');
+    }
+
+    // Load categories based on mode
+    if (groupCategoryId != null) {
+      print('🟢 GROUP MODE: Loading meal categories from Firestore');
+      print('🟢 Group Category ID: $groupCategoryId');
+      _loadGroupCategories();
+    } else {
+      print('🟢 PERSONAL MODE: Using default categories');
+      print('🟢 Default categories: $defaultCategories');
+      availableCategories.assignAll(defaultCategories);
+      isLoadingCategories.value = false;
+    }
+
+    print('═══════════════════════════════════════');
   }
 
   @override
@@ -81,7 +107,7 @@ class CreateMealController extends GetxController {
     super.onClose();
   }
 
-  // Load additional categories from user's group (add-on feature)
+  // Load meal categories from Firestore for group mode
   Future<void> _loadGroupCategories() async {
     try {
       isLoadingCategories.value = true;
@@ -90,54 +116,48 @@ class CreateMealController extends GetxController {
       final userId = authController.firebaseUser.value?.uid ?? '';
 
       if (userId.isEmpty) {
-        print('No user ID found, using default categories only');
-        groupCategories.value = [];
+        print('❌ No user ID found, falling back to default categories');
+        availableCategories.assignAll(defaultCategories);
         isLoadingCategories.value = false;
         return;
       }
 
-      // Get user's groups
-      final groups = await _groupsService.getUserGroups(userId);
-
-      if (groups.isEmpty) {
-        print('No groups found for user, using default categories only');
-        groupCategories.value = [];
+      if (groupCategoryId == null) {
+        print('❌ No groupCategoryId, falling back to default categories');
+        availableCategories.assignAll(defaultCategories);
         isLoadingCategories.value = false;
         return;
       }
 
-      // Use first group's categories
-      final groupId = groups.first.id;
-      if (groupId == null) {
-        print('Group ID is null, using default categories only');
-        groupCategories.value = [];
-        isLoadingCategories.value = false;
-        return;
-      }
+      print('🟢 Loading meal categories for groupCategoryId: $groupCategoryId');
 
-      // Subscribe to categories stream
-      _categoriesSubscription = _categoriesService
-          .getCategoriesStream(groupId)
-          .listen(
-            (categoryModels) {
-              groupCategories.value = categoryModels
-                  .map((c) => c.name)
-                  .toList();
-              isLoadingCategories.value = false;
-              print(
-                'Loaded ${groupCategories.length} group categories: $groupCategories',
-              );
-              print('Total categories available: ${categories.length}');
-            },
-            onError: (error) {
-              print('Error loading group categories: $error');
-              groupCategories.value = [];
-              isLoadingCategories.value = false;
-            },
-          );
+      // Use direct Firestore query (same as weekly meal planner)
+      final categoriesSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('group_categories')
+          .doc(groupCategoryId!)
+          .collection('meal_categories')
+          .orderBy('order')
+          .get();
+
+      final categoryNames = categoriesSnapshot.docs
+          .map((doc) {
+            final data = doc.data();
+            return data['name'] as String? ?? '';
+          })
+          .where((name) => name.isNotEmpty)
+          .toList();
+
+      availableCategories.assignAll(categoryNames);
+      isLoadingCategories.value = false;
+
+      print(
+        '🟢 SUCCESS: Loaded ${availableCategories.length} meal categories: $categoryNames',
+      );
     } catch (e) {
-      print('Error in _loadGroupCategories: $e');
-      groupCategories.value = [];
+      print('❌ Error loading meal categories: $e');
+      availableCategories.assignAll(defaultCategories);
       isLoadingCategories.value = false;
     }
   }

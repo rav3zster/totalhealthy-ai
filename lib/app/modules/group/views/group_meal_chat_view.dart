@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../data/models/meal_model.dart';
 import '../../../data/services/meals_firestore_service.dart';
 import '../../../controllers/user_controller.dart';
@@ -253,7 +254,34 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
     final userData = authController.userdataget();
     final userId = userData["id"] ?? userData["_id"] ?? "";
 
-    Get.toNamed("${Routes.CreateMeal}?id=$userId&from=group_details");
+    // Get the group's category ID to pass to Create Meal
+    try {
+      final groupDoc = await FirebaseFirestore.instance
+          .collection('groups')
+          .doc(widget.groupId)
+          .get();
+
+      String? groupCategoryId;
+      if (groupDoc.exists) {
+        final groupData = groupDoc.data();
+        groupCategoryId = groupData?['group_category_id'] as String?;
+      }
+
+      print(
+        '🚀 Group Details: Navigating to Create Meal with groupCategoryId: $groupCategoryId',
+      );
+
+      Get.toNamed(
+        "${Routes.CreateMeal}?id=$userId&from=group_details",
+        arguments: groupCategoryId != null
+            ? {'groupCategoryId': groupCategoryId}
+            : null,
+      );
+    } catch (e) {
+      print('❌ Error getting group category ID: $e');
+      // Fallback: navigate without group category ID
+      Get.toNamed("${Routes.CreateMeal}?id=$userId&from=group_details");
+    }
   }
 
   Widget _buildMealMessageBubble(MealModel meal, bool isMe) {

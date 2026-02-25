@@ -310,8 +310,31 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                   onAddMealTap: () {
                                     final userData = Get.find<AuthController>()
                                         .userdataget();
+
+                                    // Pass group category ID if in group mode
+                                    final arguments = <String, dynamic>{};
+                                    if (controller.isGroupMode.value &&
+                                        controller
+                                                .selectedGroupCategoryId
+                                                .value !=
+                                            null) {
+                                      arguments['groupCategoryId'] = controller
+                                          .selectedGroupCategoryId
+                                          .value;
+                                      print(
+                                        '🔵 Navigation: Passing groupCategoryId: ${arguments['groupCategoryId']}',
+                                      );
+                                    } else {
+                                      print(
+                                        '🔵 Navigation: No groupCategoryId (isGroupMode: ${controller.isGroupMode.value}, selectedGroupCategoryId: ${controller.selectedGroupCategoryId.value})',
+                                      );
+                                    }
+
                                     Get.toNamed(
                                       "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                      arguments: arguments.isEmpty
+                                          ? null
+                                          : arguments,
                                     );
                                   },
                                 ),
@@ -533,8 +556,28 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                               final userData =
                                                   Get.find<AuthController>()
                                                       .userdataget();
+
+                                              // Pass group category ID if in group mode
+                                              final arguments =
+                                                  <String, dynamic>{};
+                                              if (controller
+                                                      .isGroupMode
+                                                      .value &&
+                                                  controller
+                                                          .selectedGroupCategoryId
+                                                          .value !=
+                                                      null) {
+                                                arguments['groupCategoryId'] =
+                                                    controller
+                                                        .selectedGroupCategoryId
+                                                        .value;
+                                              }
+
                                               Get.toNamed(
                                                 "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                                arguments: arguments.isEmpty
+                                                    ? null
+                                                    : arguments,
                                               );
                                             },
                                           ),
@@ -991,9 +1034,19 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                             onTap: () {
                               final userData = Get.find<AuthController>()
                                   .userdataget();
+
+                              // Pass group category ID if in group mode
+                              final arguments = <String, dynamic>{'meal': meal};
+                              if (controller.isGroupMode.value &&
+                                  controller.selectedGroupCategoryId.value !=
+                                      null) {
+                                arguments['groupCategoryId'] =
+                                    controller.selectedGroupCategoryId.value;
+                              }
+
                               Get.toNamed(
                                 "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
-                                arguments: meal,
+                                arguments: arguments,
                               );
                             },
                             child: const Padding(
