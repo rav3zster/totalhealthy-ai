@@ -5,7 +5,8 @@ class NotificationSettingsView extends StatefulWidget {
   const NotificationSettingsView({super.key});
 
   @override
-  State<NotificationSettingsView> createState() => _NotificationSettingsViewState();
+  State<NotificationSettingsView> createState() =>
+      _NotificationSettingsViewState();
 }
 
 class _NotificationSettingsViewState extends State<NotificationSettingsView> {
@@ -19,126 +20,186 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: Icon(Icons.arrow_back_ios_new_outlined, color: Colors.white),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.search,
-              size: 24,
-              color: Colors.white,
-            ),
-          )
-        ],
-        title: Text(
-          'Notifications',
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: 'inter',
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
+            stops: [0.0, 0.3, 1.0],
           ),
         ),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Meal reminder
-            _buildNotificationSetting(
-              'Meal reminder',
-              mealReminderStatus,
-              (String? newValue) {
-                setState(() {
-                  mealReminderStatus = newValue!;
-                });
-              },
-            ),
-            
-            SizedBox(height: 30),
-            
-            // Water reminder
-            _buildNotificationSetting(
-              'Water reminder',
-              waterReminderStatus,
-              (String? newValue) {
-                setState(() {
-                  waterReminderStatus = newValue!;
-                });
-              },
-            ),
-            
-            SizedBox(height: 30),
-            
-            // Exercise reminder
-            _buildNotificationSetting(
-              'Exercise reminder',
-              exerciseReminderStatus,
-              (String? newValue) {
-                setState(() {
-                  exerciseReminderStatus = newValue!;
-                });
-              },
-            ),
-            
-            SizedBox(height: 30),
-            
-            // Update Notification
-            _buildNotificationSetting(
-              'Update Notification',
-              updateNotificationStatus,
-              (String? newValue) {
-                setState(() {
-                  updateNotificationStatus = newValue!;
-                });
-              },
-            ),
-          ],
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(25),
+                    bottomRight: Radius.circular(25),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                              const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                            ],
+                          ),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          onPressed: () => Get.back(),
+                          icon: const Icon(
+                            Icons.arrow_back_ios_new_outlined,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const Expanded(
+                        child: Text(
+                          'Notifications',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'inter',
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 48),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Meal reminder
+                      _buildNotificationSetting(
+                        'Meal reminder',
+                        mealReminderStatus,
+                        (String? newValue) {
+                          setState(() {
+                            mealReminderStatus = newValue!;
+                          });
+                        },
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Water reminder
+                      _buildNotificationSetting(
+                        'Water reminder',
+                        waterReminderStatus,
+                        (String? newValue) {
+                          setState(() {
+                            waterReminderStatus = newValue!;
+                          });
+                        },
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Exercise reminder
+                      _buildNotificationSetting(
+                        'Exercise reminder',
+                        exerciseReminderStatus,
+                        (String? newValue) {
+                          setState(() {
+                            exerciseReminderStatus = newValue!;
+                          });
+                        },
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Update Notification
+                      _buildNotificationSetting(
+                        'Update Notification',
+                        updateNotificationStatus,
+                        (String? newValue) {
+                          setState(() {
+                            updateNotificationStatus = newValue!;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-  
-  Widget _buildNotificationSetting(String title, String currentValue, Function(String?) onChanged) {
+
+  Widget _buildNotificationSetting(
+    String title,
+    String currentValue,
+    Function(String?) onChanged,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
           decoration: BoxDecoration(
-            color: Color(0xFF2A2A2A),
-            borderRadius: BorderRadius.circular(10),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF2A2A2A), Color(0xFF1C1C1E)],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: const Color(0xFFC2D86A).withValues(alpha: 0.15),
+              width: 1,
+            ),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: currentValue,
-              dropdownColor: Color(0xFF2A2A2A),
-              icon: Icon(Icons.keyboard_arrow_down, color: Colors.white),
-              style: TextStyle(
+              dropdownColor: const Color(0xFF2A2A2A),
+              icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+              style: const TextStyle(
                 color: Color(0xFFC2D86A),
                 fontSize: 16,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
               items: statusOptions.map((String status) {
                 return DropdownMenuItem<String>(
