@@ -11,162 +11,223 @@ class AccountPasswordSettingsView extends StatelessWidget {
     final controller = Get.put(AccountPasswordController());
 
     return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: const Icon(
-            Icons.arrow_back_ios_new_outlined,
-            color: Colors.white,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
+            stops: [0.0, 0.3, 1.0],
           ),
         ),
-        title: const Text(
-          'Account & Password',
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: 'inter',
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        actions: [
-          Obx(
-            () => TextButton(
-              onPressed: controller.canSave ? controller.saveChanges : null,
-              child: controller.isSaving.value
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Color(0xFFC2D86A),
-                      ),
-                    )
-                  : Text(
-                      'Save',
-                      style: TextStyle(
-                        color: controller.canSave
-                            ? const Color(0xFFC2D86A)
-                            : Colors.grey,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-            ),
-          ),
-        ],
-      ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(color: Color(0xFFC2D86A)),
-          );
-        }
-
-        return RefreshIndicator(
-          onRefresh: controller.refreshUserData,
-          color: const Color(0xFFC2D86A),
-          backgroundColor: const Color(0xFF2A2A2A),
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // User name
-                _buildInputField(
-                  'User name',
-                  controller.usernameController,
-                  controller.isUsernameEditable,
-                  controller.toggleUsernameEdit,
-                  errorMessage: controller.usernameError,
-                ),
-
-                const SizedBox(height: 25),
-
-                // E-mail address
-                _buildInputField(
-                  'E-mail address',
-                  controller.emailController,
-                  controller.isEmailEditable,
-                  controller.toggleEmailEdit,
-                  keyboardType: TextInputType.emailAddress,
-                  errorMessage: controller.emailError,
-                ),
-
-                const SizedBox(height: 25),
-
-                // Contact no.
-                _buildInputField(
-                  'Contact no.',
-                  controller.contactController,
-                  controller.isContactEditable,
-                  controller.toggleContactEdit,
-                  keyboardType: TextInputType.phone,
-                  errorMessage: controller.contactError,
-                ),
-
-                const SizedBox(height: 25),
-
-                // Password section with two-step verification
-                _buildPasswordSection(controller),
-
-                const SizedBox(height: 40),
-
-                // Help text
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2A2A2A),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                      width: 1,
-                    ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(25),
+                    bottomRight: Radius.circular(25),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Row(
                     children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            color: const Color(0xFFC2D86A),
-                            size: 20,
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                              const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Security Information',
-                            style: TextStyle(
-                              color: Color(0xFFC2D86A),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          onPressed: () => Get.back(),
+                          icon: const Icon(
+                            Icons.arrow_back_ios_new_outlined,
+                            color: Colors.white,
                           ),
-                        ],
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        '• Password changes require two-step verification\n'
-                        '• First verify your current password, then set a new one\n'
-                        '• Email changes require current password verification\n'
-                        '• All changes are synced to your Firebase account',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          height: 1.4,
+                      const Expanded(
+                        child: Text(
+                          'Account & Password',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'inter',
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      Obx(
+                        () => TextButton(
+                          onPressed: controller.canSave
+                              ? controller.saveChanges
+                              : null,
+                          child: controller.isSaving.value
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Color(0xFFC2D86A),
+                                  ),
+                                )
+                              : Text(
+                                  'Save',
+                                  style: TextStyle(
+                                    color: controller.canSave
+                                        ? const Color(0xFFC2D86A)
+                                        : Colors.grey,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+
+              // Content
+              Expanded(
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFC2D86A),
+                      ),
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: controller.refreshUserData,
+                    color: const Color(0xFFC2D86A),
+                    backgroundColor: const Color(0xFF2A2A2A),
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // User name
+                          _buildInputField(
+                            'User name',
+                            controller.usernameController,
+                            controller.isUsernameEditable,
+                            controller.toggleUsernameEdit,
+                            errorMessage: controller.usernameError,
+                          ),
+
+                          const SizedBox(height: 25),
+
+                          // E-mail address
+                          _buildInputField(
+                            'E-mail address',
+                            controller.emailController,
+                            controller.isEmailEditable,
+                            controller.toggleEmailEdit,
+                            keyboardType: TextInputType.emailAddress,
+                            errorMessage: controller.emailError,
+                          ),
+
+                          const SizedBox(height: 25),
+
+                          // Contact no.
+                          _buildInputField(
+                            'Contact no.',
+                            controller.contactController,
+                            controller.isContactEditable,
+                            controller.toggleContactEdit,
+                            keyboardType: TextInputType.phone,
+                            errorMessage: controller.contactError,
+                          ),
+
+                          const SizedBox(height: 25),
+
+                          // Password section with two-step verification
+                          _buildPasswordSection(controller),
+
+                          const SizedBox(height: 40),
+
+                          // Help text
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2A2A2A),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: const Color(
+                                  0xFFC2D86A,
+                                ).withValues(alpha: 0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.info_outline,
+                                      color: const Color(0xFFC2D86A),
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      'Security Information',
+                                      style: TextStyle(
+                                        color: Color(0xFFC2D86A),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  '• Password changes require two-step verification\n'
+                                  '• First verify your current password, then set a new one\n'
+                                  '• Email changes require current password verification\n'
+                                  '• All changes are synced to your Firebase account',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ],
           ),
-        );
-      }),
+        ),
+      ),
     );
   }
 
