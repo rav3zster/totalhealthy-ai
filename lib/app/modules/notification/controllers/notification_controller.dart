@@ -139,4 +139,30 @@ class NotificationController extends GetxController {
   Future<void> deleteNotification(String id) async {
     await _notificationsService.deleteNotification(id);
   }
+
+  Future<void> clearAllNotifications() async {
+    try {
+      final authController = Get.find<AuthController>();
+      final currentUser = authController.firebaseUser.value;
+
+      if (currentUser != null) {
+        await _notificationsService.deleteAllNotifications(currentUser.uid);
+
+        Get.snackbar(
+          "Success",
+          "All notifications cleared",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Failed to clear notifications: $e",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
 }

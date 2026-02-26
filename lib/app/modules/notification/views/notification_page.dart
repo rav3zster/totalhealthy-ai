@@ -75,6 +75,58 @@ class _NotificationsPageState extends State<NotificationsPage>
                             letterSpacing: -0.5,
                           ),
                         ),
+                        const Spacer(),
+                        // Clear All button
+                        Obx(() {
+                          if (widget.controller.notifications.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+                          return Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                _showClearAllDialog();
+                              },
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.red.withValues(alpha: 0.3),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.delete_sweep_rounded,
+                                      size: 18,
+                                      color: Colors.red.withValues(alpha: 0.9),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Clear All',
+                                      style: TextStyle(
+                                        color: Colors.red.withValues(
+                                          alpha: 0.9,
+                                        ),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                        const SizedBox(width: 16),
                       ],
                     ),
 
@@ -215,7 +267,36 @@ class _NotificationsPageState extends State<NotificationsPage>
         itemCount: filteredList.length,
         itemBuilder: (context, index) {
           final notification = filteredList[index];
-          return _buildModernNotificationCard(notification, index);
+          return Dismissible(
+            key: Key(notification.id),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.red.withValues(alpha: 0.1),
+                    Colors.red.withValues(alpha: 0.3),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(
+                Icons.delete_rounded,
+                color: Colors.red,
+                size: 32,
+              ),
+            ),
+            confirmDismiss: (direction) async {
+              return await _showDeleteConfirmDialog(notification);
+            },
+            onDismissed: (direction) {
+              widget.controller.deleteNotification(notification.id);
+            },
+            child: _buildModernNotificationCard(notification, index),
+          );
         },
       );
     });
@@ -522,6 +603,80 @@ class _NotificationsPageState extends State<NotificationsPage>
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Future<bool?> _showDeleteConfirmDialog(AppNotification notification) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Delete Notification',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        ),
+        content: const Text(
+          'Are you sure you want to delete this notification?',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.red.withValues(alpha: 0.2),
+            ),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showClearAllDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Clear All Notifications',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        ),
+        content: const Text(
+          'Are you sure you want to delete all notifications? This action cannot be undone.',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              widget.controller.clearAllNotifications();
+            },
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.red.withValues(alpha: 0.2),
+            ),
+            child: const Text(
+              'Clear All',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
       ),
     );
   }

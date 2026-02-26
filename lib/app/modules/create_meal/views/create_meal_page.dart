@@ -538,6 +538,7 @@ class _CreateMealPageState extends State<CreateMealPage>
             }),
             children: [
               // Show loading indicator while group categories are loading
+              // CRITICAL: Wrap entire category list in Obx for reactivity
               Obx(() {
                 if (widget.controller.isLoadingCategories.value) {
                   return const Padding(
@@ -569,66 +570,67 @@ class _CreateMealPageState extends State<CreateMealPage>
                 }
 
                 // Show category list (reactive to changes)
+                // This Column rebuilds when availableCategories changes
                 return Column(
                   children: widget.controller.availableCategories.map<Widget>((
                     category,
                   ) {
-                    return Obx(() {
-                      final isSelected = widget.controller.selectedCategories
-                          .contains(category);
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: isSelected
-                              ? LinearGradient(
-                                  colors: [
-                                    const Color(
-                                      0xFFC2D86A,
-                                    ).withValues(alpha: 0.2),
-                                    const Color(
-                                      0xFFC2D86A,
-                                    ).withValues(alpha: 0.1),
-                                  ],
-                                )
-                              : null,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: CheckboxListTile(
-                          title: Text(
-                            category,
-                            style: TextStyle(
-                              color: isSelected
-                                  ? const Color(0xFFC2D86A)
-                                  : Colors.white70,
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.normal,
-                            ),
+                    // Calculate selection state inside the map
+                    final isSelected = widget.controller.selectedCategories
+                        .contains(category);
+
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: isSelected
+                            ? LinearGradient(
+                                colors: [
+                                  const Color(
+                                    0xFFC2D86A,
+                                  ).withValues(alpha: 0.2),
+                                  const Color(
+                                    0xFFC2D86A,
+                                  ).withValues(alpha: 0.1),
+                                ],
+                              )
+                            : null,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: CheckboxListTile(
+                        title: Text(
+                          category,
+                          style: TextStyle(
+                            color: isSelected
+                                ? const Color(0xFFC2D86A)
+                                : Colors.white70,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
                           ),
-                          value: isSelected,
-                          onChanged: (selected) {
-                            widget.controller.onCategoryChanged(
-                              category,
-                              selected ?? false,
-                            );
-                          },
-                          controlAffinity: ListTileControlAffinity.leading,
-                          checkColor: Colors.black,
-                          fillColor: WidgetStateProperty.resolveWith<Color?>((
-                            states,
-                          ) {
-                            if (states.contains(WidgetState.selected)) {
-                              return const Color(0xFFC2D86A);
-                            }
-                            return Colors.white24;
-                          }),
                         ),
-                      );
-                    });
+                        value: isSelected,
+                        onChanged: (selected) {
+                          widget.controller.onCategoryChanged(
+                            category,
+                            selected ?? false,
+                          );
+                        },
+                        controlAffinity: ListTileControlAffinity.leading,
+                        checkColor: Colors.black,
+                        fillColor: WidgetStateProperty.resolveWith<Color?>((
+                          states,
+                        ) {
+                          if (states.contains(WidgetState.selected)) {
+                            return const Color(0xFFC2D86A);
+                          }
+                          return Colors.white24;
+                        }),
+                      ),
+                    );
                   }).toList(),
                 );
               }),

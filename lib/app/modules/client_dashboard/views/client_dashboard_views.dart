@@ -803,328 +803,347 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
           '/meals-details?id=${Get.find<AuthController>().userdataget()["id"] ?? Get.find<AuthController>().userdataget()["_id"] ?? ""}',
         );
       },
-      onLongPress: () => _showDeleteMealDialog(context, meal, controller),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF2A2A2A), Color(0xFF1F1F1F)],
-          ),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
-            width: 1.5,
-          ),
+          color: const Color(0xFF1C1C1E),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.4),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Section: Image, Title, and Calories
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  // Meal Image
-                  Container(
-                    width: 80,
-                    height: 80,
+            // Header Row: Image + Title + Menu
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Square Image with Icons
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: Container(
+                    width: 90,
+                    height: 90,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFC2D86A).withValues(alpha: 0.4),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
-                        ),
+                      color: const Color(0xFFC2D86A),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.hardEdge,
+                      children: [
+                        // Meal Image Background (if image exists, show it without icons)
+                        if (meal.imageUrl.isNotEmpty)
+                          Positioned.fill(
+                            child: Image(
+                              image:
+                                  UserController.getImageProvider(
+                                    meal.imageUrl,
+                                  ) ??
+                                  const AssetImage(
+                                        'assets/meal_placeholder.png',
+                                      )
+                                      as ImageProvider,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(color: const Color(0xFFC2D86A)),
+                            ),
+                          ),
+
+                        // Show icons only when there's NO image
+                        if (meal.imageUrl.isEmpty) ...[
+                          // Fork Icon (top-left)
+                          Positioned(
+                            top: 8,
+                            left: 8,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Icon(
+                                Icons.restaurant,
+                                color: Colors.black.withValues(alpha: 0.85),
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                          // Plus Icon (centered)
+                          Center(
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.85),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.add,
+                                color: Color(0xFFC2D86A),
+                                size: 28,
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
-                    child: ClipRRect(
+                  ),
+                ),
+                const SizedBox(width: 20),
+
+                // Title and Tags
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Meal Name
+                      Text(
+                        meal.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                          height: 1.2,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Tags (ORGANIC • FRESH)
+                      Text(
+                        'ORGANIC • FRESH',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.45),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(width: 8),
+
+                // Three-Dot Menu
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2C2C2E),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: PopupMenuButton<String>(
+                    icon: Icon(
+                      Icons.more_vert_rounded,
+                      color: Colors.white.withValues(alpha: 0.6),
+                      size: 20,
+                    ),
+                    color: const Color(0xFF2C2C2E),
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image(
-                        image:
-                            UserController.getImageProvider(meal.imageUrl) ??
-                            const AssetImage('assets/meal_placeholder.png')
-                                as ImageProvider,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(
-                              Icons.restaurant,
-                              color: Colors.black,
-                              size: 40,
-                            ),
+                      side: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        width: 1,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
+                    offset: const Offset(-10, 40),
+                    elevation: 8,
+                    onSelected: (value) {
+                      if (value == 'edit') {
+                        final userData = Get.find<AuthController>()
+                            .userdataget();
 
-                  // Meal Info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Meal Name
-                        Text(
-                          meal.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.3,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 10),
+                        // Pass group category ID if in group mode
+                        final arguments = <String, dynamic>{'meal': meal};
+                        if (controller.isGroupMode.value &&
+                            controller.selectedGroupCategoryId.value != null) {
+                          arguments['groupCategoryId'] =
+                              controller.selectedGroupCategoryId.value;
+                        }
 
-                        // Calories and Weight Row
-                        Row(
+                        Get.toNamed(
+                          "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
+                          arguments: arguments,
+                        );
+                      } else if (value == 'delete') {
+                        _showDeleteMealDialog(context, meal, controller);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem<String>(
+                        value: 'edit',
+                        child: Row(
                           children: [
-                            // Calories Badge
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
+                              padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.orange.withValues(alpha: 0.3),
-                                    Colors.orange.withValues(alpha: 0.15),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.orange.withValues(alpha: 0.4),
-                                  width: 1,
-                                ),
+                                color: const Color(
+                                  0xFFC2D86A,
+                                ).withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.local_fire_department,
-                                    color: Colors.orange,
-                                    size: 16,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${meal.kcal}',
-                                    style: const TextStyle(
-                                      color: Colors.orange,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const Text(
-                                    ' Kcal',
-                                    style: TextStyle(
-                                      color: Colors.orange,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
+                              child: const Icon(
+                                Icons.edit_outlined,
+                                size: 18,
+                                color: Color(0xFFC2D86A),
                               ),
                             ),
-                            const SizedBox(width: 10),
-
-                            // Weight Badge
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  width: 1,
-                                ),
-                              ),
-                              child: const Text(
-                                '100g',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Edit Meal',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.delete_outline_rounded,
+                                size: 18,
+                                color: Colors.red,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Delete Meal',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 24),
+
+            // Calories and Weight Row
+            Row(
+              children: [
+                // Calories Badge
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF3A2F1A),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('🔥', style: TextStyle(fontSize: 20)),
+                        const SizedBox(width: 10),
+                        Text(
+                          '${meal.kcal}',
+                          style: const TextStyle(
+                            color: Color(0xFFFFB800),
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const Text(
+                          ' kcal',
+                          style: TextStyle(
+                            color: Color(0xFFFFB800),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-
-            // Divider
-            Container(
-              height: 1,
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.transparent,
-                    const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                    Colors.transparent,
-                  ],
                 ),
-              ),
+                const SizedBox(width: 16),
+
+                // Weight Badge
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2C2C2E),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('⚖️', style: TextStyle(fontSize: 20)),
+                        const SizedBox(width: 10),
+                        Text(
+                          '100g',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.95),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
 
-            // Bottom Section: Nutritional Info
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      _buildModernNutrientBar(
-                        '${meal.protein}g',
-                        'Protein',
-                        Colors.green,
-                      ),
-                      const SizedBox(width: 10),
-                      _buildModernNutrientBar(
-                        '${meal.fat}g',
-                        'Fat',
-                        Colors.blue,
-                      ),
-                      const SizedBox(width: 10),
-                      _buildModernNutrientBar(
-                        '${meal.carbs}g',
-                        'Carbs',
-                        Colors.red,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  // Edit and Delete Buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: const Color(
-                              0xFFC2D86A,
-                            ).withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(8),
-                            onTap: () {
-                              final userData = Get.find<AuthController>()
-                                  .userdataget();
+            const SizedBox(height: 18),
 
-                              // Pass group category ID if in group mode
-                              final arguments = <String, dynamic>{'meal': meal};
-                              if (controller.isGroupMode.value &&
-                                  controller.selectedGroupCategoryId.value !=
-                                      null) {
-                                arguments['groupCategoryId'] =
-                                    controller.selectedGroupCategoryId.value;
-                              }
-
-                              Get.toNamed(
-                                "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
-                                arguments: arguments,
-                              );
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.edit_outlined,
-                                    size: 16,
-                                    color: Color(0xFFC2D86A),
-                                  ),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Edit',
-                                    style: TextStyle(
-                                      color: Color(0xFFC2D86A),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Colors.red.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(8),
-                            onTap: () => _showDeleteMealDialog(
-                              context,
-                              meal,
-                              controller,
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.delete_outline,
-                                    size: 16,
-                                    color: Colors.red,
-                                  ),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Delete',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            // Macros Row
+            Row(
+              children: [
+                _buildMacroBox(
+                  '${meal.protein}g',
+                  'PROTEIN',
+                  const Color(0xFF1A3A2A),
+                  const Color(0xFF4CAF50),
+                ),
+                const SizedBox(width: 12),
+                _buildMacroBox(
+                  '${meal.fat}g',
+                  'FAT',
+                  const Color(0xFF1A2A3A),
+                  const Color(0xFF2196F3),
+                ),
+                const SizedBox(width: 12),
+                _buildMacroBox(
+                  '${meal.carbs}g',
+                  'CARBS',
+                  const Color(0xFF3A1A1A),
+                  const Color(0xFFE53935),
+                ),
+              ],
             ),
           ],
         ),
@@ -1132,44 +1151,38 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     );
   }
 
-  Widget _buildModernNutrientBar(String value, String label, Color color) {
+  Widget _buildMacroBox(
+    String value,
+    String label,
+    Color bgColor,
+    Color textColor,
+  ) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              color.withValues(alpha: 0.25),
-              color.withValues(alpha: 0.1),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.4), width: 1.5),
+          color: bgColor,
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.3,
-              ),
-            ),
-            const SizedBox(height: 3),
             Text(
               label,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.8),
+                color: textColor,
                 fontSize: 10,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.2,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ],
