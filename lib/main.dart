@@ -10,6 +10,8 @@ import 'app/bindings/app_bindings.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
+import 'app/core/controllers/global_settings_controller.dart';
+import 'app/core/translations/app_translations.dart';
 
 final NotificationService _notificationService = NotificationService();
 
@@ -19,6 +21,10 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await GetStorage.init();
+
+  // Initialize global settings controller FIRST
+  Get.put(GlobalSettingsController(), permanent: true);
+
   await initializeControllers();
 
   // Determine initial route before running the app
@@ -61,22 +67,43 @@ Future<void> initializeControllers() async {
 
 class MyApp extends StatelessWidget {
   final String initialRoute;
+
   const MyApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-        child: child!,
+    // Make GetMaterialApp reactive to theme and locale changes
+    return Obx(
+      () => GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        ),
+        initialRoute: initialRoute,
+        getPages: AppPages.routes,
+        initialBinding: AppBindings(),
+        title: 'Total Healthy',
+
+        // Reactive theme and locale
+        themeMode: GlobalSettingsController.to.themeMode.value,
+        locale: GlobalSettingsController.to.locale.value,
+        translations: AppTranslations(),
+        fallbackLocale: const Locale('en'),
+
+        // Theme definitions
+        theme: ThemeData.light().copyWith(
+          scaffoldBackgroundColor: Colors.white,
+          brightness: Brightness.light,
+        ),
+        darkTheme: ThemeData.dark().copyWith(
+          scaffoldBackgroundColor: Colors.black,
+          brightness: Brightness.dark,
+        ),
+
+        onReady: () {},
+        scrollBehavior: MyCustomScrollBehavior(),
       ),
-      initialRoute: initialRoute,
-      getPages: AppPages.routes,
-      initialBinding: AppBindings(), // Add our app bindings
-      title: 'Total Healthy',
-      onReady: () {},
-      scrollBehavior: MyCustomScrollBehavior(),
-      debugShowCheckedModeBanner: false,
     );
   }
 }

@@ -1,24 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/controllers/global_settings_controller.dart';
 
-class GeneralSettingsView extends StatefulWidget {
+class GeneralSettingsView extends StatelessWidget {
   const GeneralSettingsView({super.key});
 
   @override
-  State<GeneralSettingsView> createState() => _GeneralSettingsViewState();
-}
-
-class _GeneralSettingsViewState extends State<GeneralSettingsView> {
-  String selectedLanguage = 'English';
-  String selectedRegion = 'India';
-  String selectedTheme = 'Dark';
-
-  final List<String> languages = ['English', 'Hindi', 'Spanish', 'French'];
-  final List<String> regions = ['India', 'USA', 'UK', 'Canada'];
-  final List<String> themes = ['Dark', 'Light', 'System'];
-
-  @override
   Widget build(BuildContext context) {
+    final controller = GlobalSettingsController.to;
+    final List<String> languages = ['English', 'Hindi', 'Spanish', 'French'];
+    final List<String> regions = ['India', 'USA', 'UK', 'Canada'];
+    final List<String> themes = ['Dark', 'Light', 'System'];
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -74,11 +66,11 @@ class _GeneralSettingsViewState extends State<GeneralSettingsView> {
                           ),
                         ),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'General',
+                          'general'.tr,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontFamily: 'inter',
                             fontSize: 20,
@@ -121,9 +113,9 @@ class _GeneralSettingsViewState extends State<GeneralSettingsView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Language Section
-                      const Text(
-                        'Language',
-                        style: TextStyle(
+                      Text(
+                        'language'.tr,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -151,29 +143,31 @@ class _GeneralSettingsViewState extends State<GeneralSettingsView> {
                           ),
                         ),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: selectedLanguage,
-                            dropdownColor: const Color(0xFF2A2A2A),
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Colors.white,
+                          child: Obx(
+                            () => DropdownButton<String>(
+                              value: controller.language.value,
+                              dropdownColor: const Color(0xFF2A2A2A),
+                              icon: const Icon(
+                                Icons.keyboard_arrow_down,
+                                color: Colors.white,
+                              ),
+                              style: const TextStyle(
+                                color: Color(0xFFC2D86A),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              items: languages.map((String language) {
+                                return DropdownMenuItem<String>(
+                                  value: language,
+                                  child: Text(language),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  controller.changeLanguage(newValue);
+                                }
+                              },
                             ),
-                            style: const TextStyle(
-                              color: Color(0xFFC2D86A),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            items: languages.map((String language) {
-                              return DropdownMenuItem<String>(
-                                value: language,
-                                child: Text(language),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedLanguage = newValue!;
-                              });
-                            },
                           ),
                         ),
                       ),
@@ -181,9 +175,9 @@ class _GeneralSettingsViewState extends State<GeneralSettingsView> {
                       const SizedBox(height: 30),
 
                       // Region Section
-                      const Text(
-                        'Region',
-                        style: TextStyle(
+                      Text(
+                        'region'.tr,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -211,29 +205,31 @@ class _GeneralSettingsViewState extends State<GeneralSettingsView> {
                           ),
                         ),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: selectedRegion,
-                            dropdownColor: const Color(0xFF2A2A2A),
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Colors.white,
+                          child: Obx(
+                            () => DropdownButton<String>(
+                              value: controller.region.value,
+                              dropdownColor: const Color(0xFF2A2A2A),
+                              icon: const Icon(
+                                Icons.keyboard_arrow_down,
+                                color: Colors.white,
+                              ),
+                              style: const TextStyle(
+                                color: Color(0xFFC2D86A),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              items: regions.map((String region) {
+                                return DropdownMenuItem<String>(
+                                  value: region,
+                                  child: Text(region),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  controller.changeRegion(newValue);
+                                }
+                              },
                             ),
-                            style: const TextStyle(
-                              color: Color(0xFFC2D86A),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            items: regions.map((String region) {
-                              return DropdownMenuItem<String>(
-                                value: region,
-                                child: Text(region),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedRegion = newValue!;
-                              });
-                            },
                           ),
                         ),
                       ),
@@ -241,9 +237,9 @@ class _GeneralSettingsViewState extends State<GeneralSettingsView> {
                       const SizedBox(height: 30),
 
                       // Theme Section
-                      const Text(
-                        'Theme',
-                        style: TextStyle(
+                      Text(
+                        'theme'.tr,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -271,29 +267,31 @@ class _GeneralSettingsViewState extends State<GeneralSettingsView> {
                           ),
                         ),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: selectedTheme,
-                            dropdownColor: const Color(0xFF2A2A2A),
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Colors.white,
+                          child: Obx(
+                            () => DropdownButton<String>(
+                              value: controller.themeString.value,
+                              dropdownColor: const Color(0xFF2A2A2A),
+                              icon: const Icon(
+                                Icons.keyboard_arrow_down,
+                                color: Colors.white,
+                              ),
+                              style: const TextStyle(
+                                color: Color(0xFFC2D86A),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              items: themes.map((String theme) {
+                                return DropdownMenuItem<String>(
+                                  value: theme,
+                                  child: Text(theme),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  controller.changeTheme(newValue);
+                                }
+                              },
                             ),
-                            style: const TextStyle(
-                              color: Color(0xFFC2D86A),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            items: themes.map((String theme) {
-                              return DropdownMenuItem<String>(
-                                value: theme,
-                                child: Text(theme),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedTheme = newValue!;
-                              });
-                            },
                           ),
                         ),
                       ),
