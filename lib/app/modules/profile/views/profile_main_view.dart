@@ -8,8 +8,7 @@ import '../../../controllers/user_controller.dart';
 import '../../../widgets/base_screen_wrapper.dart';
 import '../../../widgets/phone_nav_bar.dart';
 import '../../../routes/app_pages.dart';
-import '../../../data/services/groups_firestore_service.dart';
-import '../../meal_categories/controllers/meal_categories_controller.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class ProfileMainView extends StatefulWidget {
   const ProfileMainView({super.key});
@@ -34,18 +33,12 @@ class _ProfileMainViewState extends State<ProfileMainView> {
         elevation: 0,
         automaticallyImplyLeading: false, // Remove back button
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-            ),
-          ),
+          decoration: BoxDecoration(gradient: context.headerGradient),
         ),
         title: Text(
           'profile'.tr,
           style: TextStyle(
-            color: Colors.white,
+            color: context.textPrimary,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -86,9 +79,9 @@ class _ProfileMainViewState extends State<ProfileMainView> {
               ),
               if (userController.isLoading)
                 Container(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  child: const Center(
-                    child: CircularProgressIndicator(color: Color(0xFFC2D86A)),
+                  color: context.backgroundColor.withValues(alpha: 0.5),
+                  child: Center(
+                    child: CircularProgressIndicator(color: context.accent),
                   ),
                 ),
             ],
@@ -109,14 +102,14 @@ class _ProfileMainViewState extends State<ProfileMainView> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                      const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                      context.accent.withValues(alpha: 0.3),
+                      context.accent.withValues(alpha: 0.1),
                     ],
                   ),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      color: context.accent.withValues(alpha: 0.3),
                       blurRadius: 15,
                       offset: const Offset(0, 5),
                     ),
@@ -125,14 +118,14 @@ class _ProfileMainViewState extends State<ProfileMainView> {
                 padding: const EdgeInsets.all(3),
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundColor: const Color(0xFF2A2A2A),
+                  backgroundColor: context.cardColor,
                   backgroundImage: UserController.getImageProvider(
                     userController.profileImage,
                   ),
                   child: userController.profileImage.isEmpty
-                      ? const Icon(
+                      ? Icon(
                           Icons.person,
-                          color: Colors.white24,
+                          color: context.textTertiary,
                           size: 50,
                         )
                       : null,
@@ -146,13 +139,13 @@ class _ProfileMainViewState extends State<ProfileMainView> {
                 onTap: () => _pickAndUploadImage(userController),
                 child: Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFC2D86A),
+                  decoration: BoxDecoration(
+                    color: context.accent,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.camera_alt,
-                    color: Colors.black,
+                    color: context.backgroundColor,
                     size: 16,
                   ),
                 ),
@@ -163,8 +156,8 @@ class _ProfileMainViewState extends State<ProfileMainView> {
         const SizedBox(height: 16),
         Text(
           userController.fullName,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: context.textPrimary,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -173,7 +166,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
           const SizedBox(height: 4),
           Text(
             userController.email,
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
+            style: TextStyle(color: context.textSecondary, fontSize: 14),
           ),
         ],
       ],
@@ -265,33 +258,23 @@ class _ProfileMainViewState extends State<ProfileMainView> {
   Widget _buildProgressSection(UserController userController) {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-        ),
+        gradient: context.cardGradient,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+          color: context.accent.withValues(alpha: 0.3),
           width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        boxShadow: context.cardShadow,
       ),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Progress Overview',
               style: TextStyle(
-                color: Colors.white,
+                color: context.textPrimary,
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
               ),
@@ -340,7 +323,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
       children: [
         Text(
           label,
-          style: const TextStyle(color: Colors.white54, fontSize: 12),
+          style: TextStyle(color: context.textSecondary, fontSize: 12),
         ),
         const SizedBox(height: 4),
         Text(
@@ -358,23 +341,13 @@ class _ProfileMainViewState extends State<ProfileMainView> {
   Widget _buildStatCard(String label, String value, String unit) {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-        ),
+        gradient: context.cardGradient,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+          color: context.accent.withValues(alpha: 0.2),
           width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        boxShadow: context.cardShadow,
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -382,7 +355,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
           children: [
             Text(
               label,
-              style: const TextStyle(color: Colors.white54, fontSize: 12),
+              style: TextStyle(color: context.textSecondary, fontSize: 12),
             ),
             const SizedBox(height: 8),
             RichText(
@@ -390,15 +363,15 @@ class _ProfileMainViewState extends State<ProfileMainView> {
                 children: [
                   TextSpan(
                     text: value,
-                    style: const TextStyle(
-                      color: Color(0xFFC2D86A),
+                    style: TextStyle(
+                      color: context.accent,
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   TextSpan(
                     text: ' $unit',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    style: TextStyle(color: context.textPrimary, fontSize: 12),
                   ),
                 ],
               ),
@@ -418,23 +391,13 @@ class _ProfileMainViewState extends State<ProfileMainView> {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-          ),
+          gradient: context.cardGradient,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+            color: context.accent.withValues(alpha: 0.2),
             width: 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
+          boxShadow: context.cardShadow,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -443,34 +406,32 @@ class _ProfileMainViewState extends State<ProfileMainView> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-                  ),
+                  gradient: context.accentGradient,
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                      color: context.accent.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-                child: Icon(icon, color: Colors.black, size: 20),
+                child: Icon(icon, color: context.backgroundColor, size: 20),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: context.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios,
-                color: Colors.white54,
+                color: context.textSecondary,
                 size: 16,
               ),
             ],
@@ -498,13 +459,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
             color: const Color(0xFFFF6B6B).withValues(alpha: 0.3),
             width: 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
+          boxShadow: context.cardShadow,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

@@ -5,6 +5,7 @@ import '../data/services/groups_firestore_service.dart';
 import '../data/models/group_model.dart';
 import '../routes/app_pages.dart';
 import '../core/base/controllers/auth_controller.dart';
+import '../core/theme/theme_helper.dart';
 import '../modules/client_dashboard/controllers/client_dashboard_controllers.dart';
 
 class DynamicProfileHeader extends StatelessWidget {
@@ -23,18 +24,18 @@ class DynamicProfileHeader extends StatelessWidget {
       final controller = Get.find<UserController>();
 
       if (controller.isLoading && controller.currentUser == null) {
-        return _buildLoadingHeader();
+        return _buildLoadingHeader(context);
       }
 
       if (controller.error.isNotEmpty && controller.currentUser == null) {
-        return _buildErrorHeader(controller);
+        return _buildErrorHeader(controller, context);
       }
 
-      return _buildProfileHeader(controller);
+      return _buildProfileHeader(controller, context);
     });
   }
 
-  Widget _buildProfileHeader(UserController controller) {
+  Widget _buildProfileHeader(UserController controller, BuildContext context) {
     return Row(
       children: [
         GestureDetector(
@@ -43,14 +44,14 @@ class DynamicProfileHeader extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFFC2D86A).withValues(alpha: 0.3),
-                  Color(0xFFC2D86A).withValues(alpha: 0.1),
+                  context.accentColor.withValues(alpha: 0.3),
+                  context.accentColor.withValues(alpha: 0.1),
                 ],
               ),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFFC2D86A).withValues(alpha: 0.3),
+                  color: context.accentColor.withValues(alpha: 0.3),
                   blurRadius: 15,
                   offset: Offset(0, 5),
                 ),
@@ -59,7 +60,9 @@ class DynamicProfileHeader extends StatelessWidget {
             padding: EdgeInsets.all(3),
             child: CircleAvatar(
               radius: 25,
-              backgroundColor: const Color(0xFF2A2A2A),
+              backgroundColor: context.isLightTheme
+                  ? Color(0xFFF5F6F7)
+                  : const Color(0xFF2A2A2A),
               backgroundImage: UserController.getImageProvider(
                 controller.profileImage,
               ),
@@ -69,7 +72,7 @@ class DynamicProfileHeader extends StatelessWidget {
                     }
                   : null,
               child: controller.profileImage.isEmpty
-                  ? const Icon(Icons.person, color: Colors.white24, size: 25)
+                  ? Icon(Icons.person, color: context.textTertiary, size: 25)
                   : null,
             ),
           ),
@@ -82,7 +85,7 @@ class DynamicProfileHeader extends StatelessWidget {
               Text(
                 'Welcome!',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: context.textPrimary,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -90,7 +93,7 @@ class DynamicProfileHeader extends StatelessWidget {
               ),
               Text(
                 controller.fullName,
-                style: TextStyle(color: Colors.white70, fontSize: 14),
+                style: TextStyle(color: context.textSecondary, fontSize: 14),
               ),
             ],
           ),
@@ -102,7 +105,7 @@ class DynamicProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingHeader() {
+  Widget _buildLoadingHeader(BuildContext context) {
     return Row(
       children: [
         // Skeleton avatar
@@ -157,7 +160,7 @@ class DynamicProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorHeader(UserController controller) {
+  Widget _buildErrorHeader(UserController controller, BuildContext context) {
     return Row(
       children: [
         Container(
@@ -214,7 +217,9 @@ class _GroupDropdown extends StatelessWidget {
           return Container(
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Color(0xFF2A2A2A),
+              color: context.isLightTheme
+                  ? context.cardSecondaryColor
+                  : Color(0xFF2A2A2A),
               borderRadius: BorderRadius.circular(12),
             ),
             child: SizedBox(
@@ -222,7 +227,7 @@ class _GroupDropdown extends StatelessWidget {
               height: 16,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: Color(0xFFC2D86A),
+                color: context.accentColor,
               ),
             ),
           );
@@ -240,39 +245,45 @@ class _GroupDropdown extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFFC2D86A).withValues(alpha: 0.2),
-                  Color(0xFFC2D86A).withValues(alpha: 0.1),
+                  context.accentColor.withValues(alpha: 0.2),
+                  context.accentColor.withValues(alpha: 0.1),
                 ],
               ),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Color(0xFFC2D86A).withValues(alpha: 0.3),
+                color: context.accentColor.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.groups, color: Color(0xFFC2D86A), size: 20),
+                Icon(Icons.groups, color: context.accentColor, size: 20),
                 SizedBox(width: 6),
                 Text(
                   '${groups.length}',
                   style: TextStyle(
-                    color: Color(0xFFC2D86A),
+                    color: context.accentColor,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(width: 4),
-                Icon(Icons.arrow_drop_down, color: Color(0xFFC2D86A), size: 20),
+                Icon(
+                  Icons.arrow_drop_down,
+                  color: context.accentColor,
+                  size: 20,
+                ),
               ],
             ),
           ),
-          color: Color(0xFF2A2A2A),
+          color: context.isLightTheme ? context.cardColor : Color(0xFF2A2A2A),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
             side: BorderSide(
-              color: Color(0xFFC2D86A).withValues(alpha: 0.3),
+              color: context.isLightTheme
+                  ? context.borderColor
+                  : context.accentColor.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -294,15 +305,15 @@ class _GroupDropdown extends StatelessWidget {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              Color(0xFFC2D86A).withValues(alpha: 0.3),
-                              Color(0xFFC2D86A).withValues(alpha: 0.1),
+                              context.accentColor.withValues(alpha: 0.3),
+                              context.accentColor.withValues(alpha: 0.1),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
                           Icons.group,
-                          color: Color(0xFFC2D86A),
+                          color: context.accentColor,
                           size: 20,
                         ),
                       ),
@@ -314,7 +325,7 @@ class _GroupDropdown extends StatelessWidget {
                             Text(
                               group.name,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: context.textPrimary,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -328,28 +339,28 @@ class _GroupDropdown extends StatelessWidget {
                                   isAdmin
                                       ? Icons.admin_panel_settings
                                       : Icons.person,
-                                  color: Colors.white54,
+                                  color: context.textSecondary,
                                   size: 12,
                                 ),
                                 SizedBox(width: 4),
                                 Text(
                                   isAdmin ? 'Admin' : 'Member',
                                   style: TextStyle(
-                                    color: Colors.white54,
+                                    color: context.textSecondary,
                                     fontSize: 12,
                                   ),
                                 ),
                                 SizedBox(width: 8),
                                 Icon(
                                   Icons.people,
-                                  color: Colors.white54,
+                                  color: context.textSecondary,
                                   size: 12,
                                 ),
                                 SizedBox(width: 4),
                                 Text(
                                   '${group.membersList.length}',
                                   style: TextStyle(
-                                    color: Colors.white54,
+                                    color: context.textSecondary,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -360,7 +371,7 @@ class _GroupDropdown extends StatelessWidget {
                       ),
                       Icon(
                         Icons.calendar_month,
-                        color: Color(0xFFC2D86A).withValues(alpha: 0.6),
+                        color: context.accentColor.withValues(alpha: 0.6),
                         size: 20,
                       ),
                     ],

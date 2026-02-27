@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/meal_categories_controller.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class MealCategoriesView extends GetView<MealCategoriesController> {
   const MealCategoriesView({super.key});
@@ -8,23 +9,23 @@ class MealCategoriesView extends GetView<MealCategoriesController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1C1C1E),
+      backgroundColor: context.backgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1C1C1E),
+        backgroundColor: context.cardColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: context.textPrimary),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
+        title: Text(
           'Meal Categories',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: context.textPrimary),
         ),
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.categories.isEmpty) {
-          return const Center(
-            child: CircularProgressIndicator(color: Color(0xFFCDE26D)),
+          return Center(
+            child: CircularProgressIndicator(color: context.accent),
           );
         }
 
@@ -36,12 +37,12 @@ class MealCategoriesView extends GetView<MealCategoriesController> {
                 Icon(
                   Icons.category_outlined,
                   size: 64,
-                  color: Colors.grey[600],
+                  color: context.textTertiary,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'No categories available',
-                  style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                  style: TextStyle(color: context.textSecondary, fontSize: 16),
                 ),
               ],
             ),
@@ -57,7 +58,7 @@ class MealCategoriesView extends GetView<MealCategoriesController> {
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFF2C2C2E),
+                color: context.cardColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ListTile(
@@ -69,13 +70,13 @@ class MealCategoriesView extends GetView<MealCategoriesController> {
                   Icons.circle,
                   size: 8,
                   color: category.isDefault
-                      ? const Color(0xFFCDE26D)
-                      : Colors.grey[400],
+                      ? context.accent
+                      : context.textSecondary,
                 ),
                 title: Text(
                   category.name,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: context.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -87,13 +88,13 @@ class MealCategoriesView extends GetView<MealCategoriesController> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFCDE26D).withValues(alpha: 0.2),
+                          color: context.accent.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Default',
                           style: TextStyle(
-                            color: Color(0xFFCDE26D),
+                            color: context.accent,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                           ),
@@ -110,7 +111,7 @@ class MealCategoriesView extends GetView<MealCategoriesController> {
 
         return FloatingActionButton(
           onPressed: _showAddCategoryDialog,
-          backgroundColor: const Color(0xFFCDE26D),
+          backgroundColor: context.accent,
           child: const Icon(Icons.add, color: Colors.black),
         );
       }),
@@ -119,27 +120,28 @@ class MealCategoriesView extends GetView<MealCategoriesController> {
 
   void _showAddCategoryDialog() {
     final nameController = TextEditingController();
+    final context = Get.context!;
 
     Get.dialog(
       AlertDialog(
-        backgroundColor: const Color(0xFF2C2C2E),
-        title: const Text(
+        backgroundColor: context.cardColor,
+        title: Text(
           'Add Category',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: context.textPrimary),
         ),
         content: TextField(
           controller: nameController,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: context.textPrimary),
           decoration: InputDecoration(
             labelText: 'Category Name',
-            labelStyle: TextStyle(color: Colors.grey[400]),
+            labelStyle: TextStyle(color: context.textSecondary),
             hintText: 'e.g., Pre-Workout',
-            hintStyle: TextStyle(color: Colors.grey[600]),
+            hintStyle: TextStyle(color: context.textTertiary),
             enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey[700]!),
+              borderSide: BorderSide(color: context.border),
             ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFFCDE26D)),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: context.accent),
             ),
           ),
           maxLength: 30,
@@ -147,16 +149,16 @@ class MealCategoriesView extends GetView<MealCategoriesController> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('Cancel', style: TextStyle(color: Colors.grey[400])),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: context.textSecondary),
+            ),
           ),
           TextButton(
             onPressed: () {
               controller.createCategory(nameController.text);
             },
-            child: const Text(
-              'Create',
-              style: TextStyle(color: Color(0xFFCDE26D)),
-            ),
+            child: Text('Create', style: TextStyle(color: context.accent)),
           ),
         ],
       ),

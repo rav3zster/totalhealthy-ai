@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../core/base/controllers/auth_controller.dart';
+import '../core/theme/theme_helper.dart';
 import '../routes/app_pages.dart';
 
 class OntapStore {
@@ -45,14 +46,10 @@ class _MobileNavBarState extends State<MobileNavBar> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-        ),
+        gradient: context.headerGradient,
         border: Border(
           top: BorderSide(
-            color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+            color: context.accent.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -64,24 +61,28 @@ class _MobileNavBarState extends State<MobileNavBar> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildNavItem(
+                context,
                 Icons.person,
                 'member'.tr,
                 OntapStore.index == 0,
                 () => ontapFunction(0),
               ),
               _buildNavItem(
+                context,
                 Icons.group,
                 'group'.tr,
                 OntapStore.index == 1,
                 () => ontapFunction(1),
               ),
               _buildNavItem(
+                context,
                 Icons.notifications,
                 'notification'.tr,
                 OntapStore.index == 2,
                 () => ontapFunction(2),
               ),
               _buildNavItem(
+                context,
                 Icons.person,
                 'profile'.tr,
                 OntapStore.index == 3,
@@ -95,6 +96,7 @@ class _MobileNavBarState extends State<MobileNavBar> {
   }
 
   Widget _buildNavItem(
+    BuildContext context,
     IconData icon,
     String label,
     bool isActive,
@@ -107,14 +109,14 @@ class _MobileNavBarState extends State<MobileNavBar> {
         children: [
           Icon(
             icon,
-            color: isActive ? const Color(0xFFC2D86A) : Colors.white54,
+            color: isActive ? context.accent : context.textSecondary,
             size: 24,
           ),
           const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: isActive ? const Color(0xFFC2D86A) : Colors.white54,
+              color: isActive ? context.accent : context.textSecondary,
               fontSize: 12,
               fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
             ),

@@ -1,26 +1,46 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Light Theme Colors (based on reference image)
+  // Light Theme Colors (based on reference image analysis)
   static const Color lightBackground = Color(
-    0xFFF5F5F5,
-  ); // Light gray background
-  static const Color lightCardBackground = Colors.white;
-  static const Color lightCardSecondary = Color(0xFFE8F5E9); // Light mint green
-  static const Color lightAccent = Color(0xFFC2D86A); // Lime green accent
-  static const Color lightTextPrimary = Color(0xFF1A1A1A); // Dark text
-  static const Color lightTextSecondary = Color(0xFF666666); // Gray text
-  static const Color lightBorder = Color(0xFFE0E0E0); // Light border
-  static const Color lightSuccess = Color(0xFF4CAF50); // Green
-  static const Color lightError = Color(0xFFFF6B6B); // Red
+    0xFFFAFBFC,
+  ); // Very light gray background
+  static const Color lightCardBackground = Color(
+    0xFFFFFFFF,
+  ); // Pure white cards
+  static const Color lightCardSecondary = Color(
+    0xFFF5F6F7,
+  ); // Light gray for secondary cards
+  static const Color lightAccent = Color(
+    0xFFC2FF00,
+  ); // Bright lime green accent
+  static const Color lightTextPrimary = Color(
+    0xFF1A1D1F,
+  ); // Very dark gray/black for headings
+  static const Color lightTextSecondary = Color(
+    0xFF6C757D,
+  ); // Medium gray for labels
+  static const Color lightTextTertiary = Color(
+    0xFFADB5BD,
+  ); // Light gray for hints
+  static const Color lightBorder = Color(0xFFE9ECEF); // Very subtle border
+  static const Color lightSearchBar = Color(
+    0xFFF1F3F5,
+  ); // Search bar background
+  static const Color lightSuccess = Color(0xFF10B981); // Success green
+  static const Color lightError = Color(0xFFEF4444); // Error red
+  static const Color lightDivider = Color(0xFFDEE2E6); // Divider color
 
   // Dark Theme Colors (existing)
-  static const Color darkBackground = Colors.black;
+  static const Color darkBackground = Color(0xFF000000);
   static const Color darkCardBackground = Color(0xFF1C1C1E);
   static const Color darkCardSecondary = Color(0xFF2A2A2A);
-  static const Color darkAccent = Color(0xFFC2D86A); // Same lime green
-  static const Color darkTextPrimary = Colors.white;
+  static const Color darkAccent = Color(
+    0xFFC2D86A,
+  ); // Muted lime green for dark theme
+  static const Color darkTextPrimary = Color(0xFFFFFFFF);
   static const Color darkTextSecondary = Color(0xFFB0B0B0);
+  static const Color darkTextTertiary = Color(0xFF8B8B8B);
   static const Color darkBorder = Color(0xFF3A3A3A);
 
   // Light Theme
@@ -178,14 +198,34 @@ class AppTheme {
         : darkTextSecondary;
   }
 
+  static Color getTextTertiaryColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.light
+        ? lightTextTertiary
+        : darkTextTertiary;
+  }
+
   static Color getBorderColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light
         ? lightBorder
         : darkBorder;
   }
 
+  static Color getDividerColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.light
+        ? lightDivider
+        : darkBorder;
+  }
+
+  static Color getSearchBarColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.light
+        ? lightSearchBar
+        : darkCardSecondary;
+  }
+
   static Color getAccentColor(BuildContext context) {
-    return lightAccent; // Same for both themes
+    return Theme.of(context).brightness == Brightness.light
+        ? lightAccent // Bright lime green (#C2FF00) for light theme
+        : darkAccent; // Muted lime green (#C2D86A) for dark theme
   }
 
   // Gradient helpers
@@ -194,8 +234,8 @@ class AppTheme {
       return const LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [Color(0xFFF5F5F5), Color(0xFFFFFFFF), Color(0xFFF5F5F5)],
-        stops: [0.0, 0.3, 1.0],
+        colors: [Color(0xFFFAFBFC), Color(0xFFF8F9FA), Color(0xFFFAFBFC)],
+        stops: [0.0, 0.5, 1.0],
       );
     } else {
       return const LinearGradient(
@@ -209,10 +249,10 @@ class AppTheme {
 
   static LinearGradient getCardGradient(BuildContext context) {
     if (Theme.of(context).brightness == Brightness.light) {
-      return LinearGradient(
+      return const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [Colors.white, const Color(0xFFF5F5F5).withValues(alpha: 0.5)],
+        colors: [Color(0xFFFFFFFF), Color(0xFFFAFBFC)],
       );
     } else {
       return const LinearGradient(
@@ -228,7 +268,7 @@ class AppTheme {
       return const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [Colors.white, Color(0xFFF5F5F5)],
+        colors: [Color(0xFFFFFFFF), Color(0xFFF8F9FA)],
       );
     } else {
       return const LinearGradient(
@@ -242,9 +282,10 @@ class AppTheme {
   static BoxShadow getCardShadow(BuildContext context) {
     if (Theme.of(context).brightness == Brightness.light) {
       return BoxShadow(
-        color: Colors.black.withValues(alpha: 0.08),
-        blurRadius: 10,
+        color: Colors.black.withValues(alpha: 0.04),
+        blurRadius: 8,
         offset: const Offset(0, 2),
+        spreadRadius: 0,
       );
     } else {
       return BoxShadow(

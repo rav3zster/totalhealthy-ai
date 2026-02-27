@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/welcome-screen-controllers.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class WelcomeScreenView extends GetView<WelcomeScreenController> {
   const WelcomeScreenView({super.key});
@@ -9,14 +10,7 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
-            stops: [0.0, 0.3, 1.0],
-          ),
-        ),
+        decoration: BoxDecoration(gradient: context.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -47,29 +41,23 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  const Color(
-                                    0xFFC2D86A,
-                                  ).withValues(alpha: 0.3),
-                                  const Color(
-                                    0xFFC2D86A,
-                                  ).withValues(alpha: 0.1),
+                                  context.accent.withValues(alpha: 0.3),
+                                  context.accent.withValues(alpha: 0.1),
                                 ],
                               ),
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(
-                                    0xFFC2D86A,
-                                  ).withValues(alpha: 0.3),
+                                  color: context.accent.withValues(alpha: 0.3),
                                   blurRadius: 30,
                                   offset: const Offset(0, 10),
                                 ),
                               ],
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.favorite_rounded,
                               size: 60,
-                              color: Color(0xFFC2D86A),
+                              color: context.accent,
                             ),
                           ),
                         ),
@@ -129,7 +117,7 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                                 "Your Personalized Health & Diet Companion",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.6),
+                                  color: context.textSecondary,
                                   fontSize: 16,
                                   letterSpacing: 0.5,
                                   height: 1.5,
@@ -160,9 +148,7 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                               borderRadius: BorderRadius.circular(30),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(
-                                    0xFFC2D86A,
-                                  ).withValues(alpha: 0.2),
+                                  color: context.accent.withValues(alpha: 0.2),
                                   blurRadius: 40,
                                   offset: const Offset(0, 20),
                                 ),
@@ -229,21 +215,15 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        const Color(0xFF2A2A2A).withValues(alpha: 0.95),
-                        const Color(0xFF1A1A1A),
+                        context.cardColor.withValues(alpha: 0.95),
+                        context.cardColor,
                       ],
                     ),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30),
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.5),
-                        blurRadius: 20,
-                        offset: const Offset(0, -10),
-                      ),
-                    ],
+                    boxShadow: context.cardShadow,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -253,16 +233,11 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                         width: double.infinity,
                         height: 60,
                         decoration: BoxDecoration(
-                          border: Border.all(
-                            color: const Color(0xFFC2D86A),
-                            width: 2,
-                          ),
+                          border: Border.all(color: context.accent, width: 2),
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.2),
+                              color: context.accent.withValues(alpha: 0.2),
                               blurRadius: 15,
                               offset: const Offset(0, 5),
                             ),
@@ -275,23 +250,23 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                               Get.toNamed('/login');
                             },
                             borderRadius: BorderRadius.circular(30),
-                            child: const Center(
+                            child: Center(
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
                                     "Login",
                                     style: TextStyle(
-                                      color: Color(0xFFC2D86A),
+                                      color: context.accent,
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
                                     ),
                                   ),
-                                  SizedBox(width: 8),
+                                  const SizedBox(width: 8),
                                   Icon(
                                     Icons.arrow_forward_rounded,
-                                    color: Color(0xFFC2D86A),
+                                    color: context.accent,
                                     size: 24,
                                   ),
                                 ],
@@ -308,15 +283,11 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                         width: double.infinity,
                         height: 60,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-                          ),
+                          gradient: context.accentGradient,
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.4),
+                              color: context.accent.withValues(alpha: 0.4),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -329,23 +300,23 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                               Get.toNamed('/signup');
                             },
                             borderRadius: BorderRadius.circular(30),
-                            child: const Center(
+                            child: Center(
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
                                     "Sign Up",
                                     style: TextStyle(
-                                      color: Colors.black,
+                                      color: context.backgroundColor,
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
                                     ),
                                   ),
-                                  SizedBox(width: 8),
+                                  const SizedBox(width: 8),
                                   Icon(
                                     Icons.person_add_rounded,
-                                    color: Colors.black,
+                                    color: context.backgroundColor,
                                     size: 24,
                                   ),
                                 ],
@@ -362,7 +333,7 @@ class WelcomeScreenView extends GetView<WelcomeScreenController> {
                         "By continuing, you agree to our Terms & Privacy Policy",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.4),
+                          color: context.textTertiary,
                           fontSize: 12,
                           letterSpacing: 0.3,
                         ),

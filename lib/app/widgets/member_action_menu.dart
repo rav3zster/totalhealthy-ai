@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../data/models/user_model.dart';
 import '../controllers/user_controller.dart';
 import '../core/base/controllers/auth_controller.dart';
+import '../core/theme/theme_helper.dart';
 
 class MemberActionMenu {
   static void show(BuildContext context, UserModel member, bool isAdmin) {
@@ -35,12 +36,8 @@ class _MemberActionSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-        ),
+      decoration: BoxDecoration(
+        gradient: context.cardGradient,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(25),
           topRight: Radius.circular(25),
@@ -56,7 +53,7 @@ class _MemberActionSheet extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: context.textTertiary,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -72,21 +69,16 @@ class _MemberActionSheet extends StatelessWidget {
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
                         colors: isAdmin
-                            ? [const Color(0xFFC2D86A), const Color(0xFFD4E87C)]
+                            ? [
+                                context.accent,
+                                context.accent.withValues(alpha: 0.8),
+                              ]
                             : [
-                                Colors.white.withValues(alpha: 0.1),
-                                Colors.white.withValues(alpha: 0.05),
+                                context.textPrimary.withValues(alpha: 0.1),
+                                context.textPrimary.withValues(alpha: 0.05),
                               ],
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: isAdmin
-                              ? const Color(0xFFC2D86A).withValues(alpha: 0.4)
-                              : Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      boxShadow: context.cardShadow,
                     ),
                     padding: const EdgeInsets.all(2),
                     child: CircleAvatar(
@@ -99,10 +91,10 @@ class _MemberActionSheet extends StatelessWidget {
                                 member.profileImage,
                               ) ==
                               null
-                          ? const Icon(
+                          ? Icon(
                               Icons.person,
                               size: 30,
-                              color: Colors.white54,
+                              color: context.textSecondary,
                             )
                           : null,
                     ),
@@ -119,8 +111,8 @@ class _MemberActionSheet extends StatelessWidget {
                             Flexible(
                               child: Text(
                                 member.username,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: context.textPrimary,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -135,18 +127,13 @@ class _MemberActionSheet extends StatelessWidget {
                                   vertical: 3,
                                 ),
                                 decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xFFC2D86A),
-                                      Color(0xFFD4E87C),
-                                    ],
-                                  ),
+                                  gradient: context.accentGradient,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
-                                child: const Text(
+                                child: Text(
                                   'ADMIN',
                                   style: TextStyle(
-                                    color: Color(0xFF121212),
+                                    color: context.backgroundColor,
                                     fontSize: 9,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 0.5,
@@ -160,7 +147,7 @@ class _MemberActionSheet extends StatelessWidget {
                         Text(
                           member.email,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: context.textSecondary,
                             fontSize: 13,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -176,6 +163,7 @@ class _MemberActionSheet extends StatelessWidget {
 
             // Action Items
             _buildActionItem(
+              context,
               icon: Icons.access_time_outlined,
               label: 'Set Meal Timing',
               onTap: () {
@@ -184,6 +172,7 @@ class _MemberActionSheet extends StatelessWidget {
               },
             ),
             _buildActionItem(
+              context,
               icon: Icons.person_outline,
               label: 'View Profile',
               onTap: () {
@@ -192,6 +181,7 @@ class _MemberActionSheet extends StatelessWidget {
               },
             ),
             _buildActionItem(
+              context,
               icon: Icons.phone_outlined,
               label: 'Call',
               onTap: () {
@@ -200,8 +190,8 @@ class _MemberActionSheet extends StatelessWidget {
                 Get.snackbar(
                   'Call',
                   'Calling ${member.username}...',
-                  backgroundColor: const Color(0xFFC2D86A),
-                  colorText: Colors.black,
+                  backgroundColor: context.accent,
+                  colorText: context.backgroundColor,
                   snackPosition: SnackPosition.BOTTOM,
                   margin: const EdgeInsets.all(16),
                   borderRadius: 12,
@@ -209,6 +199,7 @@ class _MemberActionSheet extends StatelessWidget {
               },
             ),
             _buildActionItem(
+              context,
               icon: Icons.email_outlined,
               label: 'Send Email',
               onTap: () {
@@ -217,8 +208,8 @@ class _MemberActionSheet extends StatelessWidget {
                 Get.snackbar(
                   'Email',
                   'Opening email to ${member.email}...',
-                  backgroundColor: const Color(0xFFC2D86A),
-                  colorText: Colors.black,
+                  backgroundColor: context.accent,
+                  colorText: context.backgroundColor,
                   snackPosition: SnackPosition.BOTTOM,
                   margin: const EdgeInsets.all(16),
                   borderRadius: 12,
@@ -226,6 +217,7 @@ class _MemberActionSheet extends StatelessWidget {
               },
             ),
             _buildActionItem(
+              context,
               icon: Icons.chat_bubble_outline,
               label: 'Send Message',
               onTap: () {
@@ -234,8 +226,8 @@ class _MemberActionSheet extends StatelessWidget {
                 Get.snackbar(
                   'Message',
                   'Opening chat with ${member.username}...',
-                  backgroundColor: const Color(0xFFC2D86A),
-                  colorText: Colors.black,
+                  backgroundColor: context.accent,
+                  colorText: context.backgroundColor,
                   snackPosition: SnackPosition.BOTTOM,
                   margin: const EdgeInsets.all(16),
                   borderRadius: 12,
@@ -250,7 +242,8 @@ class _MemberActionSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildActionItem({
+  Widget _buildActionItem(
+    BuildContext context, {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
@@ -268,20 +261,20 @@ class _MemberActionSheet extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                      const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                      context.accent.withValues(alpha: 0.2),
+                      context.accent.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: const Color(0xFFC2D86A), size: 22),
+                child: Icon(icon, color: context.accent, size: 22),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
                   label,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: context.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -289,7 +282,7 @@ class _MemberActionSheet extends StatelessWidget {
               ),
               Icon(
                 Icons.arrow_forward_ios,
-                color: Colors.white.withValues(alpha: 0.3),
+                color: context.textTertiary,
                 size: 16,
               ),
             ],
@@ -304,12 +297,8 @@ class _CurrentUserActionSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-        ),
+      decoration: BoxDecoration(
+        gradient: context.cardGradient,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(25),
           topRight: Radius.circular(25),
@@ -325,7 +314,7 @@ class _CurrentUserActionSheet extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: context.textTertiary,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -338,23 +327,21 @@ class _CurrentUserActionSheet extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                      ),
+                      gradient: context.accentGradient,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.person,
-                      color: Color(0xFF121212),
+                      color: context.backgroundColor,
                       size: 24,
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Profile Options',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: context.textPrimary,
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                       ),
@@ -368,6 +355,7 @@ class _CurrentUserActionSheet extends StatelessWidget {
 
             // Action Items
             _buildActionItem(
+              context,
               icon: Icons.person_outline,
               label: 'View Profile',
               onTap: () {
@@ -376,6 +364,7 @@ class _CurrentUserActionSheet extends StatelessWidget {
               },
             ),
             _buildActionItem(
+              context,
               icon: Icons.edit_outlined,
               label: 'Edit Profile',
               onTap: () {
@@ -384,6 +373,7 @@ class _CurrentUserActionSheet extends StatelessWidget {
               },
             ),
             _buildActionItem(
+              context,
               icon: Icons.settings_outlined,
               label: 'Settings',
               onTap: () {
@@ -392,6 +382,7 @@ class _CurrentUserActionSheet extends StatelessWidget {
               },
             ),
             _buildActionItem(
+              context,
               icon: Icons.help_outline,
               label: 'Help & Support',
               onTap: () {
@@ -400,6 +391,7 @@ class _CurrentUserActionSheet extends StatelessWidget {
               },
             ),
             _buildActionItem(
+              context,
               icon: Icons.logout,
               label: 'Logout',
               color: Colors.red,
@@ -416,13 +408,14 @@ class _CurrentUserActionSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildActionItem({
+  Widget _buildActionItem(
+    BuildContext context, {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
     Color? color,
   }) {
-    final itemColor = color ?? const Color(0xFFC2D86A);
+    final itemColor = color ?? context.accent;
 
     return Material(
       color: Colors.transparent,
@@ -450,7 +443,9 @@ class _CurrentUserActionSheet extends StatelessWidget {
                 child: Text(
                   label,
                   style: TextStyle(
-                    color: color == Colors.red ? Colors.red : Colors.white,
+                    color: color == Colors.red
+                        ? Colors.red
+                        : context.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -458,7 +453,7 @@ class _CurrentUserActionSheet extends StatelessWidget {
               ),
               Icon(
                 Icons.arrow_forward_ios,
-                color: Colors.white.withValues(alpha: 0.3),
+                color: context.textTertiary,
                 size: 16,
               ),
             ],

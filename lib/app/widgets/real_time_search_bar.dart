@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../core/theme/theme_helper.dart';
 
 class RealTimeSearchBar extends StatefulWidget {
   final Function(String) onSearchChanged;
@@ -210,19 +211,21 @@ class _SimpleRealTimeSearchBarState extends State<SimpleRealTimeSearchBar> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-        ),
+        color: context.isLightTheme
+            ? context.searchBarColor
+            : Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+          color: context.isLightTheme
+              ? context.borderColor
+              : context.accentColor.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
+            color: context.isLightTheme
+                ? Colors.black.withValues(alpha: 0.04)
+                : Colors.black.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -230,16 +233,21 @@ class _SimpleRealTimeSearchBarState extends State<SimpleRealTimeSearchBar> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, color: Colors.white54),
+          Icon(
+            Icons.search,
+            color: context.isLightTheme
+                ? context.textSecondary
+                : Colors.white54,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
               controller: _textController,
               focusNode: _focusNode,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(color: context.textPrimary, fontSize: 16),
               decoration: InputDecoration(
                 hintText: widget.hintText,
-                hintStyle: const TextStyle(color: Colors.white54, fontSize: 16),
+                hintStyle: TextStyle(color: context.textTertiary, fontSize: 16),
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
@@ -263,17 +271,14 @@ class _SimpleRealTimeSearchBarState extends State<SimpleRealTimeSearchBar> {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                            const Color(0xFFC2D86A).withValues(alpha: 0.1),
-                          ],
-                        ),
+                        color: context.isLightTheme
+                            ? context.borderColor
+                            : Color(0xFF3A3A3A),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.clear,
-                        color: Colors.white,
+                        color: context.textSecondary,
                         size: 16,
                       ),
                     ),

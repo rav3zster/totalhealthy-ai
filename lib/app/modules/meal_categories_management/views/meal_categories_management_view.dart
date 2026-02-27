@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import '../controllers/meal_categories_management_controller.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class MealCategoriesManagementView
     extends GetView<MealCategoriesManagementController> {
@@ -10,16 +11,9 @@ class MealCategoriesManagementView
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: context.backgroundColor,
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [const Color(0xFF1A1A1A), Colors.black, Colors.black],
-            stops: const [0.0, 0.3, 1.0],
-          ),
-        ),
+        decoration: BoxDecoration(gradient: context.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -31,10 +25,8 @@ class MealCategoriesManagementView
                 child: Obx(() {
                   if (controller.isLoading.value &&
                       controller.mealCategories.isEmpty) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFFC2D86A),
-                      ),
+                    return Center(
+                      child: CircularProgressIndicator(color: context.accent),
                     );
                   }
 
@@ -77,31 +69,29 @@ class MealCategoriesManagementView
                           Container(
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.1),
+                              color: context.accent.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.restaurant_menu,
                               size: 64,
-                              color: Color(0xFFC2D86A),
+                              color: context.accent,
                             ),
                           ),
                           const SizedBox(height: 24),
-                          const Text(
+                          Text(
                             'No Meal Categories',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: context.textPrimary,
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const Text(
+                          Text(
                             'Add meal categories to organize\nyour daily meals',
                             style: TextStyle(
-                              color: Colors.white54,
+                              color: context.textSecondary,
                               fontSize: 15,
                             ),
                             textAlign: TextAlign.center,
@@ -119,7 +109,7 @@ class MealCategoriesManagementView
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFC2D86A),
+                              backgroundColor: context.accent,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 32,
                                 vertical: 16,
@@ -151,17 +141,19 @@ class MealCategoriesManagementView
       floatingActionButton: Obx(() {
         if (controller.mealCategories.isEmpty) return const SizedBox.shrink();
 
-        return FloatingActionButton.extended(
-          onPressed: () => _showCreateCategoryDialog(context),
-          backgroundColor: const Color(0xFFC2D86A),
-          elevation: 8,
-          icon: const Icon(Icons.add_rounded, color: Colors.black, size: 24),
-          label: const Text(
-            'Add Category',
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
+        return Builder(
+          builder: (context) => FloatingActionButton.extended(
+            onPressed: () => _showCreateCategoryDialog(context),
+            backgroundColor: context.accent,
+            elevation: 8,
+            icon: const Icon(Icons.add_rounded, color: Colors.black, size: 24),
+            label: const Text(
+              'Add Category',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
             ),
           ),
         );
@@ -173,22 +165,12 @@ class MealCategoriesManagementView
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [const Color(0xFF2A2A2A), const Color(0xFF1F1F1F)],
-        ),
+        gradient: context.headerGradient,
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(32),
           bottomRight: Radius.circular(32),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        boxShadow: context.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -198,13 +180,13 @@ class MealCategoriesManagementView
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: context.accent.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.arrow_back_ios_new,
-                    color: Colors.white,
+                    color: context.textPrimary,
                     size: 20,
                   ),
                   onPressed: () => Get.back(),
@@ -217,10 +199,10 @@ class MealCategoriesManagementView
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Meal Categories',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: context.textPrimary,
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -0.5,
@@ -236,22 +218,16 @@ class MealCategoriesManagementView
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.2),
+                              color: context.accent.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: const Color(
-                                  0xFFC2D86A,
-                                ).withValues(alpha: 0.3),
+                                color: context.accent.withValues(alpha: 0.3),
                               ),
                             ),
                             child: Text(
                               controller.groupCategoryName!,
                               style: TextStyle(
-                                color: const Color(
-                                  0xFFC2D86A,
-                                ).withValues(alpha: 0.9),
+                                color: context.accent.withValues(alpha: 0.9),
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -261,8 +237,8 @@ class MealCategoriesManagementView
                           Obx(
                             () => Text(
                               '${controller.mealCategories.length} ${controller.mealCategories.length == 1 ? 'category' : 'categories'}',
-                              style: const TextStyle(
-                                color: Colors.white54,
+                              style: TextStyle(
+                                color: context.textSecondary,
                                 fontSize: 13,
                               ),
                             ),
@@ -280,25 +256,23 @@ class MealCategoriesManagementView
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+              color: context.accent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
-              ),
+              border: Border.all(color: context.accent.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.schedule_rounded,
-                  color: const Color(0xFFC2D86A).withValues(alpha: 0.8),
+                  color: context.accent.withValues(alpha: 0.8),
                   size: 18,
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Text(
                     'Set meal times and enable alarms',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: context.textSecondary,
                       fontSize: 13,
                       height: 1.4,
                     ),
@@ -335,7 +309,7 @@ class MealCategoriesManagementView
 
     Get.dialog(
       Dialog(
-        backgroundColor: const Color(0xFF2A2A2A),
+        backgroundColor: context.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -343,10 +317,10 @@ class MealCategoriesManagementView
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Add Meal Category',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: context.textPrimary,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -354,14 +328,14 @@ class MealCategoriesManagementView
               const SizedBox(height: 24),
               TextField(
                 controller: nameController,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: context.textPrimary),
                 decoration: InputDecoration(
                   labelText: 'Category Name',
-                  labelStyle: const TextStyle(color: Colors.white54),
+                  labelStyle: TextStyle(color: context.textSecondary),
                   hintText: 'e.g., Snacks, Pre-workout',
-                  hintStyle: const TextStyle(color: Colors.white38),
+                  hintStyle: TextStyle(color: context.textTertiary),
                   filled: true,
-                  fillColor: Colors.white.withValues(alpha: 0.1),
+                  fillColor: context.cardSecondary,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -374,9 +348,9 @@ class MealCategoriesManagementView
                 children: [
                   TextButton(
                     onPressed: () => Get.back(),
-                    child: const Text(
+                    child: Text(
                       'Cancel',
-                      style: TextStyle(color: Colors.white54),
+                      style: TextStyle(color: context.textSecondary),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -392,7 +366,7 @@ class MealCategoriesManagementView
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFC2D86A),
+                      backgroundColor: context.accent,
                       foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
@@ -419,22 +393,22 @@ class MealCategoriesManagementView
   void _showDeleteDialog(BuildContext context, category) {
     Get.dialog(
       AlertDialog(
-        backgroundColor: const Color(0xFF2A2A2A),
+        backgroundColor: context.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text(
+        title: Text(
           'Delete Category',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: context.textPrimary),
         ),
         content: Text(
           'Are you sure you want to delete "${category.name}"?',
-          style: const TextStyle(color: Colors.white70),
+          style: TextStyle(color: context.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text(
+            child: Text(
               'Cancel',
-              style: TextStyle(color: Colors.white54),
+              style: TextStyle(color: context.textSecondary),
             ),
           ),
           ElevatedButton(
@@ -509,16 +483,12 @@ class _ExpandableCategoryCardState extends State<ExpandableCategoryCard> {
       curve: Curves.easeInOut,
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF2A2A2A), Color(0xFF1F1F1F)],
-        ),
+        gradient: context.cardGradient,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isExpanded
-              ? const Color(0xFFC2D86A).withValues(alpha: 0.6)
-              : const Color(0xFFC2D86A).withValues(alpha: 0.3),
+              ? context.accent.withValues(alpha: 0.6)
+              : context.accent.withValues(alpha: 0.3),
           width: isExpanded ? 2.0 : 1.5,
         ),
       ),
@@ -548,8 +518,8 @@ class _ExpandableCategoryCardState extends State<ExpandableCategoryCard> {
                             Expanded(
                               child: Text(
                                 widget.category.name,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: context.textPrimary,
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -562,15 +532,13 @@ class _ExpandableCategoryCardState extends State<ExpandableCategoryCard> {
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(
-                                    0xFFC2D86A,
-                                  ).withValues(alpha: 0.2),
+                                  color: context.accent.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: const Text(
+                                child: Text(
                                   'Default',
                                   style: TextStyle(
-                                    color: Color(0xFFC2D86A),
+                                    color: context.accent,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -581,9 +549,9 @@ class _ExpandableCategoryCardState extends State<ExpandableCategoryCard> {
                         const SizedBox(height: 12),
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.access_time,
-                              color: Color(0xFFC2D86A),
+                              color: context.accent,
                               size: 18,
                             ),
                             const SizedBox(width: 8),
@@ -591,8 +559,8 @@ class _ExpandableCategoryCardState extends State<ExpandableCategoryCard> {
                               time != null ? time.format(context) : 'Set time',
                               style: TextStyle(
                                 color: time != null
-                                    ? Colors.white70
-                                    : Colors.white38,
+                                    ? context.textSecondary
+                                    : context.textTertiary,
                                 fontSize: 15,
                               ),
                             ),
@@ -610,12 +578,10 @@ class _ExpandableCategoryCardState extends State<ExpandableCategoryCard> {
                       onChanged: (value) {
                         widget.controller.toggleAlarm(widget.category, value);
                       },
-                      activeThumbColor: const Color(0xFFC2D86A),
-                      activeTrackColor: const Color(
-                        0xFFC2D86A,
-                      ).withValues(alpha: 0.5),
-                      inactiveThumbColor: Colors.white38,
-                      inactiveTrackColor: Colors.white12,
+                      activeThumbColor: context.accent,
+                      activeTrackColor: context.accent.withValues(alpha: 0.5),
+                      inactiveThumbColor: context.textTertiary,
+                      inactiveTrackColor: context.cardSecondary,
                     ),
                   ),
                   if (!widget.category.isDefault) ...[
@@ -651,15 +617,15 @@ class _ExpandableCategoryCardState extends State<ExpandableCategoryCard> {
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               child: Column(
                 children: [
-                  const Divider(color: Color(0xFF3A3A3A), height: 1),
+                  Divider(color: context.divider, height: 1),
                   const SizedBox(height: 20),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Set Time',
                         style: TextStyle(
-                          color: Colors.white70,
+                          color: context.textSecondary,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
@@ -668,10 +634,10 @@ class _ExpandableCategoryCardState extends State<ExpandableCategoryCard> {
                       SizedBox(
                         height: 150,
                         child: CupertinoTheme(
-                          data: const CupertinoThemeData(
+                          data: CupertinoThemeData(
                             textTheme: CupertinoTextThemeData(
                               dateTimePickerTextStyle: TextStyle(
-                                color: Colors.white,
+                                color: context.textPrimary,
                                 fontSize: 22,
                               ),
                             ),
@@ -697,7 +663,7 @@ class _ExpandableCategoryCardState extends State<ExpandableCategoryCard> {
                     child: ElevatedButton(
                       onPressed: _saveTime,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFC2D86A),
+                        backgroundColor: context.accent,
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(

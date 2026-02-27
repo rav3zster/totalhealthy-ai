@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/models/user_model.dart';
 import '../../../controllers/user_controller.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class MemberProfileView extends StatelessWidget {
   const MemberProfileView({super.key});
@@ -11,30 +12,21 @@ class MemberProfileView extends StatelessWidget {
     final UserModel member = Get.arguments as UserModel;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: context.backgroundColor,
       body: CustomScrollView(
         slivers: [
           // App Bar with Profile Header
           SliverAppBar(
             expandedHeight: 280,
             pinned: true,
-            backgroundColor: const Color(0xFF1A1A1A),
+            backgroundColor: context.cardColor,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              icon: Icon(Icons.arrow_back, color: context.textPrimary),
               onPressed: () => Get.back(),
             ),
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      const Color(0xFF2A2A2A),
-                      const Color(0xFF1A1A1A).withValues(alpha: 0.9),
-                    ],
-                  ),
-                ),
+                decoration: BoxDecoration(gradient: context.headerGradient),
                 child: SafeArea(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -44,14 +36,10 @@ class MemberProfileView extends StatelessWidget {
                       Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                          ),
+                          gradient: context.accentGradient,
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.4),
+                              color: context.accent.withValues(alpha: 0.4),
                               blurRadius: 20,
                               offset: const Offset(0, 4),
                             ),
@@ -68,10 +56,10 @@ class MemberProfileView extends StatelessWidget {
                                     member.profileImage,
                                   ) ==
                                   null
-                              ? const Icon(
+                              ? Icon(
                                   Icons.person,
                                   size: 60,
-                                  color: Colors.white54,
+                                  color: context.textSecondary,
                                 )
                               : null,
                         ),
@@ -80,8 +68,8 @@ class MemberProfileView extends StatelessWidget {
                       // Name
                       Text(
                         member.fullName,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: context.textPrimary,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
@@ -91,7 +79,7 @@ class MemberProfileView extends StatelessWidget {
                       Text(
                         member.email,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
+                          color: context.textSecondary,
                           fontSize: 14,
                         ),
                       ),
@@ -103,15 +91,15 @@ class MemberProfileView extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                          ),
+                          gradient: context.accentGradient,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           member.role?.toUpperCase() ?? 'MEMBER',
-                          style: const TextStyle(
-                            color: Color(0xFF121212),
+                          style: TextStyle(
+                            color: context.isDark
+                                ? const Color(0xFF121212)
+                                : Colors.white,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1,
@@ -133,36 +121,45 @@ class MemberProfileView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Personal Information Section
-                  _buildSectionTitle('Personal Information'),
+                  _buildSectionTitle(context, 'Personal Information'),
                   const SizedBox(height: 12),
-                  _buildInfoCard([
+                  _buildInfoCard(context, [
                     _buildInfoRow(
+                      context,
                       Icons.person_outline,
                       'Username',
                       member.username,
                     ),
                     _buildInfoRow(
+                      context,
                       Icons.phone_outlined,
                       'Phone',
                       member.phone.isEmpty ? 'Not provided' : member.phone,
                     ),
                     _buildInfoRow(
+                      context,
                       Icons.cake_outlined,
                       'Age',
                       '${member.age} years',
                     ),
-                    _buildInfoRow(Icons.wc_outlined, 'Gender', member.gender),
+                    _buildInfoRow(
+                      context,
+                      Icons.wc_outlined,
+                      'Gender',
+                      member.gender,
+                    ),
                   ]),
 
                   const SizedBox(height: 24),
 
                   // Physical Stats Section
-                  _buildSectionTitle('Physical Stats'),
+                  _buildSectionTitle(context, 'Physical Stats'),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
                         child: _buildStatCard(
+                          context,
                           'Weight',
                           '${member.weight.toStringAsFixed(1)} kg',
                           Icons.monitor_weight_outlined,
@@ -171,6 +168,7 @@ class MemberProfileView extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildStatCard(
+                          context,
                           'Height',
                           '${member.height} cm',
                           Icons.height_outlined,
@@ -183,6 +181,7 @@ class MemberProfileView extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _buildStatCard(
+                          context,
                           'Target',
                           '${member.targetWeight.toStringAsFixed(1)} kg',
                           Icons.flag_outlined,
@@ -191,6 +190,7 @@ class MemberProfileView extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _buildStatCard(
+                          context,
                           'BMI',
                           _calculateBMI(member.weight, member.height),
                           Icons.analytics_outlined,
@@ -202,20 +202,23 @@ class MemberProfileView extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // Diet & Lifestyle Section
-                  _buildSectionTitle('Diet & Lifestyle'),
+                  _buildSectionTitle(context, 'Diet & Lifestyle'),
                   const SizedBox(height: 12),
-                  _buildInfoCard([
+                  _buildInfoCard(context, [
                     _buildInfoRow(
+                      context,
                       Icons.restaurant_outlined,
                       'Diet Type',
                       member.dietType,
                     ),
                     _buildInfoRow(
+                      context,
                       Icons.schedule_outlined,
                       'Meal Frequency',
                       member.mealFrequency,
                     ),
                     _buildInfoRow(
+                      context,
                       Icons.directions_run_outlined,
                       'Activity Level',
                       member.activityLevel,
@@ -225,42 +228,45 @@ class MemberProfileView extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // Goals Section
-                  _buildSectionTitle('Goals'),
+                  _buildSectionTitle(context, 'Goals'),
                   const SizedBox(height: 12),
-                  _buildGoalsCard(member.goals),
+                  _buildGoalsCard(context, member.goals),
 
                   const SizedBox(height: 24),
 
                   // Progress Section
-                  _buildSectionTitle('Progress'),
+                  _buildSectionTitle(context, 'Progress'),
                   const SizedBox(height: 12),
-                  _buildProgressCard(member),
+                  _buildProgressCard(context, member),
 
                   const SizedBox(height: 24),
 
                   // Allergies Section
                   if (member.allergies.isNotEmpty) ...[
-                    _buildSectionTitle('Allergies'),
+                    _buildSectionTitle(context, 'Allergies'),
                     const SizedBox(height: 12),
-                    _buildAllergiesCard(member.allergies),
+                    _buildAllergiesCard(context, member.allergies),
                     const SizedBox(height: 24),
                   ],
 
                   // Account Info Section
-                  _buildSectionTitle('Account Information'),
+                  _buildSectionTitle(context, 'Account Information'),
                   const SizedBox(height: 12),
-                  _buildInfoCard([
+                  _buildInfoCard(context, [
                     _buildInfoRow(
+                      context,
                       Icons.calendar_today_outlined,
                       'Join Date',
                       _formatDate(member.joinDate),
                     ),
                     _buildInfoRow(
+                      context,
                       Icons.event_outlined,
                       'Created',
                       _formatDate(member.createdAt),
                     ),
                     _buildInfoRow(
+                      context,
                       Icons.verified_user_outlined,
                       'Profile Status',
                       member.profileCompleted ? 'Completed' : 'Incomplete',
@@ -277,48 +283,38 @@ class MemberProfileView extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Text(
       title,
-      style: const TextStyle(
-        color: Color(0xFFC2D86A),
+      style: TextStyle(
+        color: context.accent,
         fontSize: 18,
         fontWeight: FontWeight.bold,
       ),
     );
   }
 
-  Widget _buildInfoCard(List<Widget> children) {
+  Widget _buildInfoCard(BuildContext context, List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF2A2A2A).withValues(alpha: 0.8),
-            const Color(0xFF1A1A1A).withValues(alpha: 0.8),
-          ],
-        ),
+        gradient: context.cardGradient,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
+        border: Border.all(color: context.border, width: 1),
       ),
       child: Column(children: children),
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
+  Widget _buildInfoRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.white.withValues(alpha: 0.05),
-            width: 1,
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: context.divider, width: 1)),
       ),
       child: Row(
         children: [
@@ -327,13 +323,13 @@ class MemberProfileView extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                  const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                  context.accent.withValues(alpha: 0.2),
+                  context.accent.withValues(alpha: 0.1),
                 ],
               ),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: const Color(0xFFC2D86A), size: 18),
+            child: Icon(icon, color: context.accent, size: 18),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -342,16 +338,13 @@ class MemberProfileView extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6),
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: context.textTertiary, fontSize: 12),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: context.textPrimary,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
@@ -364,32 +357,27 @@ class MemberProfileView extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon) {
+  Widget _buildStatCard(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF2A2A2A).withValues(alpha: 0.8),
-            const Color(0xFF1A1A1A).withValues(alpha: 0.8),
-          ],
-        ),
+        gradient: context.cardGradient,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
+        border: Border.all(color: context.border, width: 1),
       ),
       child: Column(
         children: [
-          Icon(icon, color: const Color(0xFFC2D86A), size: 28),
+          Icon(icon, color: context.accent, size: 28),
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.textPrimary,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -397,42 +385,26 @@ class MemberProfileView extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.6),
-              fontSize: 12,
-            ),
+            style: TextStyle(color: context.textTertiary, fontSize: 12),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildGoalsCard(List<String> goals) {
+  Widget _buildGoalsCard(BuildContext context, List<String> goals) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF2A2A2A).withValues(alpha: 0.8),
-            const Color(0xFF1A1A1A).withValues(alpha: 0.8),
-          ],
-        ),
+        gradient: context.cardGradient,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
+        border: Border.all(color: context.border, width: 1),
       ),
       child: goals.isEmpty
           ? Center(
               child: Text(
                 'No goals set',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: context.textTertiary, fontSize: 14),
               ),
             )
           : Wrap(
@@ -445,15 +417,15 @@ class MemberProfileView extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                    ),
+                    gradient: context.accentGradient,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     goal,
-                    style: const TextStyle(
-                      color: Color(0xFF121212),
+                    style: TextStyle(
+                      color: context.isDark
+                          ? const Color(0xFF121212)
+                          : Colors.white,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),
@@ -464,23 +436,13 @@ class MemberProfileView extends StatelessWidget {
     );
   }
 
-  Widget _buildProgressCard(UserModel member) {
+  Widget _buildProgressCard(BuildContext context, UserModel member) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF2A2A2A).withValues(alpha: 0.8),
-            const Color(0xFF1A1A1A).withValues(alpha: 0.8),
-          ],
-        ),
+        gradient: context.cardGradient,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
+        border: Border.all(color: context.border, width: 1),
       ),
       child: Column(
         children: [
@@ -488,16 +450,19 @@ class MemberProfileView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _buildProgressStat(
+                context,
                 'Fat Lost',
                 member.fatLostDisplay,
                 Icons.trending_down,
               ),
               _buildProgressStat(
+                context,
                 'Muscle Gained',
                 member.muscleGainedDisplay,
                 Icons.trending_up,
               ),
               _buildProgressStat(
+                context,
                 'Progress',
                 member.goalProgressDisplay,
                 Icons.emoji_events_outlined,
@@ -511,50 +476,50 @@ class MemberProfileView extends StatelessWidget {
             child: LinearProgressIndicator(
               value: member.goalAchievedPercentage / 100,
               minHeight: 8,
-              backgroundColor: Colors.white.withValues(alpha: 0.1),
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                Color(0xFFC2D86A),
-              ),
+              backgroundColor: context.border,
+              valueColor: AlwaysStoppedAnimation<Color>(context.accent),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             member.dayCountDisplay,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.6),
-              fontSize: 12,
-            ),
+            style: TextStyle(color: context.textTertiary, fontSize: 12),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildProgressStat(String label, String value, IconData icon) {
+  Widget _buildProgressStat(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+  ) {
     return Column(
       children: [
-        Icon(icon, color: const Color(0xFFC2D86A), size: 24),
+        Icon(icon, color: context.accent, size: 24),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: context.textPrimary,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.6),
-            fontSize: 11,
-          ),
+          style: TextStyle(color: context.textTertiary, fontSize: 11),
         ),
       ],
     );
   }
 
-  Widget _buildAllergiesCard(Map<String, bool> allergies) {
+  Widget _buildAllergiesCard(
+    BuildContext context,
+    Map<String, bool> allergies,
+  ) {
     final activeAllergies = allergies.entries
         .where((entry) => entry.value)
         .map((entry) => entry.key)
@@ -563,28 +528,15 @@ class MemberProfileView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF2A2A2A).withValues(alpha: 0.8),
-            const Color(0xFF1A1A1A).withValues(alpha: 0.8),
-          ],
-        ),
+        gradient: context.cardGradient,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
+        border: Border.all(color: context.border, width: 1),
       ),
       child: activeAllergies.isEmpty
           ? Center(
               child: Text(
                 'No allergies reported',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: context.textTertiary, fontSize: 14),
               ),
             )
           : Wrap(

@@ -79,6 +79,10 @@ class ClientDashboardControllers extends GetxController {
   final todayMealSlots = <String, String?>{}.obs; // Category → MealId mapping
   final userGroups =
       <GroupModel>[].obs; // Store user's groups for role checking
+
+  // Group Stats - Reactive state for Live Stats card
+  final RxMap<String, dynamic> groupStats = <String, dynamic>{}.obs;
+
   StreamSubscription? _groupMealsSubscription;
 
   // Stream subscription for cleanup
@@ -762,6 +766,7 @@ class ClientDashboardControllers extends GetxController {
     // Prevent rapid switching
     if (isGroupModeLoading.value) return;
 
+    print('🔵 GROUP SWITCHED → $groupId');
     print('🔵 ENTERING GROUP MODE: $groupName (ID: $groupId)');
 
     // Set group mode immediately for instant UI feedback
@@ -777,6 +782,9 @@ class ClientDashboardControllers extends GetxController {
     groupMeals.clear();
     todayMealSlots.clear();
     groupCategories.clear(); // Clear old categories
+
+    // Load group stats for Live Stats card
+    _loadGroupStats(groupId);
 
     // Load categories and meal plan in parallel for faster loading
     _loadGroupCategories(groupId);
@@ -887,6 +895,7 @@ class ClientDashboardControllers extends GetxController {
     groupMeals.clear();
     todayMealSlots.clear();
     groupCategories.clear();
+    groupStats.clear(); // Clear group stats
 
     // Reset to default category
     selectedCategory.value = 'Breakfast';
@@ -897,6 +906,29 @@ class ClientDashboardControllers extends GetxController {
 
     // Force UI update to reload personal meals
     update();
+  }
+
+  /// Load group stats from Firestore (placeholder for future stat calculations)
+  Future<void> _loadGroupStats(String groupId) async {
+    try {
+      print("📊 Loading stats for group: $groupId");
+
+      final doc = await _firestore.collection('groups').doc(groupId).get();
+
+      if (doc.exists) {
+        final data = doc.data();
+        // Extract stats if they exist, otherwise use empty map
+        final stats = data?['stats'] as Map<String, dynamic>?;
+        groupStats.assignAll(stats ?? {});
+        print("📊 Group stats loaded: $groupStats");
+      } else {
+        print("⚠️ Group document does not exist");
+        groupStats.clear();
+      }
+    } catch (e) {
+      print("❌ Group stats load error: $e");
+      groupStats.clear();
+    }
   }
 
   /// Fetch TODAY's meal plan for a specific group

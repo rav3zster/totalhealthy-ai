@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/theme/theme_helper.dart';
 import '../controllers/setting_controller.dart';
 
 class SettingView extends GetView<SettingController> {
@@ -8,36 +9,19 @@ class SettingView extends GetView<SettingController> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
-            stops: [0.0, 0.3, 1.0],
-          ),
-        ),
+        decoration: BoxDecoration(gradient: context.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
               // Header
               Container(
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                  ),
+                  gradient: context.headerGradient,
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(25),
                     bottomRight: Radius.circular(25),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
+                  boxShadow: context.cardShadow,
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -47,17 +31,17 @@ class SettingView extends GetView<SettingController> {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                              const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                              context.accentColor.withValues(alpha: 0.2),
+                              context.accentColor.withValues(alpha: 0.1),
                             ],
                           ),
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
                           onPressed: () => Get.back(),
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_back_ios_new_outlined,
-                            color: Colors.white,
+                            color: context.textPrimary,
                           ),
                         ),
                       ),
@@ -65,8 +49,8 @@ class SettingView extends GetView<SettingController> {
                         child: Text(
                           'settings'.tr,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: context.textPrimary,
                             fontFamily: 'inter',
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -137,39 +121,31 @@ class SettingOption extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-          ),
+          gradient: context.cardGradient,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+            color: context.isLightTheme
+                ? context.borderColor
+                : context.accentColor.withValues(alpha: 0.2),
             width: 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
+          boxShadow: context.cardShadow,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
-                color: Colors.white,
+                color: context.textPrimary,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios,
               size: 16,
-              color: Colors.white54,
+              color: context.textSecondary,
             ),
           ],
         ),

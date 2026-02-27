@@ -6,6 +6,7 @@ import '../../../widgets/member_action_menu.dart';
 import 'group_meal_chat_view.dart';
 import '../controllers/group_controller.dart';
 import '../../../controllers/user_controller.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class GroupDetailsScreen extends StatefulWidget {
   const GroupDetailsScreen({super.key});
@@ -62,25 +63,15 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
     final controller = Get.find<GroupController>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: context.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
             // Modern Header
             Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [const Color(0xFF1E1E1E), const Color(0xFF121212)],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                gradient: context.headerGradient,
+                boxShadow: context.cardShadow,
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -90,13 +81,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2A2A2A),
+                            color: context.cardSecondary,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.arrow_back_ios_new_rounded,
-                              color: Color(0xFFC2D86A),
+                              color: context.accent,
                               size: 20,
                             ),
                             onPressed: () {
@@ -105,11 +96,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                           ),
                         ),
                         const SizedBox(width: 16),
-                        const Expanded(
+                        Expanded(
                           child: Text(
                             'Group Details',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: context.textPrimary,
                               fontSize: 28,
                               fontWeight: FontWeight.w700,
                               letterSpacing: -0.5,
@@ -158,25 +149,18 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E),
+                        color: context.cardColor,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.05),
-                          width: 1,
-                        ),
+                        border: Border.all(color: context.border, width: 1),
                       ),
                       child: TabBar(
                         controller: _tabController,
                         indicator: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                          ),
+                          gradient: context.accentGradient,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.3),
+                              color: context.accent.withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -184,10 +168,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
                         dividerColor: Colors.transparent,
-                        labelColor: const Color(0xFF121212),
-                        unselectedLabelColor: Colors.white.withValues(
-                          alpha: 0.5,
-                        ),
+                        labelColor: context.backgroundColor,
+                        unselectedLabelColor: context.textSecondary,
                         labelStyle: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -258,23 +240,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
             },
             child: Container(
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF1E1E1E), Color(0xFF1A1A1A)],
-                ),
+                gradient: context.cardGradient,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                  color: context.accent.withValues(alpha: 0.3),
                   width: 1.5,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
+                boxShadow: context.cardShadow,
               ),
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -284,8 +256,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                     // Group Name
                     Text(
                       group['name'] ?? 'Weekly Meal Planning Group',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: context.textPrimary,
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.5,
@@ -298,7 +270,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                       group['description'] ??
                           'A support group for planning and tracking weekly meal prep, ideal for maintaining a balanced diet.',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: context.textSecondary,
                         fontSize: 15,
                         height: 1.5,
                       ),
@@ -313,30 +285,26 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.1),
+                              color: context.accent.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: const Color(
-                                  0xFFC2D86A,
-                                ).withValues(alpha: 0.2),
+                                color: context.accent.withValues(alpha: 0.2),
                                 width: 1,
                               ),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.calendar_today_rounded,
-                                  color: Color(0xFFC2D86A),
+                                  color: context.accent,
                                   size: 20,
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   'Created On',
                                   style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.5),
+                                    color: context.textTertiary,
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -344,8 +312,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                                 const SizedBox(height: 4),
                                 Text(
                                   group['createdDate'] ?? 'August 1, 2024',
-                                  style: const TextStyle(
-                                    color: Color(0xFFC2D86A),
+                                  style: TextStyle(
+                                    color: context.accent,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -360,29 +328,25 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(
-                              0xFFC2D86A,
-                            ).withValues(alpha: 0.1),
+                            color: context.accent.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.2),
+                              color: context.accent.withValues(alpha: 0.2),
                               width: 1,
                             ),
                           ),
                           child: Column(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.people_rounded,
-                                color: Color(0xFFC2D86A),
+                                color: context.accent,
                                 size: 20,
                               ),
                               const SizedBox(height: 8),
                               Text(
                                 'Members',
                                 style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.5),
+                                  color: context.textTertiary,
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -397,8 +361,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                                       snapshot.data?.length ?? 0;
                                   return Text(
                                     '$memberCount',
-                                    style: const TextStyle(
-                                      color: Color(0xFFC2D86A),
+                                    style: TextStyle(
+                                      color: context.accent,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -417,15 +381,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                        ),
+                        gradient: context.accentGradient,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(
-                              0xFFC2D86A,
-                            ).withValues(alpha: 0.3),
+                            color: context.accent.withValues(alpha: 0.3),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -438,21 +398,21 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                           onTap: () {
                             Get.toNamed('/member-management', arguments: group);
                           },
-                          child: const Padding(
+                          child: Padding(
                             padding: EdgeInsets.symmetric(vertical: 16),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
                                   Icons.group_add_rounded,
-                                  color: Color(0xFF121212),
+                                  color: context.backgroundColor,
                                   size: 22,
                                 ),
                                 SizedBox(width: 10),
                                 Text(
                                   'Manage Members',
                                   style: TextStyle(
-                                    color: Color(0xFF121212),
+                                    color: context.backgroundColor,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: 0.3,
@@ -490,23 +450,13 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF2D2D2D), Color(0xFF1D1D1D)],
-              ),
+              gradient: context.cardGradient,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                color: context.accent.withValues(alpha: 0.2),
                 width: 1,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+              boxShadow: context.cardShadow,
             ),
             child: TextField(
               controller: memberSearchController,
@@ -515,21 +465,24 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                 // Trigger member filtering for THIS group only
                 controller.filterGroupMembers(query);
               },
-              style: const TextStyle(color: Colors.white),
-              cursorColor: const Color(0xFFC2D86A),
+              style: TextStyle(color: context.textPrimary),
+              cursorColor: context.accent,
               decoration: InputDecoration(
                 hintText: 'Search members in this group...',
-                hintStyle: const TextStyle(color: Colors.white54, fontSize: 14),
-                prefixIcon: const Padding(
+                hintStyle: TextStyle(
+                  color: context.textSecondary,
+                  fontSize: 14,
+                ),
+                prefixIcon: Padding(
                   padding: EdgeInsets.all(12),
-                  child: Icon(Icons.search, color: Color(0xFFC2D86A), size: 20),
+                  child: Icon(Icons.search, color: context.accent, size: 20),
                 ),
                 suffixIcon: Obx(() {
                   if (controller.groupMembersSearchQuery.value.isNotEmpty) {
                     return IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.clear,
-                        color: Colors.white54,
+                        color: context.textSecondary,
                         size: 18,
                       ),
                       onPressed: () {
@@ -573,8 +526,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
             );
 
             if (controller.isMemberLoading.value) {
-              return const Center(
-                child: CircularProgressIndicator(color: Color(0xFFC2D86A)),
+              return Center(
+                child: CircularProgressIndicator(color: context.accent),
               );
             }
 
@@ -588,7 +541,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                           ? Icons.search_off_rounded
                           : Icons.people_outline_rounded,
                       size: 64,
-                      color: Colors.white.withValues(alpha: 0.3),
+                      color: context.textTertiary,
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -596,7 +549,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                           ? "No members found"
                           : "No members in this group yet.",
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: context.textSecondary,
                         fontSize: 16,
                       ),
                     ),
@@ -605,7 +558,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                       Text(
                         'Try a different search term',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.4),
+                          color: context.textTertiary,
                           fontSize: 14,
                         ),
                       ),
@@ -618,8 +571,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                         icon: const Icon(Icons.clear, size: 16),
                         label: const Text('Clear Search'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFC2D86A),
-                          foregroundColor: Colors.black,
+                          backgroundColor: context.accent,
+                          foregroundColor: context.backgroundColor,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 20,
                             vertical: 10,
@@ -675,29 +628,15 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isAdmin
-                ? [const Color(0xFF2A2A2A), const Color(0xFF252525)]
-                : [const Color(0xFF1E1E1E), const Color(0xFF1A1A1A)],
-          ),
+          gradient: context.cardGradient,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isAdmin
-                ? const Color(0xFFC2D86A).withValues(alpha: 0.4)
-                : Colors.white.withValues(alpha: 0.05),
+                ? context.accent.withValues(alpha: 0.4)
+                : context.border,
             width: 1.5,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: isAdmin
-                  ? const Color(0xFFC2D86A).withValues(alpha: 0.15)
-                  : Colors.black.withValues(alpha: 0.2),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: context.cardShadow,
         ),
         child: Material(
           color: Colors.transparent,
@@ -720,25 +659,15 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                           gradient: LinearGradient(
                             colors: isAdmin
                                 ? [
-                                    const Color(0xFFC2D86A),
-                                    const Color(0xFFD4E87C),
+                                    context.accent,
+                                    context.accent.withValues(alpha: 0.8),
                                   ]
                                 : [
-                                    Colors.white.withValues(alpha: 0.1),
-                                    Colors.white.withValues(alpha: 0.05),
+                                    context.textPrimary.withValues(alpha: 0.1),
+                                    context.textPrimary.withValues(alpha: 0.05),
                                   ],
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: isAdmin
-                                  ? const Color(
-                                      0xFFC2D86A,
-                                    ).withValues(alpha: 0.4)
-                                  : Colors.black.withValues(alpha: 0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
+                          boxShadow: context.cardShadow,
                         ),
                         padding: const EdgeInsets.all(2),
                         child: CircleAvatar(
@@ -751,7 +680,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                                     member.profileImage,
                                   ) ==
                                   null
-                              ? const Icon(Icons.person, color: Colors.white54)
+                              ? Icon(Icons.person, color: context.textSecondary)
                               : null,
                         ),
                       ),
@@ -762,27 +691,23 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                           child: Container(
                             padding: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                              ),
+                              gradient: context.accentGradient,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: const Color(0xFF121212),
+                                color: context.backgroundColor,
                                 width: 2,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(
-                                    0xFFC2D86A,
-                                  ).withValues(alpha: 0.6),
+                                  color: context.accent.withValues(alpha: 0.6),
                                   blurRadius: 6,
                                   offset: const Offset(0, 2),
                                 ),
                               ],
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.star_rounded,
-                              color: Color(0xFF121212),
+                              color: context.backgroundColor,
                               size: 10,
                             ),
                           ),
@@ -803,8 +728,8 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                             Flexible(
                               child: Text(
                                 member.username,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: context.textPrimary,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: -0.3,
@@ -820,27 +745,22 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
                                   vertical: 3,
                                 ),
                                 decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xFFC2D86A),
-                                      Color(0xFFD4E87C),
-                                    ],
-                                  ),
+                                  gradient: context.accentGradient,
                                   borderRadius: BorderRadius.circular(6),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: const Color(
-                                        0xFFC2D86A,
-                                      ).withValues(alpha: 0.3),
+                                      color: context.accent.withValues(
+                                        alpha: 0.3,
+                                      ),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
                                   ],
                                 ),
-                                child: const Text(
+                                child: Text(
                                   'ADMIN',
                                   style: TextStyle(
-                                    color: Color(0xFF121212),
+                                    color: context.backgroundColor,
                                     fontSize: 9,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 0.5,
@@ -927,17 +847,17 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: const Color(0xFFC2D86A).withValues(alpha: 0.15),
+            color: context.accent.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(6),
           ),
-          child: Icon(icon, size: 11, color: const Color(0xFFC2D86A)),
+          child: Icon(icon, size: 11, color: context.accent),
         ),
         const SizedBox(width: 6),
         Flexible(
           child: Text(
             text,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.8),
+              color: context.textSecondary,
               fontSize: 11,
               fontWeight: FontWeight.w500,
             ),
@@ -953,13 +873,11 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
       width: 32,
       height: 32,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-        ),
+        gradient: context.accentGradient,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+            color: context.accent.withValues(alpha: 0.3),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -970,7 +888,7 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
           onTap: onTap,
-          child: Icon(icon, color: const Color(0xFF121212), size: 15),
+          child: Icon(icon, color: context.backgroundColor, size: 15),
         ),
       ),
     );

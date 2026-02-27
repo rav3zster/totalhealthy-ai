@@ -8,6 +8,7 @@ import '../../../routes/app_pages.dart';
 import '../../../widgets/phone_nav_bar.dart';
 import '../../../controllers/user_controller.dart';
 import '../../../core/base/controllers/auth_controller.dart';
+import '../../../core/theme/theme_helper.dart';
 import 'widgets/create_group_bottom_sheet.dart';
 
 class GroupView extends StatefulWidget {
@@ -38,25 +39,15 @@ class _GroupViewState extends State<GroupView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: context.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
             // Modern Header
             Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [const Color(0xFF1E1E1E), const Color(0xFF121212)],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                gradient: context.headerGradient,
+                boxShadow: context.cardShadow,
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -67,8 +58,8 @@ class _GroupViewState extends State<GroupView>
                         const SizedBox(width: 16),
                         Text(
                           'groups'.tr,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: context.textPrimary,
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
                             letterSpacing: -0.5,
@@ -77,15 +68,11 @@ class _GroupViewState extends State<GroupView>
                         const Spacer(),
                         Container(
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                            ),
+                            gradient: context.accentGradient,
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(
-                                  0xFFC2D86A,
-                                ).withValues(alpha: 0.3),
+                                color: context.accent.withValues(alpha: 0.3),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -108,14 +95,14 @@ class _GroupViewState extends State<GroupView>
                                   children: [
                                     Icon(
                                       Icons.add_rounded,
-                                      color: Color(0xFF121212),
+                                      color: context.backgroundColor,
                                       size: 20,
                                     ),
                                     SizedBox(width: 6),
                                     Text(
                                       'add_group'.tr,
-                                      style: const TextStyle(
-                                        color: Color(0xFF121212),
+                                      style: TextStyle(
+                                        color: context.backgroundColor,
                                         fontSize: 15,
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: 0.3,
@@ -135,25 +122,18 @@ class _GroupViewState extends State<GroupView>
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E),
+                        color: context.cardColor,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.05),
-                          width: 1,
-                        ),
+                        border: Border.all(color: context.border, width: 1),
                       ),
                       child: TabBar(
                         controller: _tabController,
                         indicator: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                          ),
+                          gradient: context.accentGradient,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.3),
+                              color: context.accent.withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -161,10 +141,8 @@ class _GroupViewState extends State<GroupView>
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
                         dividerColor: Colors.transparent,
-                        labelColor: const Color(0xFF121212),
-                        unselectedLabelColor: Colors.white.withValues(
-                          alpha: 0.5,
-                        ),
+                        labelColor: context.backgroundColor,
+                        unselectedLabelColor: context.textSecondary,
                         labelStyle: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -218,43 +196,31 @@ class _GroupViewState extends State<GroupView>
                         padding: const EdgeInsets.all(16),
                         child: Container(
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [Color(0xFF2D2D2D), Color(0xFF1D1D1D)],
-                            ),
+                            gradient: context.cardGradient,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.2),
+                              color: context.accent.withValues(alpha: 0.2),
                               width: 1,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
+                            boxShadow: context.cardShadow,
                           ),
                           child: TextField(
                             onChanged: (query) {
                               controller.filterGroupsInView(query);
                             },
-                            style: const TextStyle(color: Colors.white),
-                            cursorColor: const Color(0xFFC2D86A),
+                            style: TextStyle(color: context.textPrimary),
+                            cursorColor: context.accent,
                             decoration: InputDecoration(
                               hintText: 'search_groups'.tr,
-                              hintStyle: const TextStyle(
-                                color: Colors.white54,
+                              hintStyle: TextStyle(
+                                color: context.textSecondary,
                                 fontSize: 15,
                               ),
-                              prefixIcon: const Padding(
+                              prefixIcon: Padding(
                                 padding: EdgeInsets.all(12),
                                 child: Icon(
                                   Icons.search,
-                                  color: Color(0xFFC2D86A),
+                                  color: context.accent,
                                   size: 22,
                                 ),
                               ),
@@ -264,9 +230,9 @@ class _GroupViewState extends State<GroupView>
                                     .value
                                     .isNotEmpty) {
                                   return IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.clear,
-                                      color: Colors.white54,
+                                      color: context.textSecondary,
                                       size: 20,
                                     ),
                                     onPressed: () {
@@ -290,9 +256,9 @@ class _GroupViewState extends State<GroupView>
                       Expanded(
                         child: Obx(() {
                           if (controller.isLoading.value) {
-                            return const Center(
+                            return Center(
                               child: CircularProgressIndicator(
-                                color: Color(0xFFC2D86A),
+                                color: context.accent,
                               ),
                             );
                           }
@@ -311,7 +277,7 @@ class _GroupViewState extends State<GroupView>
                                         ? Icons.search_off_rounded
                                         : Icons.group_off,
                                     size: 80,
-                                    color: Colors.white.withValues(alpha: 0.3),
+                                    color: context.textTertiary,
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
@@ -319,9 +285,7 @@ class _GroupViewState extends State<GroupView>
                                         ? 'No groups found'
                                         : 'No groups found.\nCreate one to get started!',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.8,
-                                      ),
+                                      color: context.textPrimary,
                                       fontSize: 20,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -333,9 +297,7 @@ class _GroupViewState extends State<GroupView>
                                         ? 'Try a different search term'
                                         : 'Groups you create or join will appear here',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.5,
-                                      ),
+                                      color: context.textSecondary,
                                       fontSize: 14,
                                     ),
                                     textAlign: TextAlign.center,
@@ -349,10 +311,9 @@ class _GroupViewState extends State<GroupView>
                                       icon: const Icon(Icons.clear, size: 18),
                                       label: const Text('Clear Search'),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(
-                                          0xFFC2D86A,
-                                        ),
-                                        foregroundColor: Colors.black,
+                                        backgroundColor: context.accent,
+                                        foregroundColor:
+                                            context.backgroundColor,
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 24,
                                           vertical: 12,
@@ -391,43 +352,31 @@ class _GroupViewState extends State<GroupView>
                         padding: const EdgeInsets.all(16),
                         child: Container(
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [Color(0xFF2D2D2D), Color(0xFF1D1D1D)],
-                            ),
+                            gradient: context.cardGradient,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.2),
+                              color: context.accent.withValues(alpha: 0.2),
                               width: 1,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
+                            boxShadow: context.cardShadow,
                           ),
                           child: TextField(
                             onChanged: (query) {
                               controller.filterMembers(query);
                             },
-                            style: const TextStyle(color: Colors.white),
-                            cursorColor: const Color(0xFFC2D86A),
+                            style: TextStyle(color: context.textPrimary),
+                            cursorColor: context.accent,
                             decoration: InputDecoration(
                               hintText: 'search_members'.tr,
-                              hintStyle: const TextStyle(
-                                color: Colors.white54,
+                              hintStyle: TextStyle(
+                                color: context.textSecondary,
                                 fontSize: 15,
                               ),
-                              prefixIcon: const Padding(
+                              prefixIcon: Padding(
                                 padding: EdgeInsets.all(12),
                                 child: Icon(
                                   Icons.search,
-                                  color: Color(0xFFC2D86A),
+                                  color: context.accent,
                                   size: 22,
                                 ),
                               ),
@@ -437,9 +386,9 @@ class _GroupViewState extends State<GroupView>
                                     .value
                                     .isNotEmpty) {
                                   return IconButton(
-                                    icon: const Icon(
+                                    icon: Icon(
                                       Icons.clear,
-                                      color: Colors.white54,
+                                      color: context.textSecondary,
                                       size: 20,
                                     ),
                                     onPressed: () {
@@ -484,7 +433,7 @@ class _GroupViewState extends State<GroupView>
                                         ? Icons.search_off_rounded
                                         : Icons.people_outline,
                                     size: 80,
-                                    color: Colors.white.withValues(alpha: 0.3),
+                                    color: context.textTertiary,
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
@@ -492,9 +441,7 @@ class _GroupViewState extends State<GroupView>
                                         ? 'No members found'
                                         : 'No platform members found.',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.8,
-                                      ),
+                                      color: context.textPrimary,
                                       fontSize: 20,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -505,9 +452,7 @@ class _GroupViewState extends State<GroupView>
                                         ? 'Try a different search term'
                                         : 'Members will appear here once they sign up',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.5,
-                                      ),
+                                      color: context.textSecondary,
                                       fontSize: 14,
                                     ),
                                     textAlign: TextAlign.center,
@@ -521,10 +466,9 @@ class _GroupViewState extends State<GroupView>
                                       icon: const Icon(Icons.clear, size: 18),
                                       label: const Text('Clear Search'),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(
-                                          0xFFC2D86A,
-                                        ),
-                                        foregroundColor: Colors.black,
+                                        backgroundColor: context.accent,
+                                        foregroundColor:
+                                            context.backgroundColor,
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 24,
                                           vertical: 12,
@@ -603,23 +547,10 @@ class _GroupViewState extends State<GroupView>
         child: Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF1E1E1E), Color(0xFF1A1A1A)],
-            ),
+            gradient: context.cardGradient,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.05),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            border: Border.all(color: context.border, width: 1.5),
+            boxShadow: context.cardShadow,
           ),
           child: Material(
             color: Colors.transparent,
@@ -640,8 +571,8 @@ class _GroupViewState extends State<GroupView>
                         Expanded(
                           child: Text(
                             group.name,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: context.textPrimary,
                               fontSize: 20,
                               fontWeight: FontWeight.w700,
                               letterSpacing: -0.3,
@@ -683,7 +614,7 @@ class _GroupViewState extends State<GroupView>
                     Text(
                       group.description,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: context.textSecondary,
                         fontSize: 14,
                         height: 1.4,
                       ),
@@ -703,31 +634,27 @@ class _GroupViewState extends State<GroupView>
                               vertical: 8,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.1),
+                              color: context.accent.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: const Color(
-                                  0xFFC2D86A,
-                                ).withValues(alpha: 0.2),
+                                color: context.accent.withValues(alpha: 0.2),
                                 width: 1,
                               ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.calendar_today_rounded,
-                                  color: Color(0xFFC2D86A),
+                                  color: context.accent,
                                   size: 14,
                                 ),
                                 const SizedBox(width: 6),
                                 Flexible(
                                   child: Text(
                                     'Created On: ${DateFormat('MMM dd, yyyy').format(group.createdAt)}',
-                                    style: const TextStyle(
-                                      color: Color(0xFFC2D86A),
+                                    style: TextStyle(
+                                      color: context.accent,
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -747,31 +674,27 @@ class _GroupViewState extends State<GroupView>
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(
-                              0xFFC2D86A,
-                            ).withValues(alpha: 0.1),
+                            color: context.accent.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.2),
+                              color: context.accent.withValues(alpha: 0.2),
                               width: 1,
                             ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.people_rounded,
-                                color: Color(0xFFC2D86A),
+                                color: context.accent,
                                 size: 14,
                               ),
                               const SizedBox(width: 6),
                               Obx(
                                 () => Text(
                                   '${controller.totalUsers.value}',
-                                  style: const TextStyle(
-                                    color: Color(0xFFC2D86A),
+                                  style: TextStyle(
+                                    color: context.accent,
                                     fontSize: 11,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -797,7 +720,7 @@ class _GroupViewState extends State<GroupView>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withValues(alpha: 0.5),
+      barrierColor: context.backgroundColor.withValues(alpha: 0.5),
       builder: (context) => CreateGroupBottomSheet(controller: controller),
     );
   }
@@ -815,23 +738,10 @@ class _GroupViewState extends State<GroupView>
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF1E1E1E), Color(0xFF1A1A1A)],
-          ),
+          gradient: context.cardGradient,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.05),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          border: Border.all(color: context.border, width: 1.5),
+          boxShadow: context.cardShadow,
         ),
         child: Material(
           color: Colors.transparent,
@@ -848,17 +758,11 @@ class _GroupViewState extends State<GroupView>
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
                         colors: [
-                          Colors.white.withValues(alpha: 0.1),
-                          Colors.white.withValues(alpha: 0.05),
+                          context.textPrimary.withValues(alpha: 0.1),
+                          context.textPrimary.withValues(alpha: 0.05),
                         ],
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      boxShadow: context.cardShadow,
                     ),
                     padding: const EdgeInsets.all(3),
                     child: CircleAvatar(
@@ -869,7 +773,7 @@ class _GroupViewState extends State<GroupView>
                       child:
                           UserController.getImageProvider(user.profileImage) ==
                               null
-                          ? const Icon(Icons.person, color: Colors.white54)
+                          ? Icon(Icons.person, color: context.textSecondary)
                           : null,
                     ),
                   ),
@@ -882,8 +786,8 @@ class _GroupViewState extends State<GroupView>
                       children: [
                         Text(
                           user.username,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: context.textPrimary,
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
                             letterSpacing: -0.3,
@@ -897,30 +801,26 @@ class _GroupViewState extends State<GroupView>
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(
-                              0xFFC2D86A,
-                            ).withValues(alpha: 0.15),
+                            color: context.accent.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.3),
+                              color: context.accent.withValues(alpha: 0.3),
                               width: 1,
                             ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.workspace_premium_rounded,
                                 size: 12,
-                                color: Color(0xFFC2D86A),
+                                color: context.accent,
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 user.planName,
-                                style: const TextStyle(
-                                  color: Color(0xFFC2D86A),
+                                style: TextStyle(
+                                  color: context.accent,
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -935,33 +835,27 @@ class _GroupViewState extends State<GroupView>
                   // Info Button
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.05),
+                      color: context.cardSecondary,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        width: 1,
-                      ),
+                      border: Border.all(color: context.border, width: 1),
                     ),
                     child: IconButton(
                       icon: Icon(
                         Icons.info_outline_rounded,
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: context.textSecondary,
                         size: 20,
                       ),
                       onPressed: () {
                         Get.snackbar(
                           "Info",
                           "To invite users, please open a specific group and use the 'Manage Members' option.",
-                          backgroundColor: const Color(0xFF2A2A2A),
-                          colorText: Colors.white,
+                          backgroundColor: context.cardColor,
+                          colorText: context.textPrimary,
                           snackPosition: SnackPosition.BOTTOM,
                           margin: const EdgeInsets.all(16),
                           borderRadius: 12,
                           duration: const Duration(seconds: 4),
-                          icon: const Icon(
-                            Icons.info_rounded,
-                            color: Color(0xFFC2D86A),
-                          ),
+                          icon: Icon(Icons.info_rounded, color: context.accent),
                         );
                       },
                       padding: const EdgeInsets.all(8),

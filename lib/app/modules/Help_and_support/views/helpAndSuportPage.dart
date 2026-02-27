@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class HelpPage extends StatefulWidget {
   const HelpPage({super.key});
@@ -46,15 +47,9 @@ class _HelpPageState extends State<HelpPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: context.backgroundColor,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.black, Color(0xFF0F0F0F), Colors.black],
-          ),
-        ),
+        decoration: BoxDecoration(gradient: context.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -70,11 +65,11 @@ class _HelpPageState extends State<HelpPage>
                         const SizedBox(height: 10),
                         _buildHeroSection(),
                         const SizedBox(height: 30),
-                        _buildSectionTitle("Direct Assistance"),
+                        _buildSectionTitle("direct_assistance".tr),
                         const SizedBox(height: 16),
                         _buildSupportChannels(),
                         const SizedBox(height: 40),
-                        _buildSectionTitle("Contact Information"),
+                        _buildSectionTitle("contact_information".tr),
                         const SizedBox(height: 16),
                         _buildContactInfoCards(),
                         const SizedBox(height: 50),
@@ -98,22 +93,22 @@ class _HelpPageState extends State<HelpPage>
         children: [
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+              color: context.accent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_ios_new,
-                color: Color(0xFFC2D86A),
+                color: context.accent,
                 size: 20,
               ),
               onPressed: () => Get.back(),
             ),
           ),
-          const Text(
-            "Support",
+          Text(
+            "support".tr,
             style: TextStyle(
-              color: Colors.white,
+              color: context.textPrimary,
               fontSize: 18,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
@@ -134,9 +129,9 @@ class _HelpPageState extends State<HelpPage>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "How can we\nhelp you today?",
+              "how_can_we_help".tr,
               style: TextStyle(
-                color: Colors.white,
+                color: context.textPrimary,
                 fontSize: 36,
                 fontWeight: FontWeight.w900,
                 height: 1.1,
@@ -148,9 +143,7 @@ class _HelpPageState extends State<HelpPage>
               width: 60,
               height: 4,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-                ),
+                gradient: context.accentGradient,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -164,7 +157,7 @@ class _HelpPageState extends State<HelpPage>
     return Text(
       title.toUpperCase(),
       style: TextStyle(
-        color: const Color(0xFFC2D86A).withValues(alpha: 0.6),
+        color: context.accent.withValues(alpha: 0.6),
         fontSize: 12,
         fontWeight: FontWeight.bold,
         letterSpacing: 2.0,
@@ -176,16 +169,16 @@ class _HelpPageState extends State<HelpPage>
     return Column(
       children: [
         _buildSupportCard(
-          title: "Personal Dietician",
-          subtitle: "Expert guidance for your journey",
+          title: "personal_dietician".tr,
+          subtitle: "expert_guidance".tr,
           icon: Icons.person_search_rounded,
-          gradient: [const Color(0xFFC2D86A), const Color(0xFFB8CC5A)],
+          gradient: [context.accent, context.accent.withValues(alpha: 0.8)],
           isFeatureDisabled: true,
         ),
         const SizedBox(height: 16),
         _buildSupportCard(
-          title: "AI Chatbot",
-          subtitle: "Instant answers 24/7",
+          title: "ai_chatbot".tr,
+          subtitle: "instant_answers_24_7".tr,
           icon: Icons.auto_awesome_rounded,
           gradient: [const Color(0xFF4FC3F7), const Color(0xFF29B6F6)],
           isFeatureDisabled: false,
@@ -204,12 +197,9 @@ class _HelpPageState extends State<HelpPage>
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.05),
-          width: 1,
-        ),
+        border: Border.all(color: context.border, width: 1),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -235,8 +225,8 @@ class _HelpPageState extends State<HelpPage>
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: context.textPrimary,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -245,7 +235,7 @@ class _HelpPageState extends State<HelpPage>
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
+                      color: context.textSecondary,
                       fontSize: 13,
                     ),
                   ),
@@ -259,22 +249,22 @@ class _HelpPageState extends State<HelpPage>
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: context.cardSecondary,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Text(
-                  "Offline",
+                child: Text(
+                  "offline".tr,
                   style: TextStyle(
-                    color: Colors.white54,
+                    color: context.textSecondary,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               )
             else
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios,
-                color: Colors.white24,
+                color: context.textTertiary,
                 size: 16,
               ),
           ],
@@ -288,25 +278,25 @@ class _HelpPageState extends State<HelpPage>
       children: [
         _buildInfoTile(
           icon: Icons.help_outline_rounded,
-          title: "Help Center",
-          content: "Are you having any trouble?\nFind help here.",
-          linkText: "Get Help",
-          color: const Color(0xFFC2D86A),
+          title: "help_center".tr,
+          content: "having_trouble".tr,
+          linkText: "get_help".tr,
+          color: context.accent,
         ),
         const SizedBox(height: 16),
         _buildInfoTile(
           icon: Icons.alternate_email_rounded,
-          title: "Media Inquiries",
-          content: "Journalists and bloggers, please reach out to:",
-          linkText: "press@totalhealthy.com",
+          title: "media_inquiries".tr,
+          content: "journalists_reach_out".tr,
+          linkText: "press_email".tr,
           color: const Color(0xFF4FC3F7),
         ),
         const SizedBox(height: 16),
         _buildInfoTile(
           icon: Icons.handshake_outlined,
-          title: "Partnerships",
-          content: "Looking to partner with us?\nGet in touch:",
-          linkText: "partnerships@totalhealthy.com",
+          title: "partnerships".tr,
+          content: "looking_to_partner".tr,
+          linkText: "partnerships_email".tr,
           color: const Color(0xFFFFB74D),
         ),
       ],
@@ -324,7 +314,7 @@ class _HelpPageState extends State<HelpPage>
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color.withValues(alpha: 0.1), width: 1),
       ),
@@ -350,7 +340,7 @@ class _HelpPageState extends State<HelpPage>
           Text(
             content,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
+              color: context.textSecondary,
               fontSize: 14,
               height: 1.4,
             ),

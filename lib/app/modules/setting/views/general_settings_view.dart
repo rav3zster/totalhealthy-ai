@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/controllers/global_settings_controller.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class GeneralSettingsView extends StatelessWidget {
   const GeneralSettingsView({super.key});
@@ -13,36 +14,19 @@ class GeneralSettingsView extends StatelessWidget {
     final List<String> themes = ['Dark', 'Light', 'System'];
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
-            stops: [0.0, 0.3, 1.0],
-          ),
-        ),
+        decoration: BoxDecoration(gradient: context.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
               // Header
               Container(
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                  ),
+                  gradient: context.headerGradient,
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(25),
                     bottomRight: Radius.circular(25),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
+                  boxShadow: context.cardShadow,
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -60,9 +44,9 @@ class GeneralSettingsView extends StatelessWidget {
                         ),
                         child: IconButton(
                           onPressed: () => Get.back(),
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_back_ios_new_outlined,
-                            color: Colors.white,
+                            color: context.textPrimary,
                           ),
                         ),
                       ),
@@ -70,8 +54,8 @@ class GeneralSettingsView extends StatelessWidget {
                         child: Text(
                           'general'.tr,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: context.textPrimary,
                             fontFamily: 'inter',
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -99,8 +83,8 @@ class GeneralSettingsView extends StatelessWidget {
                       // Language Section
                       Text(
                         'language'.tr,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: context.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -113,16 +97,14 @@ class GeneralSettingsView extends StatelessWidget {
                           vertical: 5,
                         ),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                          ),
+                          gradient: context.cardGradient,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(
-                              0xFFC2D86A,
-                            ).withValues(alpha: 0.2),
+                            color: context.isLightTheme
+                                ? context.borderColor
+                                : const Color(
+                                    0xFFC2D86A,
+                                  ).withValues(alpha: 0.2),
                             width: 1,
                           ),
                         ),
@@ -130,13 +112,13 @@ class GeneralSettingsView extends StatelessWidget {
                           child: Obx(
                             () => DropdownButton<String>(
                               value: controller.language.value,
-                              dropdownColor: const Color(0xFF2A2A2A),
-                              icon: const Icon(
+                              dropdownColor: context.cardColor,
+                              icon: Icon(
                                 Icons.keyboard_arrow_down,
-                                color: Colors.white,
+                                color: context.textPrimary,
                               ),
-                              style: const TextStyle(
-                                color: Color(0xFFC2D86A),
+                              style: TextStyle(
+                                color: const Color(0xFFC2D86A),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -161,8 +143,8 @@ class GeneralSettingsView extends StatelessWidget {
                       // Region Section
                       Text(
                         'region'.tr,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: context.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -175,16 +157,14 @@ class GeneralSettingsView extends StatelessWidget {
                           vertical: 5,
                         ),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                          ),
+                          gradient: context.cardGradient,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(
-                              0xFFC2D86A,
-                            ).withValues(alpha: 0.2),
+                            color: context.isLightTheme
+                                ? context.borderColor
+                                : const Color(
+                                    0xFFC2D86A,
+                                  ).withValues(alpha: 0.2),
                             width: 1,
                           ),
                         ),
@@ -192,13 +172,13 @@ class GeneralSettingsView extends StatelessWidget {
                           child: Obx(
                             () => DropdownButton<String>(
                               value: controller.region.value,
-                              dropdownColor: const Color(0xFF2A2A2A),
-                              icon: const Icon(
+                              dropdownColor: context.cardColor,
+                              icon: Icon(
                                 Icons.keyboard_arrow_down,
-                                color: Colors.white,
+                                color: context.textPrimary,
                               ),
-                              style: const TextStyle(
-                                color: Color(0xFFC2D86A),
+                              style: TextStyle(
+                                color: const Color(0xFFC2D86A),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -223,8 +203,8 @@ class GeneralSettingsView extends StatelessWidget {
                       // Theme Section
                       Text(
                         'theme'.tr,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: context.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -237,16 +217,14 @@ class GeneralSettingsView extends StatelessWidget {
                           vertical: 5,
                         ),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                          ),
+                          gradient: context.cardGradient,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: const Color(
-                              0xFFC2D86A,
-                            ).withValues(alpha: 0.2),
+                            color: context.isLightTheme
+                                ? context.borderColor
+                                : const Color(
+                                    0xFFC2D86A,
+                                  ).withValues(alpha: 0.2),
                             width: 1,
                           ),
                         ),
@@ -254,13 +232,13 @@ class GeneralSettingsView extends StatelessWidget {
                           child: Obx(
                             () => DropdownButton<String>(
                               value: controller.themeString.value,
-                              dropdownColor: const Color(0xFF2A2A2A),
-                              icon: const Icon(
+                              dropdownColor: context.cardColor,
+                              icon: Icon(
                                 Icons.keyboard_arrow_down,
-                                color: Colors.white,
+                                color: context.textPrimary,
                               ),
-                              style: const TextStyle(
-                                color: Color(0xFFC2D86A),
+                              style: TextStyle(
+                                color: const Color(0xFFC2D86A),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),

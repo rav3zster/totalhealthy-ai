@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/modules/create_meal/controllers/create_meal_controller.dart';
 import '../../../controllers/user_controller.dart';
+import '../../../core/theme/theme_helper.dart';
 
 import '../../../widgets/ingredient_input.dart';
 import '../../../data/models/meal_model.dart';
@@ -78,14 +79,7 @@ class _CreateMealPageState extends State<CreateMealPage>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
-            stops: [0.0, 0.3, 1.0],
-          ),
-        ),
+        decoration: BoxDecoration(gradient: context.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -180,22 +174,12 @@ class _CreateMealPageState extends State<CreateMealPage>
   Widget _buildModernHeader() {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-        ),
+        gradient: context.headerGradient,
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(25),
           bottomRight: Radius.circular(25),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        boxShadow: context.cardShadow,
       ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -224,9 +208,7 @@ class _CreateMealPageState extends State<CreateMealPage>
                     width: 4,
                     height: 24,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-                      ),
+                      gradient: context.accentGradient,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -236,8 +218,8 @@ class _CreateMealPageState extends State<CreateMealPage>
                       widget.controller.isEditing.value
                           ? 'edit_meal'.tr
                           : 'create_meal'.tr,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: context.textPrimary,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -269,16 +251,7 @@ class _CreateMealPageState extends State<CreateMealPage>
                 height: 180,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  gradient: hasImage
-                      ? null
-                      : LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            const Color(0xFF2A2A2A).withValues(alpha: 0.8),
-                            const Color(0xFF1A1A1A).withValues(alpha: 0.8),
-                          ],
-                        ),
+                  gradient: hasImage ? null : context.cardGradient,
                   image: hasImage
                       ? DecorationImage(
                           image:
@@ -292,12 +265,12 @@ class _CreateMealPageState extends State<CreateMealPage>
                       : null,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                    color: context.accent.withValues(alpha: 0.3),
                     width: 2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                      color: context.accent.withValues(alpha: 0.1),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -310,7 +283,9 @@ class _CreateMealPageState extends State<CreateMealPage>
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          color: Colors.black.withValues(alpha: 0.3),
+                          color: context.isDark
+                              ? Colors.black.withValues(alpha: 0.3)
+                              : Colors.white.withValues(alpha: 0.3),
                         ),
                       ),
                     // Animated gradient overlay (only if no image)
@@ -325,7 +300,7 @@ class _CreateMealPageState extends State<CreateMealPage>
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  const Color(0xFFC2D86A).withValues(
+                                  context.accent.withValues(
                                     alpha: 0.1 * _animationController.value,
                                   ),
                                   Colors.transparent,
@@ -342,15 +317,11 @@ class _CreateMealPageState extends State<CreateMealPage>
                         Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-                            ),
+                            gradient: context.accentGradient,
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(
-                                  0xFFC2D86A,
-                                ).withValues(alpha: 0.4),
+                                color: context.accent.withValues(alpha: 0.4),
                                 blurRadius: 15,
                                 offset: const Offset(0, 5),
                               ),
@@ -358,22 +329,24 @@ class _CreateMealPageState extends State<CreateMealPage>
                           ),
                           child: Icon(
                             hasImage ? Icons.edit : Icons.camera_alt,
-                            color: Colors.black,
+                            color: context.isDark ? Colors.black : Colors.white,
                             size: 32,
                           ),
                         ),
                         const SizedBox(height: 12),
                         Text(
                           hasImage ? 'change_photo'.tr : 'add_meal_photo'.tr,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: context.textPrimary,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             shadows: [
                               Shadow(
-                                color: Colors.black,
+                                color: context.isDark
+                                    ? Colors.black
+                                    : Colors.white.withValues(alpha: 0.5),
                                 blurRadius: 4,
-                                offset: Offset(0, 2),
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
@@ -395,8 +368,8 @@ class _CreateMealPageState extends State<CreateMealPage>
       children: [
         Text(
           title,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: context.textPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.3,
@@ -419,23 +392,13 @@ class _CreateMealPageState extends State<CreateMealPage>
   }) {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-        ),
+        gradient: context.cardGradient,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+          color: context.accent.withValues(alpha: 0.2),
           width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        boxShadow: context.cardShadow,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -444,7 +407,7 @@ class _CreateMealPageState extends State<CreateMealPage>
             padding: const EdgeInsets.only(left: 16, top: 18),
             child: Icon(
               icon,
-              color: const Color(0xFFC2D86A).withValues(alpha: 0.7),
+              color: context.accent.withValues(alpha: 0.7),
               size: 22,
             ),
           ),
@@ -453,13 +416,10 @@ class _CreateMealPageState extends State<CreateMealPage>
               controller: controller,
               maxLines: maxLines,
               validator: validator,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(color: context.textPrimary, fontSize: 16),
               decoration: InputDecoration(
                 hintText: hint,
-                hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.4),
-                  fontSize: 14,
-                ),
+                hintStyle: TextStyle(color: context.textTertiary, fontSize: 14),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -478,27 +438,23 @@ class _CreateMealPageState extends State<CreateMealPage>
       return AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-          ),
+          gradient: context.cardGradient,
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
             color: widget.controller.categoryError.value.isNotEmpty
                 ? Colors.red
-                : const Color(0xFFC2D86A).withValues(alpha: 0.2),
+                : context.accent.withValues(alpha: 0.2),
             width: widget.controller.categoryError.value.isNotEmpty ? 2 : 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: widget.controller.categoryError.value.isNotEmpty
-                  ? Colors.red.withValues(alpha: 0.2)
-                  : Colors.black.withValues(alpha: 0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
+          boxShadow: widget.controller.categoryError.value.isNotEmpty
+              ? [
+                  BoxShadow(
+                    color: Colors.red.withValues(alpha: 0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ]
+              : context.cardShadow,
         ),
         child: Theme(
           data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -507,14 +463,14 @@ class _CreateMealPageState extends State<CreateMealPage>
               horizontal: 20,
               vertical: 8,
             ),
-            iconColor: const Color(0xFFC2D86A),
-            collapsedIconColor: Colors.white54,
+            iconColor: context.accent,
+            collapsedIconColor: context.textSecondary,
             title: Obx(() {
               return Row(
                 children: [
                   Icon(
                     Icons.category,
-                    color: const Color(0xFFC2D86A).withValues(alpha: 0.7),
+                    color: context.accent.withValues(alpha: 0.7),
                     size: 22,
                   ),
                   const SizedBox(width: 12),
@@ -528,7 +484,7 @@ class _CreateMealPageState extends State<CreateMealPage>
                       style: TextStyle(
                         color: widget.controller.categoryError.value.isNotEmpty
                             ? Colors.red
-                            : Colors.white70,
+                            : context.textSecondary,
                         fontSize: 14,
                       ),
                     ),
@@ -558,8 +514,8 @@ class _CreateMealPageState extends State<CreateMealPage>
                           const SizedBox(width: 12),
                           Text(
                             'loading_custom_categories'.tr,
-                            style: const TextStyle(
-                              color: Colors.white70,
+                            style: TextStyle(
+                              color: context.textSecondary,
                               fontSize: 12,
                             ),
                           ),
@@ -589,12 +545,8 @@ class _CreateMealPageState extends State<CreateMealPage>
                         gradient: isSelected
                             ? LinearGradient(
                                 colors: [
-                                  const Color(
-                                    0xFFC2D86A,
-                                  ).withValues(alpha: 0.2),
-                                  const Color(
-                                    0xFFC2D86A,
-                                  ).withValues(alpha: 0.1),
+                                  context.accent.withValues(alpha: 0.2),
+                                  context.accent.withValues(alpha: 0.1),
                                 ],
                               )
                             : null,
@@ -605,8 +557,8 @@ class _CreateMealPageState extends State<CreateMealPage>
                           category,
                           style: TextStyle(
                             color: isSelected
-                                ? const Color(0xFFC2D86A)
-                                : Colors.white70,
+                                ? context.accent
+                                : context.textSecondary,
                             fontWeight: isSelected
                                 ? FontWeight.w600
                                 : FontWeight.normal,
@@ -620,14 +572,16 @@ class _CreateMealPageState extends State<CreateMealPage>
                           );
                         },
                         controlAffinity: ListTileControlAffinity.leading,
-                        checkColor: Colors.black,
+                        checkColor: context.isDark
+                            ? Colors.black
+                            : Colors.white,
                         fillColor: WidgetStateProperty.resolveWith<Color?>((
                           states,
                         ) {
                           if (states.contains(WidgetState.selected)) {
-                            return const Color(0xFFC2D86A);
+                            return context.accent;
                           }
-                          return Colors.white24;
+                          return context.textTertiary;
                         }),
                       ),
                     );
@@ -684,13 +638,13 @@ class _CreateMealPageState extends State<CreateMealPage>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFFC2D86A).withValues(alpha: 0.2),
-            const Color(0xFFC2D86A).withValues(alpha: 0.1),
+            context.accent.withValues(alpha: 0.2),
+            context.accent.withValues(alpha: 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+          color: context.accent.withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -713,19 +667,21 @@ class _CreateMealPageState extends State<CreateMealPage>
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-                    ),
+                  decoration: BoxDecoration(
+                    gradient: context.accentGradient,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.add, color: Colors.black, size: 20),
+                  child: Icon(
+                    Icons.add,
+                    color: context.isDark ? Colors.black : Colors.white,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Text(
                   'add_ingredient'.tr,
-                  style: const TextStyle(
-                    color: Color(0xFFC2D86A),
+                  style: TextStyle(
+                    color: context.accent,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -742,26 +698,13 @@ class _CreateMealPageState extends State<CreateMealPage>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF2A2A2A).withValues(alpha: 0.8),
-            const Color(0xFF1A1A1A).withValues(alpha: 0.8),
-          ],
-        ),
+        gradient: context.cardGradient,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+          color: context.accent.withValues(alpha: 0.2),
           width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        boxShadow: context.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -772,8 +715,8 @@ class _CreateMealPageState extends State<CreateMealPage>
               Expanded(
                 child: Text(
                   'nutritional_information'.tr,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: context.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -785,7 +728,7 @@ class _CreateMealPageState extends State<CreateMealPage>
                     Text(
                       'auto_calculate'.tr,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: context.textSecondary,
                         fontSize: 14,
                       ),
                     ),
@@ -795,10 +738,10 @@ class _CreateMealPageState extends State<CreateMealPage>
                       onChanged: (value) {
                         widget.controller.calculateAutomatically.value = value;
                       },
-                      activeTrackColor: const Color(0xFFC2D86A),
-                      activeThumbColor: Colors.white,
-                      inactiveTrackColor: Colors.white24,
-                      inactiveThumbColor: Colors.white54,
+                      activeTrackColor: context.accent,
+                      activeThumbColor: context.textPrimary,
+                      inactiveTrackColor: context.textTertiary,
+                      inactiveThumbColor: context.textSecondary,
                     ),
                   ],
                 );
@@ -870,10 +813,10 @@ class _CreateMealPageState extends State<CreateMealPage>
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        color: context.cardSecondary,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
+          color: context.accent.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -881,16 +824,13 @@ class _CreateMealPageState extends State<CreateMealPage>
         controller: controller,
         keyboardType: TextInputType.number,
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        style: const TextStyle(color: Colors.white, fontSize: 14),
+        style: TextStyle(color: context.textPrimary, fontSize: 14),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(
-            color: Colors.white.withValues(alpha: 0.5),
-            fontSize: 12,
-          ),
+          labelStyle: TextStyle(color: context.textTertiary, fontSize: 12),
           prefixIcon: Icon(
             icon,
-            color: const Color(0xFFC2D86A).withValues(alpha: 0.7),
+            color: context.accent.withValues(alpha: 0.7),
             size: 18,
           ),
           border: InputBorder.none,
@@ -910,15 +850,11 @@ class _CreateMealPageState extends State<CreateMealPage>
         width: double.infinity,
         height: 56,
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-          ),
+          gradient: context.accentGradient,
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFC2D86A).withValues(alpha: 0.4),
+              color: context.accent.withValues(alpha: 0.4),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -935,20 +871,22 @@ class _CreateMealPageState extends State<CreateMealPage>
             borderRadius: BorderRadius.circular(28),
             child: Center(
               child: widget.controller.isLoading.value
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          context.isDark ? Colors.black : Colors.white,
+                        ),
                       ),
                     )
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.check_circle,
-                          color: Colors.black,
+                          color: context.isDark ? Colors.black : Colors.white,
                           size: 24,
                         ),
                         const SizedBox(width: 12),
@@ -956,8 +894,8 @@ class _CreateMealPageState extends State<CreateMealPage>
                           widget.controller.isEditing.value
                               ? 'update_meal'.tr
                               : 'create_meal'.tr,
-                          style: const TextStyle(
-                            color: Colors.black,
+                          style: TextStyle(
+                            color: context.isDark ? Colors.black : Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,

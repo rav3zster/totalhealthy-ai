@@ -5,7 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'app/core/base/constants/custom_scroll.dart';
 import 'app/routes/app_pages.dart';
-import 'app/widgets/notification_services.dart';
+import 'app/widgets/notification_services.dart' as old_notification;
 import 'app/bindings/app_bindings.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,8 +13,10 @@ import 'firebase_options.dart';
 import 'app/core/controllers/global_settings_controller.dart';
 import 'app/core/translations/app_translations.dart';
 import 'app/core/theme/app_theme.dart';
+import 'app/core/services/notification_service.dart';
 
-final NotificationService _notificationService = NotificationService();
+final old_notification.NotificationService _notificationService =
+    old_notification.NotificationService();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +27,17 @@ void main() async {
 
   // Initialize global settings controller FIRST
   Get.put(GlobalSettingsController(), permanent: true);
+
+  // Initialize production notification service (optional, non-blocking)
+  // If this fails, app will continue without notification support
+  NotificationService.init()
+      .then((_) {
+        print('✅ Production NotificationService initialized');
+      })
+      .catchError((e) {
+        print('⚠️ NotificationService initialization failed: $e');
+        print('⚠️ App will continue without notification support');
+      });
 
   await initializeControllers();
 

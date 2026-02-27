@@ -15,6 +15,7 @@ import '../../../widgets/drawer_menu.dart';
 import '../../../widgets/notification_services.dart';
 import '../../../widgets/phone_nav_bar.dart';
 import '../../../widgets/real_time_search_bar.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class TrainerDashboardView extends StatefulWidget {
   const TrainerDashboardView({super.key});
@@ -366,17 +367,10 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: Colors.black,
+      backgroundColor: context.backgroundColor,
       drawer: const DrawerMenu(),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
-            stops: [0.0, 0.3, 1.0],
-          ),
-        ),
+        decoration: BoxDecoration(gradient: context.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -389,22 +383,12 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                       // Header with gradient background
                       Container(
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                          ),
+                          gradient: context.headerGradient,
                           borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(25),
                             bottomRight: Radius.circular(25),
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.3),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
+                          boxShadow: context.cardShadow,
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(20.0),
@@ -422,18 +406,12 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                         },
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            gradient: const LinearGradient(
-                                              colors: [
-                                                Color(0xFFC2D86A),
-                                                Color(0xFFD4E87C),
-                                              ],
-                                            ),
+                                            gradient: context.accentGradient,
                                             shape: BoxShape.circle,
                                             boxShadow: [
                                               BoxShadow(
-                                                color: const Color(
-                                                  0xFFC2D86A,
-                                                ).withValues(alpha: 0.4),
+                                                color: context.accent
+                                                    .withValues(alpha: 0.4),
                                                 blurRadius: 12,
                                                 offset: const Offset(0, 4),
                                               ),
@@ -442,9 +420,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                           padding: const EdgeInsets.all(3),
                                           child: CircleAvatar(
                                             radius: 28,
-                                            backgroundColor: const Color(
-                                              0xFF2A2A2A,
-                                            ),
+                                            backgroundColor: context.cardColor,
                                             backgroundImage:
                                                 UserController.getImageProvider(
                                                   userController.profileImage,
@@ -453,9 +429,9 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                                 userController
                                                     .profileImage
                                                     .isEmpty
-                                                ? const Icon(
+                                                ? Icon(
                                                     Icons.person,
-                                                    color: Colors.white24,
+                                                    color: context.textTertiary,
                                                     size: 28,
                                                   )
                                                 : null,
@@ -472,8 +448,8 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            const Text(
-                                              "Welcome Back,",
+                                            Text(
+                                              "welcome_back".tr,
                                               style: TextStyle(
                                                 color: Colors.white70,
                                                 fontSize: 14,
@@ -482,8 +458,8 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                             const SizedBox(height: 4),
                                             Text(
                                               userController.fullName,
-                                              style: const TextStyle(
-                                                color: Colors.white,
+                                              style: TextStyle(
+                                                color: context.textPrimary,
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.w700,
                                                 letterSpacing: 0.3,
@@ -509,8 +485,8 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                       ),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
-                                    child: const Text(
-                                      "Advisor",
+                                    child: Text(
+                                      "advisor".tr,
                                       style: TextStyle(
                                         color: Color(0xFF121212),
                                         fontSize: 12,
@@ -551,8 +527,8 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Live Stats',
+                                    Text(
+                                      'live_stats'.tr,
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 18,

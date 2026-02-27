@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:totalhealthy/app/controllers/user_controller.dart';
 import 'package:totalhealthy/app/widgets/drawer_menu.dart';
 import '../controllers/planner_controller.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class PlannerPage extends StatefulWidget {
   const PlannerPage({super.key});
@@ -22,12 +23,12 @@ class _PlannerPageState extends State<PlannerPage> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: const DrawerMenu(),
-      backgroundColor: Colors.black,
+      backgroundColor: context.backgroundColor,
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
-            return const Center(
-              child: CircularProgressIndicator(color: Color(0xFFCDE26D)),
+            return Center(
+              child: CircularProgressIndicator(color: context.accent),
             );
           }
 
@@ -101,7 +102,7 @@ class _PlannerPageState extends State<PlannerPage> {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.calendar_today_outlined,
                         color: Colors.grey,
                         size: 14,
@@ -109,10 +110,7 @@ class _PlannerPageState extends State<PlannerPage> {
                       const SizedBox(width: 6),
                       Text(
                         DateFormat('d MMM yyyy').format(DateTime.now()),
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 13,
-                        ),
+                        style: TextStyle(color: Colors.grey, fontSize: 13),
                       ),
                     ],
                   ),
@@ -123,12 +121,16 @@ class _PlannerPageState extends State<PlannerPage> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.grey[900],
+              color: context.cardColor,
               shape: BoxShape.circle,
             ),
-            child: const Stack(
+            child: Stack(
               children: [
-                Icon(Icons.notifications_none, color: Colors.white, size: 24),
+                Icon(
+                  Icons.notifications_none,
+                  color: context.textPrimary,
+                  size: 24,
+                ),
                 Positioned(
                   right: 2,
                   top: 2,
@@ -353,7 +355,7 @@ class _PlannerPageState extends State<PlannerPage> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -366,8 +368,8 @@ class _PlannerPageState extends State<PlannerPage> {
             onTap: () => controller.toggleDay(index),
             title: Text(
               plan['day'],
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: context.textPrimary,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -378,22 +380,25 @@ class _PlannerPageState extends State<PlannerPage> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.shopping_basket_outlined,
-                      color: Color(0xFFCDE26D),
+                      color: context.accent,
                       size: 18,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       '${plan['dishesCount'].toString().padLeft(2, '0')} Dishes',
-                      style: const TextStyle(color: Colors.white, fontSize: 15),
+                      style: TextStyle(
+                        color: context.textPrimary,
+                        fontSize: 15,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Text(
                   plan['summary'],
-                  style: const TextStyle(color: Colors.grey, fontSize: 13),
+                  style: TextStyle(color: context.textSecondary, fontSize: 13),
                 ),
               ],
             ),

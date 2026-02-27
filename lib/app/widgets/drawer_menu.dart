@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 
 import '../core/utitlity/responsive_settings.dart';
 import '../controllers/user_controller.dart';
+import '../core/theme/theme_helper.dart';
 
 class DrawerMenu extends StatefulWidget {
   const DrawerMenu({super.key});
@@ -24,13 +25,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
             backgroundColor: Colors.transparent,
             width: 300,
             child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                ),
-              ),
+              decoration: BoxDecoration(gradient: context.cardGradient),
               child: SafeArea(
                 child: GetBuilder<UserController>(
                   builder: (userController) {
@@ -44,15 +39,13 @@ class _DrawerMenuState extends State<DrawerMenu> {
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                                const Color(0xFFC2D86A).withValues(alpha: 0.05),
+                                context.accent.withValues(alpha: 0.2),
+                                context.accent.withValues(alpha: 0.05),
                               ],
                             ),
                             border: Border(
                               bottom: BorderSide(
-                                color: const Color(
-                                  0xFFC2D86A,
-                                ).withValues(alpha: 0.2),
+                                color: context.accent.withValues(alpha: 0.2),
                                 width: 1,
                               ),
                             ),
@@ -104,8 +97,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                   children: [
                                     Text(
                                       userController.fullName,
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                                      style: TextStyle(
+                                        color: context.textPrimary,
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: 0.3,
@@ -119,20 +112,15 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                         vertical: 3,
                                       ),
                                       decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
-                                          colors: [
-                                            Color(0xFFC2D86A),
-                                            Color(0xFFD4E87C),
-                                          ],
-                                        ),
+                                        gradient: context.accentGradient,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
                                         userController.currentUser?.role
                                                 ?.toUpperCase() ??
                                             "MEMBER",
-                                        style: const TextStyle(
-                                          color: Color(0xFF121212),
+                                        style: TextStyle(
+                                          color: context.backgroundColor,
                                           fontSize: 10,
                                           fontWeight: FontWeight.w800,
                                           letterSpacing: 0.5,
@@ -226,9 +214,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                     gradient: LinearGradient(
                                       colors: [
                                         Colors.transparent,
-                                        const Color(
-                                          0xFFC2D86A,
-                                        ).withValues(alpha: 0.3),
+                                        context.accent.withValues(alpha: 0.3),
                                         Colors.transparent,
                                       ],
                                     ),
@@ -243,9 +229,9 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                   child: Text(
                                     "SWITCH ROLE",
                                     style: TextStyle(
-                                      color: const Color(
-                                        0xFFC2D86A,
-                                      ).withValues(alpha: 0.7),
+                                      color: context.accent.withValues(
+                                        alpha: 0.7,
+                                      ),
                                       fontSize: 11,
                                       fontWeight: FontWeight.w700,
                                       letterSpacing: 1.2,
@@ -288,9 +274,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                     gradient: LinearGradient(
                                       colors: [
                                         Colors.transparent,
-                                        const Color(
-                                          0xFFC2D86A,
-                                        ).withValues(alpha: 0.3),
+                                        context.accent.withValues(alpha: 0.3),
                                         Colors.transparent,
                                       ],
                                     ),
@@ -316,9 +300,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                           decoration: BoxDecoration(
                             border: Border(
                               top: BorderSide(
-                                color: const Color(
-                                  0xFFC2D86A,
-                                ).withValues(alpha: 0.2),
+                                color: context.accent.withValues(alpha: 0.2),
                                 width: 1,
                               ),
                             ),
@@ -388,49 +370,51 @@ class _DrawerMenuState extends State<DrawerMenu> {
     required String title,
     required VoidCallback onTap,
   }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                        const Color(0xFFC2D86A).withValues(alpha: 0.1),
-                      ],
+    return Builder(
+      builder: (context) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: onTap,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          context.accent.withValues(alpha: 0.2),
+                          context.accent.withValues(alpha: 0.1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    borderRadius: BorderRadius.circular(10),
+                    child: Icon(icon, color: context.accent, size: 20),
                   ),
-                  child: Icon(icon, color: const Color(0xFFC2D86A), size: 20),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.2,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        color: context.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.2,
+                      ),
                     ),
                   ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: Colors.white.withValues(alpha: 0.3),
-                  size: 14,
-                ),
-              ],
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: context.textTertiary,
+                    size: 14,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

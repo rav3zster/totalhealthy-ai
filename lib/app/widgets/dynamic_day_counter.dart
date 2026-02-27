@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/user_controller.dart';
+import '../core/theme/theme_helper.dart';
 
 class DynamicDayCounter extends StatelessWidget {
   final VoidCallback? onAddMealTap;
@@ -18,18 +19,18 @@ class DynamicDayCounter extends StatelessWidget {
       final controller = Get.find<UserController>();
 
       if (controller.isLoading && controller.currentUser == null) {
-        return _buildLoadingCounter();
+        return _buildLoadingCounter(context);
       }
 
       if (controller.error.isNotEmpty && controller.currentUser == null) {
-        return _buildErrorCounter(controller);
+        return _buildErrorCounter(controller, context);
       }
 
-      return _buildDayCounter(controller);
+      return _buildDayCounter(controller, context);
     });
   }
 
-  Widget _buildDayCounter(UserController controller) {
+  Widget _buildDayCounter(UserController controller, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -40,7 +41,7 @@ class DynamicDayCounter extends StatelessWidget {
               Text(
                 '${controller.dayCountDisplay} (${controller.primaryGoal})',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: context.textPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -49,7 +50,7 @@ class DynamicDayCounter extends StatelessWidget {
                 controller.planDateRange.isNotEmpty
                     ? controller.planDateRange
                     : '23 Oct - 17 Dec',
-                style: TextStyle(color: Colors.white54, fontSize: 14),
+                style: TextStyle(color: context.textSecondary, fontSize: 14),
               ),
             ],
           ),
@@ -60,12 +61,20 @@ class DynamicDayCounter extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
+                colors: context.isLightTheme
+                    ? [
+                        Color(0xFFC2FF00),
+                        Color(0xFFB8FF00),
+                      ] // Bright green for light theme
+                    : [
+                        Color(0xFFC2D86A),
+                        Color(0xFFB8CC5A),
+                      ], // Muted green for dark theme
               ),
               borderRadius: BorderRadius.circular(25),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFFC2D86A).withValues(alpha: 0.3),
+                  color: context.accentColor.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: Offset(0, 4),
                 ),
@@ -95,7 +104,7 @@ class DynamicDayCounter extends StatelessWidget {
     );
   }
 
-  Widget _buildLoadingCounter() {
+  Widget _buildLoadingCounter(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -135,7 +144,7 @@ class DynamicDayCounter extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorCounter(UserController controller) {
+  Widget _buildErrorCounter(UserController controller, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -143,18 +152,18 @@ class DynamicDayCounter extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Day 1/55 (Weight Loss)',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: context.textPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 'Oct 1 - Nov 1',
-                style: TextStyle(color: Colors.white54, fontSize: 14),
+                style: TextStyle(color: context.textSecondary, fontSize: 14),
               ),
             ],
           ),
@@ -171,7 +180,7 @@ class DynamicDayCounter extends StatelessWidget {
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFC2D86A),
+              backgroundColor: context.accentColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),

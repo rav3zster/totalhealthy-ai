@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../data/models/group_category_model.dart';
 import '../../controllers/group_controller.dart';
+import '../../../../core/theme/theme_helper.dart';
 
 class CreateGroupBottomSheet extends StatefulWidget {
   final GroupController controller;
@@ -62,8 +63,8 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet>
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.9,
           ),
-          decoration: const BoxDecoration(
-            color: Color(0xFF1C1C1E),
+          decoration: BoxDecoration(
+            gradient: context.cardGradient,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(28),
               topRight: Radius.circular(28),

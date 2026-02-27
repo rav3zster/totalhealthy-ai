@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/user_controller.dart';
+import '../core/theme/theme_helper.dart';
 import 'error_state_widget.dart';
 
 class BaseScreenWrapper extends StatelessWidget {
@@ -34,9 +35,9 @@ class BaseScreenWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor ?? const Color(0xFF1A1A1A),
+      backgroundColor: backgroundColor ?? context.backgroundColor,
       extendBodyBehindAppBar: extendBodyBehindAppBar,
-      appBar: appBar ?? (title != null ? _buildDefaultAppBar() : null),
+      appBar: appBar ?? (title != null ? _buildDefaultAppBar(context) : null),
       drawer: drawer,
       floatingActionButton: floatingActionButton,
       bottomNavigationBar: bottomNavigationBar,
@@ -44,30 +45,24 @@ class BaseScreenWrapper extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildDefaultAppBar() {
+  PreferredSizeWidget _buildDefaultAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-          ),
-        ),
+        decoration: BoxDecoration(gradient: context.headerGradient),
       ),
       title: Text(
         title!,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: context.textPrimary,
           fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
       ),
       centerTitle: true,
       actions: actions,
-      iconTheme: const IconThemeData(color: Colors.white),
+      iconTheme: IconThemeData(color: context.textPrimary),
     );
   }
 

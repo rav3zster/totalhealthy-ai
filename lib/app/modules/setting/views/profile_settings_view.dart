@@ -6,6 +6,7 @@ import '../../../controllers/user_controller.dart';
 import '../../../widgets/loading_state_widget.dart';
 import '../../../widgets/error_state_widget.dart';
 import '../../../core/utitlity/appvalidator.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class ProfileSettingsView extends StatefulWidget {
   const ProfileSettingsView({super.key});
@@ -84,6 +85,100 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
     'Not Specific': false,
   };
 
+  // Translation keys for dropdowns
+  String _getActivityLevelKey(String level) {
+    switch (level) {
+      case 'Sedentary':
+        return 'sedentary';
+      case 'Light':
+        return 'light';
+      case 'Moderate':
+        return 'moderate';
+      case 'Active':
+        return 'active';
+      case 'Very Active':
+        return 'very_active';
+      default:
+        return 'moderate';
+    }
+  }
+
+  String _getGoalKey(String goal) {
+    switch (goal) {
+      case 'Weight Loss':
+        return 'weight_loss';
+      case 'Muscle Gain':
+        return 'muscle_gain';
+      case 'Maintenance':
+        return 'maintenance';
+      case 'Endurance':
+        return 'endurance';
+      case 'Strength':
+        return 'strength';
+      case 'Flexibility':
+        return 'flexibility';
+      case 'Improved Overall Health':
+        return 'improved_overall_health';
+      default:
+        return goal;
+    }
+  }
+
+  String _getMealFrequencyKey(String freq) {
+    switch (freq) {
+      case "3 times a day (breakfast, lunch, dinner)":
+        return 'meal_3_times';
+      case "4-5 times a day (adding snacks)":
+        return 'meal_4_5_times';
+      case "I don't have a specific schedule":
+        return 'meal_no_schedule';
+      default:
+        return freq;
+    }
+  }
+
+  String _getDietTypeKey(String type) {
+    switch (type) {
+      case 'Vegetarian':
+        return 'vegetarian';
+      case 'Vegan':
+        return 'vegan';
+      case 'Keto':
+        return 'keto';
+      case 'Paleo':
+        return 'paleo';
+      case 'Mediterranean':
+        return 'mediterranean';
+      case 'Gluten-free':
+        return 'gluten_free';
+      case 'Lactose-free':
+        return 'lactose_free';
+      case 'Not Specific':
+        return 'not_specific';
+      default:
+        return type;
+    }
+  }
+
+  String _getAllergyKey(String allergy) {
+    switch (allergy) {
+      case 'Gluten':
+        return 'gluten';
+      case 'Dairy':
+        return 'dairy';
+      case 'Nuts':
+        return 'nuts';
+      case 'Shellfish':
+        return 'shellfish';
+      case 'Meat':
+        return 'meat';
+      case 'Not Specific':
+        return 'not_specific';
+      default:
+        return allergy;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -141,36 +236,19 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
-            stops: [0.0, 0.3, 1.0],
-          ),
-        ),
+        decoration: BoxDecoration(gradient: context.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
               // Header
               Container(
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                  ),
+                  gradient: context.headerGradient,
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(25),
                     bottomRight: Radius.circular(25),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
+                  boxShadow: context.cardShadow,
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -180,26 +258,26 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                              const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                              context.accent.withValues(alpha: 0.2),
+                              context.accent.withValues(alpha: 0.1),
                             ],
                           ),
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
                           onPressed: () => Get.back(),
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_back_ios_new_outlined,
-                            color: Colors.white,
+                            color: context.textPrimary,
                           ),
                         ),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Profile',
+                          'profile'.tr,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white,
+                            color: context.textPrimary,
                             fontFamily: 'inter',
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
@@ -212,11 +290,11 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                               ? null
                               : _saveProfile,
                           child: Text(
-                            'Save',
+                            'save'.tr,
                             style: TextStyle(
                               color: userController.isLoading
-                                  ? Colors.white54
-                                  : const Color(0xFFC2D86A),
+                                  ? context.textTertiary
+                                  : context.accent,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -240,7 +318,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
 
                   return LoadingStateWidget(
                     isLoading: userController.isLoading,
-                    loadingText: 'Saving profile...',
+                    loadingText: 'saving_profile'.tr,
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
@@ -257,7 +335,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                             const SizedBox(height: 30),
 
                             // Personal Information Section
-                            _buildSectionTitle('Personal Information'),
+                            _buildSectionTitle('personal_information'.tr),
                             const SizedBox(height: 16),
 
                             // First Name and Last Name
@@ -266,7 +344,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                                 Expanded(
                                   child: _buildTextFormField(
                                     controller: _firstNameController,
-                                    label: 'First Name',
+                                    label: 'first_name'.tr,
                                     validator: AppValidator.validateName,
                                   ),
                                 ),
@@ -274,7 +352,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                                 Expanded(
                                   child: _buildTextFormField(
                                     controller: _lastNameController,
-                                    label: 'Last Name',
+                                    label: 'last_name'.tr,
                                     validator: AppValidator.validateName,
                                   ),
                                 ),
@@ -286,7 +364,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                             // Email
                             _buildTextFormField(
                               controller: _emailController,
-                              label: 'Email',
+                              label: 'email'.tr,
                               keyboardType: TextInputType.emailAddress,
                               validator: AppValidator.validateEmail,
                               enabled:
@@ -298,7 +376,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                             // Phone Number
                             _buildTextFormField(
                               controller: _phoneController,
-                              label: 'Phone Number',
+                              label: 'phone_number'.tr,
                               keyboardType: TextInputType.phone,
                               validator: AppValidator.validatePhone,
                             ),
@@ -306,7 +384,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                             const SizedBox(height: 30),
 
                             // Physical Information Section
-                            _buildSectionTitle('Physical Information'),
+                            _buildSectionTitle('physical_information'.tr),
                             const SizedBox(height: 16),
 
                             // Age, Weight, Height
@@ -315,7 +393,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                                 Expanded(
                                   child: _buildTextFormField(
                                     controller: _ageController,
-                                    label: 'Age',
+                                    label: 'age'.tr,
                                     keyboardType: TextInputType.number,
                                     validator: (value) =>
                                         AppValidator.validateAge(
@@ -327,7 +405,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                                 Expanded(
                                   child: _buildTextFormField(
                                     controller: _weightController,
-                                    label: 'Weight (kg)',
+                                    label: 'weight_kg'.tr,
                                     keyboardType: TextInputType.number,
                                     validator: (value) =>
                                         AppValidator.validateWeight(
@@ -339,7 +417,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                                 Expanded(
                                   child: _buildTextFormField(
                                     controller: _heightController,
-                                    label: 'Height (cm)',
+                                    label: 'height_cm'.tr,
                                     keyboardType: TextInputType.number,
                                     validator: (value) =>
                                         AppValidator.validateHeight(
@@ -358,21 +436,21 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
                             const SizedBox(height: 30),
 
                             // Activity Level Section
-                            _buildSectionTitle('Activity Level'),
+                            _buildSectionTitle('activity_level'.tr),
                             const SizedBox(height: 16),
                             _buildActivityLevelSelector(),
 
                             const SizedBox(height: 30),
 
                             // Meal Frequency Section
-                            _buildSectionTitle('Meal Frequency'),
+                            _buildSectionTitle('meal_frequency'.tr),
                             const SizedBox(height: 16),
                             _buildMealFrequencySelector(),
 
                             const SizedBox(height: 30),
 
                             // Fitness Goals Section
-                            _buildSectionTitle('Fitness Goals'),
+                            _buildSectionTitle('fitness_goals'.tr),
                             const SizedBox(height: 16),
                             _buildGoalsSelector(),
 
@@ -397,71 +475,76 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
   }
 
   Widget _buildProfileImageSection() {
-    return Center(
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                  const Color(0xFFC2D86A).withValues(alpha: 0.1),
+    return Builder(
+      builder: (context) => Center(
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    context.accent.withValues(alpha: 0.3),
+                    context.accent.withValues(alpha: 0.1),
+                  ],
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: context.accent.withValues(alpha: 0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
                 ],
               ),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.all(3),
-            child: GestureDetector(
-              onTap: _pickAndUploadImage,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundColor: const Color(0xFF2A2A2A),
-                backgroundImage:
-                    UserController.getImageProvider(
-                      userController.profileImage,
-                    ) ??
-                    const AssetImage('assets/user_avatar.png') as ImageProvider,
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: GestureDetector(
-              onTap: _pickAndUploadImage,
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFC2D86A),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.camera_alt,
-                  color: Colors.black,
-                  size: 20,
+              padding: const EdgeInsets.all(3),
+              child: GestureDetector(
+                onTap: _pickAndUploadImage,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: context.cardSecondary,
+                  backgroundImage:
+                      UserController.getImageProvider(
+                        userController.profileImage,
+                      ) ??
+                      const AssetImage('assets/user_avatar.png')
+                          as ImageProvider,
                 ),
               ),
             ),
-          ),
-        ],
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: GestureDetector(
+                onTap: _pickAndUploadImage,
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: context.accent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt,
+                    color: Colors.black,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
+    return Builder(
+      builder: (context) => Text(
+        title,
+        style: TextStyle(
+          color: context.textPrimary,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -473,425 +556,422 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
     String? Function(String?)? validator,
     bool enabled = true,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-            ),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
-              width: 1,
-            ),
-          ),
-          child: TextFormField(
-            controller: controller,
-            keyboardType: keyboardType,
-            validator: validator,
-            enabled: enabled,
+    return Builder(
+      builder: (context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
             style: TextStyle(
-              color: enabled ? Colors.white : Colors.white54,
-              fontSize: 16,
-            ),
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-              isDense: true,
-              contentPadding: EdgeInsets.symmetric(vertical: 8),
+              color: context.textPrimary,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+            decoration: BoxDecoration(
+              gradient: context.cardGradient,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: context.accent.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: TextFormField(
+              controller: controller,
+              keyboardType: keyboardType,
+              validator: validator,
+              enabled: enabled,
+              style: TextStyle(
+                color: enabled ? context.textPrimary : context.textSecondary,
+                fontSize: 16,
+              ),
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.symmetric(vertical: 8),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildGenderSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Gender',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-            ),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
-              width: 1,
+    return Builder(
+      builder: (context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'gender'.tr,
+            style: TextStyle(
+              color: context.textPrimary,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: _selectedGender,
-              isExpanded: true,
-              dropdownColor: const Color(0xFF2A2A2A),
-              icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-              items: ['Male', 'Female', 'Other'].map((String gender) {
-                return DropdownMenuItem<String>(
-                  value: gender,
-                  child: Text(gender),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedGender = newValue!;
-                });
-              },
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+            decoration: BoxDecoration(
+              gradient: context.cardGradient,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: context.accent.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedGender,
+                isExpanded: true,
+                dropdownColor: context.cardColor,
+                icon: Icon(
+                  Icons.keyboard_arrow_down,
+                  color: context.textPrimary,
+                ),
+                style: TextStyle(color: context.textPrimary, fontSize: 16),
+                items: ['Male', 'Female', 'Other'].map((String gender) {
+                  return DropdownMenuItem<String>(
+                    value: gender,
+                    child: Text(gender.toLowerCase().tr),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedGender = newValue!;
+                  });
+                },
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildActivityLevelSelector() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+    return Builder(
+      builder: (context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: BoxDecoration(
+          gradient: context.cardGradient,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: context.accent.withValues(alpha: 0.2),
+            width: 1,
+          ),
         ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: _selectedActivityLevel,
-          isExpanded: true,
-          dropdownColor: const Color(0xFF2A2A2A),
-          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-          style: const TextStyle(color: Colors.white, fontSize: 16),
-          items: _activityLevels.map((level) {
-            return DropdownMenuItem<String>(value: level, child: Text(level));
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedActivityLevel = value;
-            });
-          },
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: _selectedActivityLevel,
+            isExpanded: true,
+            dropdownColor: context.cardColor,
+            icon: Icon(Icons.keyboard_arrow_down, color: context.textPrimary),
+            style: TextStyle(color: context.textPrimary, fontSize: 16),
+            items: _activityLevels.map((level) {
+              return DropdownMenuItem<String>(
+                value: level,
+                child: Text(_getActivityLevelKey(level).tr),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                _selectedActivityLevel = value;
+              });
+            },
+          ),
         ),
       ),
     );
   }
 
   Widget _buildMealFrequencySelector() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+    return Builder(
+      builder: (context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: BoxDecoration(
+          gradient: context.cardGradient,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: context.accent.withValues(alpha: 0.2),
+            width: 1,
+          ),
         ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: _selectedMealFrequency,
-          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-          isExpanded: true,
-          dropdownColor: const Color(0xFF2A2A2A),
-          style: const TextStyle(color: Colors.white, fontSize: 16),
-          items: _mealFrequencies.map((freq) {
-            return DropdownMenuItem<String>(value: freq, child: Text(freq));
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedMealFrequency = value;
-            });
-          },
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: _selectedMealFrequency,
+            icon: Icon(Icons.keyboard_arrow_down, color: context.textPrimary),
+            isExpanded: true,
+            dropdownColor: context.cardColor,
+            style: TextStyle(color: context.textPrimary, fontSize: 16),
+            items: _mealFrequencies.map((freq) {
+              return DropdownMenuItem<String>(
+                value: freq,
+                child: Text(_getMealFrequencyKey(freq).tr),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                _selectedMealFrequency = value;
+              });
+            },
+          ),
         ),
       ),
     );
   }
 
   Widget _buildGoalsSelector() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: _goalOptions.map((goal) {
-        final isSelected = _selectedGoals.contains(goal);
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              if (isSelected) {
-                _selectedGoals.remove(goal);
-              } else {
-                _selectedGoals.add(goal);
-              }
-            });
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              gradient: isSelected
-                  ? const LinearGradient(
-                      colors: [Color(0xFFC2D86A), Color(0xFFB8CC5A)],
-                    )
-                  : const LinearGradient(
-                      colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                    ),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isSelected
-                    ? const Color(0xFFC2D86A)
-                    : const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                width: 1,
+    return Builder(
+      builder: (context) => Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: _goalOptions.map((goal) {
+          final isSelected = _selectedGoals.contains(goal);
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                if (isSelected) {
+                  _selectedGoals.remove(goal);
+                } else {
+                  _selectedGoals.add(goal);
+                }
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                gradient: isSelected
+                    ? context.accentGradient
+                    : context.cardGradient,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isSelected
+                      ? context.accent
+                      : context.accent.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: Text(
+                _getGoalKey(goal).tr,
+                style: TextStyle(
+                  color: isSelected ? Colors.black : context.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-            child: Text(
-              goal,
-              style: TextStyle(
-                color: isSelected ? Colors.black : Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 
   Widget _buildDietPreferenceSection() {
-    return Column(
-      children: [
-        InkWell(
-          onTap: () {
-            setState(() {
-              _isDietPreferenceExpanded = !_isDietPreferenceExpanded;
-            });
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Diet Preference And Restriction',
+    return Builder(
+      builder: (context) => Column(
+        children: [
+          InkWell(
+            onTap: () {
+              setState(() {
+                _isDietPreferenceExpanded = !_isDietPreferenceExpanded;
+              });
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'diet_preference_restriction'.tr,
+                  style: TextStyle(
+                    color: context.accent,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Icon(
+                  _isDietPreferenceExpanded
+                      ? Icons.keyboard_arrow_up
+                      : Icons.keyboard_arrow_down,
+                  color: context.accent,
+                ),
+              ],
+            ),
+          ),
+
+          if (_isDietPreferenceExpanded) ...[
+            const SizedBox(height: 20),
+
+            // Diet Type
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'diet_type'.tr,
                 style: TextStyle(
-                  color: Color(0xFFC2D86A),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  color: context.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              Icon(
-                _isDietPreferenceExpanded
-                    ? Icons.keyboard_arrow_up
-                    : Icons.keyboard_arrow_down,
-                color: const Color(0xFFC2D86A),
-              ),
-            ],
-          ),
-        ),
-
-        if (_isDietPreferenceExpanded) ...[
-          const SizedBox(height: 20),
-
-          // Diet Type
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Diet Type',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
             ),
-          ),
-          const SizedBox(height: 10),
+            const SizedBox(height: 10),
 
-          // Diet Type Grid
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 3,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemCount: _dietTypes.length,
-            itemBuilder: (context, index) {
-              final dietType = _dietTypes[index];
-              final isSelected = _selectedDietType == dietType;
-              return InkWell(
-                onTap: () {
-                  setState(() {
-                    _selectedDietType = isSelected ? '' : dietType;
-                  });
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: isSelected
-                        ? LinearGradient(
-                            colors: [
-                              const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                              const Color(0xFFC2D86A).withValues(alpha: 0.1),
-                            ],
-                          )
-                        : const LinearGradient(
-                            colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                          ),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFFC2D86A)
-                          : const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                      width: 1,
+            // Diet Type Grid
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: _dietTypes.length,
+              itemBuilder: (context, index) {
+                final dietType = _dietTypes[index];
+                final isSelected = _selectedDietType == dietType;
+                return InkWell(
+                  onTap: () {
+                    setState(() {
+                      _selectedDietType = isSelected ? '' : dietType;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 10,
                     ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      dietType,
-                      style: TextStyle(
+                    decoration: BoxDecoration(
+                      gradient: isSelected
+                          ? LinearGradient(
+                              colors: [
+                                context.accent.withValues(alpha: 0.3),
+                                context.accent.withValues(alpha: 0.1),
+                              ],
+                            )
+                          : context.cardGradient,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
                         color: isSelected
-                            ? const Color(0xFFC2D86A)
-                            : Colors.white70,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                            ? context.accent
+                            : context.accent.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        _getDietTypeKey(dietType).tr,
+                        style: TextStyle(
+                          color: isSelected
+                              ? context.accent
+                              : context.textSecondary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),
+                );
+              },
+            ),
+
+            const SizedBox(height: 20),
+
+            // Food Allergies
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'food_allergies'.tr,
+                style: TextStyle(
+                  color: context.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
-              );
-            },
-          ),
-
-          const SizedBox(height: 20),
-
-          // Food Allergies
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Food Allergies',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
               ),
             ),
-          ),
-          const SizedBox(height: 10),
+            const SizedBox(height: 10),
 
-          // Food Allergies Grid
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 3,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemCount: _foodAllergies.length,
-            itemBuilder: (context, index) {
-              final allergy = _foodAllergies.keys.elementAt(index);
-              final isSelected = _foodAllergies[allergy]!;
-              return InkWell(
-                onTap: () {
-                  setState(() {
-                    _foodAllergies[allergy] = !isSelected;
-                  });
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
+            // Food Allergies Grid
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: _foodAllergies.length,
+              itemBuilder: (context, index) {
+                final allergy = _foodAllergies.keys.elementAt(index);
+                final isSelected = _foodAllergies[allergy]!;
+                return InkWell(
+                  onTap: () {
+                    setState(() {
+                      _foodAllergies[allergy] = !isSelected;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 10,
                     ),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                      width: 1,
+                    decoration: BoxDecoration(
+                      gradient: context.cardGradient,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: context.accent.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? const Color(0xFFC2D86A)
-                              : Colors.transparent,
-                          border: Border.all(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
                             color: isSelected
-                                ? const Color(0xFFC2D86A)
-                                : Colors.white54,
-                            width: 2,
+                                ? context.accent
+                                : Colors.transparent,
+                            border: Border.all(
+                              color: isSelected
+                                  ? context.accent
+                                  : context.textSecondary,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(4),
                           ),
-                          borderRadius: BorderRadius.circular(4),
+                          child: isSelected
+                              ? const Icon(
+                                  Icons.check,
+                                  color: Colors.black,
+                                  size: 14,
+                                )
+                              : null,
                         ),
-                        child: isSelected
-                            ? const Icon(
-                                Icons.check,
-                                color: Colors.black,
-                                size: 14,
-                              )
-                            : null,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          allergy,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            _getAllergyKey(allergy).tr,
+                            style: TextStyle(
+                              color: context.textSecondary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
+                );
+              },
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 
@@ -902,8 +982,8 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
 
     if (_selectedGoals.isEmpty) {
       Get.snackbar(
-        'Validation Error',
-        'Please select at least one fitness goal',
+        'validation_error'.tr,
+        'select_one_fitness_goal'.tr,
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -927,9 +1007,9 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
       );
 
       Get.snackbar(
-        'Success',
-        'Profile updated successfully',
-        backgroundColor: const Color(0xFFC2D86A),
+        'success'.tr,
+        'profile_updated_successfully'.tr,
+        backgroundColor: context.accent,
         colorText: Colors.black,
       );
 
@@ -937,8 +1017,8 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
       Get.back();
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'Failed to update profile: $e',
+        'error'.tr,
+        '${'failed_to_update_profile'.tr}: $e',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -946,6 +1026,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
   }
 
   Future<void> _pickAndUploadImage() async {
+    final context = Get.context!;
     try {
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(
@@ -958,16 +1039,16 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
       if (image != null) {
         await userController.uploadProfileImage(File(image.path));
         Get.snackbar(
-          'Success',
-          'Profile picture updated',
-          backgroundColor: const Color(0xFFC2D86A),
+          'success'.tr,
+          'profile_picture_updated'.tr,
+          backgroundColor: context.accent,
           colorText: Colors.black,
         );
       }
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'Failed to upload image: $e',
+        'error'.tr,
+        '${'failed_to_upload_image'.tr}: $e',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );

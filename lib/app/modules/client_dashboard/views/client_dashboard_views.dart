@@ -4,6 +4,7 @@ import 'package:get_storage/get_storage.dart';
 
 import '../../../controllers/user_controller.dart';
 import '../../../core/base/controllers/auth_controller.dart';
+import '../../../core/theme/theme_helper.dart';
 import '../../../routes/app_pages.dart';
 import '../../../widgets/dynamic_profile_header.dart';
 import '../../../widgets/dynamic_live_stats_card.dart';
@@ -36,7 +37,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
 
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.black,
+      backgroundColor: context.backgroundColor,
       drawer: const DrawerMenu(), // Add the drawer here
       body: GestureDetector(
         onTap: () {
@@ -44,14 +45,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
           FocusScope.of(context).unfocus();
         },
         child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
-              stops: [0.0, 0.3, 1.0],
-            ),
-          ),
+          decoration: BoxDecoration(gradient: context.backgroundGradient),
           child: SafeArea(
             child: Column(
               children: [
@@ -64,22 +58,12 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                         // Header with gradient background
                         Container(
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                            ),
+                            gradient: context.headerGradient,
                             borderRadius: BorderRadius.only(
                               bottomLeft: Radius.circular(25),
                               bottomRight: Radius.circular(25),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                blurRadius: 10,
-                                offset: Offset(0, 5),
-                              ),
-                            ],
+                            boxShadow: context.cardShadow,
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(20.0),
@@ -104,21 +88,20 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                           decoration: BoxDecoration(
                                             gradient: LinearGradient(
                                               colors: [
-                                                Color(
-                                                  0xFFC2D86A,
-                                                ).withValues(alpha: 0.2),
-                                                Color(
-                                                  0xFFC2D86A,
-                                                ).withValues(alpha: 0.1),
+                                                context.accentColor.withValues(
+                                                  alpha: 0.2,
+                                                ),
+                                                context.accentColor.withValues(
+                                                  alpha: 0.1,
+                                                ),
                                               ],
                                             ),
                                             borderRadius: BorderRadius.circular(
                                               16,
                                             ),
                                             border: Border.all(
-                                              color: Color(
-                                                0xFFC2D86A,
-                                              ).withValues(alpha: 0.3),
+                                              color: context.accentColor
+                                                  .withValues(alpha: 0.3),
                                               width: 1,
                                             ),
                                           ),
@@ -127,14 +110,13 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                               Container(
                                                 padding: EdgeInsets.all(10),
                                                 decoration: BoxDecoration(
-                                                  color: Color(
-                                                    0xFFC2D86A,
-                                                  ).withValues(alpha: 0.3),
+                                                  color: context.accentColor
+                                                      .withValues(alpha: 0.3),
                                                   shape: BoxShape.circle,
                                                 ),
                                                 child: Icon(
                                                   Icons.group,
-                                                  color: Color(0xFFC2D86A),
+                                                  color: context.accentColor,
                                                   size: 20,
                                                 ),
                                               ),
@@ -146,10 +128,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                                   children: [
                                                     Text(
                                                       'group_mode'.tr,
-                                                      style: const TextStyle(
-                                                        color: Color(
-                                                          0xFFC2D86A,
-                                                        ),
+                                                      style: TextStyle(
+                                                        color:
+                                                            context.accentColor,
                                                         fontSize: 12,
                                                         fontWeight:
                                                             FontWeight.w600,
@@ -161,7 +142,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                                           .selectedGroupName
                                                           .value,
                                                       style: TextStyle(
-                                                        color: Colors.white,
+                                                        color:
+                                                            context.textPrimary,
                                                         fontSize: 16,
                                                         fontWeight:
                                                             FontWeight.bold,
@@ -175,7 +157,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                                     controller.exitGroupMode,
                                                 icon: Icon(
                                                   Icons.close,
-                                                  color: Colors.white70,
+                                                  color: context.isLightTheme
+                                                      ? context.textSecondary
+                                                      : Colors.white70,
                                                 ),
                                                 tooltip: 'exit_group_mode'.tr,
                                               ),
@@ -207,7 +191,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                   child: Container(
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFCDE26D),
+                                      color: context.accentColor,
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Row(
@@ -418,7 +402,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                 if (controller.shouldShowLoading) {
                                   return const Center(
                                     child: CircularProgressIndicator(
-                                      color: Color(0xFFC2D86A),
+                                      color: Color(0xFFC2FF00),
                                     ),
                                   );
                                 }
@@ -470,17 +454,14 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                             Icon(
                                               Icons.search_off_rounded,
                                               size: 80,
-                                              color: Colors.white.withValues(
-                                                alpha: 0.3,
-                                              ),
+                                              color: context.textSecondary
+                                                  .withValues(alpha: 0.5),
                                             ),
                                             const SizedBox(height: 16),
                                             Text(
                                               'no_meals_found'.tr,
                                               style: TextStyle(
-                                                color: Colors.white.withValues(
-                                                  alpha: 0.8,
-                                                ),
+                                                color: context.textPrimary,
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.w600,
                                               ),
@@ -489,9 +470,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                             Text(
                                               'try_different_keywords'.tr,
                                               style: TextStyle(
-                                                color: Colors.white.withValues(
-                                                  alpha: 0.5,
-                                                ),
+                                                color: context.textSecondary,
                                                 fontSize: 14,
                                               ),
                                               textAlign: TextAlign.center,
@@ -505,9 +484,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                               ),
                                               label: Text('clear_search'.tr),
                                               style: ElevatedButton.styleFrom(
-                                                backgroundColor: const Color(
-                                                  0xFFC2D86A,
-                                                ),
+                                                backgroundColor:
+                                                    context.accentColor,
                                                 foregroundColor: Colors.black,
                                                 padding:
                                                     const EdgeInsets.symmetric(
@@ -647,14 +625,12 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   Widget _buildModernBottomNavigationBar(String id) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-        ),
+        gradient: context.headerGradient,
         border: Border(
           top: BorderSide(
-            color: Color(0xFFC2D86A).withValues(alpha: 0.2),
+            color: context.isLightTheme
+                ? context.borderColor
+                : Color(0xFFC2D86A).withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -697,14 +673,14 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
         children: [
           Icon(
             icon,
-            color: isActive ? Color(0xFFC2D86A) : Colors.white54,
+            color: isActive ? context.accentColor : context.textSecondary,
             size: 24,
           ),
           SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: isActive ? Color(0xFFC2D86A) : Colors.white54,
+              color: isActive ? context.accentColor : context.textSecondary,
               fontSize: 12,
               fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
             ),
@@ -747,8 +723,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
           gradient: isSelected
               ? LinearGradient(
                   colors: [
-                    const Color(0xFFC2D86A).withValues(alpha: 0.3),
-                    const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                    context.accentColor.withValues(alpha: 0.3),
+                    context.accentColor.withValues(alpha: 0.1),
                   ],
                 )
               : null,
@@ -756,14 +732,16 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
-                ? const Color(0xFFC2D86A)
+                ? context.accentColor
+                : context.isLightTheme
+                ? context.borderColor
                 : Colors.white.withValues(alpha: 0.2),
             width: 1,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+                    color: context.accentColor.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -778,7 +756,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.white54,
+                color: isSelected ? context.textPrimary : context.textSecondary,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 fontSize: 13,
               ),
@@ -807,15 +785,15 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: const Color(0xFF1C1C1E),
+          gradient: context.cardGradient,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
-            ),
-          ],
+          border: Border.all(
+            color: context.isLightTheme
+                ? context.borderColor
+                : Colors.transparent,
+            width: 1,
+          ),
+          boxShadow: context.cardShadow,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -831,7 +809,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                     width: 90,
                     height: 90,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFC2D86A),
+                      color: context.accentColor,
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: Stack(
@@ -851,7 +829,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                       as ImageProvider,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
-                                  Container(color: const Color(0xFFC2D86A)),
+                                  Container(color: context.accentColor),
                             ),
                           ),
 
@@ -885,7 +863,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                               ),
                               child: const Icon(
                                 Icons.add,
-                                color: Color(0xFFC2D86A),
+                                color: Color(0xFF1A1D1F),
                                 size: 28,
                               ),
                             ),
@@ -906,8 +884,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                       // Meal Name
                       Text(
                         meal.name,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: context.textPrimary,
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
                           letterSpacing: -0.3,
@@ -922,7 +900,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                       Text(
                         '${'organic'.tr} • ${'fresh'.tr}',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.45),
+                          color: context.textSecondary.withValues(alpha: 0.7),
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.5,
@@ -939,20 +917,26 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2C2C2E),
+                    color: context.isLightTheme
+                        ? context.cardSecondaryColor
+                        : const Color(0xFF2C2C2E),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: PopupMenuButton<String>(
                     icon: Icon(
                       Icons.more_vert_rounded,
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: context.textSecondary,
                       size: 20,
                     ),
-                    color: const Color(0xFF2C2C2E),
+                    color: context.isLightTheme
+                        ? context.cardColor
+                        : const Color(0xFF2C2C2E),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                       side: BorderSide(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: context.isLightTheme
+                            ? context.borderColor
+                            : Colors.white.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -987,22 +971,22 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: const Color(
-                                  0xFFC2D86A,
-                                ).withValues(alpha: 0.15),
+                                color: context.accentColor.withValues(
+                                  alpha: 0.15,
+                                ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.edit_outlined,
                                 size: 18,
-                                color: Color(0xFFC2D86A),
+                                color: context.accentColor,
                               ),
                             ),
                             const SizedBox(width: 12),
                             Text(
                               'edit_meal'.tr,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: context.textPrimary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -1029,8 +1013,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                             const SizedBox(width: 12),
                             Text(
                               'delete_meal'.tr,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: context.textPrimary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -1057,7 +1041,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                       vertical: 16,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF3A2F1A),
+                      color: context.isLightTheme
+                          ? Color(0xFFFFF4E6) // Light orange background
+                          : const Color(0xFF3A2F1A),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -1067,16 +1053,22 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                         const SizedBox(width: 10),
                         Text(
                           '${meal.kcal}',
-                          style: const TextStyle(
-                            color: Color(0xFFFFB800),
+                          style: TextStyle(
+                            color: context.isLightTheme
+                                ? Color(
+                                    0xFFFF8C00,
+                                  ) // Darker orange for light theme
+                                : Color(0xFFFFB800),
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const Text(
+                        Text(
                           ' kcal',
                           style: TextStyle(
-                            color: Color(0xFFFFB800),
+                            color: context.isLightTheme
+                                ? Color(0xFFFF8C00)
+                                : Color(0xFFFFB800),
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
@@ -1095,7 +1087,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                       vertical: 16,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2C2C2E),
+                      color: context.isLightTheme
+                          ? context.cardSecondaryColor
+                          : const Color(0xFF2C2C2E),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -1106,7 +1100,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                         Text(
                           '100g',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.95),
+                            color: context.textPrimary,
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
@@ -1157,11 +1151,26 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
     Color bgColor,
     Color textColor,
   ) {
+    // Light theme colors
+    final lightBgColors = {
+      const Color(0xFF1A3A2A): const Color(0xFFE8F5E9), // Light green
+      const Color(0xFF1A2A3A): const Color(0xFFE3F2FD), // Light blue
+      const Color(0xFF3A1A1A): const Color(0xFFFFEBEE), // Light red
+    };
+
+    final lightTextColors = {
+      const Color(0xFF4CAF50): const Color(0xFF2E7D32), // Darker green
+      const Color(0xFF2196F3): const Color(0xFF1565C0), // Darker blue
+      const Color(0xFFE53935): const Color(0xFFC62828), // Darker red
+    };
+
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
         decoration: BoxDecoration(
-          color: bgColor,
+          color: context.isLightTheme
+              ? (lightBgColors[bgColor] ?? bgColor)
+              : bgColor,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -1170,7 +1179,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
             Text(
               label,
               style: TextStyle(
-                color: textColor,
+                color: context.isLightTheme
+                    ? (lightTextColors[textColor] ?? textColor)
+                    : textColor,
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.2,
@@ -1180,7 +1191,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
             Text(
               value,
               style: TextStyle(
-                color: textColor,
+                color: context.isLightTheme
+                    ? (lightTextColors[textColor] ?? textColor)
+                    : textColor,
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
               ),
@@ -1200,28 +1213,28 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF2A2A2A),
+          backgroundColor: context.cardColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           title: Text(
             'delete_meal'.tr,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.textPrimary,
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
           ),
           content: Text(
             '${'delete_meal_confirm'.tr} "${meal.name}"? ${'action_cannot_be_undone'.tr}',
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
+            style: TextStyle(color: context.textSecondary, fontSize: 14),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'cancel'.tr,
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
+                style: TextStyle(color: context.textSecondary, fontSize: 14),
               ),
             ),
             Container(
@@ -1239,20 +1252,20 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF2A2A2A),
+                          color: context.cardColor,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const CircularProgressIndicator(
-                              color: Color(0xFFC2D86A),
+                              color: Color(0xFFC2FF00),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               'deleting_meal'.tr,
-                              style: const TextStyle(
-                                color: Colors.white70,
+                              style: TextStyle(
+                                color: context.textSecondary,
                                 fontSize: 14,
                               ),
                             ),
@@ -1321,19 +1334,15 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
+        gradient: context.cardGradient,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: context.isLightTheme
+              ? context.borderColor
+              : Colors.white.withValues(alpha: 0.05),
           width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: context.cardShadow,
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -1355,8 +1364,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: context.textPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.3,
@@ -1367,7 +1376,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
             ElevatedButton(
               onPressed: onTap,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFC2D86A),
+                backgroundColor: context.accentColor,
                 foregroundColor: Colors.black,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(

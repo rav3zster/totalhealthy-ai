@@ -7,6 +7,7 @@ import '../../../data/services/meals_firestore_service.dart';
 import '../../../controllers/user_controller.dart';
 import '../../../routes/app_pages.dart';
 import '../../../core/base/controllers/auth_controller.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class GroupMealChatView extends StatefulWidget {
   final String groupId;
@@ -200,13 +201,11 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
               width: double.infinity,
               height: 56,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                ),
+                gradient: context.accentGradient,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFC2D86A).withOpacity(0.3),
+                    color: context.accent.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -220,16 +219,16 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.add_circle_outline_rounded,
-                        color: Color(0xFF121212),
+                        color: context.backgroundColor,
                         size: 24,
                       ),
                       const SizedBox(width: 12),
-                      const Text(
+                      Text(
                         'Create Meal for Group',
                         style: TextStyle(
-                          color: Color(0xFF121212),
+                          color: context.backgroundColor,
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.3,

@@ -4,6 +4,7 @@ import 'package:totalhealthy/app/modules/notification/controllers/notification_c
 import 'package:intl/intl.dart';
 import 'package:totalhealthy/app/data/models/notification_model.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class NotificationsPage extends StatefulWidget {
   final NotificationController controller;
@@ -38,25 +39,15 @@ class _NotificationsPageState extends State<NotificationsPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: context.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
             // Header with gradient background
             Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [const Color(0xFF1E1E1E), const Color(0xFF121212)],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                gradient: context.headerGradient,
+                boxShadow: context.cardShadow,
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -68,8 +59,8 @@ class _NotificationsPageState extends State<NotificationsPage>
                         const SizedBox(width: 16),
                         Text(
                           'notifications'.tr,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: context.textPrimary,
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
                             letterSpacing: -0.5,
@@ -136,25 +127,18 @@ class _NotificationsPageState extends State<NotificationsPage>
                     Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E),
+                        color: context.cardColor,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.05),
-                          width: 1,
-                        ),
+                        border: Border.all(color: context.border, width: 1),
                       ),
                       child: TabBar(
                         controller: _tabController,
                         indicator: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFC2D86A), Color(0xFFD4E87C)],
-                          ),
+                          gradient: context.accentGradient,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(
-                                0xFFC2D86A,
-                              ).withValues(alpha: 0.3),
+                              color: context.accent.withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -162,10 +146,8 @@ class _NotificationsPageState extends State<NotificationsPage>
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
                         dividerColor: Colors.transparent,
-                        labelColor: const Color(0xFF121212),
-                        unselectedLabelColor: Colors.white.withValues(
-                          alpha: 0.5,
-                        ),
+                        labelColor: context.backgroundColor,
+                        unselectedLabelColor: context.textSecondary,
                         labelStyle: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -235,9 +217,7 @@ class _NotificationsPageState extends State<NotificationsPage>
   Widget _buildNotificationsList({required bool showAll}) {
     return Obx(() {
       if (widget.controller.isLoading.value) {
-        return const Center(
-          child: CircularProgressIndicator(color: Color(0xFFC2D86A)),
-        );
+        return Center(child: CircularProgressIndicator(color: context.accent));
       }
 
       final filteredList = widget.controller.notifications.where((n) {
@@ -253,17 +233,14 @@ class _NotificationsPageState extends State<NotificationsPage>
               Icon(
                 Icons.notifications_none_rounded,
                 size: 64,
-                color: Colors.white.withValues(alpha: 0.3),
+                color: context.textTertiary,
               ),
               const SizedBox(height: 16),
               Text(
                 showAll
                     ? 'no_notifications_yet'.tr
                     : 'no_unread_notifications'.tr,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.6),
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: context.textSecondary, fontSize: 16),
               ),
             ],
           ),
@@ -326,23 +303,19 @@ class _NotificationsPageState extends State<NotificationsPage>
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF1E1E1E), Color(0xFF1A1A1A)],
-          ),
+          gradient: context.cardGradient,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isInvite && isPending
-                ? const Color(0xFFC2D86A).withValues(alpha: 0.3)
-                : Colors.white.withValues(alpha: 0.05),
+                ? context.accent.withValues(alpha: 0.3)
+                : context.border,
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
               color: isInvite && isPending
-                  ? const Color(0xFFC2D86A).withValues(alpha: 0.1)
-                  : Colors.black.withValues(alpha: 0.3),
+                  ? context.accent.withValues(alpha: 0.1)
+                  : context.cardShadowSingle.color,
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
@@ -362,18 +335,18 @@ class _NotificationsPageState extends State<NotificationsPage>
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: isInvite
-                            ? [const Color(0xFFC2D86A), const Color(0xFFD4E87C)]
+                            ? [context.accent, context.accent]
                             : [
-                                Colors.white.withValues(alpha: 0.1),
-                                Colors.white.withValues(alpha: 0.05),
+                                context.textPrimary.withValues(alpha: 0.1),
+                                context.textPrimary.withValues(alpha: 0.05),
                               ],
                       ),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
                           color: isInvite
-                              ? const Color(0xFFC2D86A).withValues(alpha: 0.3)
-                              : Colors.black.withValues(alpha: 0.3),
+                              ? context.accent.withValues(alpha: 0.3)
+                              : context.cardShadowSingle.color,
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
@@ -384,8 +357,8 @@ class _NotificationsPageState extends State<NotificationsPage>
                           ? Icons.mail_outline_rounded
                           : Icons.notifications_none_rounded,
                       color: isInvite
-                          ? const Color(0xFF121212)
-                          : Colors.white.withValues(alpha: 0.8),
+                          ? context.backgroundColor
+                          : context.textPrimary,
                       size: 24,
                     ),
                   ),
@@ -403,8 +376,8 @@ class _NotificationsPageState extends State<NotificationsPage>
                             Expanded(
                               child: Text(
                                 notification.title,
-                                style: const TextStyle(
-                                  color: Color(0xFFC2D86A),
+                                style: TextStyle(
+                                  color: context.accent,
                                   fontSize: 17,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: -0.3,
@@ -417,10 +390,10 @@ class _NotificationsPageState extends State<NotificationsPage>
                                 vertical: 5,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.05),
+                                color: context.cardSecondary,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.1),
+                                  color: context.border,
                                   width: 1,
                                 ),
                               ),
@@ -429,7 +402,7 @@ class _NotificationsPageState extends State<NotificationsPage>
                                   'HH:mm',
                                 ).format(notification.timestamp),
                                 style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.5),
+                                  color: context.textSecondary,
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -443,7 +416,7 @@ class _NotificationsPageState extends State<NotificationsPage>
                         Text(
                           notification.message,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: context.textPrimary,
                             fontSize: 14,
                             height: 1.5,
                           ),
@@ -456,18 +429,13 @@ class _NotificationsPageState extends State<NotificationsPage>
                               Expanded(
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFFC2D86A),
-                                        Color(0xFFD4E87C),
-                                      ],
-                                    ),
+                                    gradient: context.accentGradient,
                                     borderRadius: BorderRadius.circular(12),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(
-                                          0xFFC2D86A,
-                                        ).withValues(alpha: 0.3),
+                                        color: context.accent.withValues(
+                                          alpha: 0.3,
+                                        ),
                                         blurRadius: 8,
                                         offset: const Offset(0, 4),
                                       ),
@@ -486,8 +454,8 @@ class _NotificationsPageState extends State<NotificationsPage>
                                         child: Text(
                                           'accept'.tr,
                                           textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            color: Color(0xFF121212),
+                                          style: TextStyle(
+                                            color: context.backgroundColor,
                                             fontSize: 15,
                                             fontWeight: FontWeight.w700,
                                             letterSpacing: 0.3,
@@ -502,12 +470,10 @@ class _NotificationsPageState extends State<NotificationsPage>
                               Expanded(
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.05),
+                                    color: context.cardSecondary,
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.2,
-                                      ),
+                                      color: context.border,
                                       width: 1.5,
                                     ),
                                   ),
@@ -525,9 +491,7 @@ class _NotificationsPageState extends State<NotificationsPage>
                                           'reject'.tr,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
-                                            color: Colors.white.withValues(
-                                              alpha: 0.8,
-                                            ),
+                                            color: context.textPrimary,
                                             fontSize: 15,
                                             fontWeight: FontWeight.w700,
                                             letterSpacing: 0.3,
@@ -619,25 +583,25 @@ class _NotificationsPageState extends State<NotificationsPage>
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: context.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'delete_notification'.tr,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: context.textPrimary,
             fontWeight: FontWeight.w600,
           ),
         ),
         content: Text(
           'delete_notification_confirm'.tr,
-          style: const TextStyle(color: Colors.white70),
+          style: TextStyle(color: context.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
               'cancel'.tr,
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+              style: TextStyle(color: context.textSecondary),
             ),
           ),
           TextButton(
@@ -659,25 +623,25 @@ class _NotificationsPageState extends State<NotificationsPage>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E1E),
+        backgroundColor: context.cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'clear_all_notifications'.tr,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: context.textPrimary,
             fontWeight: FontWeight.w600,
           ),
         ),
         content: Text(
           'clear_all_confirm_message'.tr,
-          style: const TextStyle(color: Colors.white70),
+          style: TextStyle(color: context.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               'cancel'.tr,
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+              style: TextStyle(color: context.textSecondary),
             ),
           ),
           TextButton(

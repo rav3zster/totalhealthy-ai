@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/account_password_controller.dart';
+import '../../../core/theme/theme_helper.dart';
 
 class AccountPasswordSettingsView extends StatelessWidget {
   const AccountPasswordSettingsView({super.key});
@@ -12,36 +13,19 @@ class AccountPasswordSettingsView extends StatelessWidget {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.black, Color(0xFF1A1A1A), Colors.black],
-            stops: [0.0, 0.3, 1.0],
-          ),
-        ),
+        decoration: BoxDecoration(gradient: context.backgroundGradient),
         child: SafeArea(
           child: Column(
             children: [
               // Header
               Container(
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF2A2A2A), Color(0xFF1A1A1A)],
-                  ),
+                  gradient: context.headerGradient,
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(25),
                     bottomRight: Radius.circular(25),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
+                  boxShadow: context.cardShadow,
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -51,17 +35,17 @@ class AccountPasswordSettingsView extends StatelessWidget {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                              const Color(0xFFC2D86A).withValues(alpha: 0.1),
+                              context.accent.withValues(alpha: 0.2),
+                              context.accent.withValues(alpha: 0.1),
                             ],
                           ),
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
                           onPressed: () => Get.back(),
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_back_ios_new_outlined,
-                            color: Colors.white,
+                            color: context.textPrimary,
                           ),
                         ),
                       ),
@@ -69,8 +53,8 @@ class AccountPasswordSettingsView extends StatelessWidget {
                         child: Text(
                           'account_and_password'.tr,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: context.textPrimary,
                             fontFamily: 'inter',
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
@@ -83,20 +67,20 @@ class AccountPasswordSettingsView extends StatelessWidget {
                               ? controller.saveChanges
                               : null,
                           child: controller.isSaving.value
-                              ? const SizedBox(
+                              ? SizedBox(
                                   width: 16,
                                   height: 16,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: Color(0xFFC2D86A),
+                                    color: context.accent,
                                   ),
                                 )
                               : Text(
                                   'save'.tr,
                                   style: TextStyle(
                                     color: controller.canSave
-                                        ? const Color(0xFFC2D86A)
-                                        : Colors.grey,
+                                        ? context.accent
+                                        : context.textTertiary,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -112,17 +96,15 @@ class AccountPasswordSettingsView extends StatelessWidget {
               Expanded(
                 child: Obx(() {
                   if (controller.isLoading.value) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFFC2D86A),
-                      ),
+                    return Center(
+                      child: CircularProgressIndicator(color: context.accent),
                     );
                   }
 
                   return RefreshIndicator(
                     onRefresh: controller.refreshUserData,
-                    color: const Color(0xFFC2D86A),
-                    backgroundColor: const Color(0xFF2A2A2A),
+                    color: context.accent,
+                    backgroundColor: context.cardColor,
                     child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(20),
@@ -170,52 +152,52 @@ class AccountPasswordSettingsView extends StatelessWidget {
                           const SizedBox(height: 40),
 
                           // Help text
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF2A2A2A),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: const Color(
-                                  0xFFC2D86A,
-                                ).withValues(alpha: 0.3),
-                                width: 1,
+                          Builder(
+                            builder: (context) => Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: context.cardSecondary,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: context.accent.withValues(alpha: 0.3),
+                                  width: 1,
+                                ),
                               ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.info_outline,
-                                      color: const Color(0xFFC2D86A),
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'security_information'.tr,
-                                      style: TextStyle(
-                                        color: Color(0xFFC2D86A),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.info_outline,
+                                        color: context.accent,
+                                        size: 20,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  '• ${'password_changes_require'.tr}\n'
-                                  '• ${'first_verify_password'.tr}\n'
-                                  '• ${'email_changes_require'.tr}\n'
-                                  '• ${'all_changes_synced'.tr}',
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                    height: 1.4,
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'security_information'.tr,
+                                        style: TextStyle(
+                                          color: context.accent,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '• ${'password_changes_require'.tr}\n'
+                                    '• ${'first_verify_password'.tr}\n'
+                                    '• ${'email_changes_require'.tr}\n'
+                                    '• ${'all_changes_synced'.tr}',
+                                    style: TextStyle(
+                                      color: context.textSecondary,
+                                      fontSize: 12,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -239,159 +221,173 @@ class AccountPasswordSettingsView extends StatelessWidget {
     TextInputType? keyboardType,
     RxString? errorMessage,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Obx(
-          () => Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A),
-              borderRadius: BorderRadius.circular(10),
-              border: isEditable.value
-                  ? Border.all(
-                      color:
-                          errorMessage != null && errorMessage.value.isNotEmpty
-                          ? Colors.red
-                          : const Color(0xFFC2D86A),
-                      width: 1,
-                    )
-                  : null,
+    return Builder(
+      builder: (context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: context.textPrimary,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
-            child: Row(
+          ),
+          const SizedBox(height: 10),
+          Obx(
+            () => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+              decoration: BoxDecoration(
+                color: context.cardSecondary,
+                borderRadius: BorderRadius.circular(10),
+                border: isEditable.value
+                    ? Border.all(
+                        color:
+                            errorMessage != null &&
+                                errorMessage.value.isNotEmpty
+                            ? Colors.red
+                            : context.accent,
+                        width: 1,
+                      )
+                    : null,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: controller,
+                      enabled: isEditable.value,
+                      keyboardType: keyboardType,
+                      style: TextStyle(
+                        color: isEditable.value
+                            ? context.textPrimary
+                            : context.textSecondary,
+                        fontSize: 16,
+                      ),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: onEditTap,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      child: Icon(
+                        isEditable.value ? Icons.check : Icons.edit,
+                        color: isEditable.value
+                            ? context.accent
+                            : context.textSecondary,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Error message display
+          if (errorMessage != null)
+            Obx(
+              () => errorMessage.value.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 8, left: 4),
+                      child: Text(
+                        errorMessage.value,
+                        style: const TextStyle(color: Colors.red, fontSize: 12),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPasswordSection(AccountPasswordController controller) {
+    return Builder(
+      builder: (context) => Obx(() {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Password header with edit toggle
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: controller,
-                    enabled: isEditable.value,
-                    keyboardType: keyboardType,
-                    style: TextStyle(
-                      color: isEditable.value ? Colors.white : Colors.white70,
-                      fontSize: 16,
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                    ),
+                Text(
+                  'password'.tr,
+                  style: TextStyle(
+                    color: context.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 GestureDetector(
-                  onTap: onEditTap,
+                  onTap: controller.togglePasswordEdit,
                   child: Container(
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(8),
                     child: Icon(
-                      isEditable.value ? Icons.check : Icons.edit,
-                      color: isEditable.value
-                          ? const Color(0xFFC2D86A)
-                          : Colors.white54,
+                      controller.isPasswordEditable.value
+                          ? Icons.close
+                          : Icons.edit,
+                      color: controller.isPasswordEditable.value
+                          ? Colors.red
+                          : context.textSecondary,
                       size: 20,
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-        ),
-        // Error message display
-        if (errorMessage != null)
-          Obx(
-            () => errorMessage.value.isNotEmpty
-                ? Padding(
-                    padding: const EdgeInsets.only(top: 8, left: 4),
-                    child: Text(
-                      errorMessage.value,
-                      style: const TextStyle(color: Colors.red, fontSize: 12),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-          ),
-      ],
-    );
-  }
 
-  Widget _buildPasswordSection(AccountPasswordController controller) {
-    return Obx(() {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Password header with edit toggle
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'password'.tr,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+            const SizedBox(height: 10),
+
+            if (!controller.isPasswordEditable.value) ...[
+              // Password display when not editing
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: context.cardSecondary,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '••••••••',
+                        style: TextStyle(
+                          color: context.textSecondary,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              GestureDetector(
-                onTap: controller.togglePasswordEdit,
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Icon(
-                    controller.isPasswordEditable.value
-                        ? Icons.close
-                        : Icons.edit,
-                    color: controller.isPasswordEditable.value
-                        ? Colors.red
-                        : Colors.white54,
-                    size: 20,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
-          if (!controller.isPasswordEditable.value) ...[
-            // Password display when not editing
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2A2A2A),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '••••••••',
-                      style: TextStyle(color: Colors.white70, fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ] else ...[
-            // Two-step password change flow
-            if (!controller.isCurrentPasswordVerified.value) ...[
-              // Step 1: Current password verification
-              _buildCurrentPasswordVerificationStep(controller),
             ] else ...[
-              // Step 2: New password entry (after verification)
-              _buildNewPasswordStep(controller),
+              // Two-step password change flow
+              if (!controller.isCurrentPasswordVerified.value) ...[
+                // Step 1: Current password verification
+                _buildCurrentPasswordVerificationStep(controller, context),
+              ] else ...[
+                // Step 2: New password entry (after verification)
+                _buildNewPasswordStep(controller, context),
+              ],
             ],
           ],
-        ],
-      );
-    });
+        );
+      }),
+    );
   }
 
   Widget _buildCurrentPasswordVerificationStep(
     AccountPasswordController controller,
+    BuildContext context,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -431,7 +427,7 @@ class AccountPasswordSettingsView extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
           decoration: BoxDecoration(
-            color: const Color(0xFF2A2A2A),
+            color: context.cardSecondary,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: controller.currentPasswordError.value.isNotEmpty
@@ -446,13 +442,16 @@ class AccountPasswordSettingsView extends StatelessWidget {
                 child: TextFormField(
                   controller: controller.currentPasswordController,
                   obscureText: !controller.showCurrentPassword.value,
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                  decoration: const InputDecoration(
+                  style: TextStyle(color: context.textPrimary, fontSize: 16),
+                  decoration: InputDecoration(
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                     hintText: 'Enter your current password',
-                    hintStyle: TextStyle(color: Colors.white54, fontSize: 14),
+                    hintStyle: TextStyle(
+                      color: context.textTertiary,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ),
@@ -464,7 +463,7 @@ class AccountPasswordSettingsView extends StatelessWidget {
                     controller.showCurrentPassword.value
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    color: Colors.white54,
+                    color: context.textSecondary,
                     size: 20,
                   ),
                 ),
@@ -524,7 +523,10 @@ class AccountPasswordSettingsView extends StatelessWidget {
     );
   }
 
-  Widget _buildNewPasswordStep(AccountPasswordController controller) {
+  Widget _buildNewPasswordStep(
+    AccountPasswordController controller,
+    BuildContext context,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -532,22 +534,22 @@ class AccountPasswordSettingsView extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFC2D86A).withValues(alpha: 0.1),
+            color: context.accent.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
+              color: context.accent.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.check_circle, color: Color(0xFFC2D86A), size: 16),
-              SizedBox(width: 8),
+              Icon(Icons.check_circle, color: context.accent, size: 16),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'Step 2: Current password verified. Set your new password',
                   style: TextStyle(
-                    color: Color(0xFFC2D86A),
+                    color: context.accent,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -560,10 +562,10 @@ class AccountPasswordSettingsView extends StatelessWidget {
         const SizedBox(height: 15),
 
         // New password field
-        const Text(
+        Text(
           'New Password',
           style: TextStyle(
-            color: Colors.white,
+            color: context.textPrimary,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -572,12 +574,12 @@ class AccountPasswordSettingsView extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
           decoration: BoxDecoration(
-            color: const Color(0xFF2A2A2A),
+            color: context.cardSecondary,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: controller.passwordError.value.isNotEmpty
                   ? Colors.red
-                  : const Color(0xFFC2D86A),
+                  : context.accent,
               width: 1,
             ),
           ),
@@ -587,13 +589,16 @@ class AccountPasswordSettingsView extends StatelessWidget {
                 child: TextFormField(
                   controller: controller.passwordController,
                   obscureText: !controller.showPassword.value,
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                  decoration: const InputDecoration(
+                  style: TextStyle(color: context.textPrimary, fontSize: 16),
+                  decoration: InputDecoration(
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                     hintText: 'Enter new password',
-                    hintStyle: TextStyle(color: Colors.white54, fontSize: 14),
+                    hintStyle: TextStyle(
+                      color: context.textTertiary,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ),
@@ -605,7 +610,7 @@ class AccountPasswordSettingsView extends StatelessWidget {
                     controller.showPassword.value
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    color: Colors.white54,
+                    color: context.textSecondary,
                     size: 20,
                   ),
                 ),
@@ -627,10 +632,10 @@ class AccountPasswordSettingsView extends StatelessWidget {
         const SizedBox(height: 15),
 
         // Confirm password field
-        const Text(
+        Text(
           'Confirm New Password',
           style: TextStyle(
-            color: Colors.white,
+            color: context.textPrimary,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -639,12 +644,12 @@ class AccountPasswordSettingsView extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
           decoration: BoxDecoration(
-            color: const Color(0xFF2A2A2A),
+            color: context.cardSecondary,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: controller.confirmPasswordError.value.isNotEmpty
                   ? Colors.red
-                  : const Color(0xFFC2D86A),
+                  : context.accent,
               width: 1,
             ),
           ),
@@ -654,13 +659,16 @@ class AccountPasswordSettingsView extends StatelessWidget {
                 child: TextFormField(
                   controller: controller.confirmPasswordController,
                   obscureText: !controller.showConfirmPassword.value,
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                  decoration: const InputDecoration(
+                  style: TextStyle(color: context.textPrimary, fontSize: 16),
+                  decoration: InputDecoration(
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                     hintText: 'Confirm new password',
-                    hintStyle: TextStyle(color: Colors.white54, fontSize: 14),
+                    hintStyle: TextStyle(
+                      color: context.textTertiary,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ),
@@ -672,7 +680,7 @@ class AccountPasswordSettingsView extends StatelessWidget {
                     controller.showConfirmPassword.value
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    color: Colors.white54,
+                    color: context.textSecondary,
                     size: 20,
                   ),
                 ),
@@ -697,25 +705,26 @@ class AccountPasswordSettingsView extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.grey.withValues(alpha: 0.1),
+            color: context.cardSecondary,
             borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: context.border, width: 1),
           ),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Password Requirements:',
                 style: TextStyle(
-                  color: Colors.white70,
+                  color: context.textSecondary,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 '• At least 6 characters\n• Contains letters and numbers\n• Passwords must match',
                 style: TextStyle(
-                  color: Colors.white60,
+                  color: context.textTertiary,
                   fontSize: 11,
                   height: 1.3,
                 ),
@@ -735,7 +744,7 @@ class AccountPasswordSettingsView extends StatelessWidget {
                 : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: controller.canChangePassword
-                  ? const Color(0xFFC2D86A)
+                  ? context.accent
                   : Colors.grey,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
