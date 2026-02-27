@@ -12,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import 'app/core/controllers/global_settings_controller.dart';
 import 'app/core/translations/app_translations.dart';
+import 'app/core/theme/app_theme.dart';
 
 final NotificationService _notificationService = NotificationService();
 
@@ -91,15 +92,9 @@ class MyApp extends StatelessWidget {
         translations: AppTranslations(),
         fallbackLocale: const Locale('en'),
 
-        // Theme definitions
-        theme: ThemeData.light().copyWith(
-          scaffoldBackgroundColor: Colors.white,
-          brightness: Brightness.light,
-        ),
-        darkTheme: ThemeData.dark().copyWith(
-          scaffoldBackgroundColor: Colors.black,
-          brightness: Brightness.dark,
-        ),
+        // Theme definitions with custom colors
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
 
         onReady: () {},
         scrollBehavior: MyCustomScrollBehavior(),

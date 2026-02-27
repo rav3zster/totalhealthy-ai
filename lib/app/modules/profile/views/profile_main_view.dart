@@ -28,7 +28,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
   @override
   Widget build(BuildContext context) {
     return BaseScreenWrapper(
-      title: 'Profile',
+      title: 'profile'.tr,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -42,8 +42,8 @@ class _ProfileMainViewState extends State<ProfileMainView> {
             ),
           ),
         ),
-        title: const Text(
-          'Profile',
+        title: Text(
+          'profile'.tr,
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -184,15 +184,23 @@ class _ProfileMainViewState extends State<ProfileMainView> {
     return Row(
       children: [
         Expanded(
-          child: _buildStatCard('Weight', userController.weightDisplay, 'kg'),
+          child: _buildStatCard(
+            'weight'.tr,
+            userController.weightDisplay,
+            'kg'.tr,
+          ),
         ),
         const SizedBox(width: 16),
         Expanded(
-          child: _buildStatCard('Age', userController.ageDisplay, 'Year'),
+          child: _buildStatCard('age'.tr, userController.ageDisplay, 'year'.tr),
         ),
         const SizedBox(width: 16),
         Expanded(
-          child: _buildStatCard('Height', userController.heightDisplay, 'cm'),
+          child: _buildStatCard(
+            'height'.tr,
+            userController.heightDisplay,
+            'cm'.tr,
+          ),
         ),
       ],
     );
@@ -203,7 +211,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
       children: [
         _buildMenuOption(
           icon: Icons.person_outline,
-          title: 'Profile',
+          title: 'profile'.tr,
           onTap: () {
             Get.toNamed('/profile-settings');
           },
@@ -211,7 +219,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
         const SizedBox(height: 16),
         _buildMenuOption(
           icon: Icons.track_changes_outlined,
-          title: 'Goal Setting',
+          title: 'goal_setting'.tr,
           onTap: () {
             Get.toNamed('/nutrition-goal', arguments: {'fromSignup': false});
           },
@@ -219,7 +227,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
         const SizedBox(height: 16),
         _buildMenuOption(
           icon: Icons.category_outlined,
-          title: 'Group Categories',
+          title: 'group_categories'.tr,
           onTap: () {
             Get.toNamed(Routes.GROUP_CATEGORIES);
           },
@@ -227,7 +235,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
         const SizedBox(height: 16),
         _buildMenuOption(
           icon: Icons.settings_outlined,
-          title: 'Setting',
+          title: 'settings'.tr,
           onTap: () {
             Get.toNamed('/setting');
           },
@@ -235,7 +243,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
         const SizedBox(height: 16),
         _buildMenuOption(
           icon: Icons.help_outline,
-          title: 'Help & Support',
+          title: 'help_support'.tr,
           onTap: () {
             Get.toNamed('/help-support');
           },
@@ -243,7 +251,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
         const SizedBox(height: 16),
         _buildMenuOption(
           icon: Icons.privacy_tip_outlined,
-          title: 'Privacy Policy',
+          title: 'privacy_policy'.tr,
           onTap: () {
             Get.toNamed(Routes.PRIVACY_POLICY);
           },
@@ -527,10 +535,10 @@ class _ProfileMainViewState extends State<ProfileMainView> {
                 ),
               ),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Log Out',
-                  style: TextStyle(
+                  'log_out'.tr,
+                  style: const TextStyle(
                     color: Color(0xFFFF6B6B),
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -628,9 +636,9 @@ class _ProfileMainViewState extends State<ProfileMainView> {
                     const SizedBox(height: 20),
 
                     // Title
-                    const Text(
-                      'Log Out',
-                      style: TextStyle(
+                    Text(
+                      'log_out'.tr,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -641,7 +649,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
 
                     // Message
                     Text(
-                      'Are you sure you want to\nlog out of your account?',
+                      'logout_confirm_message'.tr,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.65),
@@ -692,10 +700,10 @@ class _ProfileMainViewState extends State<ProfileMainView> {
                                   ),
                                 ],
                               ),
-                              child: const Text(
-                                'Cancel',
+                              child: Text(
+                                'cancel'.tr,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
@@ -737,7 +745,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
                                 ),
                               ),
                               child: Text(
-                                'Log Out',
+                                'log_out'.tr,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: Colors.white.withValues(alpha: 0.75),

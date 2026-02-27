@@ -145,8 +145,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      'Group Mode',
-                                                      style: TextStyle(
+                                                      'group_mode'.tr,
+                                                      style: const TextStyle(
                                                         color: Color(
                                                           0xFFC2D86A,
                                                         ),
@@ -177,7 +177,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                                   Icons.close,
                                                   color: Colors.white70,
                                                 ),
-                                                tooltip: 'Exit Group Mode',
+                                                tooltip: 'exit_group_mode'.tr,
                                               ),
                                             ],
                                           ),
@@ -232,9 +232,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              const Text(
-                                                'View Weekly Planner',
-                                                style: TextStyle(
+                                              Text(
+                                                'view_weekly_planner'.tr,
+                                                style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
@@ -242,7 +242,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
-                                                'Manage your daily meal schedule',
+                                                'manage_daily_meal_schedule'.tr,
                                                 style: TextStyle(
                                                   color: Colors.black
                                                       .withOpacity(0.6),
@@ -476,7 +476,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                             ),
                                             const SizedBox(height: 16),
                                             Text(
-                                              'No meals found',
+                                              'no_meals_found'.tr,
                                               style: TextStyle(
                                                 color: Colors.white.withValues(
                                                   alpha: 0.8,
@@ -487,7 +487,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                             ),
                                             const SizedBox(height: 8),
                                             Text(
-                                              'Try searching with different keywords',
+                                              'try_different_keywords'.tr,
                                               style: TextStyle(
                                                 color: Colors.white.withValues(
                                                   alpha: 0.5,
@@ -503,7 +503,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                                 Icons.clear,
                                                 size: 18,
                                               ),
-                                              label: const Text('Clear Search'),
+                                              label: Text('clear_search'.tr),
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor: const Color(
                                                   0xFFC2D86A,
@@ -547,8 +547,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                         if (controller
                                             .isCurrentUserAdminOfSelectedGroup()) ...[
                                           _buildActionCard(
-                                            title: 'Create Manually',
-                                            buttonText: 'Create',
+                                            title: 'create_manually'.tr,
+                                            buttonText: 'create'.tr,
                                             iconEmoji: '📋',
                                             iconBgColor: Colors.orange
                                                 .withValues(alpha: 0.2),
@@ -582,8 +582,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                             },
                                           ),
                                           _buildActionCard(
-                                            title: 'Generate Using AI',
-                                            buttonText: 'Generate',
+                                            title: 'generate_using_ai'.tr,
+                                            buttonText: 'generate'.tr,
                                             iconEmoji: '✨',
                                             iconBgColor: Colors.purple
                                                 .withValues(alpha: 0.2),
@@ -591,8 +591,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                                 Get.toNamed(Routes.GENERATE_AI),
                                           ),
                                           _buildActionCard(
-                                            title: 'Copy From Existing',
-                                            buttonText: 'Copy',
+                                            title: 'copy_from_existing'.tr,
+                                            buttonText: 'copy'.tr,
                                             iconEmoji: '📄',
                                             iconBgColor: Colors.blue.withValues(
                                               alpha: 0.2,
@@ -665,16 +665,16 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(Icons.person, 'Member', true, () {
+              _buildNavItem(Icons.person, 'member'.tr, true, () {
                 // Already on member/dashboard screen
               }),
-              _buildNavItem(Icons.group, 'Group', false, () {
+              _buildNavItem(Icons.group, 'group'.tr, false, () {
                 Get.toNamed(Routes.GROUP);
               }),
-              _buildNavItem(Icons.notifications, 'Notification', false, () {
+              _buildNavItem(Icons.notifications, 'notification'.tr, false, () {
                 Get.toNamed('/notification?id=$id');
               }),
-              _buildNavItem(Icons.person, 'Profile', false, () {
+              _buildNavItem(Icons.person, 'profile'.tr, false, () {
                 Get.toNamed(Routes.PROFILE_MAIN);
               }),
             ],
@@ -920,7 +920,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
 
                       // Tags (ORGANIC • FRESH)
                       Text(
-                        'ORGANIC • FRESH',
+                        '${'organic'.tr} • ${'fresh'.tr}',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.45),
                           fontSize: 11,
@@ -999,9 +999,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            const Text(
-                              'Edit Meal',
-                              style: TextStyle(
+                            Text(
+                              'edit_meal'.tr,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -1027,9 +1027,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            const Text(
-                              'Delete Meal',
-                              style: TextStyle(
+                            Text(
+                              'delete_meal'.tr,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -1125,21 +1125,21 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
               children: [
                 _buildMacroBox(
                   '${meal.protein}g',
-                  'PROTEIN',
+                  'protein'.tr,
                   const Color(0xFF1A3A2A),
                   const Color(0xFF4CAF50),
                 ),
                 const SizedBox(width: 12),
                 _buildMacroBox(
                   '${meal.fat}g',
-                  'FAT',
+                  'fat'.tr,
                   const Color(0xFF1A2A3A),
                   const Color(0xFF2196F3),
                 ),
                 const SizedBox(width: 12),
                 _buildMacroBox(
                   '${meal.carbs}g',
-                  'CARBS',
+                  'carbs'.tr,
                   const Color(0xFF3A1A1A),
                   const Color(0xFFE53935),
                 ),
@@ -1204,24 +1204,24 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          title: const Text(
-            'Delete Meal',
-            style: TextStyle(
+          title: Text(
+            'delete_meal'.tr,
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
           ),
           content: Text(
-            'Are you sure you want to delete "${meal.name}"? This action cannot be undone.',
+            '${'delete_meal_confirm'.tr} "${meal.name}"? ${'action_cannot_be_undone'.tr}',
             style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(color: Colors.white70, fontSize: 14),
+              child: Text(
+                'cancel'.tr,
+                style: const TextStyle(color: Colors.white70, fontSize: 14),
               ),
             ),
             Container(
@@ -1249,9 +1249,9 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                               color: Color(0xFFC2D86A),
                             ),
                             const SizedBox(height: 16),
-                            const Text(
-                              'Deleting meal...',
-                              style: TextStyle(
+                            Text(
+                              'deleting_meal'.tr,
+                              style: const TextStyle(
                                 color: Colors.white70,
                                 fontSize: 14,
                               ),
@@ -1272,8 +1272,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                   // Show result message
                   if (success) {
                     Get.snackbar(
-                      'Success',
-                      'Meal deleted successfully',
+                      'success'.tr,
+                      'meal_deleted_successfully'.tr,
                       backgroundColor: Colors.green.withValues(alpha: 0.9),
                       colorText: Colors.white,
                       snackPosition: SnackPosition.BOTTOM,
@@ -1283,8 +1283,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                     );
                   } else {
                     Get.snackbar(
-                      'Error',
-                      'Failed to delete meal. Please try again.',
+                      'error'.tr,
+                      'failed_to_delete_meal'.tr,
                       backgroundColor: Colors.red.withValues(alpha: 0.9),
                       colorText: Colors.white,
                       snackPosition: SnackPosition.BOTTOM,
@@ -1294,8 +1294,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                     );
                   }
                 },
-                child: const Text(
-                  'Delete',
+                child: Text(
+                  'delete_group'.tr,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,

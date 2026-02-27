@@ -66,9 +66,9 @@ class _NotificationsPageState extends State<NotificationsPage>
                     Row(
                       children: [
                         const SizedBox(width: 16),
-                        const Text(
-                          'Notifications',
-                          style: TextStyle(
+                        Text(
+                          'notifications'.tr,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
@@ -111,7 +111,7 @@ class _NotificationsPageState extends State<NotificationsPage>
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      'Clear All',
+                                      'clear_all'.tr,
                                       style: TextStyle(
                                         color: Colors.red.withValues(
                                           alpha: 0.9,
@@ -175,14 +175,17 @@ class _NotificationsPageState extends State<NotificationsPage>
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                         ),
-                        tabs: const [
+                        tabs: [
                           Tab(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.notifications_rounded, size: 18),
-                                SizedBox(width: 6),
-                                Text('All'),
+                                const Icon(
+                                  Icons.notifications_rounded,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 6),
+                                Text('all'.tr),
                               ],
                             ),
                           ),
@@ -190,9 +193,12 @@ class _NotificationsPageState extends State<NotificationsPage>
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.mark_email_unread_rounded, size: 18),
-                                SizedBox(width: 6),
-                                Text('Unread'),
+                                const Icon(
+                                  Icons.mark_email_unread_rounded,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 6),
+                                Text('unread'.tr),
                               ],
                             ),
                           ),
@@ -251,7 +257,9 @@ class _NotificationsPageState extends State<NotificationsPage>
               ),
               const SizedBox(height: 16),
               Text(
-                showAll ? 'No notifications yet' : 'No unread notifications',
+                showAll
+                    ? 'no_notifications_yet'.tr
+                    : 'no_unread_notifications'.tr,
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.6),
                   fontSize: 16,
@@ -471,14 +479,14 @@ class _NotificationsPageState extends State<NotificationsPage>
                                       borderRadius: BorderRadius.circular(12),
                                       onTap: () => widget.controller
                                           .acceptInvitation(notification),
-                                      child: const Padding(
-                                        padding: EdgeInsets.symmetric(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
                                           vertical: 12,
                                         ),
                                         child: Text(
-                                          'Accept',
+                                          'accept'.tr,
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             color: Color(0xFF121212),
                                             fontSize: 15,
                                             fontWeight: FontWeight.w700,
@@ -514,7 +522,7 @@ class _NotificationsPageState extends State<NotificationsPage>
                                           vertical: 12,
                                         ),
                                         child: Text(
-                                          'Reject',
+                                          'reject'.tr,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             color: Colors.white.withValues(
@@ -580,7 +588,7 @@ class _NotificationsPageState extends State<NotificationsPage>
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'Status: ${notification.status.name.capitalizeFirst}',
+                                  '${'status'.tr}: ${notification.status.name.capitalizeFirst}',
                                   style: TextStyle(
                                     color:
                                         notification.status ==
@@ -613,19 +621,22 @@ class _NotificationsPageState extends State<NotificationsPage>
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E1E1E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Delete Notification',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        title: Text(
+          'delete_notification'.tr,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        content: const Text(
-          'Are you sure you want to delete this notification?',
-          style: TextStyle(color: Colors.white70),
+        content: Text(
+          'delete_notification_confirm'.tr,
+          style: const TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
-              'Cancel',
+              'cancel'.tr,
               style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
             ),
           ),
@@ -634,7 +645,10 @@ class _NotificationsPageState extends State<NotificationsPage>
             style: TextButton.styleFrom(
               backgroundColor: Colors.red.withValues(alpha: 0.2),
             ),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text(
+              'delete_group'.tr,
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -647,19 +661,22 @@ class _NotificationsPageState extends State<NotificationsPage>
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E1E1E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Clear All Notifications',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+        title: Text(
+          'clear_all_notifications'.tr,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        content: const Text(
-          'Are you sure you want to delete all notifications? This action cannot be undone.',
-          style: TextStyle(color: Colors.white70),
+        content: Text(
+          'clear_all_confirm_message'.tr,
+          style: const TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
-              'Cancel',
+              'cancel'.tr,
               style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
             ),
           ),
@@ -671,9 +688,12 @@ class _NotificationsPageState extends State<NotificationsPage>
             style: TextButton.styleFrom(
               backgroundColor: Colors.red.withValues(alpha: 0.2),
             ),
-            child: const Text(
-              'Clear All',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+            child: Text(
+              'clear_all'.tr,
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],

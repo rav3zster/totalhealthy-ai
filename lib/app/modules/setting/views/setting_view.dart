@@ -61,11 +61,11 @@ class SettingView extends GetView<SettingController> {
                           ),
                         ),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Settings',
+                          'settings'.tr,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontFamily: 'inter',
                             fontSize: 20,
@@ -73,25 +73,9 @@ class SettingView extends GetView<SettingController> {
                           ),
                         ),
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                              const Color(0xFFC2D86A).withValues(alpha: 0.1),
-                            ],
-                          ),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.search,
-                            size: 24,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
+                      const SizedBox(
+                        width: 48,
+                      ), // Spacer to balance the back button
                     ],
                   ),
                 ),
@@ -107,21 +91,21 @@ class SettingView extends GetView<SettingController> {
                   child: Column(
                     children: [
                       SettingOption(
-                        title: "General Settings",
+                        title: "general_settings".tr,
                         onTap: () {
                           Get.toNamed('/general-settings');
                         },
                       ),
                       const SizedBox(height: 20),
                       SettingOption(
-                        title: "Notifications",
+                        title: "notifications".tr,
                         onTap: () {
                           Get.toNamed('/notification-settings');
                         },
                       ),
                       const SizedBox(height: 20),
                       SettingOption(
-                        title: "Account And Password",
+                        title: "account_and_password".tr,
                         onTap: () {
                           Get.toNamed('/account-password-settings');
                         },

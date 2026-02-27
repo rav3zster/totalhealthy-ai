@@ -65,11 +65,11 @@ class AccountPasswordSettingsView extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Account & Password',
+                          'account_and_password'.tr,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontFamily: 'inter',
                             fontSize: 20,
@@ -92,7 +92,7 @@ class AccountPasswordSettingsView extends StatelessWidget {
                                   ),
                                 )
                               : Text(
-                                  'Save',
+                                  'save'.tr,
                                   style: TextStyle(
                                     color: controller.canSave
                                         ? const Color(0xFFC2D86A)
@@ -131,7 +131,7 @@ class AccountPasswordSettingsView extends StatelessWidget {
                         children: [
                           // User name
                           _buildInputField(
-                            'User name',
+                            'user_name'.tr,
                             controller.usernameController,
                             controller.isUsernameEditable,
                             controller.toggleUsernameEdit,
@@ -142,7 +142,7 @@ class AccountPasswordSettingsView extends StatelessWidget {
 
                           // E-mail address
                           _buildInputField(
-                            'E-mail address',
+                            'email_address'.tr,
                             controller.emailController,
                             controller.isEmailEditable,
                             controller.toggleEmailEdit,
@@ -154,7 +154,7 @@ class AccountPasswordSettingsView extends StatelessWidget {
 
                           // Contact no.
                           _buildInputField(
-                            'Contact no.',
+                            'contact_no'.tr,
                             controller.contactController,
                             controller.isContactEditable,
                             controller.toggleContactEdit,
@@ -193,8 +193,8 @@ class AccountPasswordSettingsView extends StatelessWidget {
                                       size: 20,
                                     ),
                                     const SizedBox(width: 8),
-                                    const Text(
-                                      'Security Information',
+                                    Text(
+                                      'security_information'.tr,
                                       style: TextStyle(
                                         color: Color(0xFFC2D86A),
                                         fontSize: 14,
@@ -204,11 +204,11 @@ class AccountPasswordSettingsView extends StatelessWidget {
                                   ],
                                 ),
                                 const SizedBox(height: 8),
-                                const Text(
-                                  '• Password changes require two-step verification\n'
-                                  '• First verify your current password, then set a new one\n'
-                                  '• Email changes require current password verification\n'
-                                  '• All changes are synced to your Firebase account',
+                                Text(
+                                  '• ${'password_changes_require'.tr}\n'
+                                  '• ${'first_verify_password'.tr}\n'
+                                  '• ${'email_changes_require'.tr}\n'
+                                  '• ${'all_changes_synced'.tr}',
                                   style: TextStyle(
                                     color: Colors.white70,
                                     fontSize: 12,
@@ -328,8 +328,8 @@ class AccountPasswordSettingsView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Password',
+              Text(
+                'password'.tr,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,

@@ -113,34 +113,34 @@ class _CreateMealPageState extends State<CreateMealPage>
                             const SizedBox(height: 30),
 
                             // Meal Name
-                            _buildSectionTitle('Meal Name'),
+                            _buildSectionTitle('meal_name'.tr),
                             const SizedBox(height: 12),
                             _buildModernTextField(
                               controller: widget.controller.fullNameController,
-                              hint: 'Enter meal name',
+                              hint: 'enter_meal_name'.tr,
                               icon: Icons.restaurant_menu,
                               validator: (value) =>
                                   value == null || value.trim().isEmpty
-                                  ? 'Meal name is required'
+                                  ? 'meal_name_required'.tr
                                   : null,
                             ),
 
                             const SizedBox(height: 24),
 
                             // Category
-                            _buildSectionTitle('Category', required: true),
+                            _buildSectionTitle('category'.tr, required: true),
                             const SizedBox(height: 12),
                             _buildCategorySelector(),
 
                             const SizedBox(height: 24),
 
                             // Description
-                            _buildSectionTitle('Description'),
+                            _buildSectionTitle('description'.tr),
                             const SizedBox(height: 12),
                             _buildModernTextField(
                               controller:
                                   widget.controller.descriptionController,
-                              hint: 'Describe your meal',
+                              hint: 'describe_your_meal'.tr,
                               icon: Icons.description,
                               maxLines: 3,
                             ),
@@ -148,7 +148,7 @@ class _CreateMealPageState extends State<CreateMealPage>
                             const SizedBox(height: 24),
 
                             // Ingredients
-                            _buildSectionTitle('Ingredients'),
+                            _buildSectionTitle('ingredients'.tr),
                             const SizedBox(height: 12),
                             _buildIngredientsSection(),
 
@@ -234,8 +234,8 @@ class _CreateMealPageState extends State<CreateMealPage>
                   Obx(
                     () => Text(
                       widget.controller.isEditing.value
-                          ? 'Edit Meal'
-                          : 'Create Meal',
+                          ? 'edit_meal'.tr
+                          : 'create_meal'.tr,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -364,7 +364,7 @@ class _CreateMealPageState extends State<CreateMealPage>
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          hasImage ? 'Change Photo' : 'Add Meal Photo',
+                          hasImage ? 'change_photo'.tr : 'add_meal_photo'.tr,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -521,10 +521,10 @@ class _CreateMealPageState extends State<CreateMealPage>
                   Expanded(
                     child: Text(
                       widget.controller.selectedCategories.isEmpty
-                          ? "Select Categories"
+                          ? "select_categories".tr
                           : widget.controller.selectedCategories.length == 1
                           ? widget.controller.selectedCategories.first
-                          : "${widget.controller.selectedCategories.length} categories selected",
+                          : "${widget.controller.selectedCategories.length} ${'categories_selected'.tr}",
                       style: TextStyle(
                         color: widget.controller.categoryError.value.isNotEmpty
                             ? Colors.red
@@ -541,13 +541,13 @@ class _CreateMealPageState extends State<CreateMealPage>
               // CRITICAL: Wrap entire category list in Obx for reactivity
               Obx(() {
                 if (widget.controller.isLoadingCategories.value) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16.0),
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
                     child: Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(
+                          const SizedBox(
                             width: 16,
                             height: 16,
                             child: CircularProgressIndicator(
@@ -555,10 +555,10 @@ class _CreateMealPageState extends State<CreateMealPage>
                               strokeWidth: 2,
                             ),
                           ),
-                          SizedBox(width: 12),
+                          const SizedBox(width: 12),
                           Text(
-                            'Loading custom categories...',
-                            style: TextStyle(
+                            'loading_custom_categories'.tr,
+                            style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 12,
                             ),
@@ -722,9 +722,9 @@ class _CreateMealPageState extends State<CreateMealPage>
                   child: const Icon(Icons.add, color: Colors.black, size: 20),
                 ),
                 const SizedBox(width: 12),
-                const Text(
-                  'Add Ingredient',
-                  style: TextStyle(
+                Text(
+                  'add_ingredient'.tr,
+                  style: const TextStyle(
                     color: Color(0xFFC2D86A),
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -769,10 +769,10 @@ class _CreateMealPageState extends State<CreateMealPage>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Nutritional Information',
-                  style: TextStyle(
+                  'nutritional_information'.tr,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -783,7 +783,7 @@ class _CreateMealPageState extends State<CreateMealPage>
                 return Row(
                   children: [
                     Text(
-                      'Auto Calculate',
+                      'auto_calculate'.tr,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 14,
@@ -818,7 +818,7 @@ class _CreateMealPageState extends State<CreateMealPage>
                         Expanded(
                           child: _buildNutritionField(
                             controller: widget.controller.kcalController,
-                            label: 'Calories',
+                            label: 'calories'.tr,
                             icon: Icons.local_fire_department,
                           ),
                         ),
@@ -826,7 +826,7 @@ class _CreateMealPageState extends State<CreateMealPage>
                         Expanded(
                           child: _buildNutritionField(
                             controller: widget.controller.carbsController,
-                            label: 'Carbs (g)',
+                            label: 'carbs_g'.tr,
                             icon: Icons.grain,
                           ),
                         ),
@@ -838,7 +838,7 @@ class _CreateMealPageState extends State<CreateMealPage>
                         Expanded(
                           child: _buildNutritionField(
                             controller: widget.controller.proteinController,
-                            label: 'Protein (g)',
+                            label: 'protein_g'.tr,
                             icon: Icons.fitness_center,
                           ),
                         ),
@@ -846,7 +846,7 @@ class _CreateMealPageState extends State<CreateMealPage>
                         Expanded(
                           child: _buildNutritionField(
                             controller: widget.controller.fatsController,
-                            label: 'Fats (g)',
+                            label: 'fats_g'.tr,
                             icon: Icons.water_drop,
                           ),
                         ),
@@ -954,8 +954,8 @@ class _CreateMealPageState extends State<CreateMealPage>
                         const SizedBox(width: 12),
                         Text(
                           widget.controller.isEditing.value
-                              ? 'Update Meal'
-                              : 'Create Meal',
+                              ? 'update_meal'.tr
+                              : 'create_meal'.tr,
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 18,

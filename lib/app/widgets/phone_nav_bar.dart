@@ -65,25 +65,25 @@ class _MobileNavBarState extends State<MobileNavBar> {
             children: [
               _buildNavItem(
                 Icons.person,
-                'Member',
+                'member'.tr,
                 OntapStore.index == 0,
                 () => ontapFunction(0),
               ),
               _buildNavItem(
                 Icons.group,
-                'Group',
+                'group'.tr,
                 OntapStore.index == 1,
                 () => ontapFunction(1),
               ),
               _buildNavItem(
                 Icons.notifications,
-                'Notification',
+                'notification'.tr,
                 OntapStore.index == 2,
                 () => ontapFunction(2),
               ),
               _buildNavItem(
                 Icons.person,
-                'Profile',
+                'profile'.tr,
                 OntapStore.index == 3,
                 () => ontapFunction(3),
               ),

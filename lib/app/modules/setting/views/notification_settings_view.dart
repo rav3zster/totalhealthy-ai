@@ -74,11 +74,11 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                           ),
                         ),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Notifications',
+                          'notifications'.tr,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontFamily: 'inter',
                             fontSize: 20,
@@ -101,7 +101,7 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                     children: [
                       // Meal reminder
                       _buildNotificationSetting(
-                        'Meal reminder',
+                        'meal_reminder'.tr,
                         mealReminderStatus,
                         (String? newValue) {
                           setState(() {
@@ -114,7 +114,7 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
 
                       // Water reminder
                       _buildNotificationSetting(
-                        'Water reminder',
+                        'water_reminder'.tr,
                         waterReminderStatus,
                         (String? newValue) {
                           setState(() {
@@ -127,7 +127,7 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
 
                       // Exercise reminder
                       _buildNotificationSetting(
-                        'Exercise reminder',
+                        'exercise_reminder'.tr,
                         exerciseReminderStatus,
                         (String? newValue) {
                           setState(() {
@@ -140,7 +140,7 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
 
                       // Update Notification
                       _buildNotificationSetting(
-                        'Update Notification',
+                        'update_notification'.tr,
                         updateNotificationStatus,
                         (String? newValue) {
                           setState(() {
@@ -204,7 +204,7 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
               items: statusOptions.map((String status) {
                 return DropdownMenuItem<String>(
                   value: status,
-                  child: Text(status),
+                  child: Text(status.toLowerCase().tr),
                 );
               }).toList(),
               onChanged: onChanged,

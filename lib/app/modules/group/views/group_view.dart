@@ -65,9 +65,9 @@ class _GroupViewState extends State<GroupView>
                     Row(
                       children: [
                         const SizedBox(width: 16),
-                        const Text(
-                          'Groups',
-                          style: TextStyle(
+                        Text(
+                          'groups'.tr,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
@@ -98,7 +98,7 @@ class _GroupViewState extends State<GroupView>
                               onTap: () {
                                 _showCreateGroupDialog(context);
                               },
-                              child: const Padding(
+                              child: Padding(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: 20,
                                   vertical: 12,
@@ -113,8 +113,8 @@ class _GroupViewState extends State<GroupView>
                                     ),
                                     SizedBox(width: 6),
                                     Text(
-                                      'Add Group',
-                                      style: TextStyle(
+                                      'add_group'.tr,
+                                      style: const TextStyle(
                                         color: Color(0xFF121212),
                                         fontSize: 15,
                                         fontWeight: FontWeight.w700,
@@ -174,14 +174,14 @@ class _GroupViewState extends State<GroupView>
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                         ),
-                        tabs: const [
+                        tabs: [
                           Tab(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.groups_rounded, size: 18),
-                                SizedBox(width: 6),
-                                Text('Groups'),
+                                const Icon(Icons.groups_rounded, size: 18),
+                                const SizedBox(width: 6),
+                                Text('groups'.tr),
                               ],
                             ),
                           ),
@@ -189,9 +189,9 @@ class _GroupViewState extends State<GroupView>
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.people_rounded, size: 18),
-                                SizedBox(width: 6),
-                                Text('Members'),
+                                const Icon(Icons.people_rounded, size: 18),
+                                const SizedBox(width: 6),
+                                Text('members'.tr),
                               ],
                             ),
                           ),
@@ -245,8 +245,7 @@ class _GroupViewState extends State<GroupView>
                             style: const TextStyle(color: Colors.white),
                             cursorColor: const Color(0xFFC2D86A),
                             decoration: InputDecoration(
-                              hintText:
-                                  'Search groups by name or description...',
+                              hintText: 'search_groups'.tr,
                               hintStyle: const TextStyle(
                                 color: Colors.white54,
                                 fontSize: 15,
@@ -419,7 +418,7 @@ class _GroupViewState extends State<GroupView>
                             style: const TextStyle(color: Colors.white),
                             cursorColor: const Color(0xFFC2D86A),
                             decoration: InputDecoration(
-                              hintText: 'Search members by name or email...',
+                              hintText: 'search_members'.tr,
                               hintStyle: const TextStyle(
                                 color: Colors.white54,
                                 fontSize: 15,

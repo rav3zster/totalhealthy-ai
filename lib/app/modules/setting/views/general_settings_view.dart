@@ -78,25 +78,9 @@ class GeneralSettingsView extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color(0xFFC2D86A).withValues(alpha: 0.2),
-                              const Color(0xFFC2D86A).withValues(alpha: 0.1),
-                            ],
-                          ),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.search,
-                            size: 24,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
+                      const SizedBox(
+                        width: 48,
+                      ), // Spacer to balance the back button
                     ],
                   ),
                 ),

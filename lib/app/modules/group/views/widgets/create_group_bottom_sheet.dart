@@ -159,9 +159,9 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Create Group',
-                  style: TextStyle(
+                Text(
+                  'create_group'.tr,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.w600,
@@ -170,7 +170,7 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet>
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Build and grow your community',
+                  'build_community'.tr,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.5),
                     fontSize: 13,
@@ -320,7 +320,7 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet>
           ),
           validator: (value) {
             if (value == null) {
-              return 'Please select a category';
+              return 'please_select_category'.tr;
             }
             return null;
           },
@@ -529,7 +529,7 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet>
           ),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Group name is required';
+              return 'group_name_required'.tr;
             }
             return null;
           },
