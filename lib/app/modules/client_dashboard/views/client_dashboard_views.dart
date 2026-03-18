@@ -14,6 +14,7 @@ import '../../../widgets/phone_nav_bar.dart';
 import '../../../widgets/drawer_menu.dart';
 import '../../../data/models/meal_model.dart';
 import '../controllers/client_dashboard_controllers.dart';
+import '../../generate_ai/views/recommendations_widget.dart';
 
 class ClientDashboardScreen extends StatefulWidget {
   const ClientDashboardScreen({super.key});
@@ -282,6 +283,14 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                               ),
 
                               const SizedBox(height: 24),
+
+                              // AI: Recommended Meals (shown only in personal mode)
+                              Obx(() {
+                                if (!controller.isGroupMode.value) {
+                                  return const RecommendationsWidget();
+                                }
+                                return const SizedBox.shrink();
+                              }),
 
                               // Dynamic Day Counter with Add Meal Button
                               // Add Meal button visibility based on user role:

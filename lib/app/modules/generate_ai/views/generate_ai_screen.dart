@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../controllers/generate_ai_controller.dart';
+import 'diet_classifier_view.dart';
 
 class GenerateAiScreen extends GetView<GenerateAiController> {
   const GenerateAiScreen({super.key});
@@ -31,6 +32,67 @@ class GenerateAiScreen extends GetView<GenerateAiController> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // ── AI Diet Analyser Entry Card ───────────────────────────────
+            GestureDetector(
+              onTap: () => Get.to(() => const DietClassifierView()),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E1E1E),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: const Color(0xFFC2D86A).withValues(alpha: 0.5),
+                    width: 1.5,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFC2D86A).withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.analytics_outlined,
+                        color: Color(0xFFC2D86A),
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'AI Diet Analyser',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Get your BMI, TDEE & personalised diet type',
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      color: Color(0xFFC2D86A),
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             // Dietary Goals Section
             _buildSection(
               title: 'Dietary Goals',

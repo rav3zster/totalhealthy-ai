@@ -7,6 +7,7 @@ import '../../../core/theme/theme_helper.dart';
 
 import '../../../widgets/ingredient_input.dart';
 import '../../../data/models/meal_model.dart';
+import '../../generate_ai/views/nutrition_autofill_widget.dart';
 
 class CreateMealPage extends StatefulWidget {
   final CreateMealController controller;
@@ -137,6 +138,28 @@ class _CreateMealPageState extends State<CreateMealPage>
                               hint: 'describe_your_meal'.tr,
                               icon: Icons.description,
                               maxLines: 3,
+                            ),
+
+                            // AI Nutrition Autofill
+                            NutritionAutofillWidget(
+                              descriptionController:
+                                  widget.controller.descriptionController,
+                              onNutritionFilled: (result) {
+                                widget.controller.kcalController.text = result
+                                    .calories
+                                    .toStringAsFixed(0);
+                                widget.controller.proteinController.text =
+                                    result.protein.toStringAsFixed(1);
+                                widget.controller.carbsController.text = result
+                                    .carbs
+                                    .toStringAsFixed(1);
+                                widget.controller.fatsController.text = result
+                                    .fat
+                                    .toStringAsFixed(1);
+                                // Disable auto-calculate so manual fields show
+                                widget.controller.calculateAutomatically.value =
+                                    false;
+                              },
                             ),
 
                             const SizedBox(height: 24),

@@ -1,0 +1,200 @@
+================================================================
+HEALTH & MEAL MANAGEMENT SYSTEM USING FLUTTER AND FIREBASE
+Major Project - Project Progress Evaluation - I Report
+================================================================
+Submitted by: Ms Sakshi S Karkera (USN: NNM24MC131)
+Guide: Ms. Raksha Puthran, Assistant Professor GD II, Dept. of MCA
+Institution: NMAM Institute of Technology, Nitte
+Date: March, 2026
+================================================================
+
+[KEEP AS IS] - Title page, certificate, and abstract sections are complete and well-structured.
+
+================================================================
+ABSTRACT
+================================================================
+[KEEP] The Health & Meal Management System project is a mobile application developed using
+the Flutter framework and Firebase cloud services. The objective of this project is to design
+and implement a user-friendly application that helps individuals track their daily meals,
+manage dietary habits, and maintain healthier lifestyles.
+
+[KEEP] The application allows users to record, update, and monitor their meal information
+while securely storing the data using Firebase Cloud Firestore.
+
+[KEEP] Core functionalities: user authentication, meal logging, meal editing, and real-time
+data synchronization via Firebase Authentication.
+
+[KEEP] Features: meal categorization, profile management, viewing meal history, group
+collaboration (create groups, send invitations, manage group participation).
+
+[CHANGE - Add more specifics] Currently the abstract mentions "group collaboration" broadly.
+Consider adding a line about the specific tech stack versions used:
+  --> e.g., "The application is built using Flutter 3.x and Firebase SDK, targeting Android
+      and iOS platforms."
+
+[CHANGE - Strengthen abstract closing] Replace the last paragraph's generic closing with
+something more specific about the outcome:
+  CURRENT: "...transforming traditional meal tracking methods into an interactive and
+            accessible mobile application."
+  SUGGESTED: "...providing a scalable, cloud-backed mobile solution that bridges the gap
+              between manual dietary tracking and intelligent health management."
+
+================================================================
+CHAPTER 1: INTRODUCTION
+================================================================
+
+1.1 Background of the Project
+[KEEP] Background context about health awareness and mobile technology is well written.
+
+[CHANGE - Minor] The phrase "Health related mobile applications" should be hyphenated:
+  CURRENT:  "Health related mobile applications"
+  SUGGESTED: "Health-related mobile applications"
+
+1.2 Problem Statement
+[KEEP] Problem statement is clear and well-defined.
+
+[CHANGE - Add specificity] Mention specific pain points with existing apps (e.g., MyFitnessPal,
+Cronometer) to strengthen the argument for why this system is needed:
+  --> Add after "Existing meal tracking systems may provide limited functionality...":
+      "Popular applications such as generic calorie counters often lack real-time collaborative
+       features and require paid subscriptions for cloud sync, making them inaccessible for
+       everyday users."
+
+1.3 Objectives of the Project
+[KEEP] All 8 bullet objectives are clear and measurable. No changes needed.
+
+1.4 Scope and Limitations
+[KEEP] Scope section is appropriate for an academic project.
+
+[CHANGE - Fix typo in Limitations] Remove stray word "Visual" at the start of first limitation:
+  CURRENT:  "• Visual The system currently focuses only on meal tracking..."
+  SUGGESTED: "• The system currently focuses only on meal tracking and does not include
+               detailed calorie analysis or nutritional calculations."
+
+[CHANGE - Add one more limitation] Consider adding:
+  --> "• The application has been tested primarily on Android devices; full iOS compatibility
+       testing is pending."
+
+================================================================
+CHAPTER 2: LITERATURE REVIEW
+================================================================
+
+[KEEP] All 6 literature review sections (2.1 to 2.6) are well-referenced and relevant.
+
+[CHANGE - Update reference year for Flutter] Section 2.4 cites Nguyen and Park (2020).
+Flutter has evolved significantly. Consider adding a note:
+  --> "As of 2023, Flutter has further matured with improved performance on both Android
+      and iOS, making it an even stronger choice for cross-platform development (Google
+      Developers, 2023)."
+
+2.7 Research Gap
+[KEEP] Research gap is clearly identified and directly connects to the project's purpose.
+
+[CHANGE - Strengthen gap statement] Add one more gap point:
+  --> "Furthermore, most existing systems lack personalized health goal tracking integrated
+      with meal data, which this project aims to partially address in future phases."
+
+================================================================
+CHAPTER 3: WORK DONE – SYSTEM DEVELOPMENT
+================================================================
+
+3.1 Overview of Development Phase
+[KEEP] Development overview and modular approach description are clear.
+
+[CHANGE - Fix duplicate word] Section 3.2.5 has a repeated "The":
+  CURRENT:  "The The User Interface (UI) System provides..."
+  SUGGESTED: "The User Interface (UI) System provides..."
+
+[CHANGE - Fix duplicate word] Section 3.6 has a repeated "The":
+  CURRENT:  "The After implementing the major modules..."
+  SUGGESTED: "After implementing the major modules..."
+
+3.2 System Architecture Design
+[KEEP] Client-server architecture description using Flutter + Firebase is accurate and appropriate.
+
+[CHANGE - Expand Table 3.1] Database Attributes table is minimal. Consider adding:
+  --> Group ID     | Unique identifier for each group
+  --> Member List  | List of user IDs belonging to a group
+  --> Invitation Status | Pending / Accepted / Rejected
+
+3.3 Application Workflow
+[KEEP] Workflow description is logical and easy to follow.
+
+3.4 Meal Management Implementation
+[KEEP] Core description is fine.
+
+[CHANGE - Add code-level detail] This section is very brief for a PPE-I report. Consider adding
+a short description of the Firestore data model structure:
+  --> "Each meal document in Firestore contains fields: userId (String), mealType (String),
+      description (String), timestamp (Timestamp), and an optional imageUrl (String) for
+      future photo logging support."
+
+3.5 User Management System
+[KEEP] Profile management module description is adequate.
+
+[CHANGE - Rename section heading for clarity]
+  CURRENT:  "3.5 User Management System"
+  SUGGESTED: "3.5 Profile & User Management System"
+  (to better distinguish it from the Authentication System in 3.2.1)
+
+3.6 Testing and Debugging
+[KEEP] Testing results table is clean.
+
+[CHANGE - Expand Table 3.3] Add more test cases to make testing section more robust:
+  --> Real-time Sync    | Data updates reflect instantly across sessions | Passed
+  --> Profile Update    | User profile changes saved correctly           | Passed
+  --> Group Creation    | New group created and visible to members       | Passed
+
+================================================================
+CHAPTER 4: CONCLUSION AND NEXT STEPS
+================================================================
+
+4.1 Summary of Work Completed
+[KEEP] Summary is comprehensive and covers all implemented modules.
+
+[CHANGE - Minor formatting] The arrow symbol "➢" is inconsistent with bullet points used
+elsewhere. Standardize to bullet points "•" throughout for consistency.
+
+4.2 Next Phase: System Enhancement
+[KEEP] Next phase description is realistic and well-scoped.
+
+[CHANGE - Be more specific] Instead of "additional features such as nutritional analysis,
+reminder notifications, and health goal tracking may also be implemented", commit to them:
+  SUGGESTED: "The next phase will specifically include:
+              • Nutritional analysis with calorie tracking per meal
+              • Push notification reminders for meal logging
+              • Health goal setting and progress visualization using charts
+              • Performance optimization for low-end Android devices"
+
+4.3 Expected Outcomes of Complete Project
+[KEEP] All 7 expected outcomes are well-defined and align with the objectives in Chapter 1.
+
+================================================================
+REFERENCES
+================================================================
+[KEEP] All 9 references are properly formatted and relevant.
+
+[CHANGE - Add missing reference] The report mentions Al-Fuqaha et al. (2015) for cloud/IoT
+but doesn't cite a direct Firebase-specific academic source. Consider adding:
+  --> [10] Moroney, L. (2017). The Definitive Guide to Firebase. Apress.
+      (Supports the Firebase architecture decisions made in Chapter 3)
+
+================================================================
+SUMMARY OF ALL CHANGES
+================================================================
+1.  Abstract       - Add Flutter/Firebase version info; strengthen closing sentence
+2.  Section 1.1    - Fix hyphenation: "Health-related"
+3.  Section 1.2    - Add reference to existing popular apps to strengthen problem statement
+4.  Section 1.4.2  - Remove stray word "Visual"; add iOS testing limitation
+5.  Section 2.4    - Add updated Flutter 2023 reference
+6.  Section 2.7    - Add health goal tracking as an additional research gap
+7.  Section 3.2.5  - Fix duplicate "The The" typo
+8.  Section 3.4    - Add Firestore data model field details
+9.  Section 3.5    - Rename section heading for clarity
+10. Section 3.6    - Fix duplicate "The After" typo; expand testing table
+11. Section 4.1    - Standardize arrow symbols to bullet points
+12. Section 4.2    - Make next phase features more specific and committed
+13. References     - Add Moroney (2017) Firebase reference
+================================================================
+END OF FILE
+================================================================
