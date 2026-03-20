@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../controllers/generate_ai_controller.dart';
+import 'ai_results_screen.dart';
 import 'diet_classifier_view.dart';
 
 class GenerateAiScreen extends GetView<GenerateAiController> {
@@ -293,19 +294,44 @@ class GenerateAiScreen extends GetView<GenerateAiController> {
             SizedBox(
               width: double.infinity,
               height: 56,
-              child: ElevatedButton(
-                onPressed: controller.generatePlan,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFC2D86A), // Lime Green
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
+              child: Obx(
+                () => ElevatedButton(
+                  onPressed: controller.isGenerating.value
+                      ? null
+                      : () async {
+                          await Get.to(
+                            () => AiResultsScreen(controller: controller),
+                            transition: Transition.fadeIn,
+                          );
+                          controller.generatePlan();
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFC2D86A),
+                    foregroundColor: Colors.black,
+                    disabledBackgroundColor: const Color(
+                      0xFFC2D86A,
+                    ).withValues(alpha: 0.4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28),
+                    ),
+                    elevation: 0,
                   ),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Generate Using AI',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  child: controller.isGenerating.value
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.black,
+                          ),
+                        )
+                      : const Text(
+                          'Generate Using AI',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ),

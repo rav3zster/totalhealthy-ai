@@ -82,6 +82,27 @@ class AiService {
       jsonDecode(response.body) as Map<String, dynamic>,
     );
   }
+
+  // ── GENERATE MEAL WITH AI (Gemini) ────────────────────────────────────────
+  Future<List<AiGeneratedMeal>> generateMealWithAI(
+    Map<String, dynamic> userInputs,
+  ) async {
+    final response = await http
+        .post(
+          Uri.parse('$_baseUrl/generate_meal_with_ai'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(userInputs),
+        )
+        .timeout(const Duration(seconds: 20));
+
+    if (response.statusCode != 200) {
+      throw Exception('Generate meal API error: ${response.body}');
+    }
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    final meals = data['meals'] as List<dynamic>? ?? [];
+    return meals.map((e) => AiGeneratedMeal.fromJson(e)).toList();
+  }
 }
 
 // ── Data models ───────────────────────────────────────────────────────────────
@@ -147,4 +168,66 @@ class DietClassification {
         recommendedCalories:
             (j['recommendedCalories'] as num?)?.toInt() ?? 2000,
       );
+}
+
+class AiGeneratedMeal {
+  final String name;
+  final String category;
+  final List<String> ingredients;
+  final double calories;
+  final double protein;
+  final double carbs;
+  final double fat;
+  final String bestTime;
+  final String description;
+
+  const AiGeneratedMeal({
+    required this.name,
+    required this.category,
+    required this.ingredients,
+    required this.calories,
+    required this.protein,
+    required this.carbs,
+    required this.fat,
+    required this.bestTime,
+    required this.description,
+  });
+
+  factory AiGeneratedMeal.fromJson(Map<String, dynamic> j) => AiGeneratedMeal(
+    name: j['name'] as String? ?? '',
+    category: j['category'] as String? ?? '',
+    ingredients: List<String>.from(j['ingredients'] as List? ?? []),
+    calories: (j['calories'] as num?)?.toDouble() ?? 0,
+    protein: (j['protein'] as num?)?.toDouble() ?? 0,
+    carbs: (j['carbs'] as num?)?.toDouble() ?? 0,
+    fat: (j['fat'] as num?)?.toDouble() ?? 0,
+    bestTime: j['bestTime'] as String? ?? '',
+    description: j['description'] as String? ?? '',
+  );
+
+  /// Convert to MealModel for Firestore save
+  Map<String, dynamic> toFirestoreMap({
+    required String userId,
+    required String groupId,
+  }) => {
+    'userId': userId,
+    'groupId': groupId,
+    'name': name,
+    'description': description,
+    'kcal': calories.toStringAsFixed(0),
+    'protein': protein.toStringAsFixed(1),
+    'carbs': carbs.toStringAsFixed(1),
+    'fat': fat.toStringAsFixed(1),
+    'categorys': [category],
+    'imageUrl': '',
+    'ingredients': ingredients
+        .map((i) => {'name': i, 'amount': '', 'unit': ''})
+        .toList(),
+    'instructions': '',
+    'created_at': DateTime.now().toIso8601String(),
+    'prep_time': '',
+    'difficulty': '',
+    'generatedByAI': true,
+    'bestTime': bestTime,
+  };
 }
