@@ -2,10 +2,13 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 
-/// Base URL of your deployed Firebase Cloud Functions (Python)
-/// Replace with your actual project region + function URLs after deployment
-const String _baseUrl =
-    'https://YOUR_REGION-YOUR_PROJECT_ID.cloudfunctions.net';
+/// Render Flask backend — handles Gemini meal generation
+/// Replace with your actual Render URL after deployment
+const String _renderUrl = 'https://YOUR-APP-NAME.onrender.com';
+
+/// Cloud Functions base URL — handles recommendations, nutrition, classifier
+/// Replace with your actual GCP URL after deployment
+const String _gcpUrl = 'https://YOUR_REGION-YOUR_PROJECT_ID.cloudfunctions.net';
 
 class AiService {
   AiService._();
@@ -18,7 +21,7 @@ class AiService {
 
     final response = await http
         .post(
-          Uri.parse('$_baseUrl/recommend_meals'),
+          Uri.parse('$_gcpUrl/recommend_meals'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({'userId': userId}),
         )
@@ -37,7 +40,7 @@ class AiService {
   Future<NutritionResult> predictNutrition(String description) async {
     final response = await http
         .post(
-          Uri.parse('$_baseUrl/predict_meal_nutrition'),
+          Uri.parse('$_gcpUrl/predict_meal_nutrition'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({'description': description}),
         )
@@ -62,7 +65,7 @@ class AiService {
   }) async {
     final response = await http
         .post(
-          Uri.parse('$_baseUrl/classify_user_diet'),
+          Uri.parse('$_gcpUrl/classify_user_diet'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'age': age,
@@ -83,25 +86,40 @@ class AiService {
     );
   }
 
-  // ── GENERATE MEAL WITH AI (Gemini) ────────────────────────────────────────
+  // ── GENERATE MEAL WITH AI — Render Flask backend ─────────────────────────
+  /// Calls the Flask backend on Render.
+  /// Render free tier has cold starts (~30s) so we use a 60s timeout
+  /// and retry once on timeout/failure.
   Future<List<AiGeneratedMeal>> generateMealWithAI(
-    Map<String, dynamic> userInputs,
-  ) async {
-    final response = await http
-        .post(
-          Uri.parse('$_baseUrl/generate_meal_with_ai'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(userInputs),
-        )
-        .timeout(const Duration(seconds: 20));
+    Map<String, dynamic> userInputs, {
+    int attempt = 0,
+  }) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$_renderUrl/generate_meal'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(userInputs),
+          )
+          .timeout(const Duration(seconds: 60));
 
-    if (response.statusCode != 200) {
-      throw Exception('Generate meal API error: ${response.body}');
+      if (response.statusCode != 200) {
+        throw Exception(
+          'Generate meal API error ${response.statusCode}: '
+          '${response.body}',
+        );
+      }
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final meals = data['meals'] as List<dynamic>? ?? [];
+      return meals.map((e) => AiGeneratedMeal.fromJson(e)).toList();
+    } catch (e) {
+      if (attempt == 0) {
+        // Retry once — handles Render cold start timeout
+        return generateMealWithAI(userInputs, attempt: 1);
+      }
+      rethrow;
     }
-
-    final data = jsonDecode(response.body) as Map<String, dynamic>;
-    final meals = data['meals'] as List<dynamic>? ?? [];
-    return meals.map((e) => AiGeneratedMeal.fromJson(e)).toList();
   }
 }
 

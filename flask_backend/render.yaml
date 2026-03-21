@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: totalhealthy-ai
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:10000 --timeout 60 --workers 1
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false        # set manually in Render dashboard
+      - key: PORT
+        value: "10000"
