@@ -228,7 +228,7 @@ class _MealCardState extends State<_MealCard>
                 children: [
                   _NutrientBadge(
                     label: 'Cal',
-                    value: '${meal.calories.toStringAsFixed(0)}',
+                    value: meal.calories.toStringAsFixed(0),
                     color: Colors.orange,
                   ),
                   _NutrientBadge(
