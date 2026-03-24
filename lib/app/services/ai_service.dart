@@ -3,8 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 
 /// Render Flask backend — handles Gemini meal generation
-/// Replace with your actual Render URL after deployment
-const String _renderUrl = 'https://YOUR-APP-NAME.onrender.com';
+const String _renderUrl = 'https://totalhealthy-ai.onrender.com';
 
 /// Cloud Functions base URL — handles recommendations, nutrition, classifier
 /// Replace with your actual GCP URL after deployment
