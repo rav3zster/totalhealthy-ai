@@ -54,11 +54,17 @@ class _DietClassifierViewState extends State<DietClassifierView> {
         activityLevel: _activityLevel,
         goal: _goal,
       );
-      if (mounted)
+      if (mounted) {
         setState(() {
           _result = result;
           _loading = false;
         });
+        if (result == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Diet classifier not available yet')),
+          );
+        }
+      }
     } catch (e) {
       if (mounted) {
         setState(() => _loading = false);

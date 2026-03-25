@@ -1,123 +1,190 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 
-/// Render Flask backend — handles Gemini meal generation
+// ── Backend URLs ──────────────────────────────────────────────────────────────
+
+/// Render Flask backend — live, handles Gemini meal generation
 const String _renderUrl = 'https://totalhealthy-ai.onrender.com';
 
-/// Cloud Functions base URL — handles recommendations, nutrition, classifier
-/// Replace with your actual GCP URL after deployment
-const String _gcpUrl = 'https://YOUR_REGION-YOUR_PROJECT_ID.cloudfunctions.net';
+/// GCP Cloud Functions — set this once your functions are deployed.
+/// While empty, the recommendation / nutrition / classifier features
+/// will return empty/null results instead of crashing.
+const String _gcpUrl = '';
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+bool get _gcpReady => _gcpUrl.isNotEmpty && !_gcpUrl.contains('YOUR_');
+
+Map<String, String> get _jsonHeaders => {'Content-Type': 'application/json'};
+
+/// Decode response body safely — returns null on any error.
+Map<String, dynamic>? _decode(http.Response res) {
+  try {
+    return jsonDecode(res.body) as Map<String, dynamic>;
+  } catch (_) {
+    return null;
+  }
+}
+
+// ── Service ───────────────────────────────────────────────────────────────────
 
 class AiService {
   AiService._();
   static final AiService instance = AiService._();
 
   // ── PHASE 1: Meal Recommendations ────────────────────────────────────────
+  /// Returns empty list when GCP is not yet configured.
   Future<List<MealRecommendation>> getRecommendations() async {
+    if (!_gcpReady) return [];
+
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return [];
 
-    final response = await http
-        .post(
-          Uri.parse('$_gcpUrl/recommend_meals'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({'userId': userId}),
-        )
-        .timeout(const Duration(seconds: 15));
+    try {
+      final res = await http
+          .post(
+            Uri.parse('$_gcpUrl/recommend_meals'),
+            headers: _jsonHeaders,
+            body: jsonEncode({'userId': userId}),
+          )
+          .timeout(const Duration(seconds: 15));
 
-    if (response.statusCode != 200) {
-      throw Exception('Recommendation API error: ${response.body}');
+      if (res.statusCode != 200) return [];
+
+      final data = _decode(res);
+      final list = data?['recommendations'] as List<dynamic>? ?? [];
+      return list
+          .whereType<Map<String, dynamic>>()
+          .map(MealRecommendation.fromJson)
+          .toList();
+    } catch (_) {
+      return [];
     }
-
-    final data = jsonDecode(response.body) as Map<String, dynamic>;
-    final list = data['recommendations'] as List<dynamic>? ?? [];
-    return list.map((e) => MealRecommendation.fromJson(e)).toList();
   }
 
   // ── PHASE 2: Nutrition Prediction ────────────────────────────────────────
-  Future<NutritionResult> predictNutrition(String description) async {
-    final response = await http
-        .post(
-          Uri.parse('$_gcpUrl/predict_meal_nutrition'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({'description': description}),
-        )
-        .timeout(const Duration(seconds: 10));
+  /// Returns null when GCP is not yet configured or call fails.
+  Future<NutritionResult?> predictNutrition(String description) async {
+    if (!_gcpReady) return null;
 
-    if (response.statusCode != 200) {
-      throw Exception('Nutrition API error: ${response.body}');
+    try {
+      final res = await http
+          .post(
+            Uri.parse('$_gcpUrl/predict_meal_nutrition'),
+            headers: _jsonHeaders,
+            body: jsonEncode({'description': description}),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (res.statusCode != 200) return null;
+
+      final data = _decode(res);
+      if (data == null) return null;
+      return NutritionResult.fromJson(data);
+    } catch (_) {
+      return null;
     }
-
-    return NutritionResult.fromJson(
-      jsonDecode(response.body) as Map<String, dynamic>,
-    );
   }
 
   // ── PHASE 3: Diet Classifier ──────────────────────────────────────────────
-  Future<DietClassification> classifyDiet({
+  /// Returns null when GCP is not yet configured or call fails.
+  Future<DietClassification?> classifyDiet({
     required int age,
     required double weight,
     required double height,
     required int activityLevel,
     required String goal,
   }) async {
-    final response = await http
-        .post(
-          Uri.parse('$_gcpUrl/classify_user_diet'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'age': age,
-            'weight': weight,
-            'height': height,
-            'activityLevel': activityLevel,
-            'goal': goal,
-          }),
-        )
-        .timeout(const Duration(seconds: 10));
+    if (!_gcpReady) return null;
 
-    if (response.statusCode != 200) {
-      throw Exception('Classifier API error: ${response.body}');
+    try {
+      final res = await http
+          .post(
+            Uri.parse('$_gcpUrl/classify_user_diet'),
+            headers: _jsonHeaders,
+            body: jsonEncode({
+              'age': age,
+              'weight': weight,
+              'height': height,
+              'activityLevel': activityLevel,
+              'goal': goal,
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (res.statusCode != 200) return null;
+
+      final data = _decode(res);
+      if (data == null) return null;
+      return DietClassification.fromJson(data);
+    } catch (_) {
+      return null;
     }
-
-    return DietClassification.fromJson(
-      jsonDecode(response.body) as Map<String, dynamic>,
-    );
   }
 
-  // ── GENERATE MEAL WITH AI — Render Flask backend ─────────────────────────
-  /// Calls the Flask backend on Render.
-  /// Render free tier has cold starts (~30s) so we use a 60s timeout
-  /// and retry once on timeout/failure.
+  // ── GENERATE MEAL — Render Flask backend ──────────────────────────────────
+  /// POST /generate_meal → {"status":"ok","meals":[...]}
+  ///
+  /// Render free tier cold-starts in ~30 s, so we allow 90 s total
+  /// (60 s first attempt + 30 s retry) before giving up.
   Future<List<AiGeneratedMeal>> generateMealWithAI(
     Map<String, dynamic> userInputs, {
     int attempt = 0,
   }) async {
     try {
-      final response = await http
+      final res = await http
           .post(
             Uri.parse('$_renderUrl/generate_meal'),
-            headers: {'Content-Type': 'application/json'},
+            headers: _jsonHeaders,
             body: jsonEncode(userInputs),
           )
-          .timeout(const Duration(seconds: 60));
+          .timeout(const Duration(seconds: 90));
 
-      if (response.statusCode != 200) {
-        throw Exception(
-          'Generate meal API error ${response.statusCode}: '
-          '${response.body}',
-        );
+      if (res.statusCode != 200) {
+        throw Exception('Render API error ${res.statusCode}: ${res.body}');
       }
 
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final data = _decode(res);
+      if (data == null) throw const FormatException('Invalid JSON response');
+
+      final status = data['status'] as String? ?? '';
+      if (status != 'ok') {
+        throw Exception('Backend returned status: $status');
+      }
+
       final meals = data['meals'] as List<dynamic>? ?? [];
-      return meals.map((e) => AiGeneratedMeal.fromJson(e)).toList();
-    } catch (e) {
-      if (attempt == 0) {
-        // Retry once — handles Render cold start timeout
-        return generateMealWithAI(userInputs, attempt: 1);
-      }
+      if (meals.isEmpty) throw Exception('No meals returned from backend');
+
+      return meals
+          .whereType<Map<String, dynamic>>()
+          .map(AiGeneratedMeal.fromJson)
+          .toList();
+    } on SocketException {
+      if (attempt == 0) return generateMealWithAI(userInputs, attempt: 1);
+      throw Exception('No internet connection');
+    } on http.ClientException {
+      if (attempt == 0) return generateMealWithAI(userInputs, attempt: 1);
       rethrow;
+    } catch (e) {
+      // Retry once for cold-start timeouts
+      if (attempt == 0) return generateMealWithAI(userInputs, attempt: 1);
+      rethrow;
+    }
+  }
+
+  // ── Health check ──────────────────────────────────────────────────────────
+  /// Returns true if the Render backend is reachable.
+  Future<bool> pingBackend() async {
+    try {
+      final res = await http
+          .get(Uri.parse('$_renderUrl/'))
+          .timeout(const Duration(seconds: 10));
+      final data = _decode(res);
+      return res.statusCode == 200 && data?['status'] == 'ok';
+    } catch (_) {
+      return false;
     }
   }
 }
@@ -213,7 +280,9 @@ class AiGeneratedMeal {
   factory AiGeneratedMeal.fromJson(Map<String, dynamic> j) => AiGeneratedMeal(
     name: j['name'] as String? ?? '',
     category: j['category'] as String? ?? '',
-    ingredients: List<String>.from(j['ingredients'] as List? ?? []),
+    ingredients: (j['ingredients'] as List<dynamic>? ?? [])
+        .map((e) => e.toString())
+        .toList(),
     calories: (j['calories'] as num?)?.toDouble() ?? 0,
     protein: (j['protein'] as num?)?.toDouble() ?? 0,
     carbs: (j['carbs'] as num?)?.toDouble() ?? 0,
@@ -222,7 +291,6 @@ class AiGeneratedMeal {
     description: j['description'] as String? ?? '',
   );
 
-  /// Convert to MealModel for Firestore save
   Map<String, dynamic> toFirestoreMap({
     required String userId,
     required String groupId,

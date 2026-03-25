@@ -68,14 +68,15 @@ class _NutritionAutofillWidgetState extends State<NutritionAutofillWidget> {
           _result = result;
           _loading = false;
         });
-        widget.onNutritionFilled?.call(result);
+        if (result != null) widget.onNutritionFilled?.call(result);
       }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _error = 'Could not estimate nutrition';
           _loading = false;
         });
+      }
     }
   }
 
