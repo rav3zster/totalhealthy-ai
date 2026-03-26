@@ -9,7 +9,8 @@ import re
 import time
 import logging
 from flask import Flask, request, jsonify
-import google.generativeai as genai
+import google.genai as genai
+from google.genai import types
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -28,9 +29,9 @@ if not GEMINI_API_KEY:
 else:
     logger.info(f"✅ GEMINI_API_KEY loaded (ends ...{GEMINI_API_KEY[-4:]})")
 
-genai.configure(api_key=GEMINI_API_KEY)
-gemini_model = genai.GenerativeModel("gemini-2.0-flash")
-logger.info("✅ Gemini model initialised: gemini-2.0-flash")
+gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+GEMINI_MODEL  = "gemini-2.0-flash-lite"
+logger.info(f"✅ Gemini client initialised: {GEMINI_MODEL}")
 
 # ── Fallback meal — returned when Gemini fails ────────────────────────────────
 FALLBACK_MEAL = {
@@ -217,14 +218,15 @@ OUTPUT FORMAT — return ONLY this JSON with exactly {total_meals} items in the 
 
 def _call_gemini(prompt: str, attempt: int = 0) -> str:
     try:
-        response = gemini_model.generate_content(
-            prompt,
-            generation_config={
-                "temperature": 0.9,
-                "max_output_tokens": 4096,
-            },
+        response = gemini_client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.9,
+                max_output_tokens=4096,
+            ),
         )
-        text = response.text.strip()
+        text = response.text.strip() if response.text else ""
         if not text:
             raise ValueError("Gemini returned empty response")
         return text
