@@ -142,18 +142,6 @@ class GenerateAiController extends GetxController {
       hasResult.value = true;
     } catch (e) {
       errorMessage.value = 'Failed to generate meal plan. Please try again.';
-      Get.snackbar(
-        'Generation Failed',
-        errorMessage.value,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFFFF4444),
-        colorText: Colors.white,
-        duration: const Duration(seconds: 4),
-        mainButton: TextButton(
-          onPressed: generatePlan,
-          child: const Text('Retry', style: TextStyle(color: Colors.white)),
-        ),
-      );
     } finally {
       isGenerating.value = false;
     }

@@ -298,12 +298,16 @@ class GenerateAiScreen extends GetView<GenerateAiController> {
                 () => ElevatedButton(
                   onPressed: controller.isGenerating.value
                       ? null
-                      : () async {
-                          await Get.to(
+                      : () {
+                          Get.to(
                             () => AiResultsScreen(controller: controller),
                             transition: Transition.fadeIn,
+                            preventDuplicates: true,
                           );
-                          controller.generatePlan();
+                          // microtask runs after the current event loop tick —
+                          // navigation is committed but no frame has rendered yet,
+                          // so isGenerating flipping true won't touch the old route.
+                          Future.microtask(controller.generatePlan);
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFC2D86A),
@@ -346,31 +350,33 @@ class GenerateAiScreen extends GetView<GenerateAiController> {
     required String title,
     required List<Widget> children,
   }) {
-    return Theme(
-      data: Theme.of(Get.context!).copyWith(dividerColor: Colors.transparent),
-      child: ExpansionTile(
-        initiallyExpanded: true,
-        title: Text(
-          title,
-          style: const TextStyle(
-            color: Color(0xFFC2D86A), // Lime Green
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        iconColor: const Color(0xFFC2D86A),
-        collapsedIconColor: const Color(0xFFC2D86A),
-        childrenPadding: EdgeInsets.zero,
-        tilePadding: EdgeInsets.zero,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: children,
+    return Builder(
+      builder: (context) => Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: true,
+          title: Text(
+            title,
+            style: const TextStyle(
+              color: Color(0xFFC2D86A),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
-        ],
+          iconColor: const Color(0xFFC2D86A),
+          collapsedIconColor: const Color(0xFFC2D86A),
+          childrenPadding: EdgeInsets.zero,
+          tilePadding: EdgeInsets.zero,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: children,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
