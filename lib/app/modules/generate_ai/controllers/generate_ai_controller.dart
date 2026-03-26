@@ -141,7 +141,7 @@ class GenerateAiController extends GetxController {
       generatedMeals.assignAll(meals);
       hasResult.value = true;
     } catch (e) {
-      errorMessage.value = 'Failed to generate meal plan. Please try again.';
+      errorMessage.value = e.toString().replaceFirst('Exception: ', '');
     } finally {
       isGenerating.value = false;
     }

@@ -143,7 +143,9 @@ class AiService {
           .timeout(const Duration(seconds: 90));
 
       if (res.statusCode != 200) {
-        throw Exception('Render API error ${res.statusCode}: ${res.body}');
+        final data = _decode(res);
+        final errMsg = data?['error'] as String? ?? res.body;
+        throw Exception('Backend error: $errMsg');
       }
 
       final data = _decode(res);

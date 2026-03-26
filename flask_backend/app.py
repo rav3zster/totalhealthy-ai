@@ -107,11 +107,12 @@ def generate_meal():
 
     except Exception as e:
         logger.exception(f"❌ Unhandled error: {e}")
+        # Return error status so Flutter shows the error state, not fake data
         return jsonify({
-            "status": "ok",
-            "meals": [FALLBACK_MEAL],
-            "warning": f"AI generation failed: {str(e)}",
-        }), 200
+            "status": "error",
+            "error": str(e),
+            "meals": [],
+        }), 500
 
 
 # ── Prompt builder ────────────────────────────────────────────────────────────
