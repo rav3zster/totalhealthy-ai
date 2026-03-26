@@ -209,7 +209,7 @@ def _call_gemini(prompt: str, attempt: int = 0) -> str:
         response = gemini_model.generate_content(
             prompt,
             generation_config={
-                "temperature": 0.4,
+                "temperature": 0.9,
                 "max_output_tokens": 2048,
             },
         )
