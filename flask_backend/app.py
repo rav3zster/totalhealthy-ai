@@ -132,7 +132,12 @@ def _build_prompt(data: dict) -> str:
     meal_types    = data.get("mealTypes", ["Breakfast", "Lunch", "Dinner"])
     if not meal_types:
         meal_types = ["Breakfast", "Lunch", "Dinner"]
+
+    # Use the number of selected meal types as the target count.
+    # This ensures one distinct meal is generated per type selected.
+    total_meals   = max(meals_per_day, len(meal_types))
     meal_types_str = ", ".join(meal_types)
+
     include_foods = data.get("includeFoods", "")
     avoid_foods   = data.get("avoidFoods", "")
     exercise_freq = data.get("exerciseFrequency", "")
@@ -167,8 +172,11 @@ def _build_prompt(data: dict) -> str:
     # Build the JSON schema example for Gemini to follow
     example_meal = '{"name":"string","category":"string","ingredients":["string"],"calories":0,"protein":0,"carbs":0,"fat":0,"description":"string"}'
 
+    # List each required meal type explicitly so Gemini maps one meal per type
+    meal_type_list = "\n".join(f"  {i+1}. {t}" for i, t in enumerate(meal_types))
+
     prompt = f"""You are a professional nutritionist and meal planner.
-Generate a personalised meal plan for exactly {meals_per_day} meal(s).
+Generate a complete personalised meal plan with exactly {total_meals} meals — one for each meal type listed below.
 
 USER PROFILE:
   - Goal: {goal}
@@ -181,22 +189,24 @@ DIET REQUIREMENTS:
   - Allergies — NEVER include these ingredients: {allergies}
   - Cuisine Preference: {cuisine}
 
-MEAL TYPES REQUIRED: {meal_types_str}
-CATEGORIES (map each meal to exactly one): {categories}
+REQUIRED MEAL TYPES (generate exactly one meal per type, in this order):
+{meal_type_list}
 
 PHYSICAL ACTIVITY:{activity_block}
 {extras_block}
 
 ABSOLUTE RULES — FOLLOW EXACTLY:
-  1. NEVER include any allergen: {allergies}
-  2. Match cuisine style: {cuisine}
-  3. Support the goal: {goal}
-  4. Map each meal to one category from: {categories}
-  5. Use realistic, accurate calorie and macro values
-  6. Output ONLY raw JSON — zero markdown, zero explanation, zero code fences
-  7. Do NOT wrap output in ```json or ``` blocks
+  1. Generate exactly {total_meals} meals — one per meal type above, no duplicates
+  2. Each meal's "category" field MUST match its meal type exactly
+  3. NEVER include any allergen: {allergies}
+  4. Match cuisine style: {cuisine}
+  5. Support the goal: {goal}
+  6. Every meal must be nutritionally distinct — no repeated dishes or ingredients
+  7. Use realistic, accurate calorie and macro values appropriate for each meal type
+  8. Output ONLY raw JSON — zero markdown, zero explanation, zero code fences
+  9. Do NOT wrap output in ```json or ``` blocks
 
-OUTPUT FORMAT — return ONLY this JSON with exactly {meals_per_day} item(s) in the meals array:
+OUTPUT FORMAT — return ONLY this JSON with exactly {total_meals} items in the meals array:
 {{"meals":[{example_meal}]}}"""
 
     return prompt
@@ -210,7 +220,7 @@ def _call_gemini(prompt: str, attempt: int = 0) -> str:
             prompt,
             generation_config={
                 "temperature": 0.9,
-                "max_output_tokens": 2048,
+                "max_output_tokens": 4096,
             },
         )
         text = response.text.strip()
