@@ -25,9 +25,12 @@ app = Flask(__name__)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 if not GEMINI_API_KEY:
     logger.warning("⚠️  GEMINI_API_KEY not set — AI calls will return fallback")
+else:
+    logger.info(f"✅ GEMINI_API_KEY loaded (ends ...{GEMINI_API_KEY[-4:]})")
 
 genai.configure(api_key=GEMINI_API_KEY)
-gemini_model = genai.GenerativeModel("gemini-1.5-flash")
+gemini_model = genai.GenerativeModel("gemini-2.0-flash")
+logger.info("✅ Gemini model initialised: gemini-2.0-flash")
 
 # ── Fallback meal — returned when Gemini fails ────────────────────────────────
 FALLBACK_MEAL = {
