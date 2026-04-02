@@ -330,9 +330,7 @@ class CreateMealController extends GetxController {
               ? "0"
               : fatsController.text.trim(),
           categories: selectedCategories.toList(),
-          imageUrl: mealImage.value.isEmpty
-              ? "https://example.com/meal_placeholder.png"
-              : mealImage.value,
+          imageUrl: mealImage.value.isEmpty ? "" : mealImage.value,
           ingredients: cleanIngredients,
           instructions: _instructions,
           createdAt: DateTime.now(),
