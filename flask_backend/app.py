@@ -1,5 +1,5 @@
 """
-TotalHealthy AI Backend — Flask + Gemini
+TotalHealthy AI Backend — Flask + OpenRouter (Mistral)
 Deployed on Render | Endpoint: POST /generate_meal
 """
 
@@ -8,9 +8,8 @@ import json
 import re
 import time
 import logging
+import requests
 from flask import Flask, request, jsonify
-import google.genai as genai
-from google.genai import types
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -22,16 +21,16 @@ logger = logging.getLogger(__name__)
 # ── Flask app ─────────────────────────────────────────────────────────────────
 app = Flask(__name__)
 
-# ── Gemini setup (API key from env var — never hardcoded) ─────────────────────
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-if not GEMINI_API_KEY:
-    logger.warning("⚠️  GEMINI_API_KEY not set — AI calls will return fallback")
+# ── OpenRouter setup ──────────────────────────────────────────────────────────
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+if not OPENROUTER_API_KEY:
+    logger.warning("⚠️  OPENROUTER_API_KEY not set — AI calls will fail")
 else:
-    logger.info(f"✅ GEMINI_API_KEY loaded (ends ...{GEMINI_API_KEY[-4:]})")
+    logger.info(f"✅ OPENROUTER_API_KEY loaded (ends ...{OPENROUTER_API_KEY[-4:]})")
 
-gemini_client = genai.Client(api_key=GEMINI_API_KEY)
-GEMINI_MODEL  = "gemini-2.0-flash-lite"
-logger.info(f"✅ Gemini client initialised: {GEMINI_MODEL}")
+OPENROUTER_MODEL = "mistralai/mistral-7b-instruct"
+OPENROUTER_URL   = "https://openrouter.ai/api/v1/chat/completions"
+logger.info(f"✅ AI model: {OPENROUTER_MODEL}")
 
 # ── Fallback meal — returned when Gemini fails ────────────────────────────────
 FALLBACK_MEAL = {
@@ -66,7 +65,7 @@ def health():
     return jsonify({"status": "ok", "service": "TotalHealthy AI Backend"}), 200
 
 
-# ── Route 2: Quick test — returns sample meal without calling Gemini ──────────
+# ── Route 2: Quick test — returns sample meal without calling AI ──────────────
 @app.route("/test", methods=["GET"])
 def test():
     logger.info("GET /test — returning sample meal")
@@ -98,8 +97,8 @@ def generate_meal():
         prompt = _build_prompt(body)
         logger.info(f"Prompt built — {len(prompt)} chars")
 
-        raw = _call_gemini(prompt)
-        logger.info(f"Gemini responded — first 400 chars:\n{raw[:400]}")
+        raw = _call_ai(prompt)
+        logger.info(f"AI responded — first 400 chars:\n{raw[:400]}")
 
         meals = _parse_response(raw)
         logger.info(f"✅ Parsed {len(meals)} meals — sending response")
@@ -214,28 +213,36 @@ OUTPUT FORMAT — return ONLY this JSON with exactly {total_meals} items in the 
     return prompt
 
 
-# ── Gemini call with one retry ────────────────────────────────────────────────
+# ── OpenRouter / Mistral call with one retry ─────────────────────────────────
 
-def _call_gemini(prompt: str, attempt: int = 0) -> str:
+def _call_ai(prompt: str, attempt: int = 0) -> str:
     try:
-        response = gemini_client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                temperature=0.9,
-                max_output_tokens=4096,
-            ),
+        response = requests.post(
+            OPENROUTER_URL,
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": OPENROUTER_MODEL,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.9,
+                "max_tokens": 4096,
+            },
+            timeout=60,
         )
-        text = response.text.strip() if response.text else ""
+        response.raise_for_status()
+        data = response.json()
+        text = data["choices"][0]["message"]["content"].strip()
         if not text:
-            raise ValueError("Gemini returned empty response")
+            raise ValueError("AI returned empty response")
         return text
     except Exception as e:
         if attempt == 0:
-            logger.warning(f"Gemini attempt 1 failed: {e} — retrying in 2s")
+            logger.warning(f"AI attempt 1 failed: {e} — retrying in 2s")
             time.sleep(2)
-            return _call_gemini(prompt, attempt=1)
-        logger.error(f"Gemini attempt 2 also failed: {e}")
+            return _call_ai(prompt, attempt=1)
+        logger.error(f"AI attempt 2 also failed: {e}")
         raise
 
 
