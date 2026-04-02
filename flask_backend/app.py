@@ -28,7 +28,7 @@ if not OPENROUTER_API_KEY:
 else:
     logger.info(f"✅ OPENROUTER_API_KEY loaded (ends ...{OPENROUTER_API_KEY[-4:]})")
 
-OPENROUTER_MODEL = "mistralai/mistral-7b-instruct:free"
+OPENROUTER_MODEL = "google/gemma-3-4b-it:free"
 OPENROUTER_URL   = "https://openrouter.ai/api/v1/chat/completions"
 logger.info(f"✅ AI model: {OPENROUTER_MODEL}")
 
