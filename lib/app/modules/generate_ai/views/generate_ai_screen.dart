@@ -5,374 +5,361 @@ import '../controllers/generate_ai_controller.dart';
 import 'ai_results_screen.dart';
 import 'diet_classifier_view.dart';
 
+// ── Colour constants ──────────────────────────────────────────────────────────
+const _lime = Color(0xFFC2D86A);
+const _bg = Color(0xFF0A0A0A);
+const _card = Color(0xFF141414);
+const _input = Color(0xFF1A1A1A);
+const _border = Color(0xFF2A2A2A);
+
 class GenerateAiScreen extends GetView<GenerateAiController> {
   const GenerateAiScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: _bg,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-          onPressed: () => Get.back(),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: GestureDetector(
+          onTap: () => Get.back(),
+          child: Container(
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.07),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            ),
+            child: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Colors.white,
+              size: 17,
+            ),
+          ),
         ),
         title: const Text(
-          'Creating A Meal',
+          'AI Meal Planner',
           style: TextStyle(
             color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.2,
           ),
         ),
         centerTitle: true,
-        elevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // ── AI Diet Analyser Entry Card ───────────────────────────────
-            GestureDetector(
-              onTap: () => Get.to(() => const DietClassifierView()),
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 20),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: const Color(0xFFC2D86A).withValues(alpha: 0.5),
-                    width: 1.5,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFC2D86A).withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.analytics_outlined,
-                        color: Color(0xFFC2D86A),
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'AI Diet Analyser',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Get your BMI, TDEE & personalised diet type',
-                            style: TextStyle(
-                              color: Colors.white54,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      color: Color(0xFFC2D86A),
-                      size: 16,
-                    ),
-                  ],
+      body: Stack(
+        children: [
+          // subtle top glow
+          Positioned(
+            top: -60,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 200,
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  colors: [_lime.withValues(alpha: 0.08), Colors.transparent],
+                  radius: 0.8,
                 ),
               ),
             ),
-            // Dietary Goals Section
-            _buildSection(
-              title: 'Dietary Goals',
+          ),
+          SingleChildScrollView(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 70,
+              left: 16,
+              right: 16,
+              bottom: 110,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildLabel('Goal'),
-                _buildGridSelector(
-                  options: controller.goals,
-                  selectedOption: controller.selectedGoal,
-                  onSelect: controller.selectGoal,
-                  crossAxisCount: 2,
-                ),
-                const SizedBox(height: 16),
-                Row(
+                // ── AI Analyser banner ──────────────────────────────────
+                _AnalyserBanner(),
+                const SizedBox(height: 20),
+
+                // ── Sections ────────────────────────────────────────────
+                _Section(
+                  icon: Icons.flag_rounded,
+                  title: 'Dietary Goals',
                   children: [
-                    Expanded(
-                      child: _buildInput(
-                        controller: controller.currentWeightController,
-                        label: 'Current Weight',
-                        hint: 'Weight',
-                      ),
+                    _SectionLabel('Goal'),
+                    _GridSelector(
+                      options: controller.goals,
+                      selected: controller.selectedGoal,
+                      onSelect: controller.selectGoal,
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildInput(
-                        controller: controller.targetWeightController,
-                        label: 'Target Weight',
-                        hint: 'Weight',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                _buildLabel('Nutritional Breakdown'),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildInput(
-                        controller: controller.kcalController,
-                        hint: 'kcal',
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildInput(
-                        controller: controller.carbsController,
-                        hint: 'Carbs (grams)',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildInput(
-                        controller: controller.proteinController,
-                        hint: 'Protein (grams)',
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildInput(
-                        controller: controller.fatsController,
-                        hint: 'Fats (grams)',
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            // Diet Preference And Restriction Section
-            _buildSection(
-              title: 'Diet Preference And Restriction',
-              children: [
-                _buildLabel('Diet Type'),
-                _buildGridSelector(
-                  options: controller.dietTypes,
-                  selectedOption: controller.dietType,
-                  onSelect: controller.selectDietType,
-                  crossAxisCount: 2,
-                ),
-                const SizedBox(height: 16),
-                _buildLabel('Food Allergies'),
-                _buildMultiSelectGrid(
-                  options: controller.allergies,
-                  selectedOptions: controller.selectedAllergies,
-                  onToggle: controller.toggleAllergy,
-                ),
-                const SizedBox(height: 16),
-                _buildLabel('Preferred Cuisine'),
-                _buildGridSelector(
-                  options: controller.cuisines,
-                  selectedOption: controller.preferredCuisine,
-                  onSelect: controller.selectCuisine,
-                  crossAxisCount: 2,
-                ),
-              ],
-            ),
-
-            // Meal Preference Section
-            _buildSection(
-              title: 'Meal Preference',
-              children: [
-                _buildLabel('Number Of Meals Per Day'),
-                _buildCounter(),
-                const SizedBox(height: 16),
-                _buildLabel('Meal Types'),
-                _buildMultiSelectGrid(
-                  options: controller.mealTypesList,
-                  selectedOptions: controller.selectedMealTypes,
-                  onToggle: controller.toggleMealType,
-                ),
-                const SizedBox(height: 16),
-                _buildLabel('Specific Foods To Include'),
-                _buildInput(
-                  controller: controller.specificFoodsController,
-                  hint: 'Note',
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 16),
-                _buildLabel('Foods To Avoid'),
-                _buildInput(
-                  controller: controller.foodsToAvoidController,
-                  hint: 'Note',
-                  maxLines: 3,
-                ),
-              ],
-            ),
-
-            // Physical Activity Section
-            _buildSection(
-              title: 'Physical Activity',
-              children: [
-                _buildLabel('Exercise Frequency'),
-                _buildGridSelector(
-                  options: controller.exerciseFrequencies,
-                  selectedOption: controller.exerciseFrequency,
-                  onSelect: controller.selectFrequency,
-                  crossAxisCount: 2,
-                ),
-                const SizedBox(height: 16),
-                _buildLabel('Types Of Exercise'),
-                _buildGridSelector(
-                  options: controller.exerciseTypes,
-                  selectedOption: controller.exerciseType,
-                  onSelect: controller.selectExerciseType,
-                  crossAxisCount: 2,
-                ),
-                const SizedBox(height: 16),
-                _buildLabel('Pre/Post Workout Nutrition'),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildRadioButton(
-                        'Yes',
-                        controller.prePostWorkoutNutrition,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildRadioButton(
-                        'No',
-                        controller.prePostWorkoutNutrition,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            // Additional Info Section
-            _buildSection(
-              title: 'Additional Info',
-              children: [
-                _buildLabel('Any Medical Condition'),
-                _buildInput(
-                  controller: controller.medicalConditionController,
-                  hint: 'Text',
-                  maxLines: 2, // Slightly taller
-                ),
-                const SizedBox(height: 16),
-                _buildLabel('Preferred Start Date'),
-                _buildDatePicker(context),
-                const SizedBox(height: 16),
-                _buildLabel('Special Instructions'),
-                _buildInput(
-                  controller: controller.specialInstructionsController,
-                  hint: 'Note',
-                  maxLines: 4,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 30),
-
-            // Generate Button
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: Obx(
-                () => ElevatedButton(
-                  onPressed: controller.isGenerating.value
-                      ? null
-                      : () {
-                          Get.to(
-                            () => AiResultsScreen(controller: controller),
-                            transition: Transition.fadeIn,
-                            preventDuplicates: true,
-                          );
-                          // microtask runs after the current event loop tick —
-                          // navigation is committed but no frame has rendered yet,
-                          // so isGenerating flipping true won't touch the old route.
-                          Future.microtask(controller.generatePlan);
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFC2D86A),
-                    foregroundColor: Colors.black,
-                    disabledBackgroundColor: const Color(
-                      0xFFC2D86A,
-                    ).withValues(alpha: 0.4),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: controller.isGenerating.value
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.black,
-                          ),
-                        )
-                      : const Text(
-                          'Generate Using AI',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _InputField(
+                            ctrl: controller.currentWeightController,
+                            hint: 'Current weight',
+                            suffix: 'kg',
+                            keyboardType: TextInputType.number,
                           ),
                         ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _InputField(
+                            ctrl: controller.targetWeightController,
+                            hint: 'Target weight',
+                            suffix: 'kg',
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    _SectionLabel('Daily Nutrition Targets'),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _InputField(
+                            ctrl: controller.kcalController,
+                            hint: 'Calories',
+                            suffix: 'kcal',
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _InputField(
+                            ctrl: controller.carbsController,
+                            hint: 'Carbs',
+                            suffix: 'g',
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _InputField(
+                            ctrl: controller.proteinController,
+                            hint: 'Protein',
+                            suffix: 'g',
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _InputField(
+                            ctrl: controller.fatsController,
+                            hint: 'Fats',
+                            suffix: 'g',
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ),
+
+                _Section(
+                  icon: Icons.restaurant_rounded,
+                  title: 'Diet & Restrictions',
+                  children: [
+                    _SectionLabel('Diet Type'),
+                    _GridSelector(
+                      options: controller.dietTypes,
+                      selected: controller.dietType,
+                      onSelect: controller.selectDietType,
+                    ),
+                    const SizedBox(height: 16),
+                    _SectionLabel('Food Allergies'),
+                    _MultiSelectGrid(
+                      options: controller.allergies,
+                      selected: controller.selectedAllergies,
+                      onToggle: controller.toggleAllergy,
+                    ),
+                    const SizedBox(height: 16),
+                    _SectionLabel('Preferred Cuisine'),
+                    _GridSelector(
+                      options: controller.cuisines,
+                      selected: controller.preferredCuisine,
+                      onSelect: controller.selectCuisine,
+                    ),
+                  ],
+                ),
+
+                _Section(
+                  icon: Icons.dinner_dining_rounded,
+                  title: 'Meal Preferences',
+                  children: [
+                    _SectionLabel('Meals Per Day'),
+                    _MealCounter(controller: controller),
+                    const SizedBox(height: 16),
+                    _SectionLabel('Meal Types'),
+                    _MultiSelectGrid(
+                      options: controller.mealTypesList,
+                      selected: controller.selectedMealTypes,
+                      onToggle: controller.toggleMealType,
+                    ),
+                    const SizedBox(height: 16),
+                    _InputField(
+                      ctrl: controller.specificFoodsController,
+                      hint: 'Foods to include (e.g. chicken, oats)',
+                      maxLines: 2,
+                    ),
+                    const SizedBox(height: 10),
+                    _InputField(
+                      ctrl: controller.foodsToAvoidController,
+                      hint: 'Foods to avoid',
+                      maxLines: 2,
+                    ),
+                  ],
+                ),
+
+                _Section(
+                  icon: Icons.fitness_center_rounded,
+                  title: 'Physical Activity',
+                  children: [
+                    _SectionLabel('Exercise Frequency'),
+                    _GridSelector(
+                      options: controller.exerciseFrequencies,
+                      selected: controller.exerciseFrequency,
+                      onSelect: controller.selectFrequency,
+                    ),
+                    const SizedBox(height: 16),
+                    _SectionLabel('Exercise Type'),
+                    _GridSelector(
+                      options: controller.exerciseTypes,
+                      selected: controller.exerciseType,
+                      onSelect: controller.selectExerciseType,
+                    ),
+                    const SizedBox(height: 16),
+                    _SectionLabel('Pre/Post Workout Nutrition'),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _RadioTile(
+                            label: 'Yes',
+                            groupValue: controller.prePostWorkoutNutrition,
+                            onTap: () =>
+                                controller.selectPrePostNutrition('Yes'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _RadioTile(
+                            label: 'No',
+                            groupValue: controller.prePostWorkoutNutrition,
+                            onTap: () =>
+                                controller.selectPrePostNutrition('No'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+                _Section(
+                  icon: Icons.info_outline_rounded,
+                  title: 'Additional Info',
+                  children: [
+                    _InputField(
+                      ctrl: controller.medicalConditionController,
+                      hint: 'Medical conditions (optional)',
+                      maxLines: 2,
+                    ),
+                    const SizedBox(height: 10),
+                    _DatePickerField(controller: controller),
+                    const SizedBox(height: 10),
+                    _InputField(
+                      ctrl: controller.specialInstructionsController,
+                      hint: 'Special instructions (optional)',
+                      maxLines: 3,
+                    ),
+                  ],
+                ),
+              ],
             ),
-            const SizedBox(height: 30),
-          ],
-        ),
+          ),
+
+          // ── Sticky generate button ──────────────────────────────────────
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _GenerateButton(controller: controller),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildSection({
-    required String title,
-    required List<Widget> children,
-  }) {
-    return Builder(
-      builder: (context) => Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          initiallyExpanded: true,
-          title: Text(
-            title,
-            style: const TextStyle(
-              color: Color(0xFFC2D86A),
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+// ── AI Analyser Banner ────────────────────────────────────────────────────────
+
+class _AnalyserBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Get.to(() => const DietClassifierView()),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              _lime.withValues(alpha: 0.12),
+              _lime.withValues(alpha: 0.04),
+            ],
           ),
-          iconColor: const Color(0xFFC2D86A),
-          collapsedIconColor: const Color(0xFFC2D86A),
-          childrenPadding: EdgeInsets.zero,
-          tilePadding: EdgeInsets.zero,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: _lime.withValues(alpha: 0.3)),
+        ),
+        child: Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 24.0),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: _lime.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.analytics_rounded,
+                color: _lime,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 14),
+            const Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: children,
+                children: [
+                  Text(
+                    'AI Diet Analyser',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 3),
+                  Text(
+                    'Get your BMI, TDEE & personalised diet type',
+                    style: TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: _lime.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: _lime,
+                size: 13,
               ),
             ),
           ],
@@ -380,169 +367,286 @@ class GenerateAiScreen extends GetView<GenerateAiController> {
       ),
     );
   }
+}
 
-  Widget _buildLabel(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
+// ── Section card ──────────────────────────────────────────────────────────────
+
+class _Section extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final List<Widget> children;
+  const _Section({
+    required this.icon,
+    required this.title,
+    required this.children,
+  });
+
+  @override
+  State<_Section> createState() => _SectionState();
+}
+
+class _SectionState extends State<_Section> {
+  bool _expanded = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      decoration: BoxDecoration(
+        color: _card,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _border),
       ),
-    );
-  }
-
-  Widget _buildInput({
-    required TextEditingController controller,
-    String? label,
-    required String hint,
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (label != null) _buildLabel(label),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E), // Dark Grey
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: TextField(
-            controller: controller,
-            maxLines: maxLines,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: TextStyle(
-                color: Colors.white.withValues(alpha: 0.4),
-                fontSize: 14,
-              ),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: () => setState(() => _expanded = !_expanded),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: _lime.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(widget.icon, color: _lime, size: 18),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      widget.title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    _expanded
+                        ? Icons.keyboard_arrow_up_rounded
+                        : Icons.keyboard_arrow_down_rounded,
+                    color: Colors.white38,
+                    size: 22,
+                  ),
+                ],
               ),
             ),
           ),
-        ),
-      ],
+          if (_expanded)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Divider(
+                    color: Colors.white.withValues(alpha: 0.06),
+                    height: 1,
+                  ),
+                  const SizedBox(height: 14),
+                  ...widget.children,
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
+}
 
-  Widget _buildGridSelector({
-    required List<String> options,
-    required RxString selectedOption,
-    required Function(String) onSelect,
-    int crossAxisCount = 2,
-  }) {
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        childAspectRatio: 3.5, // Wide buttons
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+// ── Section label ─────────────────────────────────────────────────────────────
+
+class _SectionLabel extends StatelessWidget {
+  final String text;
+  const _SectionLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.6),
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.5,
+        ),
       ),
-      itemCount: options.length,
-      itemBuilder: (context, index) {
-        final option = options[index];
+    );
+  }
+}
+
+// ── Input field ───────────────────────────────────────────────────────────────
+
+class _InputField extends StatelessWidget {
+  final TextEditingController ctrl;
+  final String hint;
+  final String? suffix;
+  final int maxLines;
+  final TextInputType keyboardType;
+
+  const _InputField({
+    required this.ctrl,
+    required this.hint,
+    this.suffix,
+    this.maxLines = 1,
+    this.keyboardType = TextInputType.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: _input,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _border),
+      ),
+      child: TextField(
+        controller: ctrl,
+        maxLines: maxLines,
+        keyboardType: keyboardType,
+        style: const TextStyle(color: Colors.white, fontSize: 14),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(
+            color: Colors.white.withValues(alpha: 0.3),
+            fontSize: 14,
+          ),
+          suffixText: suffix,
+          suffixStyle: TextStyle(
+            color: Colors.white.withValues(alpha: 0.4),
+            fontSize: 13,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 13,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Grid selector (single select) ────────────────────────────────────────────
+
+class _GridSelector extends StatelessWidget {
+  final List<String> options;
+  final RxString selected;
+  final Function(String) onSelect;
+
+  const _GridSelector({
+    required this.options,
+    required this.selected,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: options.map((opt) {
         return Obx(() {
-          final isSelected = selectedOption.value == option;
+          final isSelected = selected.value == opt;
           return GestureDetector(
-            onTap: () => onSelect(option),
-            child: Container(
-              alignment: Alignment.center,
+            onTap: () => onSelect(opt),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
-                borderRadius: BorderRadius.circular(12),
-                border: isSelected
-                    ? Border.all(color: const Color(0xFFC2D86A), width: 1.5)
-                    : null,
+                color: isSelected ? _lime.withValues(alpha: 0.15) : _input,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isSelected ? _lime.withValues(alpha: 0.6) : _border,
+                  width: isSelected ? 1.5 : 1,
+                ),
               ),
               child: Text(
-                option,
+                opt,
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: isSelected ? 1.0 : 0.6),
+                  color: isSelected ? _lime : Colors.white54,
                   fontSize: 13,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
             ),
           );
         });
-      },
+      }).toList(),
     );
   }
+}
 
-  Widget _buildMultiSelectGrid({
-    required List<String> options,
-    required RxList<String> selectedOptions,
-    required Function(String) onToggle,
-  }) {
-    return GridView.builder(
-      physics:
-          const NeverScrollableScrollPhysics(), // Important inside ScrollView
-      shrinkWrap: true,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 3.5,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-      ),
-      itemCount: options.length,
-      itemBuilder: (context, index) {
-        final option = options[index];
+// ── Multi-select grid ─────────────────────────────────────────────────────────
+
+class _MultiSelectGrid extends StatelessWidget {
+  final List<String> options;
+  final RxList<String> selected;
+  final Function(String) onToggle;
+
+  const _MultiSelectGrid({
+    required this.options,
+    required this.selected,
+    required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: options.map((opt) {
         return Obx(() {
-          final isSelected = selectedOptions.contains(option);
+          final isSelected = selected.contains(opt);
           return GestureDetector(
-            onTap: () => onToggle(option),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+            onTap: () => onToggle(opt),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
-                borderRadius: BorderRadius.circular(12),
-                border: isSelected
-                    ? Border.all(color: const Color(0xFFC2D86A), width: 1.5)
-                    : null,
+                color: isSelected ? _lime.withValues(alpha: 0.15) : _input,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isSelected ? _lime.withValues(alpha: 0.6) : _border,
+                  width: isSelected ? 1.5 : 1,
+                ),
               ),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 20,
-                    height: 20,
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    width: 16,
+                    height: 16,
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? const Color(0xFFC2D86A)
-                          : Colors.transparent,
+                      color: isSelected ? _lime : Colors.transparent,
                       borderRadius: BorderRadius.circular(4),
                       border: Border.all(
-                        color: isSelected
-                            ? const Color(0xFFC2D86A)
-                            : Colors.grey,
+                        color: isSelected ? _lime : Colors.white30,
                       ),
                     ),
                     child: isSelected
-                        ? const Icon(Icons.check, size: 16, color: Colors.black)
+                        ? const Icon(
+                            Icons.check_rounded,
+                            size: 11,
+                            color: Colors.black,
+                          )
                         : null,
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      option,
-                      style: TextStyle(
-                        color: Colors.white.withValues(
-                          alpha: isSelected ? 1.0 : 0.6,
-                        ),
-                        fontSize: 13,
-                        fontWeight: isSelected
-                            ? FontWeight.w600
-                            : FontWeight.normal,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                  const SizedBox(width: 7),
+                  Text(
+                    opt,
+                    style: TextStyle(
+                      color: isSelected ? _lime : Colors.white54,
+                      fontSize: 13,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w400,
                     ),
                   ),
                 ],
@@ -550,90 +654,141 @@ class GenerateAiScreen extends GetView<GenerateAiController> {
             ),
           );
         });
-      },
+      }).toList(),
     );
   }
+}
 
-  Widget _buildCounter() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Obx(
-        () => Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+// ── Meal counter ──────────────────────────────────────────────────────────────
+
+class _MealCounter extends StatelessWidget {
+  final GenerateAiController controller;
+  const _MealCounter({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(
+      () => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: _input,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: _border),
+        ),
+        child: Row(
           children: [
-            // Decrement
-            IconButton(
-              onPressed: controller.decrementMeals,
-              icon: const Icon(
-                Icons.arrow_downward,
-                color: Colors.white,
-              ), // Using arrow icon as in screenshot
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            ),
-
-            // Value
-            Text(
-              controller.mealsPerDay.value.toString().padLeft(2, '0'),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+            GestureDetector(
+              onTap: controller.decrementMeals,
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: _border),
+                ),
+                child: const Icon(
+                  Icons.remove_rounded,
+                  color: Colors.white70,
+                  size: 18,
+                ),
               ),
             ),
-
-            // Increment
-            IconButton(
-              onPressed: controller.incrementMeals,
-              icon: const Icon(Icons.arrow_upward, color: Color(0xFFC2D86A)),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
+            Expanded(
+              child: Column(
+                children: [
+                  Text(
+                    controller.mealsPerDay.value.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text(
+                    'meals per day',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.4),
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: controller.incrementMeals,
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: _lime.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: _lime.withValues(alpha: 0.4)),
+                ),
+                child: const Icon(Icons.add_rounded, color: _lime, size: 18),
+              ),
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildRadioButton(String label, RxString groupValue) {
+// ── Radio tile ────────────────────────────────────────────────────────────────
+
+class _RadioTile extends StatelessWidget {
+  final String label;
+  final RxString groupValue;
+  final VoidCallback onTap;
+  const _RadioTile({
+    required this.label,
+    required this.groupValue,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Obx(() {
       final isSelected = groupValue.value == label;
       return GestureDetector(
-        onTap: () => controller.selectPrePostNutrition(label),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: 13),
           decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E),
+            color: isSelected ? _lime.withValues(alpha: 0.12) : _input,
             borderRadius: BorderRadius.circular(12),
-            border: isSelected
-                ? Border.all(color: const Color(0xFFC2D86A), width: 1.5)
-                : null,
+            border: Border.all(
+              color: isSelected ? _lime.withValues(alpha: 0.5) : _border,
+              width: isSelected ? 1.5 : 1,
+            ),
           ),
           alignment: Alignment.center,
           child: Text(
             label,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: isSelected ? 1.0 : 0.6),
+              color: isSelected ? _lime : Colors.white54,
               fontSize: 14,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
             ),
           ),
         ),
       );
     });
   }
+}
 
-  Widget _buildDatePicker(BuildContext context) {
+// ── Date picker ───────────────────────────────────────────────────────────────
+
+class _DatePickerField extends StatelessWidget {
+  final GenerateAiController controller;
+  const _DatePickerField({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
     return Obx(() {
       final date = controller.preferredStartDate.value;
-      final dateString = date != null
-          ? DateFormat('MM/dd/yyyy').format(date)
-          : 'Date';
-
       return GestureDetector(
         onTap: () async {
           final picked = await showDatePicker(
@@ -641,49 +796,147 @@ class GenerateAiScreen extends GetView<GenerateAiController> {
             initialDate: DateTime.now(),
             firstDate: DateTime.now(),
             lastDate: DateTime.now().add(const Duration(days: 365)),
-            builder: (context, child) {
-              return Theme(
-                data: Theme.of(context).copyWith(
-                  colorScheme: const ColorScheme.dark(
-                    primary: Color(0xFFC2D86A),
-                    onPrimary: Colors.black,
-                    surface: Color(0xFF1E1E1E),
-                    onSurface: Colors.white,
-                  ),
+            builder: (ctx, child) => Theme(
+              data: Theme.of(ctx).copyWith(
+                colorScheme: const ColorScheme.dark(
+                  primary: _lime,
+                  onPrimary: Colors.black,
+                  surface: Color(0xFF1E1E1E),
+                  onSurface: Colors.white,
                 ),
-                child: child!,
-              );
-            },
+              ),
+              child: child!,
+            ),
           );
           if (picked != null) controller.selectDate(picked);
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
           decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E),
+            color: _input,
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: date != null ? _lime.withValues(alpha: 0.4) : _border,
+            ),
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Icon(
+                Icons.calendar_month_rounded,
+                color: date != null ? _lime : Colors.white38,
+                size: 18,
+              ),
+              const SizedBox(width: 10),
               Text(
-                dateString,
+                date != null
+                    ? DateFormat('MMM dd, yyyy').format(date)
+                    : 'Preferred start date (optional)',
                 style: TextStyle(
-                  color: Colors.white.withValues(
-                    alpha: date != null ? 1.0 : 0.4,
-                  ),
+                  color: date != null
+                      ? Colors.white
+                      : Colors.white.withValues(alpha: 0.3),
                   fontSize: 14,
                 ),
-              ),
-              Icon(
-                Icons.calendar_today,
-                size: 18,
-                color: Colors.white.withValues(alpha: 0.6),
               ),
             ],
           ),
         ),
       );
     });
+  }
+}
+
+// ── Generate button ───────────────────────────────────────────────────────────
+
+class _GenerateButton extends StatelessWidget {
+  final GenerateAiController controller;
+  const _GenerateButton({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        16,
+        12,
+        16,
+        MediaQuery.of(context).padding.bottom + 12,
+      ),
+      decoration: BoxDecoration(
+        color: _bg,
+        border: Border(
+          top: BorderSide(color: Colors.white.withValues(alpha: 0.06)),
+        ),
+      ),
+      child: Obx(() {
+        final generating = controller.isGenerating.value;
+        return GestureDetector(
+          onTap: generating
+              ? null
+              : () {
+                  Get.to(
+                    () => AiResultsScreen(controller: controller),
+                    transition: Transition.fadeIn,
+                    preventDuplicates: true,
+                  );
+                  Future.microtask(controller.generatePlan);
+                },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            height: 54,
+            decoration: BoxDecoration(
+              gradient: generating
+                  ? null
+                  : const LinearGradient(
+                      colors: [Color(0xFFD4EF7A), _lime],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+              color: generating ? _lime.withValues(alpha: 0.3) : null,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: generating
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: _lime.withValues(alpha: 0.3),
+                        blurRadius: 16,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+            ),
+            child: Center(
+              child: generating
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Colors.black,
+                      ),
+                    )
+                  : const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.auto_awesome_rounded,
+                          color: Colors.black,
+                          size: 18,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          'Generate My Meal Plan',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+        );
+      }),
+    );
   }
 }

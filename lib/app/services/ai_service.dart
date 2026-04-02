@@ -89,7 +89,7 @@ class AiService {
   }
 
   // ── PHASE 3: Diet Classifier ──────────────────────────────────────────────
-  /// Returns null when GCP is not yet configured or call fails.
+  /// Calls the Render backend /classify_diet endpoint.
   Future<DietClassification?> classifyDiet({
     required int age,
     required double weight,
@@ -97,12 +97,10 @@ class AiService {
     required int activityLevel,
     required String goal,
   }) async {
-    if (!_gcpReady) return null;
-
     try {
       final res = await http
           .post(
-            Uri.parse('$_gcpUrl/classify_user_diet'),
+            Uri.parse('$_renderUrl/classify_diet'),
             headers: _jsonHeaders,
             body: jsonEncode({
               'age': age,
@@ -112,12 +110,11 @@ class AiService {
               'goal': goal,
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 30));
 
       if (res.statusCode != 200) return null;
-
       final data = _decode(res);
-      if (data == null) return null;
+      if (data == null || data['status'] != 'ok') return null;
       return DietClassification.fromJson(data);
     } catch (_) {
       return null;

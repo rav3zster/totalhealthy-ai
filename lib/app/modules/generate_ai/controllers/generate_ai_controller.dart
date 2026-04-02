@@ -147,6 +147,34 @@ class GenerateAiController extends GetxController {
     }
   }
 
+  // ── Save a single meal to Firestore ──────────────────────────────────────
+  Future<void> saveSingleMeal(AiGeneratedMeal meal) async {
+    try {
+      final auth = Get.find<AuthController>();
+      final userId = auth.firebaseUser.value?.uid ?? '';
+      final groupId = auth.groupgetId();
+      await FirebaseFirestore.instance
+          .collection('meals')
+          .add(meal.toFirestoreMap(userId: userId, groupId: groupId));
+      Get.snackbar(
+        'Saved',
+        '${meal.name} added to your plan',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFFC2D86A),
+        colorText: Colors.black,
+        duration: const Duration(seconds: 2),
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Save Failed',
+        'Could not save meal: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFFFF4444),
+        colorText: Colors.white,
+      );
+    }
+  }
+
   // ── Save all generated meals to Firestore ──────────────────────────────────
   Future<void> saveAllMeals() async {
     if (generatedMeals.isEmpty) return;

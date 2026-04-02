@@ -131,6 +131,69 @@ def generate_meal():
         }), 500
 
 
+# ── Route 4: Diet classifier ──────────────────────────────────────────────────
+@app.route("/classify_diet", methods=["POST", "OPTIONS"])
+def classify_diet():
+    if request.method == "OPTIONS":
+        return jsonify({}), 204
+
+    body = request.get_json(silent=True) or {}
+    try:
+        age            = int(body.get("age", 25))
+        weight         = float(body.get("weight", 70))
+        height         = float(body.get("height", 170))
+        activity_level = int(body.get("activityLevel", 2))   # 1–5
+        goal           = body.get("goal", "maintenance")
+
+        # ── BMI ───────────────────────────────────────────────────────────
+        height_m = height / 100
+        bmi = round(weight / (height_m ** 2), 1)
+
+        # ── BMR (Mifflin-St Jeor, gender-neutral) ─────────────────────────
+        bmr = 10 * weight + 6.25 * height - 5 * age
+
+        # ── TDEE activity multipliers ─────────────────────────────────────
+        multipliers = {1: 1.2, 2: 1.375, 3: 1.55, 4: 1.725, 5: 1.9}
+        tdee = round(bmr * multipliers.get(activity_level, 1.375), 0)
+
+        # ── Recommended calories based on goal ────────────────────────────
+        goal_lower = goal.lower().replace(" ", "_")
+        if "loss" in goal_lower:
+            recommended = int(tdee - 500)
+        elif "gain" in goal_lower or "muscle" in goal_lower or "build" in goal_lower:
+            recommended = int(tdee + 300)
+        else:
+            recommended = int(tdee)
+
+        # ── Diet type via AI ──────────────────────────────────────────────
+        diet_prompt = (
+            f"A person aged {age}, weighing {weight}kg, height {height}cm, "
+            f"BMI {bmi}, activity level {activity_level}/5, goal: {goal}. "
+            f"Recommend ONE diet type from: keto, mediterranean, high_protein, "
+            f"balanced, low_carb, vegetarian. Reply with ONLY the diet type word, nothing else."
+        )
+        try:
+            diet_type = _call_ai(diet_prompt).strip().lower().split()[0]
+            # sanitise — only allow known values
+            allowed = {"keto","mediterranean","high_protein","balanced","low_carb","vegetarian"}
+            if diet_type not in allowed:
+                diet_type = "balanced"
+        except Exception:
+            diet_type = "balanced"
+
+        return jsonify({
+            "status":               "ok",
+            "dietType":             diet_type,
+            "bmi":                  bmi,
+            "tdee":                 tdee,
+            "recommendedCalories":  recommended,
+        }), 200
+
+    except Exception as e:
+        logger.exception(f"❌ classify_diet error: {e}")
+        return jsonify({"status": "error", "error": str(e)}), 500
+
+
 # ── Prompt builder ────────────────────────────────────────────────────────────
 
 def _build_prompt(data: dict) -> str:
@@ -150,80 +213,100 @@ def _build_prompt(data: dict) -> str:
     if not meal_types:
         meal_types = ["Breakfast", "Lunch", "Dinner"]
 
-    # Use the number of selected meal types as the target count.
-    # This ensures one distinct meal is generated per type selected.
-    total_meals   = max(meals_per_day, len(meal_types))
-    meal_types_str = ", ".join(meal_types)
+    total_meals    = max(meals_per_day, len(meal_types))
+    include_foods  = data.get("includeFoods", "")
+    avoid_foods    = data.get("avoidFoods", "")
+    exercise_freq  = data.get("exerciseFrequency", "")
+    exercise_type  = data.get("exerciseType", "")
+    pre_post       = data.get("prePostWorkoutNutrition", "no")
+    medical        = data.get("medicalConditions", "none")
+    instructions   = data.get("specialInstructions", "")
 
-    include_foods = data.get("includeFoods", "")
-    avoid_foods   = data.get("avoidFoods", "")
-    exercise_freq = data.get("exerciseFrequency", "")
-    exercise_type = data.get("exerciseType", "")
-    pre_post      = data.get("prePostWorkoutNutrition", "no")
-    medical       = data.get("medicalConditions", "none")
-    instructions  = data.get("specialInstructions", "")
-    group_cats    = data.get("groupCategories", [])
-    categories    = ", ".join(group_cats) if group_cats else meal_types_str
+    # ── Build constraint blocks ───────────────────────────────────────────────
 
-    # Build optional blocks
-    nutrition_lines = []
-    if calories: nutrition_lines.append(f"Target Calories: {calories} kcal")
-    if protein:  nutrition_lines.append(f"Target Protein: {protein}g")
-    if carbs:    nutrition_lines.append(f"Target Carbs: {carbs}g")
-    if fats:     nutrition_lines.append(f"Target Fats: {fats}g")
-    nutrition_block = ("\n" + "\n".join(f"  - {l}" for l in nutrition_lines)) if nutrition_lines else " not specified"
+    # Macro targets — shown as hard limits, not suggestions
+    macro_lines = []
+    if calories: macro_lines.append(f"Total daily calories ≈ {calories} kcal (split across all meals)")
+    if protein:  macro_lines.append(f"Total daily protein ≈ {protein}g")
+    if carbs:    macro_lines.append(f"Total daily carbs ≈ {carbs}g")
+    if fats:     macro_lines.append(f"Total daily fats ≈ {fats}g")
+    macro_block = "\n".join(f"  ⚡ {l}" for l in macro_lines) if macro_lines else "  Not specified — use sensible defaults for the goal"
 
-    activity_lines = []
-    if exercise_freq:             activity_lines.append(f"Frequency: {exercise_freq}")
-    if exercise_type:             activity_lines.append(f"Type: {exercise_type}")
-    if pre_post.lower() == "yes": activity_lines.append("Include pre/post workout meals")
-    activity_block = ("\n" + "\n".join(f"  - {l}" for l in activity_lines)) if activity_lines else " not specified"
+    # Activity context
+    activity_parts = []
+    if exercise_freq:              activity_parts.append(exercise_freq)
+    if exercise_type:              activity_parts.append(exercise_type)
+    if pre_post.lower() == "yes":  activity_parts.append("needs pre/post workout nutrition")
+    activity_str = ", ".join(activity_parts) if activity_parts else "not specified"
 
-    extras = []
-    if include_foods:                         extras.append(f"Foods to include: {include_foods}")
-    if avoid_foods:                           extras.append(f"Foods to avoid: {avoid_foods}")
-    if medical and medical.lower() != "none": extras.append(f"Medical conditions: {medical}")
-    if instructions:                          extras.append(f"Special instructions: {instructions}")
-    extras_block = ("\n" + "\n".join(f"  - {e}" for e in extras)) if extras else ""
+    # Hard exclusions
+    exclusions = []
+    if allergies != "none": exclusions.append(f"allergens ({allergies})")
+    if avoid_foods:         exclusions.append(f"user-avoided foods ({avoid_foods})")
+    exclusion_str = " and ".join(exclusions) if exclusions else "none"
 
-    # Build the JSON schema example for Gemini to follow
-    example_meal = '{"name":"string","category":"string","ingredients":["string"],"calories":0,"protein":0,"carbs":0,"fat":0,"description":"string"}'
+    # Preferred inclusions
+    inclusion_str = include_foods if include_foods else "none specified"
 
-    # List each required meal type explicitly so Gemini maps one meal per type
+    # Medical / special
+    medical_str      = medical if medical and medical.lower() != "none" else "none"
+    instructions_str = instructions if instructions else "none"
+
+    # Numbered meal type list
     meal_type_list = "\n".join(f"  {i+1}. {t}" for i, t in enumerate(meal_types))
 
-    prompt = f"""You are a professional nutritionist and meal planner.
-Generate a complete personalised meal plan with exactly {total_meals} meals — one for each meal type listed below.
+    example_meal = '{"name":"string","category":"string","ingredients":["string"],"calories":0,"protein":0,"carbs":0,"fat":0,"description":"string"}'
 
-USER PROFILE:
-  - Goal: {goal}
-  - Current Weight: {curr_weight} kg
-  - Target Weight: {target_weight} kg
-  - Nutrition targets:{nutrition_block}
+    prompt = f"""You are a certified nutritionist and personal meal planner. Your job is to create a highly personalised meal plan that strictly follows every constraint below. Ignoring any constraint is not acceptable.
 
-DIET REQUIREMENTS:
-  - Diet Type: {diet_type}
-  - Allergies — NEVER include these ingredients: {allergies}
-  - Cuisine Preference: {cuisine}
+═══════════════════════════════════════
+CRITICAL USER CONSTRAINTS — FOLLOW ALL
+═══════════════════════════════════════
 
-REQUIRED MEAL TYPES (generate exactly one meal per type, in this order):
+🎯 GOAL: {goal}
+   Current weight: {curr_weight} kg → Target: {target_weight} kg
+   Every meal MUST actively support this goal.
+
+🍽️ CUISINE: {cuisine}
+   ALL meals must be authentic {cuisine} cuisine dishes.
+   Do NOT use generic or non-{cuisine} meals.
+
+🥗 DIET TYPE: {diet_type}
+   Strictly follow this diet. No exceptions.
+
+🚫 NEVER USE (hard exclusions): {exclusion_str}
+   If any excluded ingredient appears, the response is invalid.
+
+✅ PREFERRED INGREDIENTS TO INCLUDE: {inclusion_str}
+
+📊 DAILY MACRO TARGETS (distribute across all {total_meals} meals):
+{macro_block}
+
+🏋️ ACTIVITY LEVEL: {activity_str}
+   Adjust meal timing and macros to support this activity.
+
+🏥 MEDICAL CONDITIONS: {medical_str}
+🗒️ SPECIAL INSTRUCTIONS: {instructions_str}
+
+═══════════════════════════════════════
+MEAL TYPES REQUIRED
+═══════════════════════════════════════
+Generate exactly {total_meals} meals, one per type:
 {meal_type_list}
 
-PHYSICAL ACTIVITY:{activity_block}
-{extras_block}
+Each meal's "category" field must exactly match the meal type name above.
 
-ABSOLUTE RULES — FOLLOW EXACTLY:
-  1. Generate exactly {total_meals} meals — one per meal type above, no duplicates
-  2. Each meal's "category" field MUST match its meal type exactly
-  3. NEVER include any allergen: {allergies}
-  4. Match cuisine style: {cuisine}
-  5. Support the goal: {goal}
-  6. Every meal must be nutritionally distinct — no repeated dishes or ingredients
-  7. Use realistic, accurate calorie and macro values appropriate for each meal type
-  8. Output ONLY raw JSON — zero markdown, zero explanation, zero code fences
-  9. Do NOT wrap output in ```json or ``` blocks
+═══════════════════════════════════════
+OUTPUT RULES
+═══════════════════════════════════════
+1. Output ONLY raw JSON — no markdown, no explanation, no code fences
+2. Do NOT wrap in ```json or ``` blocks
+3. Every meal must be a real, named dish (not "Healthy Lunch")
+4. Ingredients must be specific with quantities (e.g. "150g chicken breast")
+5. Calories and macros must be realistic and match the targets
+6. No two meals can share the same main ingredient
 
-OUTPUT FORMAT — return ONLY this JSON with exactly {total_meals} items in the meals array:
+Return ONLY this JSON structure with exactly {total_meals} items:
 {{"meals":[{example_meal}]}}"""
 
     return prompt
@@ -241,7 +324,13 @@ def _call_ai(prompt: str, attempt: int = 0) -> str:
             },
             json={
                 "model": OPENROUTER_MODEL,
-                "messages": [{"role": "user", "content": prompt}],
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are a strict meal planning assistant. You ALWAYS follow every user constraint exactly — cuisine, diet type, allergies, macros, and goal. You NEVER ignore any input. You output ONLY valid raw JSON with no markdown, no explanation, and no code fences."
+                    },
+                    {"role": "user", "content": prompt}
+                ],
                 "temperature": 0.9,
                 "max_tokens": 4096,
             },
