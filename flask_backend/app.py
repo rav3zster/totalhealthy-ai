@@ -324,11 +324,9 @@ def _call_ai(prompt: str, attempt: int = 0) -> str:
             },
             json={
                 "model": OPENROUTER_MODEL,
+                # Gemma models only support "user" / "assistant" roles —
+                # no "system" role. Instruction is embedded in the user message.
                 "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are a strict meal planning assistant. You ALWAYS follow every user constraint exactly — cuisine, diet type, allergies, macros, and goal. You NEVER ignore any input. You output ONLY valid raw JSON with no markdown, no explanation, and no code fences."
-                    },
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": 0.9,
@@ -336,6 +334,8 @@ def _call_ai(prompt: str, attempt: int = 0) -> str:
             },
             timeout=60,
         )
+        if not response.ok:
+            logger.error(f"OpenRouter {response.status_code}: {response.text[:600]}")
         response.raise_for_status()
         data = response.json()
         text = data["choices"][0]["message"]["content"].strip()
