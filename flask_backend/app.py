@@ -58,6 +58,22 @@ def after_request(response):
     return _cors(response)
 
 
+# ── Global error handlers — ensure CORS headers on all errors ─────────────────
+@app.errorhandler(Exception)
+def handle_exception(e):
+    logger.exception(f"❌ Unhandled exception: {e}")
+    response = jsonify({"status": "error", "error": str(e), "meals": []})
+    response.status_code = 500
+    return _cors(response)
+
+
+@app.errorhandler(500)
+def handle_500(e):
+    response = jsonify({"status": "error", "error": str(e), "meals": []})
+    response.status_code = 500
+    return _cors(response)
+
+
 # ── Route 1: Health check ─────────────────────────────────────────────────────
 @app.route("/", methods=["GET"])
 def health():
