@@ -10,6 +10,7 @@ import time
 import logging
 import requests
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 # ── Flask app ─────────────────────────────────────────────────────────────────
 app = Flask(__name__)
+CORS(app, origins="*", supports_credentials=False)
 
 # ── OpenRouter setup ──────────────────────────────────────────────────────────
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
@@ -45,32 +47,16 @@ FALLBACK_MEAL = {
 }
 
 
-# ── CORS helper ───────────────────────────────────────────────────────────────
-def _cors(response):
-    response.headers["Access-Control-Allow-Origin"]  = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    return response
-
-
-@app.after_request
-def after_request(response):
-    return _cors(response)
-
-
-# ── Global error handlers — ensure CORS headers on all errors ─────────────────
+# ── Global error handlers ─────────────────────────────────────────────────────
 @app.errorhandler(Exception)
 def handle_exception(e):
     logger.exception(f"❌ Unhandled exception: {e}")
-    response = jsonify({"status": "error", "error": str(e), "meals": []})
-    response.status_code = 500
-    return _cors(response)
+    return jsonify({"status": "error", "error": str(e), "meals": []}), 500
 
 
 @app.errorhandler(500)
 def handle_500(e):
-    response = jsonify({"status": "error", "error": str(e), "meals": []})
-    response.status_code = 500
+    return jsonify({"status": "error", "error": str(e), "meals": []}), 500
     return _cors(response)
 
 
@@ -93,13 +79,8 @@ def test():
 
 
 # ── Route 3: Main AI endpoint ─────────────────────────────────────────────────
-@app.route("/generate_meal", methods=["POST", "OPTIONS"])
-def generate_meal():
-    # Handle CORS preflight
-    if request.method == "OPTIONS":
-        return jsonify({}), 204
-
-    logger.info("=" * 50)
+@app.route("/generate_meal", methods=["POST"])
+def generate_meal():    logger.info("=" * 50)
     logger.info("POST /generate_meal — request received")
 
     body = request.get_json(silent=True)
@@ -132,11 +113,8 @@ def generate_meal():
 
 
 # ── Route 4: Diet classifier ──────────────────────────────────────────────────
-@app.route("/classify_diet", methods=["POST", "OPTIONS"])
+@app.route("/classify_diet", methods=["POST"])
 def classify_diet():
-    if request.method == "OPTIONS":
-        return jsonify({}), 204
-
     body = request.get_json(silent=True) or {}
     try:
         age            = int(body.get("age", 25))
