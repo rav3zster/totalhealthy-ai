@@ -537,7 +537,7 @@ def _call_ai(prompt: str, attempt: int = 0) -> str:
                 "model": model,
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.9,
-                "max_tokens": 4096,
+                "max_tokens": 6000,
             },
             timeout=(10, 40),  # (connect timeout, read timeout)
             stream=False,
@@ -569,49 +569,50 @@ def _parse_response(raw: str) -> list:
     cleaned = re.sub(r"```(?:json)?", "", raw, flags=re.IGNORECASE)
     cleaned = cleaned.strip().strip("`").strip()
 
-    # Step 2: try to parse — handle both {"meals":[...]} and [{...}] formats
-    data = None
+    meals_list = None
 
-    # Try object format first: {"meals": [...]}
-    obj_match = re.search(r"\{.*\}", cleaned, re.DOTALL)
-    if obj_match:
+    # Step 2a: try full parse — {"meals":[...]} or [{...}]
+    for pattern in (r"\{.*\}", r"\[.*\]"):
+        match = re.search(pattern, cleaned, re.DOTALL)
+        if not match:
+            continue
         try:
-            parsed = json.loads(obj_match.group())
+            parsed = json.loads(match.group())
             if isinstance(parsed, dict) and "meals" in parsed:
-                data = parsed
+                meals_list = parsed["meals"]
             elif isinstance(parsed, dict):
-                # Single meal object — wrap it
-                data = {"meals": [parsed]}
+                meals_list = [parsed]
+            elif isinstance(parsed, list):
+                meals_list = parsed
+            if meals_list:
+                break
         except json.JSONDecodeError:
             pass
 
-    # Try array format: [{...}, {...}]
-    if data is None:
-        arr_match = re.search(r"\[.*\]", cleaned, re.DOTALL)
-        if arr_match:
+    # Step 2b: truncated JSON recovery — extract individual complete meal objects
+    # Matches each {...} block that contains a "name" key (a meal object)
+    if not meals_list:
+        candidates = []
+        for m in re.finditer(r'\{[^{}]*"name"\s*:\s*"[^"]+?"[^{}]*\}', cleaned, re.DOTALL):
             try:
-                parsed = json.loads(arr_match.group())
-                if isinstance(parsed, list):
-                    data = {"meals": parsed}
+                obj = json.loads(m.group())
+                if isinstance(obj, dict) and obj.get("name"):
+                    candidates.append(obj)
             except json.JSONDecodeError:
                 pass
+        if candidates:
+            logger.warning(f"Used truncation recovery — salvaged {len(candidates)} meal(s)")
+            meals_list = candidates
 
-    if data is None:
+    if not meals_list:
         logger.error(f"Could not parse any JSON. Raw:\n{raw[:500]}")
         return [FALLBACK_MEAL]
 
-    # Step 3: extract meals array
-    meals = data.get("meals")
-    if not isinstance(meals, list) or len(meals) == 0:
-        logger.warning(f"'meals' key missing or empty. Keys: {list(data.keys())}")
-        return [FALLBACK_MEAL]
-
-    # Step 4: validate and sanitise each meal
+    # Step 3: validate and sanitise each meal
     validated = []
-    for i, meal in enumerate(meals):
+    for meal in meals_list:
         if not isinstance(meal, dict):
             continue
-        # Clean ingredients — strip any embedded nutrition text after " - "
         raw_ings = meal.get("ingredients") or []
         ingredients = [str(x).split(" - ")[0].strip() for x in raw_ings]
         validated.append({
