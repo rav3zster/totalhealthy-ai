@@ -147,16 +147,20 @@ class AiResultsScreen extends StatelessWidget {
                 () => ListView.builder(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
                   itemCount: controller.generatedMeals.length,
-                  itemBuilder: (context, i) => _MealCard(
-                    meal: controller.generatedMeals[i],
-                    index: i,
-                    onSave: () =>
-                        controller.saveSingleMeal(controller.generatedMeals[i]),
-                    onRegenerate: () => controller.regenerateSingleMeal(
-                      controller.generatedMeals[i],
+                  itemBuilder: (context, i) => Obx(
+                    () => _MealCard(
+                      meal: controller.generatedMeals[i],
+                      index: i,
+                      onSave: () => controller.saveSingleMeal(
+                        controller.generatedMeals[i],
+                      ),
+                      onRegenerate: () => controller.regenerateSingleMeal(
+                        controller.generatedMeals[i],
+                      ),
+                      onExplain: () =>
+                          controller.explainMeal(controller.generatedMeals[i]),
+                      isSwapping: controller.swappingIndices.contains(i),
                     ),
-                    onExplain: () =>
-                        controller.explainMeal(controller.generatedMeals[i]),
                   ),
                 ),
               ),
@@ -246,12 +250,14 @@ class _MealCard extends StatefulWidget {
   final VoidCallback onSave;
   final VoidCallback onRegenerate;
   final VoidCallback onExplain;
+  final bool isSwapping;
   const _MealCard({
     required this.meal,
     required this.index,
     required this.onSave,
     required this.onRegenerate,
     required this.onExplain,
+    required this.isSwapping,
   });
 
   @override
@@ -546,11 +552,46 @@ class _MealCardState extends State<_MealCard>
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
                 child: Row(
                   children: [
-                    _ActionChip(
-                      icon: Icons.refresh_rounded,
-                      label: 'Swap',
-                      onTap: widget.onRegenerate,
-                    ),
+                    widget.isSwapping
+                        ? Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.1),
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: 12,
+                                  height: 12,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 1.5,
+                                    color: Color(0xFFC2D86A),
+                                  ),
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Swapping...',
+                                  style: TextStyle(
+                                    color: Color(0xFFC2D86A),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : _ActionChip(
+                            icon: Icons.refresh_rounded,
+                            label: 'Swap',
+                            onTap: widget.onRegenerate,
+                          ),
                     const SizedBox(width: 8),
                     _ActionChip(
                       icon: Icons.help_outline_rounded,

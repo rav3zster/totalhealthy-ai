@@ -197,17 +197,13 @@ class GenerateAiController extends GetxController {
   }
 
   // ── Regenerate a single meal in-place ─────────────────────────────────────
+  final RxSet<int> swappingIndices = <int>{}.obs;
+
   Future<void> regenerateSingleMeal(AiGeneratedMeal meal) async {
     final idx = generatedMeals.indexOf(meal);
     if (idx < 0) return;
-    Get.snackbar(
-      'Swapping',
-      'Finding a different ${meal.category}...',
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-      backgroundColor: const Color(0xFF1A1A1A),
-      colorText: Colors.white70,
-    );
+
+    swappingIndices.add(idx);
     try {
       final replacement = await AiService.instance.regenerateSingleMeal(
         excludeMealName: meal.name,
@@ -215,7 +211,16 @@ class GenerateAiController extends GetxController {
         userInputs: _buildPayload(),
       );
       if (replacement != null) {
-        generatedMeals[idx] = replacement;
+        // replaceRange triggers GetX reactivity correctly
+        generatedMeals.replaceRange(idx, idx + 1, [replacement]);
+      } else {
+        Get.snackbar(
+          'No result',
+          'Could not find a different ${meal.category}.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: const Color(0xFF1A1A1A),
+          colorText: Colors.white70,
+        );
       }
     } catch (_) {
       Get.snackbar(
@@ -225,6 +230,8 @@ class GenerateAiController extends GetxController {
         backgroundColor: const Color(0xFFFF4444),
         colorText: Colors.white,
       );
+    } finally {
+      swappingIndices.remove(idx);
     }
   }
 
