@@ -30,8 +30,8 @@ if not OPENROUTER_API_KEY:
 else:
     logger.info(f"✅ OPENROUTER_API_KEY loaded (ends ...{OPENROUTER_API_KEY[-4:]})")
 
-OPENROUTER_MODEL         = "stepfun/step-3.5-flash:free"
-OPENROUTER_MODEL_FALLBACK = "arcee-ai/trinity-mini:free"
+OPENROUTER_MODEL         = "arcee-ai/trinity-mini:free"
+OPENROUTER_MODEL_FALLBACK = "liquid/lfm-2.5-1.2b-instruct:free"
 OPENROUTER_URL   = "https://openrouter.ai/api/v1/chat/completions"
 logger.info(f"✅ AI model: {OPENROUTER_MODEL}")
 
@@ -316,7 +316,10 @@ def _call_ai(prompt: str, attempt: int = 0) -> str:
             logger.error(f"OpenRouter {response.status_code} [{model}]: {response.text[:400]}")
         response.raise_for_status()
         data = response.json()
-        text = data["choices"][0]["message"]["content"].strip()
+        content = data.get("choices", [{}])[0].get("message", {}).get("content")
+        if not content:
+            raise ValueError(f"AI returned null/empty content. Full response: {data}")
+        text = content.strip()
         if not text:
             raise ValueError("AI returned empty response")
         return text
