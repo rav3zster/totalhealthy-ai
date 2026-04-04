@@ -232,6 +232,8 @@ class GenerateAiController extends GetxController {
     'medicalConditions': medicalConditionController.text.trim(),
     'specialInstructions': specialInstructionsController.text.trim(),
     'preferredStartDate': preferredStartDate.value?.toIso8601String(),
+    // Send previously generated meal names so the backend avoids repeating them
+    'previousMeals': generatedMeals.map((m) => m.name).toList(),
   };
 
   @override

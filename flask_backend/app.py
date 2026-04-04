@@ -7,6 +7,7 @@ import os
 import json
 import re
 import time
+import random
 import logging
 import requests
 from flask import Flask, request, jsonify
@@ -95,7 +96,6 @@ def generate_meal():
     try:
         prompt = _build_prompt(body)
         logger.info(f"Prompt built — {len(prompt)} chars")
-
         raw = _call_ai(prompt)
         logger.info(f"AI responded — first 400 chars:\n{raw[:400]}")
 
@@ -177,6 +177,141 @@ def classify_diet():
 # ── Prompt builder ────────────────────────────────────────────────────────────
 
 def _build_prompt(data: dict) -> str:
+    goal          = data.get("goal", "maintenance")
+    curr_weight   = data.get("currentWeight", "not specified")
+    target_weight = data.get("targetWeight", "not specified")
+    calories      = data.get("calories", "")
+    protein       = data.get("protein", "")
+    carbs         = data.get("carbs", "")
+    fats          = data.get("fats", "")
+    diet_type     = data.get("dietType", "not specific")
+    allergies_raw = data.get("allergies", [])
+    allergies     = ", ".join(allergies_raw) if allergies_raw else "none"
+    cuisine       = data.get("cuisine", "any")
+    meals_per_day = max(1, int(data.get("mealsPerDay", 3)))
+    meal_types    = data.get("mealTypes", ["Breakfast", "Lunch", "Dinner"])
+    if not meal_types:
+        meal_types = ["Breakfast", "Lunch", "Dinner"]
+
+    total_meals    = max(meals_per_day, len(meal_types))
+    include_foods  = data.get("includeFoods", "")
+    avoid_foods    = data.get("avoidFoods", "")
+    exercise_freq  = data.get("exerciseFrequency", "")
+    exercise_type  = data.get("exerciseType", "")
+    pre_post       = data.get("prePostWorkoutNutrition", "no")
+    medical        = data.get("medicalConditions", "none")
+    instructions   = data.get("specialInstructions", "")
+
+    # Previously generated meal names — must not repeat these
+    previous_meals = data.get("previousMeals", [])
+
+    # ── Build constraint blocks ───────────────────────────────────────────────
+
+    macro_lines = []
+    if calories: macro_lines.append(f"Total daily calories ≈ {calories} kcal (split across all meals)")
+    if protein:  macro_lines.append(f"Total daily protein ≈ {protein}g")
+    if carbs:    macro_lines.append(f"Total daily carbs ≈ {carbs}g")
+    if fats:     macro_lines.append(f"Total daily fats ≈ {fats}g")
+    macro_block = "\n".join(f"  ⚡ {l}" for l in macro_lines) if macro_lines else "  Not specified — use sensible defaults for the goal"
+
+    activity_parts = []
+    if exercise_freq:              activity_parts.append(exercise_freq)
+    if exercise_type:              activity_parts.append(exercise_type)
+    if pre_post.lower() == "yes":  activity_parts.append("needs pre/post workout nutrition")
+    activity_str = ", ".join(activity_parts) if activity_parts else "not specified"
+
+    exclusions = []
+    if allergies != "none": exclusions.append(f"allergens ({allergies})")
+    if avoid_foods:         exclusions.append(f"user-avoided foods ({avoid_foods})")
+    exclusion_str = " and ".join(exclusions) if exclusions else "none"
+
+    inclusion_str    = include_foods if include_foods else "none specified"
+    medical_str      = medical if medical and medical.lower() != "none" else "none"
+    instructions_str = instructions if instructions else "none"
+    meal_type_list   = "\n".join(f"  {i+1}. {t}" for i, t in enumerate(meal_types))
+
+    # Variety seed — forces the model to think differently each call
+    variety_themes = [
+        "Focus on bold, spicy flavours this time.",
+        "Use lighter, refreshing ingredients this time.",
+        "Emphasise high-fibre whole foods this time.",
+        "Use fermented or probiotic-rich ingredients where possible.",
+        "Focus on quick-to-prepare meals with minimal cooking.",
+        "Use seasonal vegetables as the star ingredient.",
+        "Emphasise anti-inflammatory ingredients this time.",
+        "Focus on comfort food versions that still hit the macros.",
+    ]
+    variety_hint = random.choice(variety_themes)
+
+    # Previously generated meals exclusion block
+    if previous_meals:
+        prev_list = "\n".join(f"  - {m}" for m in previous_meals[:20])
+        exclusion_block = f"""
+🔄 VARIETY REQUIRED — DO NOT REPEAT:
+   These meals were already generated. Generate completely different dishes:
+{prev_list}
+   Every meal name and main ingredient must be different from the above.
+"""
+    else:
+        exclusion_block = ""
+
+    example_meal = '{"name":"string","category":"string","ingredients":["string"],"calories":0,"protein":0,"carbs":0,"fat":0,"description":"string"}'
+
+    prompt = f"""You are a certified nutritionist and personal meal planner. Your job is to create a highly personalised meal plan that strictly follows every constraint below. Ignoring any constraint is not acceptable.
+
+═══════════════════════════════════════
+CRITICAL USER CONSTRAINTS — FOLLOW ALL
+═══════════════════════════════════════
+
+🎯 GOAL: {goal}
+   Current weight: {curr_weight} kg → Target: {target_weight} kg
+   Every meal MUST actively support this goal.
+
+🍽️ CUISINE: {cuisine}
+   ALL meals must be authentic {cuisine} cuisine dishes.
+   Do NOT use generic or non-{cuisine} meals.
+
+🥗 DIET TYPE: {diet_type}
+   Strictly follow this diet. No exceptions.
+
+🚫 NEVER USE (hard exclusions): {exclusion_str}
+   If any excluded ingredient appears, the response is invalid.
+
+✅ PREFERRED INGREDIENTS TO INCLUDE: {inclusion_str}
+
+📊 DAILY MACRO TARGETS (distribute across all {total_meals} meals):
+{macro_block}
+
+🏋️ ACTIVITY LEVEL: {activity_str}
+   Adjust meal timing and macros to support this activity.
+
+🏥 MEDICAL CONDITIONS: {medical_str}
+🗒️ SPECIAL INSTRUCTIONS: {instructions_str}
+{exclusion_block}
+💡 VARIETY HINT: {variety_hint}
+
+═══════════════════════════════════════
+MEAL TYPES REQUIRED
+═══════════════════════════════════════
+Generate exactly {total_meals} meals, one per type:
+{meal_type_list}
+
+Each meal's "category" field must exactly match the meal type name above.
+
+═══════════════════════════════════════
+OUTPUT RULES
+═══════════════════════════════════════
+1. Output ONLY raw JSON — no markdown, no explanation, no code fences
+2. Do NOT wrap in ```json or ``` blocks
+3. Every meal must be a real, named dish (not "Healthy Lunch")
+4. Ingredients must be specific with quantities (e.g. "150g chicken breast")
+5. Calories and macros must be realistic and match the targets
+6. No two meals can share the same main ingredient
+
+Return ONLY this JSON structure with exactly {total_meals} items:
+{{"meals":[{example_meal}]}}"""
+
+    return prompt
     goal          = data.get("goal", "maintenance")
     curr_weight   = data.get("currentWeight", "not specified")
     target_weight = data.get("targetWeight", "not specified")
