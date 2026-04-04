@@ -30,7 +30,8 @@ if not OPENROUTER_API_KEY:
 else:
     logger.info(f"✅ OPENROUTER_API_KEY loaded (ends ...{OPENROUTER_API_KEY[-4:]})")
 
-OPENROUTER_MODEL = "meta-llama/llama-3.2-3b-instruct:free"
+OPENROUTER_MODEL         = "stepfun/step-3.5-flash:free"
+OPENROUTER_MODEL_FALLBACK = "arcee-ai/trinity-mini:free"
 OPENROUTER_URL   = "https://openrouter.ai/api/v1/chat/completions"
 logger.info(f"✅ AI model: {OPENROUTER_MODEL}")
 
@@ -294,6 +295,7 @@ Return ONLY this JSON structure with exactly {total_meals} items:
 # ── OpenRouter / Mistral call with one retry ─────────────────────────────────
 
 def _call_ai(prompt: str, attempt: int = 0) -> str:
+    model = OPENROUTER_MODEL if attempt == 0 else OPENROUTER_MODEL_FALLBACK
     try:
         response = requests.post(
             OPENROUTER_URL,
@@ -302,19 +304,15 @@ def _call_ai(prompt: str, attempt: int = 0) -> str:
                 "Content-Type": "application/json",
             },
             json={
-                "model": OPENROUTER_MODEL,
-                # Gemma models only support "user" / "assistant" roles —
-                # no "system" role. Instruction is embedded in the user message.
-                "messages": [
-                    {"role": "user", "content": prompt}
-                ],
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.9,
                 "max_tokens": 4096,
             },
             timeout=60,
         )
         if not response.ok:
-            logger.error(f"OpenRouter {response.status_code}: {response.text[:600]}")
+            logger.error(f"OpenRouter {response.status_code} [{model}]: {response.text[:400]}")
         response.raise_for_status()
         data = response.json()
         text = data["choices"][0]["message"]["content"].strip()
@@ -323,10 +321,10 @@ def _call_ai(prompt: str, attempt: int = 0) -> str:
         return text
     except Exception as e:
         if attempt == 0:
-            logger.warning(f"AI attempt 1 failed: {e} — retrying in 2s")
-            time.sleep(2)
+            logger.warning(f"Model {model} failed: {e} — trying fallback")
+            time.sleep(1)
             return _call_ai(prompt, attempt=1)
-        logger.error(f"AI attempt 2 also failed: {e}")
+        logger.error(f"Fallback model {model} also failed: {e}")
         raise
 
 
