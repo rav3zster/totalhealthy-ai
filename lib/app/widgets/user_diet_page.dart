@@ -20,7 +20,7 @@ import 'nutritional_card.dart';
 class UserDietPage extends StatefulWidget {
   final String id;
   final UserDietScreenController controller;
-  UserDietPage({Key? key, required this.id, required this.controller});
+  const UserDietPage({super.key, required this.id, required this.controller});
   @override
   State<UserDietPage> createState() => _UserDietPageState();
 }
