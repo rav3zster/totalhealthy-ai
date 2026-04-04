@@ -174,6 +174,101 @@ def classify_diet():
         return jsonify({"status": "error", "error": str(e)}), 500
 
 
+# ── Route 5: Explain meal ─────────────────────────────────────────────────────@app.route("/explain_meal", methods=["POST"])
+def explain_meal():
+    body      = request.get_json(silent=True) or {}
+    meal_name = body.get("mealName", "")
+    goal      = body.get("goal", "maintenance")
+    diet_type = body.get("dietType", "not specific")
+
+    if not meal_name:
+        return jsonify({"status": "error", "error": "mealName required"}), 400
+
+    try:
+        prompt = (
+            f"In 2-3 sentences, explain why '{meal_name}' is a great choice for someone "
+            f"with a {goal} goal following a {diet_type} diet. "
+            f"Focus on the key nutritional benefits. Be concise and encouraging."
+        )
+        explanation = _call_ai(prompt)
+        return jsonify({"status": "ok", "explanation": explanation.strip()}), 200
+    except Exception as e:
+        logger.exception(f"❌ explain_meal error: {e}")
+        return jsonify({"status": "error", "error": str(e)}), 500
+
+
+# ── Route 6: Food image scan ──────────────────────────────────────────────────
+@app.route("/scan_food", methods=["POST"])
+def scan_food():
+    body       = request.get_json(silent=True) or {}
+    image_b64  = body.get("image")   # base64-encoded image string
+    mime_type  = body.get("mimeType", "image/jpeg")
+
+    if not image_b64:
+        return jsonify({"status": "error", "error": "image required"}), 400
+
+    try:
+        prompt = (
+            "You are a nutrition expert. Analyse this food image and return ONLY raw JSON "
+            "(no markdown, no explanation) in this exact format:\n"
+            '{"name":"string","calories":0,"protein":0,"carbs":0,"fat":0,"description":"string"}\n'
+            "Use realistic nutritional values for a standard serving size."
+        )
+
+        # Use OpenRouter vision-capable model
+        vision_model = "google/gemma-3-4b-it:free"  # supports vision
+        response = requests.post(
+            OPENROUTER_URL,
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": vision_model,
+                "messages": [{
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {"type": "image_url", "image_url": {
+                            "url": f"data:{mime_type};base64,{image_b64}"
+                        }},
+                    ],
+                }],
+                "max_tokens": 256,
+            },
+            timeout=(10, 30),
+            stream=False,
+        )
+
+        if not response.ok:
+            logger.error(f"Vision API {response.status_code}: {response.text[:300]}")
+            return jsonify({"status": "error", "error": "Vision model unavailable"}), 500
+
+        data    = response.json()
+        content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+
+        # Parse JSON from response
+        cleaned = re.sub(r"```(?:json)?", "", content, flags=re.IGNORECASE).strip().strip("`")
+        match   = re.search(r"\{.*\}", cleaned, re.DOTALL)
+        if not match:
+            return jsonify({"status": "error", "error": "Could not parse food data"}), 500
+
+        food = json.loads(match.group())
+        return jsonify({
+            "status":      "ok",
+            "name":        str(food.get("name", "Unknown Food")),
+            "calories":    _safe_num(food.get("calories"), 0),
+            "protein":     _safe_num(food.get("protein"),  0),
+            "carbs":       _safe_num(food.get("carbs"),    0),
+            "fat":         _safe_num(food.get("fat"),      0),
+            "description": str(food.get("description", "")),
+        }), 200
+
+    except Exception as e:
+        logger.exception(f"❌ scan_food error: {e}")
+        return jsonify({"status": "error", "error": str(e)}), 500
+
+
 # ── Prompt builder ────────────────────────────────────────────────────────────
 
 def _build_prompt(data: dict) -> str:

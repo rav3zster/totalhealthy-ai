@@ -126,6 +126,21 @@ class GenerateAiController extends GetxController {
     }
   }
 
+  @override
+  void onInit() {
+    super.onInit();
+    _loadSavedPreferences();
+  }
+
+  Future<void> _loadSavedPreferences() async {
+    final prefs = await AiService.instance.loadPreferences();
+    if (prefs['goal']?.isNotEmpty == true) selectedGoal.value = prefs['goal']!;
+    if (prefs['dietType']?.isNotEmpty == true)
+      dietType.value = prefs['dietType']!;
+    if (prefs['cuisine']?.isNotEmpty == true)
+      preferredCuisine.value = prefs['cuisine']!;
+  }
+
   // ── MAIN: Generate Plan ────────────────────────────────────────────────────
   Future<void> generatePlan() async {
     if (isGenerating.value) return;
@@ -140,6 +155,12 @@ class GenerateAiController extends GetxController {
       );
       generatedMeals.assignAll(meals);
       hasResult.value = true;
+      // Persist preferences for next session
+      AiService.instance.savePreferences(
+        goal: selectedGoal.value,
+        dietType: dietType.value,
+        cuisine: preferredCuisine.value,
+      );
     } catch (e) {
       errorMessage.value = e.toString().replaceFirst('Exception: ', '');
     } finally {
@@ -173,6 +194,50 @@ class GenerateAiController extends GetxController {
         colorText: Colors.white,
       );
     }
+  }
+
+  // ── Regenerate a single meal in-place ─────────────────────────────────────
+  Future<void> regenerateSingleMeal(AiGeneratedMeal meal) async {
+    final idx = generatedMeals.indexOf(meal);
+    if (idx < 0) return;
+    Get.snackbar(
+      'Swapping',
+      'Finding a different ${meal.category}...',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 2),
+      backgroundColor: const Color(0xFF1A1A1A),
+      colorText: Colors.white70,
+    );
+    try {
+      final replacement = await AiService.instance.regenerateSingleMeal(
+        excludeMealName: meal.name,
+        category: meal.category,
+        userInputs: _buildPayload(),
+      );
+      if (replacement != null) {
+        generatedMeals[idx] = replacement;
+      }
+    } catch (_) {
+      Get.snackbar(
+        'Failed',
+        'Could not swap meal. Try again.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFFFF4444),
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  // ── Explain why a meal fits the user's goal ────────────────────────────────
+  Future<void> explainMeal(AiGeneratedMeal meal) async {
+    Get.dialog(
+      _ExplainDialog(
+        mealName: meal.name,
+        goal: selectedGoal.value,
+        dietType: dietType.value,
+      ),
+      barrierDismissible: true,
+    );
   }
 
   // ── Save all generated meals to Firestore ──────────────────────────────────
@@ -249,5 +314,127 @@ class GenerateAiController extends GetxController {
     medicalConditionController.dispose();
     specialInstructionsController.dispose();
     super.onClose();
+  }
+}
+
+// ── Explain Meal Dialog ───────────────────────────────────────────────────────
+
+class _ExplainDialog extends StatefulWidget {
+  final String mealName;
+  final String goal;
+  final String dietType;
+  const _ExplainDialog({
+    required this.mealName,
+    required this.goal,
+    required this.dietType,
+  });
+
+  @override
+  State<_ExplainDialog> createState() => _ExplainDialogState();
+}
+
+class _ExplainDialogState extends State<_ExplainDialog> {
+  String? _explanation;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final result = await AiService.instance.explainMeal(
+      mealName: widget.mealName,
+      goal: widget.goal,
+      dietType: widget.dietType,
+    );
+    if (mounted)
+      setState(() {
+        _explanation = result;
+        _loading = false;
+      });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: const Color(0xFF141414),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: Color(0xFFC2D86A),
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    widget.mealName,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Why this meal?',
+              style: TextStyle(color: Colors.white38, fontSize: 12),
+            ),
+            const SizedBox(height: 16),
+            if (_loading)
+              const Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Color(0xFFC2D86A),
+                  ),
+                ),
+              )
+            else
+              Text(
+                _explanation ?? 'Could not generate explanation.',
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Get.back(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFC2D86A),
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Got it',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

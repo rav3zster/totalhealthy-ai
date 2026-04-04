@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
 class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
+
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
 }
@@ -96,7 +98,7 @@ class SettingOption extends StatelessWidget {
   final List<String> items;
   final ValueChanged<String?> onChanged;
 
-  SettingOption({
+  const SettingOption({super.key, 
     required this.title,
     required this.value,
     required this.items,

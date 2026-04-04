@@ -283,7 +283,7 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet>
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButtonFormField<GroupCategoryModel>(
-          value: widget.controller.selectedGroupCategory.value,
+          initialValue: widget.controller.selectedGroupCategory.value,
           hint: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(

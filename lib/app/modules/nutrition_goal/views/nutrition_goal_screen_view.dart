@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:totalhealthy/app/widgets/base_screen.dart';
 
 import '../controllers/nutrition_goal_controller.dart';
 import 'nutrition_goal_screen.dart';

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/base/views/base_view.dart';
-import '../../nutrition_goal/views/nutrition_goal_screen_view.dart';
 import 'notification_screen.dart';
 
 class NotificationView extends BaseView {

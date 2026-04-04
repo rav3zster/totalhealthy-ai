@@ -257,7 +257,7 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
             Switch(
               value: currentValue,
               onChanged: (value) => onChanged(value),
-              activeColor: context.accent,
+              activeThumbColor: context.accent,
               activeTrackColor: context.accent.withValues(alpha: 0.5),
               inactiveThumbColor: context.textSecondary,
               inactiveTrackColor: context.textSecondary.withValues(alpha: 0.3),

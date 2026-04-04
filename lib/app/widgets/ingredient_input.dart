@@ -7,7 +7,7 @@ class IngredientInput extends StatelessWidget {
   final CreateMealController controller;
   final VoidCallback onRemove;
 
-  IngredientInput({
+  const IngredientInput({super.key, 
     required this.onRemove,
     required this.index,
     required this.controller,
@@ -55,7 +55,7 @@ class IngredientInput extends StatelessWidget {
             ),
           ),
           SizedBox(width: 10),
-          Container(
+          SizedBox(
             width: 80,
             child: TextField(
               controller:
@@ -90,7 +90,7 @@ class IngredientInput extends StatelessWidget {
             ),
           ),
           SizedBox(width: 10),
-          Container(
+          SizedBox(
             width: 80,
             child: TextField(
               controller:

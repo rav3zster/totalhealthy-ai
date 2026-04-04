@@ -908,25 +908,62 @@ class ClientDashboardControllers extends GetxController {
     update();
   }
 
-  /// Load group stats from Firestore (placeholder for future stat calculations)
+  /// Compute group stats from actual meals filtered by groupId and today's date
   Future<void> _loadGroupStats(String groupId) async {
     try {
-      print("📊 Loading stats for group: $groupId");
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) return;
 
-      final doc = await _firestore.collection('groups').doc(groupId).get();
+      // Fetch all meals for this group
+      final snapshot = await _firestore
+          .collection('meals')
+          .where('groupId', isEqualTo: groupId)
+          .get();
 
-      if (doc.exists) {
-        final data = doc.data();
-        // Extract stats if they exist, otherwise use empty map
-        final stats = data?['stats'] as Map<String, dynamic>?;
-        groupStats.assignAll(stats ?? {});
-        print("📊 Group stats loaded: $groupStats");
-      } else {
-        print("⚠️ Group document does not exist");
-        groupStats.clear();
+      final allMeals = snapshot.docs
+          .map((d) => MealModel.fromJson(d.data(), docId: d.id))
+          .toList();
+
+      // Today's meals only
+      final today = DateTime.now();
+      final todayMeals = allMeals.where((m) {
+        return m.createdAt.year == today.year &&
+            m.createdAt.month == today.month &&
+            m.createdAt.day == today.day;
+      }).toList();
+
+      // Compute totals
+      double totalCal = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
+      for (final m in todayMeals) {
+        totalCal += double.tryParse(m.kcal) ?? 0;
+        totalProtein += double.tryParse(m.protein) ?? 0;
+        totalCarbs += double.tryParse(m.carbs) ?? 0;
+        totalFat += double.tryParse(m.fat) ?? 0;
       }
+
+      // Fetch group goal calories from group doc
+      final groupDoc = await _firestore.collection('groups').doc(groupId).get();
+      final goalCal =
+          double.tryParse(groupDoc.data()?['goalCalories']?.toString() ?? '') ??
+          2000.0;
+
+      final remaining = (goalCal - totalCal).clamp(0, goalCal);
+      final pct = goalCal > 0
+          ? ((totalCal / goalCal) * 100).clamp(0, 100).toStringAsFixed(0)
+          : '0';
+
+      groupStats.assignAll({
+        'totalCalories': totalCal.toStringAsFixed(0),
+        'totalProtein': '${totalProtein.toStringAsFixed(1)}g',
+        'totalCarbs': '${totalCarbs.toStringAsFixed(1)}g',
+        'totalFat': '${totalFat.toStringAsFixed(1)}g',
+        'remainingCalories': remaining.toStringAsFixed(0),
+        'totalMeals': todayMeals.length.toString(),
+        'goalAchieved': '$pct%',
+        'fatLost': '${totalFat.toStringAsFixed(1)}g',
+        'muscleGained': '${totalProtein.toStringAsFixed(1)}g',
+      });
     } catch (e) {
-      print("❌ Group stats load error: $e");
       groupStats.clear();
     }
   }

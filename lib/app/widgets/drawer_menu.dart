@@ -176,8 +176,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                     final userData = Get.find<AuthController>()
                                         .userdataget();
                                     Get.toNamed(
-                                      Routes.PLANNER +
-                                          "?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                      "${Routes.PLANNER}?id=${userData["id"] ?? userData["_id"] ?? ""}",
                                     );
                                   },
                                 ),

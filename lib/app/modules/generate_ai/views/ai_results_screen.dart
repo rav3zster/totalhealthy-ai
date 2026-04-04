@@ -152,6 +152,11 @@ class AiResultsScreen extends StatelessWidget {
                     index: i,
                     onSave: () =>
                         controller.saveSingleMeal(controller.generatedMeals[i]),
+                    onRegenerate: () => controller.regenerateSingleMeal(
+                      controller.generatedMeals[i],
+                    ),
+                    onExplain: () =>
+                        controller.explainMeal(controller.generatedMeals[i]),
                   ),
                 ),
               ),
@@ -239,10 +244,14 @@ class _MealCard extends StatefulWidget {
   final AiGeneratedMeal meal;
   final int index;
   final VoidCallback onSave;
+  final VoidCallback onRegenerate;
+  final VoidCallback onExplain;
   const _MealCard({
     required this.meal,
     required this.index,
     required this.onSave,
+    required this.onRegenerate,
+    required this.onExplain,
   });
 
   @override
@@ -501,7 +510,7 @@ class _MealCardState extends State<_MealCard>
 
               if (_expanded)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                   child: Wrap(
                     spacing: 6,
                     runSpacing: 6,
@@ -531,6 +540,26 @@ class _MealCardState extends State<_MealCard>
                         .toList(),
                   ),
                 ),
+
+              // ── Action row ────────────────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+                child: Row(
+                  children: [
+                    _ActionChip(
+                      icon: Icons.refresh_rounded,
+                      label: 'Swap',
+                      onTap: widget.onRegenerate,
+                    ),
+                    const SizedBox(width: 8),
+                    _ActionChip(
+                      icon: Icons.help_outline_rounded,
+                      label: 'Why this?',
+                      onTap: widget.onExplain,
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -543,6 +572,43 @@ class _MealCardState extends State<_MealCard>
     height: 28,
     color: Colors.white.withValues(alpha: 0.07),
   );
+}
+
+class _ActionChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  const _ActionChip({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 13, color: Colors.white54),
+            const SizedBox(width: 5),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white54, fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _MacroBadge extends StatelessWidget {

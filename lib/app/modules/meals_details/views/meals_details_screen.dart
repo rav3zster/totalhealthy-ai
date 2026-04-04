@@ -6,7 +6,7 @@ import '../controllers/meals_details_controller.dart';
 import 'meals_details_page.dart';
 
 class MealsDetailsScreen extends GetView<MealsDetailsController> {
-  MealsDetailsScreen({super.key});
+  const MealsDetailsScreen({super.key});
   @override
   Widget build(BuildContext context) {
     String id = Get.parameters["id"] ?? "";

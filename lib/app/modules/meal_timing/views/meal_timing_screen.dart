@@ -18,6 +18,8 @@ class MealTimingScreen extends GetView<MealTimingController> {
 }
 
 class MealTiminWidget extends StatelessWidget {
+  const MealTiminWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,7 +129,7 @@ class MealTiminWidget extends StatelessWidget {
                 Switch(
                   value: isEnabled,
                   onChanged: (value) {},
-                  activeColor:
+                  activeThumbColor:
                       Color(0XFFFFFFFF), // Keep active color for breakfast
                   inactiveThumbColor:
                       Color(0xFFFFFFFF), // Set inactive thumb color to white

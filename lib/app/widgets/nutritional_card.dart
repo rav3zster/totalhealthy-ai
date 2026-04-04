@@ -20,7 +20,7 @@ class NutritionalCard extends StatefulWidget {
   final String? role;
   final ValueChanged<bool?> onChanged;
 
-  NutritionalCard({
+  const NutritionalCard({super.key, 
     required this.title,
     required this.kcal,
     required this.weight,
@@ -133,11 +133,11 @@ class _NutritionalCardState extends State<NutritionalCard> {
                           box.write("mealdetails", widget.data);
                           Get.toNamed('/meals-details?id=${widget.id}');
                         },
+                        value: "Meal Details",
                         child: Text(
                           "Meal Details",
                           style: TextStyle(color: Colors.black),
                         ),
-                        value: "Meal Details",
                       ),
                       PopupMenuItem(
                         value: "Option 2",
@@ -213,8 +213,8 @@ class NutrientIndicator extends StatelessWidget {
   final Color color;
   final bool isPadding;
   final Color? textcolor;
-  NutrientIndicator(
-      {required this.label,
+  const NutrientIndicator(
+      {super.key, required this.label,
       required this.amount,
       required this.color,
       this.textcolor,

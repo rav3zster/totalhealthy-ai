@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/base/views/base_view.dart';
-import '../../../widgets/user_diet_page.dart';
 import 'user_diet_screen_view.dart';
 
 class UserDietView extends BaseView {

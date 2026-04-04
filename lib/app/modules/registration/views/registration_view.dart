@@ -9,6 +9,8 @@ import 'package:totalhealthy/app/controllers/user_controller.dart';
 import '../../nutrition_goal/views/nutrition_goal_screen.dart';
 
 class RegistrationView extends StatelessWidget {
+  const RegistrationView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BaseWidget(

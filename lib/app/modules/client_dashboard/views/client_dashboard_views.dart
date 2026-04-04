@@ -34,10 +34,10 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   Widget build(BuildContext context) {
     String id = Get.parameters["id"] ?? "";
     final controller = Get.find<ClientDashboardControllers>();
-    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
     return Scaffold(
-      key: _scaffoldKey,
+      key: scaffoldKey,
       backgroundColor: context.backgroundColor,
       drawer: const DrawerMenu(), // Add the drawer here
       body: GestureDetector(
@@ -74,7 +74,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                 DynamicProfileHeader(
                                   onProfileTap: () {
                                     // Open the side drawer
-                                    _scaffoldKey.currentState?.openDrawer();
+                                    scaffoldKey.currentState?.openDrawer();
                                   },
                                 ),
 
@@ -185,8 +185,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                     final userData = Get.find<AuthController>()
                                         .userdataget();
                                     Get.toNamed(
-                                      Routes.PLANNER +
-                                          "?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                      "${Routes.PLANNER}?id=${userData["id"] ?? userData["_id"] ?? ""}",
                                     );
                                   },
                                   child: Container(
@@ -1061,7 +1060,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                         const Text('🔥', style: TextStyle(fontSize: 20)),
                         const SizedBox(width: 10),
                         Text(
-                          '${meal.kcal}',
+                          meal.kcal,
                           style: TextStyle(
                             color: context.isLightTheme
                                 ? Color(

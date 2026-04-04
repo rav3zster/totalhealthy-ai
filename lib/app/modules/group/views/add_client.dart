@@ -57,7 +57,7 @@ class _AddClientState extends State<AddClient> {
 
   var isAddLoading = false;
 //  {"name": "string", "amount": "string", "unit": "string"}
-  addMember(userId) async {
+  Future<void> addMember(userId) async {
     try {
       setState(() {
         isAddLoading = true;
@@ -230,6 +230,9 @@ class _AddClientState extends State<AddClient> {
                   ),
                 ),
                 CustomButton(
+                    onPressed: () => submitUser(),
+                    size: ButtonSize.medium,
+                    type: ButtonType.elevated,
                     child: isLoading
                         ? Center(
                             child: CircularProgressIndicator(),
@@ -237,10 +240,7 @@ class _AddClientState extends State<AddClient> {
                         : Text(
                             "Search",
                             style: TextStyle(color: AppColors.buttonText),
-                          ),
-                    onPressed: () => submitUser(),
-                    size: ButtonSize.medium,
-                    type: ButtonType.elevated),
+                          )),
                 // SizedBox(width: 10),
                 // Icon(Icons.filter_list, color: Colors.white, size: 30),
               ],

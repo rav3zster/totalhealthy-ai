@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_common/get_reset.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:totalhealthy/app/modules/forget_passowrd_screen/views/create_new_passowrd.dart';
 
 class VerifyScreen extends StatefulWidget {

@@ -211,7 +211,7 @@ class _MealTimingPageState extends State<MealTimingPage> {
                                             ),
                                           ),
                                           CupertinoSwitch(
-                                            activeColor: const Color(
+                                            activeTrackColor: const Color(
                                               0xffCDE26D,
                                             ),
                                             value: isEnabled,

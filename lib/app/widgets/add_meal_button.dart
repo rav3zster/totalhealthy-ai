@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:totalhealthy/app/widgets/custom_button.dart';
 
 import '../core/base/constants/appcolor.dart';
 import '../core/base/controllers/auth_controller.dart';
-import '../routes/app_pages.dart';
 import '../data/services/mock_api_service.dart';
 
 class AddMealButton extends StatefulWidget {

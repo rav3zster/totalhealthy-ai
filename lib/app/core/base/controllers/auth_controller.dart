@@ -277,7 +277,7 @@ class AuthController extends GetxController {
   }
 
   // Role Management
-  roleStore(String role) => box.write("role", role);
+  Future<void> roleStore(String role) => box.write("role", role);
   String roleGet() => box.read("role") ?? "user";
 
   // Notification Service
@@ -320,7 +320,7 @@ class AuthController extends GetxController {
   }
 
   // Navigation Helper
-  handleAuthChange() {
+  String handleAuthChange() {
     if (isAuthenticated.value) {
       if (Get.currentRoute == '/login' ||
           Get.currentRoute == '/signup' ||
@@ -342,19 +342,19 @@ class AuthController extends GetxController {
   }
 
   // Data Helpers
-  categoriesAdd(data) => box.write("categories", data);
-  categoriesGet() =>
+  Future<void> categoriesAdd(data) => box.write("categories", data);
+  dynamic categoriesGet() =>
       box.read("categories") ?? DummyDataService.getDummyMealCategories();
 
-  groupgetId() => box.read("groupId") ?? "group_123";
-  userdataget() =>
+  dynamic groupgetId() => box.read("groupId") ?? "group_123";
+  dynamic userdataget() =>
       box.read("userdata") ?? DummyDataService.getDummyUser().toJson();
 
-  groupIdStore(String id) async {
+  Future<void> groupIdStore(String id) async {
     await box.write("groupId", id);
   }
 
-  userdataStore(userData) async {
+  Future<void> userdataStore(userData) async {
     await box.write("userdata", userData);
   }
 

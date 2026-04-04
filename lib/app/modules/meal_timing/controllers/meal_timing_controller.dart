@@ -7,10 +7,6 @@ import '../../../data/services/mock_api_service.dart';
 import '../../../data/services/dummy_data_service.dart';
 
 class MealTimingController extends GetxController {
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   GlobalKey<FormState> key = GlobalKey<FormState>();
 

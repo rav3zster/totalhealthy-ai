@@ -7,7 +7,7 @@ import 'drawer_menu.dart';
 
 
 class BaseWidget extends StatefulWidget {
-  BaseWidget({
+  const BaseWidget({super.key, 
     this.title = "",
     this.body,
     this.isNav = true,
@@ -100,8 +100,8 @@ class _BaseWidgetState extends State<BaseWidget> {
                   bottomLeft: Radius.circular(40),
                 ),
               ),
-              child: widget.widget,
               height: widget.topBarHeight,
+              child: widget.widget,
             ),
           // No `Expanded` here, as it causes issues inside `SingleChildScrollView`
           Expanded(
@@ -169,7 +169,7 @@ class DialogUtils {
                     Get.back();
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
+                    backgroundColor: WidgetStateProperty.all<Color>(
                       textColor,
                     ),
                   ),

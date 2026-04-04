@@ -6,10 +6,10 @@ import 'package:flutter/gestures.dart';
 class SwipeBackPageRoute<T> extends PageRoute<T> {
   SwipeBackPageRoute({
     required this.builder,
-    RouteSettings? settings,
+    super.settings,
     this.maintainState = true,
-    bool fullscreenDialog = false,
-  }) : super(settings: settings, fullscreenDialog: fullscreenDialog);
+    super.fullscreenDialog,
+  });
 
   final WidgetBuilder builder;
 
@@ -59,8 +59,8 @@ class SwipeBackPageRoute<T> extends PageRoute<T> {
     return _SwipeBackTransition(
       primaryRouteAnimation: animation,
       secondaryRouteAnimation: secondaryAnimation,
-      child: child,
       linearTransition: false,
+      child: child,
     );
   }
 }
@@ -272,12 +272,12 @@ class _SwipeBackGestureController {
   }
 
   void dragEnd(double velocity) {
-    const double _kMinFlingVelocity = 1.0;
-    const double _kBackGestureWidth = 20.0;
+    const double kMinFlingVelocity = 1.0;
+    const double kBackGestureWidth = 20.0;
 
     bool animateForward;
 
-    if (velocity.abs() >= _kMinFlingVelocity) {
+    if (velocity.abs() >= kMinFlingVelocity) {
       animateForward = velocity <= 0;
     } else {
       animateForward = controller.value > 0.5;

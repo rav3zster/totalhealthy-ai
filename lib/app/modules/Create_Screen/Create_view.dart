@@ -151,7 +151,7 @@ class _CreateViewState extends State<CreateView> {
                   ),
                 ],
               ),
-              Container(
+              SizedBox(
                 height: 180,
                 width: 420,
                 child: Image.network(
@@ -235,7 +235,7 @@ class _CreateViewState extends State<CreateView> {
               const SizedBox(height: 10),
               SizedBox(
                 width: 390,
-                child: Container(
+                child: SizedBox(
                   height: 130, // Increase this value to change the height
                   child: TextField(
                     maxLines: 5, // Allows for multiple lines of text
@@ -458,7 +458,7 @@ class _CreateViewState extends State<CreateView> {
                   ],
                 ),
               ),SizedBox(height: 20,),
-              Container(
+              SizedBox(
                 width: 138,
                 height: 45,
                 child: ElevatedButton(
@@ -505,7 +505,7 @@ class _CreateViewState extends State<CreateView> {
                               isSwitched = value;
                             });
                           },
-                          activeColor: Colors.white, // The thumb (circle) color when the switch is active
+                          activeThumbColor: Colors.white, // The thumb (circle) color when the switch is active
                           inactiveThumbColor: Colors.white,
                           inactiveTrackColor: Colors.grey[700], // The track color when the switch is inactive
                         ),

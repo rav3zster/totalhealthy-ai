@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // ── Backend URLs ──────────────────────────────────────────────────────────────
 
@@ -184,6 +185,108 @@ class AiService {
       return res.statusCode == 200 && data?['status'] == 'ok';
     } catch (_) {
       return false;
+    }
+  }
+
+  // ── Regenerate single meal ────────────────────────────────────────────────
+  /// Regenerates one meal by excluding the current meal name.
+  Future<AiGeneratedMeal?> regenerateSingleMeal({
+    required String excludeMealName,
+    required String category,
+    required Map<String, dynamic> userInputs,
+  }) async {
+    try {
+      final payload = {
+        ...userInputs,
+        'mealTypes': [category],
+        'mealsPerDay': 1,
+        'previousMeals': [
+          excludeMealName,
+          ...((userInputs['previousMeals'] as List?)?.cast<String>() ?? []),
+        ],
+      };
+      final meals = await generateMealWithAI(payload);
+      return meals.isNotEmpty ? meals.first : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // ── Explain meal ──────────────────────────────────────────────────────────
+  /// Returns an AI explanation of why a meal fits the user's goal.
+  Future<String?> explainMeal({
+    required String mealName,
+    required String goal,
+    required String dietType,
+  }) async {
+    try {
+      final res = await http
+          .post(
+            Uri.parse('$_renderUrl/explain_meal'),
+            headers: _jsonHeaders,
+            body: jsonEncode({
+              'mealName': mealName,
+              'goal': goal,
+              'dietType': dietType,
+            }),
+          )
+          .timeout(const Duration(seconds: 60));
+      final data = _decode(res);
+      if (res.statusCode == 200 && data?['status'] == 'ok') {
+        return data?['explanation'] as String?;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // ── Save / load AI preferences ────────────────────────────────────────────
+  static const String _prefsKey = 'ai_preferences';
+
+  Future<void> savePreferences({
+    required String goal,
+    required String dietType,
+    required String cuisine,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _prefsKey,
+      jsonEncode({'goal': goal, 'dietType': dietType, 'cuisine': cuisine}),
+    );
+  }
+
+  Future<Map<String, String>> loadPreferences() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_prefsKey);
+      if (raw == null) return {};
+      final data = jsonDecode(raw) as Map<String, dynamic>;
+      return data.map((k, v) => MapEntry(k, v.toString()));
+    } catch (_) {
+      return {};
+    }
+  }
+
+  // ── Food image scan ───────────────────────────────────────────────────────
+  /// Sends a base64 image to the backend and returns nutritional data.
+  Future<Map<String, dynamic>?> scanFood({
+    required String base64Image,
+    String mimeType = 'image/jpeg',
+  }) async {
+    try {
+      final res = await http
+          .post(
+            Uri.parse('$_renderUrl/scan_food'),
+            headers: _jsonHeaders,
+            body: jsonEncode({'image': base64Image, 'mimeType': mimeType}),
+          )
+          .timeout(const Duration(seconds: 60));
+      final data = _decode(res);
+      if (res.statusCode == 200 && data?['status'] == 'ok') return data;
+      return null;
+    } catch (_) {
+      return null;
     }
   }
 }

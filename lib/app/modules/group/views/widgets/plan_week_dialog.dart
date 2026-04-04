@@ -277,7 +277,7 @@ class _PlanWeekDialogState extends State<PlanWeekDialog> {
                         ),
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
                 onChanged: onSelect,
               ),

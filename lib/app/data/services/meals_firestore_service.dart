@@ -90,7 +90,7 @@ class MealsFirestoreService {
         .where('userId', isEqualTo: userId)
         .orderBy('name')
         .startAt([searchQuery])
-        .endAt([searchQuery + '\uf8ff'])
+        .endAt(['$searchQuery\uf8ff'])
         .snapshots()
         .map((snapshot) {
           return snapshot.docs

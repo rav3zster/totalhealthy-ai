@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MealTypeSelector extends StatelessWidget {
+  const MealTypeSelector({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Row(

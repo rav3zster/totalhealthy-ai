@@ -918,15 +918,8 @@ class GroupController extends GetxController {
                         ),
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundImage: user.profileImage != null
-                                ? NetworkImage(user.profileImage!)
-                                : null,
-                            child: user.profileImage == null
-                                ? const Icon(
-                                    Icons.person,
-                                    color: Colors.white54,
-                                  )
-                                : null,
+                            backgroundImage: NetworkImage(user.profileImage!),
+                            child: null,
                           ),
                           title: Text(
                             user.username,

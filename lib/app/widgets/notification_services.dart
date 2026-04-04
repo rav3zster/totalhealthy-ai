@@ -15,7 +15,7 @@ class NotificationService {
     print("Notification Service Initialized (disabled for compatibility)");
   }
 
-  showNotification({
+  Future<void> showNotification({
     int id = 0,
     String? title,
     String? body,

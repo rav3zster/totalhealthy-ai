@@ -270,7 +270,7 @@ class CreateMealController extends GetxController {
   }
 
   //  {"name": "string", "amount": "string", "unit": "string"}
-  submitUser(context, userId) async {
+  Future<void> submitUser(context, userId) async {
     try {
       // Validate form and categories
       bool isFormValid = key.currentState!.validate();

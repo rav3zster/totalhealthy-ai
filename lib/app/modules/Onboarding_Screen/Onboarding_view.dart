@@ -14,7 +14,7 @@ class OnboardingView extends StatefulWidget {
 }
 
 class _OnboardingViewState extends State<OnboardingView> {
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
   int _currentPage = 0;
 
   @override
@@ -245,7 +245,7 @@ class _OnboardingViewState extends State<OnboardingView> {
 class DotIndicator extends StatelessWidget {
   final bool isActive;
 
-  const DotIndicator({Key? key, required this.isActive}) : super(key: key);
+  const DotIndicator({super.key, required this.isActive});
 
   @override
   Widget build(BuildContext context) {

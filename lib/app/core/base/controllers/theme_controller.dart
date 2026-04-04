@@ -75,7 +75,7 @@ class ThemeController extends GetxController {
     useMaterial3: true,
 
     appBarTheme: const AppBarTheme(
-      color: AppColors.black,
+      backgroundColor: AppColors.black,
       iconTheme: IconThemeData(color: AppColors.white),
       titleTextStyle: TextStyle(
         color: AppColors.white,
@@ -114,7 +114,7 @@ class ThemeController extends GetxController {
     ),
     colorScheme: AppColorSchemes.darkColorScheme,
     appBarTheme: const AppBarTheme(
-      color: AppColors.lightGrey,
+      backgroundColor: AppColors.lightGrey,
       iconTheme: IconThemeData(color: AppColors.white),
       titleTextStyle: TextStyle(
         color: AppColors.white,
