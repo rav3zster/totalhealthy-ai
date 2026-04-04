@@ -309,7 +309,7 @@ def _call_ai(prompt: str, attempt: int = 0) -> str:
                 "temperature": 0.9,
                 "max_tokens": 4096,
             },
-            timeout=60,
+            timeout=45,
         )
         if not response.ok:
             logger.error(f"OpenRouter {response.status_code} [{model}]: {response.text[:400]}")
