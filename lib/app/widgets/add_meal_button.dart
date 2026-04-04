@@ -1,199 +1,261 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../core/base/constants/appcolor.dart';
-import '../core/base/controllers/auth_controller.dart';
-import '../data/services/mock_api_service.dart';
+import '../routes/app_pages.dart';
 
-class AddMealButton extends StatefulWidget {
+const _lime = Color(0xFFC2D86A);
+const _card = Color(0xFF141414);
+const _bdr = Color(0xFF2A2A2A);
+
+class AddMealButton extends StatelessWidget {
   final String id;
   const AddMealButton({super.key, required this.id});
 
-  @override
-  State<AddMealButton> createState() => _AddMealButtonState();
-}
-
-class _AddMealButtonState extends State<AddMealButton> {
-  var isLoading = false;
-  Future<void> copyExisting(context) async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-      var data = {
-        "userId": widget.id,
-        "groupId": Get.find<AuthController>().groupgetId(),
-        "meal_ids": ["string"],
-        "from_date": "2024-10-30",
-        "to_date": "2024-10-30T10:40:19.067Z"
-      };
-      print(data);
-      
-      // Use mock API instead of real API
-      final response = await MockApiService.copyMeals(data);
-      
-      if (response['statusCode'] == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Existing Meals Copy Successful!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Meals not copy'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      print(e);
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
+  void _show(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => _AddMealSheet(id: id),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          "Today's Diet Plan",
-          style: TextStyle(
-              color: Color(0XFFFFFFFF),
-              fontWeight: FontWeight.bold,
-              fontSize: 24),
+    return GestureDetector(
+      onTap: () => _show(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: _lime,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: _lime.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        Spacer(),
-        ElevatedButton.icon(
-          onPressed: () {
-            showBottomSheet(
-                context: context,
-                builder: (contex) {
-                  return Container(
-                    height: 420,
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.black,
-                        borderRadius: BorderRadius.horizontal()),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      // Align items at the start
-                      children: [
-                        Align(
-                            alignment: Alignment.centerRight,
-                            child: IconButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                icon: Icon(Icons.close))),
-                        SizedBox(
-                          height: 10,
-                        ),
-
-                        InkWell(
-                          mouseCursor: SystemMouseCursors.click,
-                          onTap: () {
-                            Get.toNamed('/createmeal?id=${widget.id}');
-                          },
-                          child: buildActionButton(
-                              'Create Manually',
-                              'Create',
-                              Color(0XFF242522),
-                              'https://s3-alpha-sig.figma.com/img/ac61/7d63/d22e2690d5c8624e35deda268d9a1882?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=XFUtIQ3nAmRJphMKbKyRb4uUMVXSUm12t~TjF3-FuA7neNw247D0sNXvuRk8AZJDWkaZuwAcwPu8-oR15RKSmYL6XLwaGLFufXdn0MddabVgqGUDQgAt~GmeKQi~ZMa3a4OiyeQAMPVcXc1S8ootksf-bEy3LnlnyUv2ZmN9j-czUQb4cJvHeSVPjYGTGUoowEMvoBWSM3d8CCG9MaJw~JGdlpsx4X3Sz6T7YJ5yS4GoaIp3XIfRkjCR1vbEOB5DtCtREsdeBoIfwxcnGRVnJDcmvJ2SlrL6b5vhS-QxySZdgOTvoJxJ5MBCVme580VB~EEvSLVMpE8EN9aC5vw-aQ__'),
-                        ),
-                        SizedBox(
-                            height: 16), // Add vertical space between buttons
-                        InkWell(
-                          mouseCursor: SystemMouseCursors.click,
-                          onTap: () {
-                            Get.toNamed('/generate-ai?id=${widget.id}');
-                          },
-                          child: buildActionButton(
-                              'Generate Using AI',
-                              'Generate',
-                              Color(0XFF242522),
-                              'https://s3-alpha-sig.figma.com/img/3718/a52e/756040d7214bbf9e6ae7af5e14c47433?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=Zk8lTcJxC4TlPWWWLW0o7wZKpnRwN9xYWVA~pgvtHM6YR3uYzvCeAKH5ObA6LV~6ki2KqNdmr1KZTygBEtSRIrNlbjCksJhNI8XKnxYYdov4jzWY~xp0YGoHIoUR5m4UQ4OjlipIUO-MjLDU3wvUuQHD778m2cCuICcSmIOEDqlu0s~NGm0xKInmiUGzq69xZPy5-R13kata0ULjUtiavaIdUa~qXV5-ydr-Ipy0svPt1iMuw4pLT7ajRt8jI0XXyX7LrqpYD1agrtf3Wuaob4vBPI0Z-faC0OeNNu75e9J86OmqT7lKTEWZqSSvNt7uXWYSmiD~Y8bZL8JDDZLRAw__'),
-                        ),
-                        SizedBox(
-                            height: 16), // Add vertical space between buttons
-                        InkWell(
-                          mouseCursor: SystemMouseCursors.click,
-                          onTap: () {
-                            copyExisting(context);
-                          },
-                          child: isLoading
-                              ? Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                              : buildActionButton(
-                                  'Copy From Existing',
-                                  'Copy',
-                                  Color(0XFF242522),
-                                  'https://s3-alpha-sig.figma.com/img/998d/f5b8/588e18036288fef4fd3d5749d955121d?Expires=1730678400&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=Id~jUYUwpPe51lSz5m4r2vLfzLlG2a-aTByInwPUOumEZTNXxO4Z7qyMtvwRdxbIJvPSaGjh1X2zwS7tP7GKcWgLdRhbmm6mcZxTYEyvnqNBfva3E87xRqeVJoLBPhvlj~GGVtWdF7Ey-m7zU9G9FIiq5R9zoLPKMoD5mE0zNaYuQFMJtOZF7drJDjfUDjAXRXZXvJprIv06wYzocMALMV~FDm98XdWj1x752zbXhHTkwSLy9jRUZYK9yA5SOmQ~E0BpvYjsYJVbL6oV96SVS0PZfuhjDnlUoNze72kE9udAVqaBJB9Ow1Tqs-y~m0lFlmkbvaF1-qZR42pAdAmr5Q__'),
-                        ),
-                      ],
-                    ),
-                  );
-                });
-            // Navigator.pop(context);
-          },
-          icon: Icon(
-            Icons.add,
-            color: Color(0XFF242522),
-          ),
-          label: Text(
-            'Add Meal',
-            style: TextStyle(color: Color(0XFF242522), fontSize: 16),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0XFFCDE26D),
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-          ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.add_rounded, color: Colors.black, size: 20),
+            SizedBox(width: 6),
+            Text(
+              'Add Meal',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
+}
 
-  Widget buildActionButton(
-      String label, String label2, Color color, String imageUrl) {
+// ── Bottom sheet ──────────────────────────────────────────────────────────────
+
+class _AddMealSheet extends StatelessWidget {
+  final String id;
+  const _AddMealSheet({required this.id});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      height: 80,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10), color: Color(0XFF242522)),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      decoration: const BoxDecoration(
+        color: Color(0xFF0F0F0F),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        12,
+        20,
+        MediaQuery.of(context).padding.bottom + 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Image.network(
-          //   imageUrl, // Load image from the network
-          //   width: 50, // Set the width of the image
-          //   height: 50, // Set the height of the image
-          // ),
-          SizedBox(width: 8), // Add some space between the image and text
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.white, // Change text color to white
-            ),
-            textAlign: TextAlign.left, // Align text to the left
-          ),
-          SizedBox(
-            width: 30,
-          ),
+          // drag handle
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            width: 40,
+            height: 4,
             decoration: BoxDecoration(
-                color: Color(0XFFCDE26D),
-                borderRadius: BorderRadius.circular(30)),
-            child: Text(
-              label2,
-              style: TextStyle(color: Color(0XFF242522)),
+              color: Colors.white24,
+              borderRadius: BorderRadius.circular(2),
             ),
-          )
+          ),
+          const SizedBox(height: 20),
+
+          // header
+          const Row(
+            children: [
+              Icon(Icons.restaurant_rounded, color: _lime, size: 20),
+              SizedBox(width: 10),
+              Text(
+                'Add a Meal',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Choose how you want to add your meal',
+            style: TextStyle(color: Colors.white38, fontSize: 13),
+          ),
+          const SizedBox(height: 20),
+
+          // Option 1 — Create manually
+          _OptionTile(
+            icon: Icons.edit_note_rounded,
+            iconColor: const Color(0xFF4FC3F7),
+            title: 'Create Manually',
+            subtitle: 'Enter meal details, ingredients & macros yourself',
+            badge: null,
+            onTap: () {
+              Navigator.pop(context);
+              Get.toNamed('${Routes.CreateMeal}?id=$id');
+            },
+          ),
+          const SizedBox(height: 10),
+
+          // Option 2 — Generate with AI
+          _OptionTile(
+            icon: Icons.auto_awesome_rounded,
+            iconColor: _lime,
+            title: 'Generate with AI',
+            subtitle: 'Get a personalised meal plan based on your goals',
+            badge: 'AI',
+            onTap: () {
+              Navigator.pop(context);
+              Get.toNamed('${Routes.GENERATE_AI}?id=$id');
+            },
+          ),
+          const SizedBox(height: 10),
+
+          // Option 3 — Scan food
+          _OptionTile(
+            icon: Icons.camera_alt_rounded,
+            iconColor: const Color(0xFFFFB347),
+            title: 'Scan Food',
+            subtitle: 'Take a photo and AI fills in the nutrition data',
+            badge: 'NEW',
+            onTap: () {
+              Navigator.pop(context);
+              // Navigate to create meal with scan mode
+              Get.toNamed(
+                '${Routes.CreateMeal}?id=$id',
+                arguments: {'scanMode': true},
+              );
+            },
+          ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Option tile ───────────────────────────────────────────────────────────────
+
+class _OptionTile extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final String? badge;
+  final VoidCallback onTap;
+
+  const _OptionTile({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    required this.badge,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: _card,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: _bdr),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: iconColor, size: 22),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      if (badge != null) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 7,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: iconColor.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            badge!,
+                            style: TextStyle(
+                              color: iconColor,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(color: Colors.white38, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.white24,
+              size: 14,
+            ),
+          ],
+        ),
       ),
     );
   }

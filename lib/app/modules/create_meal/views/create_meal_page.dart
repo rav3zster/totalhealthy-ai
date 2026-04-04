@@ -6,6 +6,7 @@ import '../../../controllers/user_controller.dart';
 import '../../../core/theme/theme_helper.dart';
 
 import '../../../widgets/ingredient_input.dart';
+import '../../../widgets/food_scan_button.dart';
 import '../../../data/models/meal_model.dart';
 import '../../generate_ai/views/nutrition_autofill_widget.dart';
 
@@ -105,7 +106,12 @@ class _CreateMealPageState extends State<CreateMealPage>
                             // Image Upload Section
                             _buildImageUploadSection(),
 
-                            const SizedBox(height: 30),
+                            const SizedBox(height: 20),
+
+                            // AI Food Scan (shown when launched in scan mode or always available)
+                            _FoodScanSection(controller: widget.controller),
+
+                            const SizedBox(height: 20),
 
                             // Meal Name
                             _buildSectionTitle('meal_name'.tr),
@@ -931,5 +937,60 @@ class _CreateMealPageState extends State<CreateMealPage>
         ),
       );
     });
+  }
+}
+
+// ── Food Scan Section ─────────────────────────────────────────────────────────
+
+class _FoodScanSection extends StatelessWidget {
+  final CreateMealController controller;
+  const _FoodScanSection({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        FoodScanButton(
+          onResult: (data) {
+            // Auto-fill form fields from scan result
+            if (data['name'] != null) {
+              controller.fullNameController.text = data['name'].toString();
+            }
+            if (data['calories'] != null) {
+              controller.kcalController.text = data['calories']
+                  .toString()
+                  .split('.')
+                  .first;
+            }
+            if (data['protein'] != null) {
+              controller.proteinController.text = data['protein'].toString();
+            }
+            if (data['carbs'] != null) {
+              controller.carbsController.text = data['carbs'].toString();
+            }
+            if (data['fat'] != null) {
+              controller.fatsController.text = data['fat'].toString();
+            }
+            if (data['description'] != null) {
+              controller.descriptionController.text = data['description']
+                  .toString();
+            }
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('✅ ${data['name']} detected — fields filled'),
+                backgroundColor: const Color(0xFF1A1A1A),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 6),
+        const Text(
+          'Scan a food photo to auto-fill nutrition data',
+          style: TextStyle(color: Colors.white38, fontSize: 11),
+        ),
+      ],
+    );
   }
 }
