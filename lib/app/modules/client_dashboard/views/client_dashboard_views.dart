@@ -302,6 +302,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                   onAddMealTap: () {
                                     final userData = Get.find<AuthController>()
                                         .userdataget();
+                                    final userId =
+                                        userData["id"] ?? userData["_id"] ?? "";
 
                                     // Pass group category ID if in group mode
                                     final arguments = <String, dynamic>{};
@@ -313,20 +315,19 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                       arguments['groupCategoryId'] = controller
                                           .selectedGroupCategoryId
                                           .value;
-                                      print(
-                                        '🔵 Navigation: Passing groupCategoryId: ${arguments['groupCategoryId']}',
-                                      );
-                                    } else {
-                                      print(
-                                        '🔵 Navigation: No groupCategoryId (isGroupMode: ${controller.isGroupMode.value}, selectedGroupCategoryId: ${controller.selectedGroupCategoryId.value})',
-                                      );
                                     }
 
-                                    Get.toNamed(
-                                      "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
-                                      arguments: arguments.isEmpty
-                                          ? null
-                                          : arguments,
+                                    // Show choice bottom sheet instead of navigating directly
+                                    showModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: Colors.transparent,
+                                      isScrollControlled: true,
+                                      builder: (_) => _MealCreationSheet(
+                                        userId: userId,
+                                        groupArguments: arguments.isEmpty
+                                            ? null
+                                            : arguments,
+                                      ),
                                     );
                                   },
                                 ),
@@ -1403,6 +1404,198 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Meal Creation Choice Sheet ────────────────────────────────────────────────
+
+class _MealCreationSheet extends StatelessWidget {
+  final String userId;
+  final Map<String, dynamic>? groupArguments;
+
+  const _MealCreationSheet({required this.userId, this.groupArguments});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color(0xFF0F0F0F),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        12,
+        20,
+        MediaQuery.of(context).padding.bottom + 28,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // drag handle
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.white24,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 22),
+
+          // header
+          const Row(
+            children: [
+              Icon(
+                Icons.restaurant_rounded,
+                color: Color(0xFFC2D86A),
+                size: 20,
+              ),
+              SizedBox(width: 10),
+              Text(
+                'Add a Meal',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'How would you like to create this meal?',
+            style: TextStyle(color: Colors.white38, fontSize: 13),
+          ),
+          const SizedBox(height: 24),
+
+          // Option 1 — Create manually
+          _SheetOption(
+            icon: Icons.edit_note_rounded,
+            iconColor: const Color(0xFF4FC3F7),
+            title: 'Create Manually',
+            subtitle: 'Enter meal name, ingredients and macros yourself',
+            onTap: () {
+              Navigator.pop(context);
+              Get.toNamed(
+                '${Routes.CreateMeal}?id=$userId',
+                arguments: groupArguments,
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+
+          // Option 2 — Generate with AI
+          _SheetOption(
+            icon: Icons.auto_awesome_rounded,
+            iconColor: const Color(0xFFC2D86A),
+            title: 'Generate with AI',
+            subtitle: 'Get a personalised meal plan based on your goals',
+            badge: 'AI',
+            onTap: () {
+              Navigator.pop(context);
+              Get.toNamed('${Routes.GENERATE_AI}?id=$userId');
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SheetOption extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final String? badge;
+  final VoidCallback onTap;
+
+  const _SheetOption({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    this.badge,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF141414),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFF2A2A2A)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: iconColor, size: 22),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      if (badge != null) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 7,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: iconColor.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            badge!,
+                            style: TextStyle(
+                              color: iconColor,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(color: Colors.white38, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.white24,
+              size: 14,
             ),
           ],
         ),
