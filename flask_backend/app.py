@@ -80,7 +80,8 @@ def test():
 
 # ── Route 3: Main AI endpoint ─────────────────────────────────────────────────
 @app.route("/generate_meal", methods=["POST"])
-def generate_meal():    logger.info("=" * 50)
+def generate_meal():
+    logger.info("=" * 50)
     logger.info("POST /generate_meal — request received")
 
     body = request.get_json(silent=True)
