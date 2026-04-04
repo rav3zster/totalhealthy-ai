@@ -30,7 +30,7 @@ if not OPENROUTER_API_KEY:
 else:
     logger.info(f"✅ OPENROUTER_API_KEY loaded (ends ...{OPENROUTER_API_KEY[-4:]})")
 
-OPENROUTER_MODEL = "google/gemma-3-4b-it:free"
+OPENROUTER_MODEL = "meta-llama/llama-3.2-3b-instruct:free"
 OPENROUTER_URL   = "https://openrouter.ai/api/v1/chat/completions"
 logger.info(f"✅ AI model: {OPENROUTER_MODEL}")
 
@@ -337,37 +337,55 @@ def _parse_response(raw: str) -> list:
     cleaned = re.sub(r"```(?:json)?", "", raw, flags=re.IGNORECASE)
     cleaned = cleaned.strip().strip("`").strip()
 
-    # Step 2: extract first complete JSON object
-    match = re.search(r"\{.*\}", cleaned, re.DOTALL)
-    if not match:
-        logger.error(f"No JSON object found. Raw response:\n{raw[:500]}")
+    # Step 2: try to parse — handle both {"meals":[...]} and [{...}] formats
+    data = None
+
+    # Try object format first: {"meals": [...]}
+    obj_match = re.search(r"\{.*\}", cleaned, re.DOTALL)
+    if obj_match:
+        try:
+            parsed = json.loads(obj_match.group())
+            if isinstance(parsed, dict) and "meals" in parsed:
+                data = parsed
+            elif isinstance(parsed, dict):
+                # Single meal object — wrap it
+                data = {"meals": [parsed]}
+        except json.JSONDecodeError:
+            pass
+
+    # Try array format: [{...}, {...}]
+    if data is None:
+        arr_match = re.search(r"\[.*\]", cleaned, re.DOTALL)
+        if arr_match:
+            try:
+                parsed = json.loads(arr_match.group())
+                if isinstance(parsed, list):
+                    data = {"meals": parsed}
+            except json.JSONDecodeError:
+                pass
+
+    if data is None:
+        logger.error(f"Could not parse any JSON. Raw:\n{raw[:500]}")
         return [FALLBACK_MEAL]
 
-    json_str = match.group()
-
-    # Step 3: parse
-    try:
-        data = json.loads(json_str)
-    except json.JSONDecodeError as e:
-        logger.error(f"JSON decode error: {e}\nAttempted to parse:\n{json_str[:500]}")
-        return [FALLBACK_MEAL]
-
-    # Step 4: extract meals array
+    # Step 3: extract meals array
     meals = data.get("meals")
     if not isinstance(meals, list) or len(meals) == 0:
-        logger.warning(f"'meals' key missing or empty. Keys found: {list(data.keys())}")
+        logger.warning(f"'meals' key missing or empty. Keys: {list(data.keys())}")
         return [FALLBACK_MEAL]
 
-    # Step 5: validate and sanitise each meal
+    # Step 4: validate and sanitise each meal
     validated = []
     for i, meal in enumerate(meals):
         if not isinstance(meal, dict):
-            logger.warning(f"Meal {i} is not a dict — skipping")
             continue
+        # Clean ingredients — strip any embedded nutrition text after " - "
+        raw_ings = meal.get("ingredients") or []
+        ingredients = [str(x).split(" - ")[0].strip() for x in raw_ings]
         validated.append({
             "name":        str(meal.get("name") or "Meal"),
             "category":    str(meal.get("category") or "Lunch"),
-            "ingredients": [str(x) for x in (meal.get("ingredients") or [])],
+            "ingredients": ingredients,
             "calories":    _safe_num(meal.get("calories"), 400),
             "protein":     _safe_num(meal.get("protein"),  20),
             "carbs":       _safe_num(meal.get("carbs"),    40),
