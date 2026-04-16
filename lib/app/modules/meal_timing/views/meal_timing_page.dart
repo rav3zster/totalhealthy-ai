@@ -12,7 +12,7 @@ class MealTimingPage extends StatefulWidget {
   final String id;
 
   @override
-  _MealTimingPageState createState() => _MealTimingPageState();
+  State<MealTimingPage> createState() => _MealTimingPageState();
 }
 
 class _MealTimingPageState extends State<MealTimingPage> {

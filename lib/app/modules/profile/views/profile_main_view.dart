@@ -222,7 +222,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
           icon: Icons.category_outlined,
           title: 'group_categories'.tr,
           onTap: () {
-            Get.toNamed(Routes.GROUP_CATEGORIES);
+            Get.toNamed(Routes.groupCategories);
           },
         ),
         const SizedBox(height: 16),
@@ -246,7 +246,7 @@ class _ProfileMainViewState extends State<ProfileMainView> {
           icon: Icons.privacy_tip_outlined,
           title: 'privacy_policy'.tr,
           onTap: () {
-            Get.toNamed(Routes.PRIVACY_POLICY);
+            Get.toNamed(Routes.privacyPolicy);
           },
         ),
         const SizedBox(height: 16),

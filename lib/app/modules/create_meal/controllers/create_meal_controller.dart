@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -339,7 +339,7 @@ class CreateMealController extends GetxController {
           debugPrint("Updating Meal in Firestore: ${meal.toJson()}");
           await _mealsService.updateMeal(meal);
 
-          Get.offAllNamed("${Routes.ClientDashboard}?id=$finalUserId");
+          Get.offAllNamed("${Routes.clientDashboard}?id=$finalUserId");
           Get.snackbar(
             'Success',
             'Meal Updated Successfully!',
@@ -358,7 +358,7 @@ class CreateMealController extends GetxController {
             Get.back();
           } else {
             // Default behavior
-            Get.offAllNamed("${Routes.ClientDashboard}?id=$finalUserId");
+            Get.offAllNamed("${Routes.clientDashboard}?id=$finalUserId");
           }
 
           Get.snackbar(

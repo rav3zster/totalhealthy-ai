@@ -44,16 +44,16 @@ void main() async {
   // Determine initial route before running the app
   final auth = FirebaseAuth.instance;
   final box = GetStorage();
-  String initialRoute = AppPages.INITIAL;
+  String initialRoute = AppPages.initial;
 
   if (auth.currentUser != null) {
     // User is logged in, skip onboarding
     final role = box.read('role');
     if (role == 'advisor' || role == 'admin') {
-      initialRoute = Routes.TrainerDashboard;
+      initialRoute = Routes.trainerDashboard;
     } else {
       // Default to Client Dashboard if logged in
-      initialRoute = Routes.ClientDashboard;
+      initialRoute = Routes.clientDashboard;
     }
     debugPrint("🚀 App Launch: Logged in as $role, starting at $initialRoute");
   } else {

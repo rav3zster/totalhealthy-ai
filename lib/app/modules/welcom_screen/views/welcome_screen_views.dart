@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/welcome-screen-controllers.dart';
+import '../controllers/welcome_screen_controllers.dart';
 import '../../../core/theme/theme_helper.dart';
 
 class WelcomeScreenView extends GetView<WelcomeScreenController> {

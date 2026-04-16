@@ -8,10 +8,10 @@ import '../routes/app_pages.dart';
 class OntapStore {
   static var index = 0;
   static List<String> routes = [
-    Routes.ClientDashboard,
-    Routes.GROUP,
-    Routes.NOTIFICATION,
-    Routes.PROFILE_MAIN,
+    Routes.clientDashboard,
+    Routes.group,
+    Routes.notification,
+    Routes.profileMain,
   ];
 }
 
@@ -27,7 +27,7 @@ class _MobileNavBarState extends State<MobileNavBar> {
     Get.offAllNamed(
       value == 0
           ? Get.find<AuthController>().roleGet() == "admin"
-                ? Routes.TrainerDashboard
+                ? Routes.trainerDashboard
                 : OntapStore.routes[value]
           : OntapStore.routes[value],
     );

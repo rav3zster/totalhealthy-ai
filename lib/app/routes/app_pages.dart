@@ -1,8 +1,8 @@
-import 'package:get/get.dart';
+﻿import 'package:get/get.dart';
 
 import '../core/middlewares/global_middleware.dart';
 import '../core/theme/page_transitions.dart';
-import '../modules/Onboarding_Screen/Onboarding_view.dart';
+import '../modules/Onboarding_Screen/onboarding_view.dart';
 import '../modules/client_dashboard/bindings/client_dashboard_bindings.dart';
 import '../modules/client_dashboard/views/client_dashboard_views.dart';
 import '../modules/create_meal/bindings/create_meal_binding.dart';
@@ -58,10 +58,10 @@ import '../modules/trainer_dashboard/bindings/trainer_dashboard_bindings.dart';
 import '../modules/trainer_dashboard/views/trainer_dashboard_views.dart';
 import '../modules/user_diet_screen/bindings/user_diet_screen_bindings.dart';
 import '../modules/user_diet_screen/views/user_diet_view.dart';
-import '../modules/welcom_screen/bindings/welcome-screen-bindings.dart';
-import '../modules/welcom_screen/views/welcome-screen-views.dart';
+import '../modules/welcom_screen/bindings/welcome_screen_bindings.dart';
+import '../modules/welcom_screen/views/welcome_screen_views.dart';
 import '../modules/manage_accounts/views/manage_accounts_views.dart';
-import '../modules/Help_and_support/views/helpAndSuportPage.dart';
+import '../modules/Help_and_support/views/help_and_support_page.dart';
 import '../widgets/switch_role_screen.dart';
 import '../modules/planner/bindings/planner_binding.dart';
 import '../modules/planner/views/planner_view.dart';
@@ -75,11 +75,11 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.ONBOARDING;
+  static const initial = Routes.onboarding;
 
   static final routes = [
     GetPage(
-      name: _Paths.HOME,
+      name: _Paths.home,
       page: () => HomeView(),
       binding: HomeBinding(),
       customTransition: SmoothPageTransition(),
@@ -87,48 +87,48 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.ONBOARDING,
+      name: _Paths.onboarding,
       page: () => OnboardingView(),
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
-      name: _Paths.SwipeScreen,
+      name: _Paths.swipeScreen,
       page: () => SwipeScreenView(),
       binding: SwipeScreenBindings(),
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
-      name: _Paths.WelcomeScreen,
+      name: _Paths.welcomeScreen,
       page: () => WelcomeScreenView(),
       binding: WelcomeScreenBindings(),
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
-      name: _Paths.Registration,
+      name: _Paths.registration,
       page: () => RegistrationView(),
       binding: RegistrationBinding(),
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
-      name: _Paths.Login,
+      name: _Paths.login,
       page: () => const LoginView(),
       binding: LoginBinding(),
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
-      name: _Paths.NUTRITION_GOAL,
+      name: _Paths.nutritionGoal,
       page: () => NutritionGoalView(),
       binding: NutritionGoalBinding(),
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
-      name: _Paths.NOTIFICATION,
+      name: _Paths.notification,
       page: () => NotificationView(),
       binding: NotificationBinding(),
       customTransition: SmoothPageTransition(),
@@ -136,7 +136,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.GENERATE_AI,
+      name: _Paths.generateAi,
       page: () => GenerateAiView(),
       binding: GenerateAiBinding(),
       customTransition: SmoothPageTransition(),
@@ -144,7 +144,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.MEAL_HISTORY,
+      name: _Paths.mealHistory,
       page: () => MealHistoryView(),
       binding: MealHistoryBinding(),
       customTransition: SmoothPageTransition(),
@@ -152,7 +152,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.MEALS_DETAILS,
+      name: _Paths.mealsDetails,
       page: () => MealsDetailsView(),
       binding: MealsDetailsBinding(),
       customTransition: SmoothPageTransition(),
@@ -162,7 +162,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.MEAL_TIMING,
+      name: _Paths.mealTiming,
       page: () => MealTimingView(),
       binding: MealTimingBinding(),
       customTransition: SmoothPageTransition(),
@@ -170,7 +170,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.MEAL_CATEGORIES,
+      name: _Paths.mealCategories,
       page: () => const MealCategoriesView(),
       binding: MealCategoriesBinding(),
       customTransition: SmoothPageTransition(),
@@ -180,7 +180,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.MEAL_CATEGORIES_MANAGEMENT,
+      name: _Paths.mealCategoriesManagement,
       page: () => const MealCategoriesManagementView(),
       binding: MealCategoriesManagementBinding(),
       customTransition: SmoothPageTransition(),
@@ -190,7 +190,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.GROUP_CATEGORIES,
+      name: _Paths.groupCategories,
       page: () => const GroupCategoriesView(),
       binding: GroupCategoriesBinding(),
       customTransition: SmoothPageTransition(),
@@ -200,7 +200,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.TrainerDashboard,
+      name: _Paths.trainerDashboard,
       page: () => TrainerDashboardView(),
       binding: TrainerDashboardBindings(),
       customTransition: SmoothPageTransition(),
@@ -208,13 +208,13 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.SWITCHROLE,
+      name: _Paths.switchRole,
       page: () => SwitchRoleScreen(),
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
-      name: _Paths.UserDiet,
+      name: _Paths.userDiet,
       page: () => UserDietView(),
       binding: UserDietScreenBindings(),
       customTransition: SmoothPageTransition(),
@@ -222,7 +222,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.ClientDashboard,
+      name: _Paths.clientDashboard,
       page: () => ClientDashboardScreen(),
       binding: ClientDashboardBindings(),
       customTransition: SmoothPageTransition(),
@@ -230,14 +230,14 @@ class AppPages {
       middlewares: <GetMiddleware>[AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.FORGETPASSWORD,
+      name: _Paths.forgetPassword,
       binding: ForgetPasswordScreenBindings(),
       page: () => ForgetPasswordScreenViews(),
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
-      name: _Paths.CreateMeal,
+      name: _Paths.createMeal,
       binding: CreateMealBinding(),
       page: () => CreateMealScreen(),
       customTransition: SmoothPageTransition(),
@@ -247,7 +247,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.GROUP,
+      name: _Paths.group,
       page: () => GroupView(),
       binding: GroupBinding(),
       customTransition: SmoothPageTransition(),
@@ -255,7 +255,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.CREATE_GROUP,
+      name: _Paths.createGroup,
       page: () => const CreateGroupScreen(),
       binding: CreateGroupBinding(),
       customTransition: SmoothPageTransition(),
@@ -264,7 +264,7 @@ class AppPages {
       preventDuplicates: true,
     ),
     GetPage(
-      name: _Paths.GROUP_DETAILS,
+      name: _Paths.groupDetails,
       page: () => GroupDetailsScreen(),
       binding: GroupBinding(),
       customTransition: SmoothPageTransition(),
@@ -273,7 +273,7 @@ class AppPages {
       preventDuplicates: true,
     ),
     GetPage(
-      name: _Paths.MEMBER_MANAGEMENT,
+      name: _Paths.memberManagement,
       page: () => MemberManagementScreen(),
       binding: GroupBinding(),
       customTransition: SmoothPageTransition(),
@@ -282,7 +282,7 @@ class AppPages {
       preventDuplicates: true,
     ),
     GetPage(
-      name: _Paths.CLIENT_LIST,
+      name: _Paths.clientList,
       page: () => ClientListScreen(),
       binding: GroupBinding(),
       customTransition: SmoothPageTransition(),
@@ -290,14 +290,14 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.SIGNUP,
+      name: _Paths.signup,
       page: () => const SignupScreen(),
       binding: SignupBinding(),
       customTransition: SmoothPageTransition(),
       transitionDuration: const Duration(milliseconds: 300),
     ),
     GetPage(
-      name: _Paths.SETTING,
+      name: _Paths.setting,
       page: () => const SettingView(),
       binding: SettingBinding(),
       customTransition: SmoothPageTransition(),
@@ -307,7 +307,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.GENERAL_SETTINGS,
+      name: _Paths.generalSettings,
       page: () => const GeneralSettingsView(),
       binding: SettingBinding(),
       customTransition: SmoothPageTransition(),
@@ -317,7 +317,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.PROFILE_SETTINGS,
+      name: _Paths.profileSettings,
       page: () => const ProfileSettingsView(),
       binding: SettingBinding(),
       customTransition: SmoothPageTransition(),
@@ -327,7 +327,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.NOTIFICATION_SETTINGS,
+      name: _Paths.notificationSettings,
       page: () => const NotificationSettingsView(),
       binding: SettingBinding(),
       customTransition: SmoothPageTransition(),
@@ -337,7 +337,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.ACCOUNT_PASSWORD_SETTINGS,
+      name: _Paths.accountPasswordSettings,
       page: () => const AccountPasswordSettingsView(),
       binding: SettingBinding(),
       customTransition: SmoothPageTransition(),
@@ -347,7 +347,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.PROFILE_MAIN,
+      name: _Paths.profileMain,
       page: () => const ProfileMainView(),
       binding: ProfileBinding(),
       customTransition: SmoothPageTransition(),
@@ -389,7 +389,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.PLANNER,
+      name: _Paths.planner,
       page: () => const PlannerPage(),
       binding: PlannerBinding(),
       customTransition: SmoothPageTransition(),
@@ -397,7 +397,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.GROUP_MEAL_CALENDAR,
+      name: _Paths.groupMealCalendar,
       page: () => const GroupMealCalendarView(),
       binding: BindingsBuilder(() {
         Get.lazyPut<GroupMealCalendarController>(
@@ -411,7 +411,7 @@ class AppPages {
       middlewares: [AuthCheckMiddleware()],
     ),
     GetPage(
-      name: _Paths.WEEKLY_MEAL_PLANNER,
+      name: _Paths.weeklyMealPlanner,
       page: () => const WeeklyMealPlannerView(),
       binding: BindingsBuilder(() {
         Get.lazyPut<WeeklyMealPlannerController>(

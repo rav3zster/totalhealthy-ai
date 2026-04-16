@@ -12,7 +12,7 @@ class GroupCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         // Navigate to group details with group data
-        Get.toNamed(Routes.GROUP_DETAILS, arguments: group);
+        Get.toNamed(Routes.groupDetails, arguments: group);
       },
       child: Card(
         margin: const EdgeInsets.all(8.0),

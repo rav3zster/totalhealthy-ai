@@ -10,17 +10,10 @@ import 'app_pages.dart';
 class AppPagesSimple {
   AppPagesSimple._();
 
-  static const initial = Routes.Login;
+  static const initial = Routes.login;
 
   static final routes = [
-    GetPage(
-      name: Routes.HOME,
-      page: () => HomeView(),
-      binding: HomeBinding(),
-    ),
-    GetPage(
-      name: Routes.Login,
-      page: () => LoginView(),
-    ),
+    GetPage(name: Routes.home, page: () => HomeView(), binding: HomeBinding()),
+    GetPage(name: Routes.login, page: () => LoginView()),
   ];
 }

@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:totalhealthy/app/data/models/user_model.dart';
 import 'package:totalhealthy/app/data/services/users_firestore_service.dart';
-import 'package:totalhealthy/app/widgets/baseWidget.dart';
+import 'package:totalhealthy/app/widgets/base_widget.dart';
 import 'package:totalhealthy/app/controllers/user_controller.dart';
 
 class ManageAccountScreen extends StatefulWidget {

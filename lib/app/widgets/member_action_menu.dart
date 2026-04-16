@@ -186,7 +186,6 @@ class _MemberActionSheet extends StatelessWidget {
               label: 'Call',
               onTap: () {
                 Get.back();
-                // TODO: Implement call functionality
                 Get.snackbar(
                   'Call',
                   'Calling ${member.username}...',
@@ -204,7 +203,6 @@ class _MemberActionSheet extends StatelessWidget {
               label: 'Send Email',
               onTap: () {
                 Get.back();
-                // TODO: Implement email functionality
                 Get.snackbar(
                   'Email',
                   'Opening email to ${member.email}...',
@@ -222,7 +220,6 @@ class _MemberActionSheet extends StatelessWidget {
               label: 'Send Message',
               onTap: () {
                 Get.back();
-                // TODO: Implement messaging functionality
                 Get.snackbar(
                   'Message',
                   'Opening chat with ${member.username}...',

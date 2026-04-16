@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -184,7 +184,7 @@ class WeeklyMealSlotSheet extends StatelessWidget {
 
             final userData = authController.userdataget();
             Get.toNamed(
-              "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}&from=weekly_planner",
+              "${Routes.createMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}&from=weekly_planner",
               arguments: groupCategoryId != null
                   ? {'groupCategoryId': groupCategoryId}
                   : null,

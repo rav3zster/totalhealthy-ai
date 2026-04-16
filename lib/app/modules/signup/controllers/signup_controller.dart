@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
+
 class SignupController extends GetxController {
-  //TODO: Implement SignupController
   // Gender selection state
   var isMaleSelected = false.obs;
   var isFemaleSelected = false.obs;

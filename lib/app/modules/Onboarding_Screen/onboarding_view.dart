@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../routes/app_pages.dart';
@@ -44,7 +44,7 @@ class _OnboardingViewState extends State<OnboardingView> {
       );
     } else {
       // Navigate to Welcome Screen instead of Signup
-      Get.offAllNamed(Routes.WelcomeScreen);
+      Get.offAllNamed(Routes.welcomeScreen);
     }
   }
 
@@ -64,36 +64,32 @@ class _OnboardingViewState extends State<OnboardingView> {
                 children: [
                   Column(
                     children: [
-                      Container(
-                        child: Column(
-                          children: [
-                            _buildPageContent(
-                              "assets/Group.png",
-                              "Welcome to TotalHealthy",
-                              "Your all-in-one health and fitness app.",
+                      Column(
+                        children: [
+                          _buildPageContent(
+                            "assets/Group.png",
+                            "Welcome to TotalHealthy",
+                            "Your all-in-one health and fitness app.",
+                          ),
+                          const SizedBox(height: 3),
+                          const Text(
+                            "Get personalized plans and track your",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white54,
+                              fontSize: 22,
                             ),
-                            const SizedBox(height: 3),
-                            Container(
-                              child: const Text(
-                                "Get personalized plans and track your",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white54,
-                                  fontSize: 22,
-                                ),
-                              ),
+                          ),
+                          const SizedBox(height: 3),
+                          const Text(
+                            "progress to achieve your goals.",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white54,
+                              fontSize: 22,
                             ),
-                            const SizedBox(height: 3),
-                            const Text(
-                              "progress to achieve your goals.",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white54,
-                                fontSize: 22,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -171,7 +167,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                       GestureDetector(
                         onTap: () {
                           // Skip to Welcome Screen
-                          Get.offAllNamed(Routes.WelcomeScreen);
+                          Get.offAllNamed(Routes.welcomeScreen);
                         },
                         child: const Text(
                           "Skip",
@@ -218,27 +214,23 @@ class _OnboardingViewState extends State<OnboardingView> {
           child: Image.asset(imagePath, fit: BoxFit.fitWidth),
         ),
         const SizedBox(height: 20),
-        Container(
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 32,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 32,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 20),
-        Container(
-          child: Text(
-            subtitle,
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-              color: Colors.white54,
-              fontSize: 22,
-            ),
-            textAlign: TextAlign.center,
+        Text(
+          subtitle,
+          style: const TextStyle(
+            fontWeight: FontWeight.w500,
+            color: Colors.white54,
+            fontSize: 22,
           ),
+          textAlign: TextAlign.center,
         ),
       ],
     );

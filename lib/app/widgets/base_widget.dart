@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 import '../core/base/constants/appcolor.dart';
-import 'backButton.dart';
+import 'back_button.dart';
 import 'drawer_menu.dart';
 
-
 class BaseWidget extends StatefulWidget {
-  const BaseWidget({super.key, 
+  const BaseWidget({
+    super.key,
     this.title = "",
     this.body,
     this.isNav = true,
@@ -72,18 +72,17 @@ class _BaseWidgetState extends State<BaseWidget> {
                   leading: widget.backButton
                       ? CustomBackButton()
                       : widget.isDrawer
-                          ? IconButton(
-                              onPressed: () {
-                                _scaffoldKey.currentState?.openDrawer();
-                              },
-                              icon: Icon(Icons.menu))
-                          : null,
+                      ? IconButton(
+                          onPressed: () {
+                            _scaffoldKey.currentState?.openDrawer();
+                          },
+                          icon: Icon(Icons.menu),
+                        )
+                      : null,
                   backgroundColor: AppColors.cardbackground,
-                  title: widget.titleWidget ??
-                      Text(
-                        widget.title,
-                        style: widget.titlestyle,
-                      ),
+                  title:
+                      widget.titleWidget ??
+                      Text(widget.title, style: widget.titlestyle),
                 ),
               ),
             )
@@ -122,80 +121,85 @@ class OnTap {
 }
 
 class DialogUtils {
-  static void showConfirmationDialog1(String message, dynamic datades,
-      {Color? popColor}) {
+  static void showConfirmationDialog1(
+    String message,
+    dynamic datades, {
+    Color? popColor,
+  }) {
     Color textColor = popColor ?? Colors.blue;
 
-    Get.dialog(AlertDialog(
-      contentPadding: const EdgeInsets.all(20),
-      scrollable: true,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
-      elevation: 0,
-      backgroundColor: Colors.white,
-      // Replace AppColors.background if not accessible
-      actionsAlignment: MainAxisAlignment.center,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            message,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
-          ),
-        ],
-      ),
-      content: SizedBox(
-        child: Column(
+    Get.dialog(
+      AlertDialog(
+        contentPadding: const EdgeInsets.all(20),
+        scrollable: true,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        // Replace AppColors.background if not accessible
+        actionsAlignment: MainAxisAlignment.center,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Text(
-                    datades.toString(),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Get.back();
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all<Color>(
-                      textColor,
-                    ),
-                  ),
-                  child: const Text(
-                    "Ok",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
+            Text(
+              message,
+              style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
             ),
           ],
         ),
+        content: SizedBox(
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Text(
+                      datades.toString(),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.all<Color>(
+                        textColor,
+                      ),
+                    ),
+                    child: const Text(
+                      "Ok",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
-    ));
+    );
   }
 }
 
 class Snackbar {
   static void showErrorSnackBar({String title = "", String message = ""}) {
-    Get.snackbar(title, message,
-        backgroundColor: const Color(0x8AD32F2F),
-        barBlur: 10.0,
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
-        margin: const EdgeInsets.only(bottom: 10.0, left: 10.0, right: 10.0),
-        duration: const Duration(seconds: 2),
-        icon: const Icon(Icons.error, color: Colors.white));
+    Get.snackbar(
+      title,
+      message,
+      backgroundColor: const Color(0x8AD32F2F),
+      barBlur: 10.0,
+      snackPosition: SnackPosition.BOTTOM,
+      colorText: Colors.white,
+      margin: const EdgeInsets.only(bottom: 10.0, left: 10.0, right: 10.0),
+      duration: const Duration(seconds: 2),
+      icon: const Icon(Icons.error, color: Colors.white),
+    );
   }
 }

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../core/base/controllers/auth_controller.dart';
@@ -17,7 +17,7 @@ class AppRouteAccess {
     if (authController.isAuthenticated.value) {
       return RouteSettings(name: currentRoute);
     } else {
-      return const RouteSettings(name: Routes.Login);
+      return const RouteSettings(name: Routes.login);
     }
   }
 }

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/utitlity/appvalidator.dart';
 
@@ -363,7 +363,7 @@ class SignupScreenState extends State<SignupScreen>
                                   ),
                                 ),
                                 TextButton(
-                                  onPressed: () => Get.toNamed(Routes.Login),
+                                  onPressed: () => Get.toNamed(Routes.login),
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.zero,
                                     minimumSize: const Size(0, 0),

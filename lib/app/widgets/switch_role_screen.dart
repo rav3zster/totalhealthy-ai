@@ -313,10 +313,10 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen>
                                       // Navigate to appropriate dashboard
                                       if (profile.isAdvisor) {
                                         Get.offAllNamed(
-                                          Routes.TrainerDashboard,
+                                          Routes.trainerDashboard,
                                         );
                                       } else {
-                                        Get.offAllNamed(Routes.ClientDashboard);
+                                        Get.offAllNamed(Routes.clientDashboard);
                                       }
                                       return;
                                     }
@@ -360,12 +360,12 @@ class _SwitchRoleScreenState extends State<SwitchRoleScreen>
 
                                     // Navigate based on role
                                     if (role == "admin") {
-                                      Get.offAllNamed(Routes.TrainerDashboard);
+                                      Get.offAllNamed(Routes.trainerDashboard);
                                     } else {
                                       // If user already proceeded to goals before, go back to goals
                                       // Otherwise, this is first time, so proceed normally
                                       Get.offAllNamed(
-                                        Routes.NUTRITION_GOAL,
+                                        Routes.nutritionGoal,
                                         arguments: {'fromSignup': true},
                                       );
                                     }

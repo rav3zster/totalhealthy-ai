@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../routes/app_pages.dart';
 import '../../../core/base/controllers/auth_controller.dart';
@@ -130,7 +130,7 @@ class MealHistoryController extends GetxController {
           : "";
 
       Get.toNamed(
-        "${Routes.CreateMeal}?id=$userId",
+        "${Routes.createMeal}?id=$userId",
         arguments: {'mode': 'copy', 'meal': mealToCopy},
       );
     } else {

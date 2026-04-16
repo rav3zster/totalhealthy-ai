@@ -185,7 +185,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                     final userData = Get.find<AuthController>()
                                         .userdataget();
                                     Get.toNamed(
-                                      "${Routes.PLANNER}?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                      "${Routes.planner}?id=${userData["id"] ?? userData["_id"] ?? ""}",
                                     );
                                   },
                                   child: Container(
@@ -561,7 +561,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                               }
 
                                               Get.toNamed(
-                                                "${Routes.CreateMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                                "${Routes.createMeal}?id=${userData["id"] ?? userData["_id"] ?? ""}",
                                                 arguments: arguments.isEmpty
                                                     ? null
                                                     : arguments,
@@ -575,7 +575,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                             iconBgColor: Colors.purple
                                                 .withValues(alpha: 0.2),
                                             onTap: () =>
-                                                Get.toNamed(Routes.GENERATE_AI),
+                                                Get.toNamed(Routes.generateAi),
                                           ),
                                           _buildActionCard(
                                             title: 'copy_from_existing'.tr,
@@ -585,7 +585,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                               alpha: 0.2,
                                             ),
                                             onTap: () => Get.toNamed(
-                                              Routes.MEAL_HISTORY,
+                                              Routes.mealHistory,
                                             ),
                                           ),
                                         ],
@@ -654,13 +654,13 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                 // Already on member/dashboard screen
               }),
               _buildNavItem(Icons.group, 'group'.tr, false, () {
-                Get.toNamed(Routes.GROUP);
+                Get.toNamed(Routes.group);
               }),
               _buildNavItem(Icons.notifications, 'notification'.tr, false, () {
                 Get.toNamed('/notification?id=$id');
               }),
               _buildNavItem(Icons.person, 'profile'.tr, false, () {
-                Get.toNamed(Routes.PROFILE_MAIN);
+                Get.toNamed(Routes.profileMain);
               }),
             ],
           ),
@@ -965,7 +965,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                         }
 
                         Get.toNamed(
-                          "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
+                          "${Routes.createMeal}?id=${userData["_id"] ?? ""}",
                           arguments: arguments,
                         );
                       } else if (value == 'delete') {
@@ -1482,7 +1482,7 @@ class _MealCreationSheet extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               Get.toNamed(
-                '${Routes.CreateMeal}?id=$userId',
+                '${Routes.createMeal}?id=$userId',
                 arguments: groupArguments,
               );
             },
@@ -1498,7 +1498,7 @@ class _MealCreationSheet extends StatelessWidget {
             badge: 'AI',
             onTap: () {
               Navigator.pop(context);
-              Get.toNamed('${Routes.GENERATE_AI}?id=$userId');
+              Get.toNamed('${Routes.generateAi}?id=$userId');
             },
           ),
         ],

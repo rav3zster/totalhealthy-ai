@@ -201,7 +201,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
                             if (fromSignup) {
                               // Coming from signup, go back to switch role with flag
                               Get.offAllNamed(
-                                Routes.SWITCHROLE,
+                                Routes.switchRole,
                                 arguments: {'fromGoalScreen': true},
                               );
                             } else {
@@ -222,7 +222,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
                     TextButton(
                       onPressed: () {
                         // Skip to dashboard
-                        Get.offAllNamed(Routes.ClientDashboard);
+                        Get.offAllNamed(Routes.clientDashboard);
                       },
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
@@ -1207,6 +1207,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
                         onTap: selectedDietaryRestriction != -1
                             ? () async {
                                 try {
+                                  final accentColor = context.accent;
                                   final userController =
                                       Get.find<UserController>();
                                   await userController.updateUserProfile(
@@ -1222,14 +1223,14 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
                                   Get.snackbar(
                                     'Success',
                                     'Nutrition goals updated successfully',
-                                    backgroundColor: context.accent,
+                                    backgroundColor: accentColor,
                                     colorText: Colors.black,
                                     snackPosition: SnackPosition.BOTTOM,
                                     margin: const EdgeInsets.all(20),
                                   );
 
                                   // Navigate to client dashboard after completing nutrition goals
-                                  Get.offAllNamed(Routes.ClientDashboard);
+                                  Get.offAllNamed(Routes.clientDashboard);
                                 } catch (e) {
                                   Get.snackbar(
                                     'Error',

@@ -393,7 +393,7 @@ class _GroupDropdown extends StatelessWidget {
               debugPrint('Error entering group mode: $e');
               // Fallback: Navigate to weekly planner
               Get.toNamed(
-                Routes.WEEKLY_MEAL_PLANNER,
+                Routes.weeklyMealPlanner,
                 arguments: {
                   'id': group.id,
                   'groupId': group.id,

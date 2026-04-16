@@ -145,7 +145,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                   title: "Profile",
                                   onTap: () {
                                     Get.back();
-                                    Get.toNamed(Routes.PROFILE_MAIN);
+                                    Get.toNamed(Routes.profileMain);
                                   },
                                 ),
                                 _buildModernMenuItem(
@@ -165,7 +165,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                   title: "Settings",
                                   onTap: () {
                                     Get.back();
-                                    Get.toNamed(Routes.SETTING);
+                                    Get.toNamed(Routes.setting);
                                   },
                                 ),
                                 _buildModernMenuItem(
@@ -176,7 +176,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                     final userData = Get.find<AuthController>()
                                         .userdataget();
                                     Get.toNamed(
-                                      "${Routes.PLANNER}?id=${userData["id"] ?? userData["_id"] ?? ""}",
+                                      "${Routes.planner}?id=${userData["id"] ?? userData["_id"] ?? ""}",
                                     );
                                   },
                                 ),
@@ -188,7 +188,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                 //     final userData = Get.find<AuthController>()
                                 //         .userdataget();
                                 //     Get.toNamed(
-                                //       Routes.MEAL_TIMING +
+                                //       Routes.mealTiming +
                                 //           "?id=${userData["id"] ?? userData["_id"] ?? ""}",
                                 //     );
                                 //   },
@@ -198,7 +198,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                 //   title: "Diet History",
                                 //   onTap: () {
                                 //     Get.back();
-                                //     Get.toNamed(Routes.MEAL_HISTORY);
+                                //     Get.toNamed(Routes.mealHistory);
                                 //   },
                                 // ),
 

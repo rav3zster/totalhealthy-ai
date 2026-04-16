@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class notification_SettingsScreen extends StatefulWidget {
-  const notification_SettingsScreen({super.key});
+class NotificationSettingsScreen extends StatefulWidget {
+  const NotificationSettingsScreen({super.key});
 
   @override
-  _SettingsScreenState createState() => _SettingsScreenState();
+  State<NotificationSettingsScreen> createState() =>
+      _NotificationSettingsScreenState();
 }
 
-class _SettingsScreenState extends State<notification_SettingsScreen> {
+class _NotificationSettingsScreenState
+    extends State<NotificationSettingsScreen> {
   String selectedLanguage = 'English';
   String selectedRegion = 'India';
   String selectedTheme = 'Dark';
 
-  String selected_meal = "on";
-  String selected_water = "off";
-  String selected_expercise = "on";
-  String selected_notification = "on";
+  String selectedMeal = "on";
+  String selectedWater = "off";
+  String selectedExercise = "on";
+  String selectedNotification = "on";
 
   @override
   Widget build(BuildContext context) {
@@ -34,14 +36,13 @@ class _SettingsScreenState extends State<notification_SettingsScreen> {
             onPressed: () {
               Get.back();
             },
-            icon: Icon(Icons.search, size: 35, color: Colors.white),
+            icon: const Icon(Icons.search, size: 35, color: Colors.white),
           ),
         ],
         title: const SizedBox(
           width: double.infinity,
           child: Padding(
             padding: EdgeInsets.only(right: 35),
-            // Adjust this value to control the left shift
             child: Text(
               'Notifications',
               style: TextStyle(
@@ -59,43 +60,43 @@ class _SettingsScreenState extends State<notification_SettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SettingOption(
+            NotificationSettingOption(
               title: 'Meal Reminder',
-              value: selected_meal,
-              items: ['on', 'off'],
+              value: selectedMeal,
+              items: const ['on', 'off'],
               onChanged: (value) {
                 setState(() {
-                  selectedLanguage = value!;
+                  selectedMeal = value!;
                 });
               },
             ),
-            SettingOption(
+            NotificationSettingOption(
               title: 'Water Reminder ',
-              value: selected_water,
-              items: ['on', 'off'],
+              value: selectedWater,
+              items: const ['on', 'off'],
               onChanged: (value) {
                 setState(() {
-                  selectedRegion = value!;
+                  selectedWater = value!;
                 });
               },
             ),
-            SettingOption(
+            NotificationSettingOption(
               title: 'Exercise Reminder',
-              value: selected_expercise,
-              items: ['on', 'off'],
+              value: selectedExercise,
+              items: const ['on', 'off'],
               onChanged: (value) {
                 setState(() {
-                  selectedTheme = value!;
+                  selectedExercise = value!;
                 });
               },
             ),
-            SettingOption(
+            NotificationSettingOption(
               title: 'Update Notification',
-              value: selected_notification,
-              items: ['on', 'off'],
+              value: selectedNotification,
+              items: const ['on', 'off'],
               onChanged: (value) {
                 setState(() {
-                  selectedTheme = value!;
+                  selectedNotification = value!;
                 });
               },
             ),
@@ -106,13 +107,13 @@ class _SettingsScreenState extends State<notification_SettingsScreen> {
   }
 }
 
-class SettingOption extends StatelessWidget {
+class NotificationSettingOption extends StatelessWidget {
   final String title;
   final String value;
   final List<String> items;
   final ValueChanged<String?> onChanged;
 
-  const SettingOption({
+  const NotificationSettingOption({
     super.key,
     required this.title,
     required this.value,
@@ -127,21 +128,27 @@ class SettingOption extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: TextStyle(color: Colors.white, fontSize: 16)),
-          SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
               color: Colors.grey[900],
               borderRadius: BorderRadius.circular(10),
             ),
-            padding: EdgeInsets.symmetric(horizontal: 15),
+            padding: const EdgeInsets.symmetric(horizontal: 15),
             child: DropdownButton<String>(
               value: value,
               dropdownColor: Colors.grey[900],
-              underline: SizedBox(),
+              underline: const SizedBox(),
               isExpanded: true,
-              icon: Icon(Icons.keyboard_arrow_down, color: Color(0xffCCE16B)),
-              style: TextStyle(color: Color(0xffCCE16B), fontSize: 16),
+              icon: const Icon(
+                Icons.keyboard_arrow_down,
+                color: Color(0xffCCE16B),
+              ),
+              style: const TextStyle(color: Color(0xffCCE16B), fontSize: 16),
               onChanged: onChanged,
               items: items.map((item) {
                 return DropdownMenuItem(value: item, child: Text(item));

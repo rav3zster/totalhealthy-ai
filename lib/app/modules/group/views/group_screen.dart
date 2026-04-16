@@ -18,7 +18,7 @@ class GroupScreen extends GetView<GroupController> {
       // 🔥 THIS IS THE REAL FIX FOR FLUTTER WEB
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
-          Get.offAllNamed(Routes.ClientDashboard);
+          Get.offAllNamed(Routes.clientDashboard);
         }
       },
       canPop: false,
@@ -33,7 +33,7 @@ class GroupScreen extends GetView<GroupController> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
-              Get.offAllNamed(Routes.ClientDashboard);
+              Get.offAllNamed(Routes.clientDashboard);
             },
           ),
 

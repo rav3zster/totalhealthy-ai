@@ -1,7 +1,7 @@
-//
+﻿//
 // import 'package:flutter/material.dart';
 // import 'package:get/get.dart';
-// import 'package:totalhealthy/app/widgets/sideMenu.dart';
+// import 'package:totalhealthy/app/widgets/side_menu.dart';
 //
 // import '../core/base/controllers/auth_controller.dart';
 // import '../routes/app_pages.dart';

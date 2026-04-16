@@ -121,7 +121,7 @@ class _AddMealSheet extends StatelessWidget {
             badge: null,
             onTap: () {
               Navigator.pop(context);
-              Get.toNamed('${Routes.CreateMeal}?id=$id');
+              Get.toNamed('${Routes.createMeal}?id=$id');
             },
           ),
           const SizedBox(height: 10),
@@ -135,7 +135,7 @@ class _AddMealSheet extends StatelessWidget {
             badge: 'AI',
             onTap: () {
               Navigator.pop(context);
-              Get.toNamed('${Routes.GENERATE_AI}?id=$id');
+              Get.toNamed('${Routes.generateAi}?id=$id');
             },
           ),
           const SizedBox(height: 10),
@@ -151,7 +151,7 @@ class _AddMealSheet extends StatelessWidget {
               Navigator.pop(context);
               // Navigate to create meal with scan mode
               Get.toNamed(
-                '${Routes.CreateMeal}?id=$id',
+                '${Routes.createMeal}?id=$id',
                 arguments: {'scanMode': true},
               );
             },

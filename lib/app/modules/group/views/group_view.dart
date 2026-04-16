@@ -527,7 +527,7 @@ class _GroupViewState extends State<GroupView>
       },
       child: GestureDetector(
         onTap: () {
-          Get.toNamed(Routes.GROUP_DETAILS, arguments: group.toJson());
+          Get.toNamed(Routes.groupDetails, arguments: group.toJson());
         },
         child: Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -542,7 +542,7 @@ class _GroupViewState extends State<GroupView>
             child: InkWell(
               borderRadius: BorderRadius.circular(16),
               onTap: () {
-                Get.toNamed(Routes.GROUP_DETAILS, arguments: group.toJson());
+                Get.toNamed(Routes.groupDetails, arguments: group.toJson());
               },
               child: Padding(
                 padding: const EdgeInsets.all(20),

@@ -129,7 +129,7 @@ class EmptyDataScreen extends StatelessWidget {
                 Icons.edit_note,
                 () {
                   Get.toNamed(
-                    "${Routes.CreateMeal}?id=${userData["_id"] ?? ""}",
+                    "${Routes.createMeal}?id=${userData["_id"] ?? ""}",
                   );
                 },
               ),
@@ -139,7 +139,7 @@ class EmptyDataScreen extends StatelessWidget {
                 "Generate",
                 Icons.auto_awesome,
                 () {
-                  Get.toNamed(Routes.GENERATE_AI);
+                  Get.toNamed(Routes.generateAi);
                 },
               ),
               const SizedBox(height: 15),
@@ -148,7 +148,7 @@ class EmptyDataScreen extends StatelessWidget {
                 "Copy",
                 Icons.copy,
                 () {
-                  // TODO: Implement Copy From Existing logic if route exists
+                  // Copy from existing not yet available
                 },
               ),
               const SizedBox(height: 20),

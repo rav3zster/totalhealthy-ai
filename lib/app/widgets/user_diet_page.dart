@@ -170,7 +170,7 @@ class _UserDietPageState extends State<UserDietPage> {
           children: [
             IconButton(
               onPressed: () {
-                Get.toNamed(Routes.TrainerDashboard);
+                Get.toNamed(Routes.trainerDashboard);
               },
               icon: Icon(Icons.arrow_back_ios, color: Colors.white),
             ),

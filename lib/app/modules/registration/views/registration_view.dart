@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:totalhealthy/app/modules/manage_accounts/views/manage_accounts_views.dart';
-import 'package:totalhealthy/app/widgets/baseWidget.dart';
+import 'package:totalhealthy/app/widgets/base_widget.dart';
 import 'package:totalhealthy/app/controllers/user_controller.dart';
 
 import '../../nutrition_goal/views/nutrition_goal_screen.dart';

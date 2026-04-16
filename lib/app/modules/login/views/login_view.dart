@@ -251,7 +251,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () =>
-                                    Get.toNamed(Routes.FORGETPASSWORD),
+                                    Get.toNamed(Routes.forgetPassword),
                                 child: const Text(
                                   'Forgot Password?',
                                   style: TextStyle(
@@ -338,7 +338,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   TextButton(
-                                    onPressed: () => Get.toNamed(Routes.SIGNUP),
+                                    onPressed: () => Get.toNamed(Routes.signup),
                                     style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                       minimumSize: const Size(0, 0),

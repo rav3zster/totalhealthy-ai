@@ -635,7 +635,7 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
                                       return;
                                     }
 
-                                    Get.toNamed(Routes.CLIENT_LIST);
+                                    Get.toNamed(Routes.clientList);
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
@@ -949,17 +949,17 @@ class _TrainerDashboardViewState extends State<TrainerDashboardView> {
             children: [
               _buildNavItem(Icons.person, 'Member', false, () {
                 Get.find<AuthController>().roleStore("user");
-                Get.offAllNamed(Routes.ClientDashboard);
+                Get.offAllNamed(Routes.clientDashboard);
               }),
               _buildNavItem(Icons.group, 'Group', false, () {
-                Get.toNamed(Routes.GROUP);
+                Get.toNamed(Routes.group);
               }),
               _buildNavItem(Icons.notifications, 'Notification', false, () {
                 final userData = Get.find<AuthController>().userdataget();
                 Get.toNamed('/notification?id=${userData["_id"] ?? ""}');
               }),
               _buildNavItem(Icons.person, 'Profile', false, () {
-                Get.toNamed(Routes.PROFILE_MAIN);
+                Get.toNamed(Routes.profileMain);
               }),
             ],
           ),

@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:totalhealthy/app/widgets/baseWidget.dart';
+import 'package:totalhealthy/app/widgets/base_widget.dart';
 
 import '../../routes/app_pages.dart';
 
@@ -45,17 +45,19 @@ class _RegistrationViewState extends State<RegistrationView> {
                     Text(
                       "Create Your",
                       style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white),
+                        fontSize: 28,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
                     ),
                     SizedBox(width: 6),
                     Text(
                       "Account",
                       style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.amberAccent),
+                        fontSize: 28,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.amberAccent,
+                      ),
                     ),
                   ],
                 ),
@@ -83,7 +85,7 @@ class _RegistrationViewState extends State<RegistrationView> {
                               ? const Color.fromARGB(255, 146, 159, 83)
                               // Yellow when selected
                               : Colors
-                                  .transparent, // Transparent when not selected
+                                    .transparent, // Transparent when not selected
                           width: 3,
                         ),
                       ),
@@ -125,9 +127,10 @@ class _RegistrationViewState extends State<RegistrationView> {
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
                           color: isFemaleSelected
-                              ? Colors.amberAccent // Yellow when selected
+                              ? Colors
+                                    .amberAccent // Yellow when selected
                               : Colors
-                                  .transparent, // Transparent when not selected
+                                    .transparent, // Transparent when not selected
                           width: 3,
                         ),
                       ),
@@ -172,47 +175,45 @@ class _RegistrationViewState extends State<RegistrationView> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 20,
-              ),
-              Container(
-                child: Row(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(left: 130, top: 20),
-                      child: Text(
-                        "----------",
-                        style: TextStyle(
-                            color: Colors.white30,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(left: 130, top: 20),
+                    child: Text(
+                      "----------",
+                      style: TextStyle(
+                        color: Colors.white30,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(left: 5, top: 20),
-                      child: Text(
-                        "Or",
-                        style: TextStyle(
-                            color: Colors.white30,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 5, top: 20),
+                    child: Text(
+                      "Or",
+                      style: TextStyle(
+                        color: Colors.white30,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    Container(
-                        margin: const EdgeInsets.only(left: 5, top: 20),
-                        child: Text(
-                          "----------",
-                          style: TextStyle(
-                              color: Colors.white30,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500),
-                        )),
-                  ],
-                ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 5, top: 20),
+                    child: Text(
+                      "----------",
+                      style: TextStyle(
+                        color: Colors.white30,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(
-                height: 15,
-              ),
+              SizedBox(height: 15),
               Row(
                 children: [
                   Container(
@@ -220,30 +221,30 @@ class _RegistrationViewState extends State<RegistrationView> {
                     child: Text(
                       "Don't have an account yet?",
                       style: TextStyle(
-                          color: Colors.white54, fontWeight: FontWeight.w500),
+                        color: Colors.white54,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
-                  SizedBox(
-                    width: 3,
-                  ),
+                  SizedBox(width: 3),
                   Container(
                     margin: EdgeInsets.only(right: 0),
                     child: GestureDetector(
-                        onTap: () {
-                          Get.toNamed(Routes.SIGNUP);
-                        },
-                        child: Text(
-                          "Sign up",
-                          style: TextStyle(
-                              color: Color.fromARGB(255, 205, 226, 109),
-                              fontWeight: FontWeight.w500),
-                        )),
+                      onTap: () {
+                        Get.toNamed(Routes.signup);
+                      },
+                      child: Text(
+                        "Sign up",
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 205, 226, 109),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
-              SizedBox(
-                height: 20,
-              )
+              SizedBox(height: 20),
             ],
           ),
         ),

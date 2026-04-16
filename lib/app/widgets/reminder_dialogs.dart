@@ -216,7 +216,12 @@ class WaterReminderDialog {
             ),
             ElevatedButton(
               onPressed: () async {
-                // Save settings
+                // Capture context-dependent values before async gap
+                final startFormatted = startTime.format(context);
+                final endFormatted = endTime.format(context);
+                final accentColor = context.accent;
+                final nav = Navigator.of(context);
+
                 final settings = WaterReminderSettings(
                   startTime: startTime,
                   endTime: endTime,
@@ -225,7 +230,6 @@ class WaterReminderDialog {
 
                 await ReminderStorageService.saveWaterReminder(true, settings);
 
-                // Schedule notifications
                 await NotificationService.scheduleWaterReminders(
                   startTime: startTime,
                   endTime: endTime,
@@ -233,15 +237,15 @@ class WaterReminderDialog {
                 );
 
                 debugPrint(
-                  'Reminder scheduled: ${startTime.format(context)} to ${endTime.format(context)}, every $intervalMinutes min',
+                  'Reminder scheduled: $startFormatted to $endFormatted, every $intervalMinutes min',
                 );
 
-                Navigator.pop(context);
+                nav.pop();
 
                 Get.snackbar(
                   'success'.tr,
                   'water_reminder_set'.tr,
-                  backgroundColor: context.accent,
+                  backgroundColor: accentColor,
                   colorText: Colors.black,
                 );
               },
@@ -415,7 +419,11 @@ class MealReminderDialog {
             ),
             ElevatedButton(
               onPressed: () async {
-                // Save settings
+                // Capture context-dependent values before async gap
+                final mealFormatted = selectedTime.format(context);
+                final accentColor = context.accent;
+                final nav = Navigator.of(context);
+
                 final settings = MealReminderSettings(
                   mealCategory: selectedMeal,
                   time: selectedTime,
@@ -424,22 +432,21 @@ class MealReminderDialog {
 
                 await ReminderStorageService.saveMealReminder(true, [settings]);
 
-                // Schedule notification
                 await NotificationService.scheduleMealReminder(
                   mealType: selectedMeal,
                   time: selectedTime,
                 );
 
                 debugPrint(
-                  'Reminder scheduled: $selectedMeal at ${selectedTime.format(context)}',
+                  'Reminder scheduled: $selectedMeal at $mealFormatted',
                 );
 
-                Navigator.pop(context);
+                nav.pop();
 
                 Get.snackbar(
                   'success'.tr,
                   'meal_reminder_set'.tr,
-                  backgroundColor: context.accent,
+                  backgroundColor: accentColor,
                   colorText: Colors.black,
                 );
               },
@@ -632,7 +639,11 @@ class ExerciseReminderDialog {
                   return;
                 }
 
-                // Save settings
+                // Capture context-dependent values before async gap
+                final exerciseFormatted = selectedTime.format(context);
+                final accentColor = context.accent;
+                final nav = Navigator.of(context);
+
                 final settings = ExerciseReminderSettings(
                   weekdays: selectedDays.toList(),
                   time: selectedTime,
@@ -643,22 +654,21 @@ class ExerciseReminderDialog {
                   settings,
                 );
 
-                // Schedule notification
                 await NotificationService.scheduleExerciseReminder(
                   time: selectedTime,
                   weekdays: selectedDays.toList(),
                 );
 
                 debugPrint(
-                  'Reminder scheduled: Exercise at ${selectedTime.format(context)} on days ${selectedDays.toList()}',
+                  'Reminder scheduled: Exercise at $exerciseFormatted on days ${selectedDays.toList()}',
                 );
 
-                Navigator.pop(context);
+                nav.pop();
 
                 Get.snackbar(
                   'success'.tr,
                   'exercise_reminder_set'.tr,
-                  backgroundColor: context.accent,
+                  backgroundColor: accentColor,
                   colorText: Colors.black,
                 );
               },

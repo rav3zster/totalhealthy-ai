@@ -271,7 +271,7 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
       );
 
       Get.toNamed(
-        "${Routes.CreateMeal}?id=$userId&from=group_details",
+        "${Routes.createMeal}?id=$userId&from=group_details",
         arguments: groupCategoryId != null
             ? {'groupCategoryId': groupCategoryId}
             : null,
@@ -279,7 +279,7 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
     } catch (e) {
       debugPrint('❌ Error getting group category ID: $e');
       // Fallback: navigate without group category ID
-      Get.toNamed("${Routes.CreateMeal}?id=$userId&from=group_details");
+      Get.toNamed("${Routes.createMeal}?id=$userId&from=group_details");
     }
   }
 
@@ -339,7 +339,7 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
                     meal.toJson(),
                   );
 
-                  Get.toNamed("${Routes.MEALS_DETAILS}?id=${meal.id ?? ''}");
+                  Get.toNamed("${Routes.mealsDetails}?id=${meal.id ?? ''}");
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(12),

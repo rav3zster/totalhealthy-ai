@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -69,7 +69,7 @@ class AuthController extends GetxController {
       if (profile == null) {
         // Document DOES NOT exist - this is a BRAND NEW USER
         debugPrint("📝 New user detected - no Firestore document");
-        Get.offAllNamed(Routes.SWITCHROLE);
+        Get.offAllNamed(Routes.switchRole);
         return;
       }
 
@@ -85,7 +85,7 @@ class AuthController extends GetxController {
         if (isNewSignup) {
           // This is a new signup - show Switch Role screen
           debugPrint("⚠️ New signup without role - showing Switch Role");
-          Get.offAllNamed(Routes.SWITCHROLE);
+          Get.offAllNamed(Routes.switchRole);
           return;
         } else {
           // This is an existing user logging in - assign default role "member"
@@ -123,7 +123,7 @@ class AuthController extends GetxController {
 
           roleStore("member");
           debugPrint("✅ Navigating to Client Dashboard with default role");
-          Get.offAllNamed(Routes.ClientDashboard);
+          Get.offAllNamed(Routes.clientDashboard);
           return;
         }
       }
@@ -136,15 +136,15 @@ class AuthController extends GetxController {
 
       if (normalizedRole == "advisor") {
         debugPrint("✅ Navigating to Trainer Dashboard");
-        Get.offAllNamed(Routes.TrainerDashboard);
+        Get.offAllNamed(Routes.trainerDashboard);
       } else {
         debugPrint("✅ Navigating to Client Dashboard");
-        Get.offAllNamed(Routes.ClientDashboard);
+        Get.offAllNamed(Routes.clientDashboard);
       }
     } catch (e) {
       debugPrint("❌ Bootstrap error: $e");
       // On error, go to login
-      Get.offAllNamed(Routes.Login);
+      Get.offAllNamed(Routes.login);
     }
   }
 
@@ -273,7 +273,7 @@ class AuthController extends GetxController {
     await _auth.signOut();
     box.erase();
     isAuthenticated.value = false;
-    Get.offAllNamed(Routes.Login);
+    Get.offAllNamed(Routes.login);
   }
 
   // Role Management
@@ -329,10 +329,10 @@ class AuthController extends GetxController {
         if (box.hasData("role")) {
           String role = box.read("role");
           return role == "admin"
-              ? Routes.TrainerDashboard
-              : Routes.ClientDashboard;
+              ? Routes.trainerDashboard
+              : Routes.clientDashboard;
         } else {
-          return Routes.SWITCHROLE;
+          return Routes.switchRole;
         }
       }
       return Get.currentRoute;
@@ -470,9 +470,9 @@ class AuthController extends GetxController {
 
       // Navigate to appropriate dashboard
       if (normalizedRole == "advisor") {
-        Get.offAllNamed(Routes.TrainerDashboard);
+        Get.offAllNamed(Routes.trainerDashboard);
       } else {
-        Get.offAllNamed(Routes.ClientDashboard);
+        Get.offAllNamed(Routes.clientDashboard);
       }
     } catch (e) {
       debugPrint("❌ Error switching role: $e");
