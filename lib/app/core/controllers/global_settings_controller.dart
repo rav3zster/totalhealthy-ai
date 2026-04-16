@@ -54,7 +54,7 @@ class GlobalSettingsController extends GetxController {
       _applyThemeMode(settings.theme);
       _applyLocale(settings.language);
     } catch (e) {
-      print('Error loading settings: $e');
+      debugPrint('Error loading settings: $e');
       // Use defaults on error
       language.value = 'English';
       region.value = 'India';
@@ -172,7 +172,7 @@ class GlobalSettingsController extends GetxController {
         await _settingsService.syncToFirestore(user.uid, settings);
       }
     } catch (e) {
-      print('Error saving settings: $e');
+      debugPrint('Error saving settings: $e');
     }
   }
 

@@ -64,7 +64,7 @@ class GroupController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    print("GroupController: onInit called");
+    debugPrint("GroupController: onInit called");
 
     // Initialize immediately after the frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -75,7 +75,7 @@ class GroupController extends GetxController {
     // Listen for auth state changes and refresh groups
     final authController = Get.find<AuthController>();
     ever(authController.firebaseUser, (User? user) {
-      print("GroupController: Auth state changed - User: ${user?.uid}");
+      debugPrint("GroupController: Auth state changed - User: ${user?.uid}");
       if (user != null) {
         // User logged in, refresh groups with their data
         groupData.bindStream(_groupsService.getUserGroupsStream(user.uid));
@@ -114,20 +114,20 @@ class GroupController extends GetxController {
 
     // Initialize filtered group members when groupMembers changes
     ever(groupMembers, (_) {
-      print(
+      debugPrint(
         '🔍 EVER LISTENER - groupMembers changed, count: ${groupMembers.length}',
       );
-      print(
+      debugPrint(
         '🔍 EVER LISTENER - groupMembersSearchQuery: "${groupMembersSearchQuery.value}"',
       );
       if (groupMembersSearchQuery.value.isEmpty) {
         filteredGroupMembers.value = groupMembers;
-        print(
+        debugPrint(
           '🔍 EVER LISTENER - Set filteredGroupMembers to ${filteredGroupMembers.length} members',
         );
       } else {
         filterGroupMembers(groupMembersSearchQuery.value);
-        print(
+        debugPrint(
           '🔍 EVER LISTENER - Filtered to ${filteredGroupMembers.length} members',
         );
       }
@@ -135,18 +135,18 @@ class GroupController extends GetxController {
 
     // Initialize filtered members when users changes (LEVEL 2 search)
     ever(users, (_) {
-      print('🔍 EVER LISTENER - users changed, count: ${users.length}');
-      print(
+      debugPrint('🔍 EVER LISTENER - users changed, count: ${users.length}');
+      debugPrint(
         '🔍 EVER LISTENER - membersSearchQuery: "${membersSearchQuery.value}"',
       );
       if (membersSearchQuery.value.isEmpty) {
         filteredMembers.value = users;
-        print(
+        debugPrint(
           '🔍 EVER LISTENER - Set filteredMembers to ${filteredMembers.length} members',
         );
       } else {
         filterMembers(membersSearchQuery.value);
-        print(
+        debugPrint(
           '🔍 EVER LISTENER - Filtered to ${filteredMembers.length} members',
         );
       }
@@ -154,20 +154,20 @@ class GroupController extends GetxController {
 
     // Initialize filtered available users when availableUsers changes (LEVEL 4 search)
     ever(availableUsers, (_) {
-      print(
+      debugPrint(
         '🔍 EVER LISTENER - availableUsers changed, count: ${availableUsers.length}',
       );
-      print(
+      debugPrint(
         '🔍 EVER LISTENER - availableUsersSearchQuery: "${availableUsersSearchQuery.value}"',
       );
       if (availableUsersSearchQuery.value.isEmpty) {
         filteredAvailableUsers.value = availableUsers;
-        print(
+        debugPrint(
           '🔍 EVER LISTENER - Set filteredAvailableUsers to ${filteredAvailableUsers.length} users',
         );
       } else {
         filterAvailableUsers(availableUsersSearchQuery.value);
-        print(
+        debugPrint(
           '🔍 EVER LISTENER - Filtered to ${filteredAvailableUsers.length} users',
         );
       }
@@ -175,14 +175,14 @@ class GroupController extends GetxController {
   }
 
   void _initUsers() {
-    print("GroupController: Initializing users");
+    debugPrint("GroupController: Initializing users");
     totalUsers.bindStream(_usersService.getTotalUsersCountStream());
     users.bindStream(_usersService.getUsersStream());
 
     final authController = Get.find<AuthController>();
     final currentUser = authController.firebaseUser.value;
     if (currentUser != null) {
-      print(
+      debugPrint(
         "GroupController: Binding to invitations stream for user: ${currentUser.uid}",
       );
       sentInvitations.bindStream(
@@ -192,7 +192,7 @@ class GroupController extends GetxController {
   }
 
   void _initGroups() {
-    print("GroupController: Initializing groups");
+    debugPrint("GroupController: Initializing groups");
     isLoading.value = true;
 
     // Get current user ID
@@ -201,27 +201,29 @@ class GroupController extends GetxController {
     final currentUserId = currentUser?.uid;
 
     if (currentUserId != null) {
-      print(
+      debugPrint(
         "GroupController: Binding to groups stream for user: $currentUserId",
       );
       // Bind the groupData to the filtered Firestore stream
       groupData.bindStream(_groupsService.getUserGroupsStream(currentUserId));
     } else {
-      print("GroupController: No user logged in, showing empty list");
+      debugPrint("GroupController: No user logged in, showing empty list");
       // If no user is logged in, show empty list
       groupData.value = [];
     }
 
     // Set isLoading to false when the first batch of data is received
     ever(groupData, (_) {
-      print("GroupController: Groups data received, clearing loading state");
+      debugPrint(
+        "GroupController: Groups data received, clearing loading state",
+      );
       isLoading.value = false;
     });
 
     // Safety timeout
     Future.delayed(const Duration(seconds: 5), () {
       if (isLoading.value) {
-        print("GroupController: Timeout reached, clearing loading state");
+        debugPrint("GroupController: Timeout reached, clearing loading state");
         isLoading.value = false;
       }
     });
@@ -280,7 +282,7 @@ class GroupController extends GetxController {
         colorText: Colors.white,
       );
     } catch (e) {
-      print("Error creating group: $e");
+      debugPrint("Error creating group: $e");
       Get.snackbar(
         'Error',
         'Failed to create group: $e',
@@ -307,7 +309,7 @@ class GroupController extends GetxController {
       // Don't auto-select - let user choose explicitly
       selectedGroupCategory.value = null;
     } catch (e) {
-      print('Error loading group categories: $e');
+      debugPrint('Error loading group categories: $e');
     } finally {
       isLoadingCategories.value = false;
     }
@@ -459,9 +461,9 @@ class GroupController extends GetxController {
         duration: const Duration(seconds: 3),
       );
 
-      print('Group ${group.id} deleted successfully');
+      debugPrint('Group ${group.id} deleted successfully');
     } catch (e) {
-      print("Error deleting group: $e");
+      debugPrint("Error deleting group: $e");
       Get.snackbar(
         'Error',
         'Failed to delete group: $e',
@@ -596,9 +598,9 @@ class GroupController extends GetxController {
       // Navigate back to groups list (pop all group-related screens)
       Get.until((route) => route.settings.name == '/groups' || route.isFirst);
 
-      print('Member $currentUserId left group $groupId');
+      debugPrint('Member $currentUserId left group $groupId');
     } catch (e) {
-      print("Error leaving group: $e");
+      debugPrint("Error leaving group: $e");
       Get.snackbar(
         'Error',
         'Failed to leave group: $e',
@@ -629,31 +631,31 @@ class GroupController extends GetxController {
 
       isLoading.value = true;
 
-      print('=== ADMIN LEAVE VALIDATION ===');
-      print('Group ID: $groupId');
-      print('Current Admin ID: $currentUserId');
-      print('Querying Firestore: groups/$groupId/members');
+      debugPrint('=== ADMIN LEAVE VALIDATION ===');
+      debugPrint('Group ID: $groupId');
+      debugPrint('Current Admin ID: $currentUserId');
+      debugPrint('Querying Firestore: groups/$groupId/members');
 
       // Fetch ALL members from Firestore subcollection
       // Auto-healing will create admin membership if missing
       final allMemberIds = await _groupsService.getGroupMembers(groupId);
 
-      print('Total members in subcollection: ${allMemberIds.length}');
-      print('All member IDs: $allMemberIds');
+      debugPrint('Total members in subcollection: ${allMemberIds.length}');
+      debugPrint('All member IDs: $allMemberIds');
 
       // Filter out current admin to get OTHER members
       final otherMemberIds = allMemberIds
           .where((id) => id != currentUserId)
           .toList();
 
-      print('Other members (excluding admin): ${otherMemberIds.length}');
-      print('Other member IDs: $otherMemberIds');
-      print('==============================');
+      debugPrint('Other members (excluding admin): ${otherMemberIds.length}');
+      debugPrint('Other member IDs: $otherMemberIds');
+      debugPrint('==============================');
 
       // Check if there are other members besides the admin
       if (otherMemberIds.isEmpty) {
         isLoading.value = false;
-        print('❌ No other members - admin cannot leave');
+        debugPrint('❌ No other members - admin cannot leave');
 
         // Show dialog suggesting to delete group instead
         await Get.dialog(
@@ -735,7 +737,9 @@ class GroupController extends GetxController {
         return;
       }
 
-      print('✓ ${otherMemberIds.length} other members available for transfer');
+      debugPrint(
+        '✓ ${otherMemberIds.length} other members available for transfer',
+      );
 
       // Get member details for display
       final memberUsers = <UserModel>[];
@@ -743,16 +747,16 @@ class GroupController extends GetxController {
         final user = users.firstWhereOrNull((u) => u.id == memberId);
         if (user != null) {
           memberUsers.add(user);
-          print('  - ${user.username} (${user.id})');
+          debugPrint('  - ${user.username} (${user.id})');
         } else {
-          print('  - Warning: User $memberId not found in users list');
+          debugPrint('  - Warning: User $memberId not found in users list');
         }
       }
 
       isLoading.value = false;
 
       if (memberUsers.isEmpty) {
-        print('❌ No valid user details found');
+        debugPrint('❌ No valid user details found');
         Get.snackbar(
           "Cannot Leave",
           "No valid members found to transfer ownership",
@@ -762,7 +766,7 @@ class GroupController extends GetxController {
         return;
       }
 
-      print('✓ ${memberUsers.length} valid users for selection');
+      debugPrint('✓ ${memberUsers.length} valid users for selection');
 
       // Show confirmation dialog first
       final shouldProceed = await Get.dialog<bool>(
@@ -918,7 +922,7 @@ class GroupController extends GetxController {
                         ),
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundImage: NetworkImage(user.profileImage!),
+                            backgroundImage: NetworkImage(user.profileImage),
                             child: null,
                           ),
                           title: Text(
@@ -1076,11 +1080,11 @@ class GroupController extends GetxController {
       // This ensures we go back to the groups list, not just one screen back
       Get.until((route) => route.settings.name == '/groups' || route.isFirst);
 
-      print(
+      debugPrint(
         'Admin $currentUserId left group $groupId, new admin: ${selectedUser.id}',
       );
     } catch (e) {
-      print("Error leaving group as admin: $e");
+      debugPrint("Error leaving group as admin: $e");
       Get.snackbar(
         'Error',
         'Failed to leave group: $e',
@@ -1121,7 +1125,7 @@ class GroupController extends GetxController {
 
       return memberUsers;
     } catch (e) {
-      print("Error getting group members: $e");
+      debugPrint("Error getting group members: $e");
       return [];
     }
   }
@@ -1132,43 +1136,43 @@ class GroupController extends GetxController {
   Future<List<UserModel>> getAvailableUsers(String groupId) async {
     try {
       if (groupId.isEmpty) {
-        print("DEBUG: Empty group ID provided");
+        debugPrint("DEBUG: Empty group ID provided");
         return [];
       }
 
       final group = groupData.firstWhereOrNull((g) => g.id == groupId);
       if (group == null) {
-        print("DEBUG: Group not found for ID: $groupId");
+        debugPrint("DEBUG: Group not found for ID: $groupId");
         return [];
       }
 
-      print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-      print("DEBUG AVAILABLE USERS FILTERING:");
-      print("Total users in system: ${users.length}");
+      debugPrint("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      debugPrint("DEBUG AVAILABLE USERS FILTERING:");
+      debugPrint("Total users in system: ${users.length}");
 
       // Get current member IDs (including creator)
       final currentMemberIds = Set<String>.from(group.membersList);
       currentMemberIds.add(group.createdBy); // Always include creator
-      print("Current members in group: ${currentMemberIds.length}");
-      print("Current member IDs: $currentMemberIds");
+      debugPrint("Current members in group: ${currentMemberIds.length}");
+      debugPrint("Current member IDs: $currentMemberIds");
 
       // Get users who have pending invitations for this group
       final pendingUserIds = sentInvitations
           .where((invitation) => invitation.groupId == groupId)
           .map((invitation) => invitation.recipientId)
           .toSet();
-      print("Pending invitations: ${pendingUserIds.length}");
-      print("Pending user IDs: $pendingUserIds");
+      debugPrint("Pending invitations: ${pendingUserIds.length}");
+      debugPrint("Pending user IDs: $pendingUserIds");
 
       // Debug: Check each user's role
-      print("\nUser roles breakdown:");
+      debugPrint("\nUser roles breakdown:");
       final roleCount = <String, int>{};
       for (final user in users) {
         final role = user.role ?? 'null';
         roleCount[role] = (roleCount[role] ?? 0) + 1;
       }
       roleCount.forEach((role, count) {
-        print("  $role: $count users");
+        debugPrint("  $role: $count users");
       });
 
       // CRITICAL: Use permission service to filter available members
@@ -1182,21 +1186,21 @@ class GroupController extends GetxController {
       // Sort alphabetically for better UX
       availableUsers.sort((a, b) => a.username.compareTo(b.username));
 
-      print("\nFinal available users: ${availableUsers.length}");
-      print("Available users list:");
+      debugPrint("\nFinal available users: ${availableUsers.length}");
+      debugPrint("Available users list:");
       for (final user in availableUsers.take(10)) {
-        print(
+        debugPrint(
           "  - ${user.username} (${user.email}) [${user.role ?? 'no role'}]",
         );
       }
       if (availableUsers.length > 10) {
-        print("  ... and ${availableUsers.length - 10} more");
+        debugPrint("  ... and ${availableUsers.length - 10} more");
       }
-      print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      debugPrint("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
       return availableUsers;
     } catch (e) {
-      print("Error getting available users: $e");
+      debugPrint("Error getting available users: $e");
       return [];
     }
   }
@@ -1372,7 +1376,7 @@ class GroupController extends GetxController {
         await _groupsService.addMemberToGroup(groupId, group.createdBy);
       }
     } catch (e) {
-      print("Error ensuring creator is member: $e");
+      debugPrint("Error ensuring creator is member: $e");
     }
   }
 
@@ -1382,15 +1386,15 @@ class GroupController extends GetxController {
       isMemberLoading.value = true;
 
       // Force refresh group data from Firestore
-      print("DEBUG: Refreshing group data from Firestore for: $groupId");
+      debugPrint("DEBUG: Refreshing group data from Firestore for: $groupId");
       final freshGroup = await _groupsService.getGroupById(groupId);
 
       if (freshGroup != null) {
-        print(
+        debugPrint(
           "DEBUG: Setting current group: ${freshGroup.name} (${freshGroup.id})",
         );
-        print("DEBUG: Group members_list: ${freshGroup.membersList}");
-        print("DEBUG: Group admin (created_by): ${freshGroup.createdBy}");
+        debugPrint("DEBUG: Group members_list: ${freshGroup.membersList}");
+        debugPrint("DEBUG: Group admin (created_by): ${freshGroup.createdBy}");
 
         // Ensure creator is in members list for existing groups
         await ensureCreatorIsMember(groupId);
@@ -1401,7 +1405,7 @@ class GroupController extends GetxController {
         final members = await getGroupMembers(groupId);
         final available = await getAvailableUsers(groupId);
 
-        print(
+        debugPrint(
           "DEBUG: Loaded ${members.length} members and ${available.length} available users",
         );
 
@@ -1424,7 +1428,7 @@ class GroupController extends GetxController {
         filteredAvailableUsers.refresh();
       }
     } catch (e) {
-      print("Error in setCurrentGroup: $e");
+      debugPrint("Error in setCurrentGroup: $e");
       Get.snackbar(
         "Error",
         "Failed to load group data: $e",
@@ -1601,7 +1605,7 @@ class GroupController extends GetxController {
           .toList();
     }
 
-    print(
+    debugPrint(
       '🔍 LEVEL 1 - Groups filtered: ${filteredGroups.length} results for "$query"',
     );
   }
@@ -1639,7 +1643,7 @@ class GroupController extends GetxController {
       }).toList();
     }
 
-    print(
+    debugPrint(
       '🔍 LEVEL 1b - Groups view filtered: ${filteredGroupsView.length} results for "$query"',
     );
   }
@@ -1668,7 +1672,7 @@ class GroupController extends GetxController {
       }).toList();
     }
 
-    print(
+    debugPrint(
       '🔍 LEVEL 2 - Global members filtered: ${filteredMembers.length} results for "$query"',
     );
   }
@@ -1697,7 +1701,7 @@ class GroupController extends GetxController {
       }).toList();
     }
 
-    print(
+    debugPrint(
       '🔍 LEVEL 3 - Group members filtered: ${filteredGroupMembers.length} results for "$query"',
     );
   }
@@ -1720,7 +1724,7 @@ class GroupController extends GetxController {
       }).toList();
     }
 
-    print(
+    debugPrint(
       '🔍 LEVEL 4 - Available users filtered: ${filteredAvailableUsers.length} results for "$query"',
     );
   }

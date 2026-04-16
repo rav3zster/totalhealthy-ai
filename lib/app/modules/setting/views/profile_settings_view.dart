@@ -91,7 +91,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
       case 'Sedentary':
         return 'sedentary';
       case 'Light':
-        return 'light';
+        return 'light_activity';
       case 'Moderate':
         return 'moderate';
       case 'Active':
@@ -991,6 +991,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
     }
 
     try {
+      final accentColor = context.accent;
       await userController.updateUserProfile(
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
@@ -1009,7 +1010,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
       Get.snackbar(
         'success'.tr,
         'profile_updated_successfully'.tr,
-        backgroundColor: context.accent,
+        backgroundColor: accentColor,
         colorText: Colors.black,
       );
 
@@ -1026,7 +1027,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
   }
 
   Future<void> _pickAndUploadImage() async {
-    final context = Get.context!;
+    final accentColor = Get.context?.accent;
     try {
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(
@@ -1041,7 +1042,7 @@ class _ProfileSettingsViewState extends State<ProfileSettingsView> {
         Get.snackbar(
           'success'.tr,
           'profile_picture_updated'.tr,
-          backgroundColor: context.accent,
+          backgroundColor: accentColor,
           colorText: Colors.black,
         );
       }

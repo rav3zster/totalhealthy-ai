@@ -1,10 +1,10 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../data/models/meal_category_model.dart';
 import '../../../data/models/group_model.dart';
 import '../../../data/services/meal_categories_firestore_service.dart';
-
 class MealCategoriesController extends GetxController {
   final _categoriesService = MealCategoriesFirestoreService();
 
@@ -46,7 +46,7 @@ class MealCategoriesController extends GetxController {
             isLoading.value = false;
           },
           onError: (error) {
-            print('Error loading categories: $error');
+            debugPrint('Error loading categories: $error');
             isLoading.value = false;
             Get.snackbar('Error', 'Failed to load categories');
           },

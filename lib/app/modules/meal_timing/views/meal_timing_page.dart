@@ -23,7 +23,7 @@ class _MealTimingPageState extends State<MealTimingPage> {
   @override
   void initState() {
     super.initState();
-    widget.controller.getMeal(context, widget.id);
+    widget.controller.getMeal(widget.id);
   }
 
   void _onToggleMeal(int index, bool value) {
@@ -100,7 +100,7 @@ class _MealTimingPageState extends State<MealTimingPage> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.05),
+                            color: Colors.white.withValues(alpha: 0.05),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -176,7 +176,7 @@ class _MealTimingPageState extends State<MealTimingPage> {
                                             ? Border.all(
                                                 color: const Color(
                                                   0xffCDE26D,
-                                                ).withOpacity(0.3),
+                                                ).withValues(alpha: 0.3),
                                               )
                                             : null,
                                       ),
@@ -308,7 +308,7 @@ class _MealTimingPageState extends State<MealTimingPage> {
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xffCDE26D).withOpacity(0.2),
+                        color: const Color(0xffCDE26D).withValues(alpha: 0.2),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -317,8 +317,7 @@ class _MealTimingPageState extends State<MealTimingPage> {
                   child: TextButton(
                     onPressed: isSaving
                         ? null
-                        : () =>
-                              widget.controller.saveChanges(context, widget.id),
+                        : () => widget.controller.saveChanges(widget.id),
                     child: isSaving
                         ? const SizedBox(
                             height: 20,

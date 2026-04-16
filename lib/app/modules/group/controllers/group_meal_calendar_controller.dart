@@ -162,14 +162,14 @@ class GroupMealCalendarController extends GetxController {
       Get.snackbar(
         'Success',
         'Meal updated successfully',
-        backgroundColor: const Color(0xFFC2D86A).withOpacity(0.8),
+        backgroundColor: const Color(0xFFC2D86A).withValues(alpha: 0.8),
         colorText: Colors.black,
       );
     } catch (e) {
       Get.snackbar(
         'Error',
         'Failed to update meal: $e',
-        backgroundColor: Colors.red.withOpacity(0.8),
+        backgroundColor: Colors.red.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
     } finally {
@@ -202,14 +202,14 @@ class GroupMealCalendarController extends GetxController {
       Get.snackbar(
         'Success',
         'Meals duplicated successfully',
-        backgroundColor: const Color(0xFFC2D86A).withOpacity(0.8),
+        backgroundColor: const Color(0xFFC2D86A).withValues(alpha: 0.8),
         colorText: Colors.black,
       );
     } catch (e) {
       Get.snackbar(
         'Error',
         'Failed to duplicate meals: $e',
-        backgroundColor: Colors.red.withOpacity(0.8),
+        backgroundColor: Colors.red.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
     } finally {
@@ -248,14 +248,14 @@ class GroupMealCalendarController extends GetxController {
       Get.snackbar(
         'Success',
         'Week template applied successfully',
-        backgroundColor: const Color(0xFFC2D86A).withOpacity(0.8),
+        backgroundColor: const Color(0xFFC2D86A).withValues(alpha: 0.8),
         colorText: Colors.black,
       );
     } catch (e) {
       Get.snackbar(
         'Error',
         'Failed to apply template: $e',
-        backgroundColor: Colors.red.withOpacity(0.8),
+        backgroundColor: Colors.red.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
     } finally {

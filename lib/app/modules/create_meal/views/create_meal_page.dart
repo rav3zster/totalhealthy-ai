@@ -32,17 +32,17 @@ class _CreateMealPageState extends State<CreateMealPage>
 
     // Check if we are editing or copying an existing meal
     final args = Get.arguments;
-    print("CreateMealPage initialized with args: $args");
+    debugPrint("CreateMealPage initialized with args: $args");
     if (args is MealModel) {
-      print("Mode: Edit Normal");
+      debugPrint("Mode: Edit Normal");
       widget.controller.populateForEdit(args);
     } else if (args is Map &&
         args['mode'] == 'copy' &&
         args['meal'] is MealModel) {
-      print("Mode: Copy");
+      debugPrint("Mode: Copy");
       widget.controller.populateForCopy(args['meal']);
     } else {
-      print("Mode: Create New (No args)");
+      debugPrint("Mode: Create New (No args)");
     }
 
     ingredients = List.generate(
@@ -895,7 +895,7 @@ class _CreateMealPageState extends State<CreateMealPage>
             onTap: widget.controller.isLoading.value
                 ? null
                 : () {
-                    widget.controller.submitUser(context, widget.id);
+                    widget.controller.submitUser(widget.id);
                   },
             borderRadius: BorderRadius.circular(28),
             child: Center(

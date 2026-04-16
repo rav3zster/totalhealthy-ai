@@ -131,7 +131,7 @@ class _NutritionGoalsScreenState extends State<NutritionGoalsScreen>
         setState(() {});
       }
     } catch (e) {
-      print('Error initializing goal settings: $e');
+      debugPrint('Error initializing goal settings: $e');
     }
   }
 

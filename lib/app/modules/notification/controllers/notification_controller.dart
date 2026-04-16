@@ -33,12 +33,12 @@ class NotificationController extends GetxController {
         // Safety timeout for loading
         Future.delayed(const Duration(seconds: 10), () {
           if (isLoading.value) {
-            print("DEBUG: NotificationController - Loading timeout reached");
+            debugPrint("DEBUG: NotificationController - Loading timeout reached");
             isLoading.value = false;
           }
         });
       } catch (e) {
-        print(
+        debugPrint(
           "DEBUG: NotificationController - Error initializing notifications: $e",
         );
         isLoading.value = false;
@@ -108,7 +108,7 @@ class NotificationController extends GetxController {
         duration: const Duration(seconds: 4),
       );
 
-      print("DEBUG: Error accepting invitation: $e");
+      debugPrint("DEBUG: Error accepting invitation: $e");
     }
   }
 

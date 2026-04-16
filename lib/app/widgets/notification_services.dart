@@ -12,7 +12,7 @@ class NotificationService {
 
   Future<void> initialize() async {
     // Temporarily disabled for compatibility
-    print("Notification Service Initialized (disabled for compatibility)");
+    debugPrint("Notification Service Initialized (disabled for compatibility)");
   }
 
   Future<void> showNotification({
@@ -22,7 +22,7 @@ class NotificationService {
     String? payload,
   }) async {
     // Temporarily disabled
-    print("Show notification called: $title - $body");
+    debugPrint("Show notification called: $title - $body");
   }
 
   Future<void> scheduleNotification({
@@ -33,11 +33,11 @@ class NotificationService {
     required int minute,
   }) async {
     // Temporarily disabled
-    print("Schedule notification called: $title at $hour:$minute");
+    debugPrint("Schedule notification called: $title at $hour:$minute");
   }
 
   Future<void> cancelNotification(int id) async {
     // Temporarily disabled
-    print("Cancel notification called for id: $id");
+    debugPrint("Cancel notification called for id: $id");
   }
 }

@@ -1,9 +1,9 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/reminder_model.dart';
-
 /// Service for persisting reminder settings locally and to Firestore
 class ReminderStorageService {
   static final GetStorage _storage = GetStorage();
@@ -21,7 +21,7 @@ class ReminderStorageService {
     bool enabled,
     WaterReminderSettings? settings,
   ) async {
-    print('💾 Saving water reminder: enabled=$enabled');
+    debugPrint('💾 Saving water reminder: enabled=$enabled');
 
     final data = {'enabled': enabled, 'settings': settings?.toJson()};
 
@@ -30,7 +30,7 @@ class ReminderStorageService {
     // Sync to Firestore
     await _syncToFirestore('water', data);
 
-    print('✅ Water reminder saved');
+    debugPrint('✅ Water reminder saved');
   }
 
   /// Load water reminder settings
@@ -41,7 +41,7 @@ class ReminderStorageService {
     try {
       return jsonDecode(jsonString) as Map<String, dynamic>;
     } catch (e) {
-      print('❌ Error loading water reminder: $e');
+      debugPrint('❌ Error loading water reminder: $e');
       return null;
     }
   }
@@ -51,7 +51,7 @@ class ReminderStorageService {
     bool enabled,
     List<MealReminderSettings>? settings,
   ) async {
-    print('💾 Saving meal reminder: enabled=$enabled');
+    debugPrint('💾 Saving meal reminder: enabled=$enabled');
 
     final data = {
       'enabled': enabled,
@@ -63,7 +63,7 @@ class ReminderStorageService {
     // Sync to Firestore
     await _syncToFirestore('meal', data);
 
-    print('✅ Meal reminder saved');
+    debugPrint('✅ Meal reminder saved');
   }
 
   /// Load meal reminder settings
@@ -74,7 +74,7 @@ class ReminderStorageService {
     try {
       return jsonDecode(jsonString) as Map<String, dynamic>;
     } catch (e) {
-      print('❌ Error loading meal reminder: $e');
+      debugPrint('❌ Error loading meal reminder: $e');
       return null;
     }
   }
@@ -84,7 +84,7 @@ class ReminderStorageService {
     bool enabled,
     ExerciseReminderSettings? settings,
   ) async {
-    print('💾 Saving exercise reminder: enabled=$enabled');
+    debugPrint('💾 Saving exercise reminder: enabled=$enabled');
 
     final data = {'enabled': enabled, 'settings': settings?.toJson()};
 
@@ -93,7 +93,7 @@ class ReminderStorageService {
     // Sync to Firestore
     await _syncToFirestore('exercise', data);
 
-    print('✅ Exercise reminder saved');
+    debugPrint('✅ Exercise reminder saved');
   }
 
   /// Load exercise reminder settings
@@ -104,14 +104,14 @@ class ReminderStorageService {
     try {
       return jsonDecode(jsonString) as Map<String, dynamic>;
     } catch (e) {
-      print('❌ Error loading exercise reminder: $e');
+      debugPrint('❌ Error loading exercise reminder: $e');
       return null;
     }
   }
 
   /// Save update notification settings locally
   static Future<void> saveUpdateNotification(bool enabled) async {
-    print('💾 Saving update notification: enabled=$enabled');
+    debugPrint('💾 Saving update notification: enabled=$enabled');
 
     final data = {'enabled': enabled};
 
@@ -120,7 +120,7 @@ class ReminderStorageService {
     // Sync to Firestore
     await _syncToFirestore('update', data);
 
-    print('✅ Update notification saved');
+    debugPrint('✅ Update notification saved');
   }
 
   /// Load update notification settings
@@ -131,7 +131,7 @@ class ReminderStorageService {
     try {
       return jsonDecode(jsonString) as Map<String, dynamic>;
     } catch (e) {
-      print('❌ Error loading update notification: $e');
+      debugPrint('❌ Error loading update notification: $e');
       return null;
     }
   }
@@ -144,7 +144,7 @@ class ReminderStorageService {
     try {
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
-        print('⚠️ No user logged in, skipping Firestore sync');
+        debugPrint('⚠️ No user logged in, skipping Firestore sync');
         return;
       }
 
@@ -155,9 +155,9 @@ class ReminderStorageService {
           .doc('reminders')
           .set({type: data}, SetOptions(merge: true));
 
-      print('☁️ Synced $type reminder to Firestore');
+      debugPrint('☁️ Synced $type reminder to Firestore');
     } catch (e) {
-      print('⚠️ Failed to sync to Firestore: $e');
+      debugPrint('⚠️ Failed to sync to Firestore: $e');
       // Don't throw - local storage is primary
     }
   }
@@ -200,9 +200,9 @@ class ReminderStorageService {
         );
       }
 
-      print('☁️ Loaded reminder settings from Firestore');
+      debugPrint('☁️ Loaded reminder settings from Firestore');
     } catch (e) {
-      print('⚠️ Failed to load from Firestore: $e');
+      debugPrint('⚠️ Failed to load from Firestore: $e');
     }
   }
 
@@ -212,6 +212,6 @@ class ReminderStorageService {
     await _storage.remove(_mealReminderKey);
     await _storage.remove(_exerciseReminderKey);
     await _storage.remove(_updateNotificationKey);
-    print('🗑️ All reminder settings cleared');
+    debugPrint('🗑️ All reminder settings cleared');
   }
 }

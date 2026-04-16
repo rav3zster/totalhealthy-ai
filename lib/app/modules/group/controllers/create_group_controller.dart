@@ -56,7 +56,7 @@ class CreateGroupController extends GetxController {
             isLoadingCategories.value = false;
           },
           onError: (e) {
-            print('Error loading group categories: $e');
+            debugPrint('Error loading group categories: $e');
             isLoadingCategories.value = false;
             Get.snackbar(
               'Error',

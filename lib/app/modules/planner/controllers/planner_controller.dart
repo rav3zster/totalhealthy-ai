@@ -1,9 +1,9 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../data/models/meal_model.dart';
 import '../../../data/services/meals_firestore_service.dart';
-
 class PlannerController extends GetxController {
   final _mealsService = MealsFirestoreService();
 
@@ -47,7 +47,7 @@ class PlannerController extends GetxController {
               isLoading.value = false;
             },
             onError: (e) {
-              print("Error fetching meals for planner: $e");
+              debugPrint("Error fetching meals for planner: $e");
               isLoading.value = false;
             },
           );
@@ -123,7 +123,7 @@ class PlannerController extends GetxController {
   }
 
   void toggleDay(int index) {
-    print(
+    debugPrint(
       '🖱️ CONTROLLER - Toggling day $index. Current state: ${expandedDays.contains(index)}',
     );
     if (expandedDays.contains(index)) {
@@ -134,7 +134,7 @@ class PlannerController extends GetxController {
     // Force update just in case RxSet doesn't trigger outer Obx correctly
     expandedDays.refresh();
     update();
-    print(
+    debugPrint(
       '🖱️ CONTROLLER - Toggle complete. New state: ${expandedDays.contains(index)}',
     );
   }

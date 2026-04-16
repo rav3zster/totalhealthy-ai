@@ -39,7 +39,7 @@ class MealSlotBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -62,7 +62,7 @@ class MealSlotBottomSheet extends StatelessWidget {
                       Text(
                         DateFormat('EEEE').format(date),
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white.withValues(alpha: 0.6),
                           fontSize: 13,
                         ),
                       ),
@@ -141,11 +141,11 @@ class MealSlotBottomSheet extends StatelessWidget {
                   final groupData = groupDoc.data();
                   groupCategoryId = groupData?['group_category_id'] as String?;
                 }
-                print(
+                debugPrint(
                   '🚀 Meal Slot: Navigating with groupCategoryId: $groupCategoryId',
                 );
               } catch (e) {
-                print('❌ Error getting group category ID: $e');
+                debugPrint('❌ Error getting group category ID: $e');
               }
             }
 
@@ -186,7 +186,7 @@ class MealSlotBottomSheet extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF2A2A2A),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3), width: 1),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
         ),
         child: Row(
           children: [
@@ -229,8 +229,8 @@ class MealSlotBottomSheet extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
-                ? const Color(0xFFC2D86A).withOpacity(0.5)
-                : Colors.white.withOpacity(0.05),
+                ? const Color(0xFFC2D86A).withValues(alpha: 0.5)
+                : Colors.white.withValues(alpha: 0.05),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -303,9 +303,9 @@ class MealSlotBottomSheet extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Text(
         label,
@@ -326,13 +326,13 @@ class MealSlotBottomSheet extends StatelessWidget {
           Icon(
             Icons.restaurant_menu_rounded,
             size: 64,
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
           Text(
             'No meals available',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               fontSize: 16,
             ),
           ),
@@ -340,7 +340,7 @@ class MealSlotBottomSheet extends StatelessWidget {
           Text(
             'Create a meal first to assign it',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.4),
+              color: Colors.white.withValues(alpha: 0.4),
               fontSize: 14,
             ),
           ),

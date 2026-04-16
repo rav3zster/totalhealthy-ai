@@ -19,14 +19,14 @@ class NotificationService {
   /// Initialize notification service
   static Future<void> init() async {
     try {
-      print('📱 Initializing NotificationService...');
+      debugPrint('📱 Initializing NotificationService...');
 
       // Initialize timezone data
       try {
         tz.initializeTimeZones();
-        print('✅ Timezone initialized');
+        debugPrint('✅ Timezone initialized');
       } catch (e) {
-        print('⚠️ Timezone initialization failed: $e');
+        debugPrint('⚠️ Timezone initialization failed: $e');
         // Continue anyway - notifications will still work without timezone
       }
 
@@ -52,35 +52,35 @@ class NotificationService {
         onDidReceiveNotificationResponse: _onNotificationTapped,
       );
 
-      print('✅ Notification plugin initialized');
+      debugPrint('✅ Notification plugin initialized');
 
       // Request permissions (non-blocking)
       try {
         await requestPermissions();
       } catch (e) {
-        print('⚠️ Permission request failed: $e');
+        debugPrint('⚠️ Permission request failed: $e');
         // Continue anyway
       }
 
-      print('✅ NotificationService initialized successfully');
+      debugPrint('✅ NotificationService initialized successfully');
     } catch (e) {
-      print('❌ NotificationService initialization error: $e');
+      debugPrint('❌ NotificationService initialization error: $e');
       rethrow; // Let main.dart handle it
     }
   }
 
   /// Request notification permissions
   static Future<bool> requestPermissions() async {
-    print('📱 Requesting notification permissions...');
+    debugPrint('📱 Requesting notification permissions...');
 
     // Request Android 13+ notification permission
     if (await Permission.notification.isDenied) {
       final status = await Permission.notification.request();
       if (status.isGranted) {
-        print('✅ Notification permission granted');
+        debugPrint('✅ Notification permission granted');
         return true;
       } else {
-        print('❌ Notification permission denied');
+        debugPrint('❌ Notification permission denied');
         return false;
       }
     }
@@ -89,9 +89,9 @@ class NotificationService {
     if (await Permission.scheduleExactAlarm.isDenied) {
       final status = await Permission.scheduleExactAlarm.request();
       if (status.isGranted) {
-        print('✅ Exact alarm permission granted');
+        debugPrint('✅ Exact alarm permission granted');
       } else {
-        print(
+        debugPrint(
           '⚠️ Exact alarm permission denied - notifications may be delayed',
         );
       }
@@ -102,7 +102,7 @@ class NotificationService {
 
   /// Handle notification tap
   static void _onNotificationTapped(NotificationResponse response) {
-    print('📱 Notification tapped: ${response.payload}');
+    debugPrint('📱 Notification tapped: ${response.payload}');
     // Handle navigation based on payload
     // Can be extended to navigate to specific screens
   }
@@ -115,7 +115,7 @@ class NotificationService {
     required TimeOfDay time,
     String? payload,
   }) async {
-    print('📅 Scheduling notification: $title at ${time.format}');
+    debugPrint('📅 Scheduling notification: $title at ${time.format}');
 
     final now = DateTime.now();
     var scheduledDate = DateTime(
@@ -160,7 +160,7 @@ class NotificationService {
       payload: payload,
     );
 
-    print('✅ Notification scheduled: ID=$id, Time=${time.format}');
+    debugPrint('✅ Notification scheduled: ID=$id, Time=${time.format}');
   }
 
   /// Schedule multiple water reminders with interval
@@ -169,7 +169,7 @@ class NotificationService {
     required TimeOfDay endTime,
     required int intervalMinutes,
   }) async {
-    print(
+    debugPrint(
       '💧 Scheduling water reminders: ${startTime.format} to ${endTime.format}, every $intervalMinutes min',
     );
 
@@ -182,7 +182,7 @@ class NotificationService {
     final totalMinutes = endMinutes - startMinutes;
     final reminderCount = (totalMinutes / intervalMinutes).floor() + 1;
 
-    print('💧 Scheduling $reminderCount water reminders');
+    debugPrint('💧 Scheduling $reminderCount water reminders');
 
     // Schedule each reminder
     for (int i = 0; i < reminderCount; i++) {
@@ -207,7 +207,7 @@ class NotificationService {
       );
     }
 
-    print('✅ Water reminders scheduled successfully');
+    debugPrint('✅ Water reminders scheduled successfully');
   }
 
   /// Schedule meal reminder
@@ -215,7 +215,7 @@ class NotificationService {
     required String mealType,
     required TimeOfDay time,
   }) async {
-    print('🍽️ Scheduling meal reminder: $mealType at ${time.format}');
+    debugPrint('🍽️ Scheduling meal reminder: $mealType at ${time.format}');
 
     await scheduleNotification(
       id: mealReminderId + mealType.hashCode,
@@ -225,7 +225,7 @@ class NotificationService {
       payload: 'meal_reminder_$mealType',
     );
 
-    print('✅ Meal reminder scheduled: $mealType');
+    debugPrint('✅ Meal reminder scheduled: $mealType');
   }
 
   /// Schedule exercise reminder
@@ -233,7 +233,7 @@ class NotificationService {
     required TimeOfDay time,
     List<int>? weekdays, // 1=Monday, 7=Sunday
   }) async {
-    print('💪 Scheduling exercise reminder at ${time.format}');
+    debugPrint('💪 Scheduling exercise reminder at ${time.format}');
 
     await scheduleNotification(
       id: exerciseReminderId,
@@ -243,29 +243,29 @@ class NotificationService {
       payload: 'exercise_reminder',
     );
 
-    print('✅ Exercise reminder scheduled');
+    debugPrint('✅ Exercise reminder scheduled');
   }
 
   /// Cancel a specific notification
   static Future<void> cancel(int id) async {
-    print('🗑️ Cancelling notification: ID=$id');
+    debugPrint('🗑️ Cancelling notification: ID=$id');
     await _notifications.cancel(id: id);
-    print('✅ Notification cancelled: ID=$id');
+    debugPrint('✅ Notification cancelled: ID=$id');
   }
 
   /// Cancel all water reminders
   static Future<void> cancelWaterReminders() async {
-    print('🗑️ Cancelling all water reminders...');
+    debugPrint('🗑️ Cancelling all water reminders...');
     // Cancel up to 50 water reminder slots
     for (int i = 0; i < 50; i++) {
       await _notifications.cancel(id: waterReminderBaseId + i);
     }
-    print('✅ Water reminders cancelled');
+    debugPrint('✅ Water reminders cancelled');
   }
 
   /// Cancel meal reminders
   static Future<void> cancelMealReminders() async {
-    print('🗑️ Cancelling meal reminders...');
+    debugPrint('🗑️ Cancelling meal reminders...');
     // Cancel common meal types
     final mealTypes = [
       'Breakfast',
@@ -277,30 +277,30 @@ class NotificationService {
     for (final meal in mealTypes) {
       await _notifications.cancel(id: mealReminderId + meal.hashCode);
     }
-    print('✅ Meal reminders cancelled');
+    debugPrint('✅ Meal reminders cancelled');
   }
 
   /// Cancel exercise reminders
   static Future<void> cancelExerciseReminders() async {
-    print('🗑️ Cancelling exercise reminders...');
+    debugPrint('🗑️ Cancelling exercise reminders...');
     await _notifications.cancel(id: exerciseReminderId);
-    print('✅ Exercise reminders cancelled');
+    debugPrint('✅ Exercise reminders cancelled');
   }
 
   /// Cancel all notifications
   static Future<void> cancelAll() async {
-    print('🗑️ Cancelling ALL notifications...');
+    debugPrint('🗑️ Cancelling ALL notifications...');
     await _notifications.cancelAll();
-    print('✅ All notifications cancelled');
+    debugPrint('✅ All notifications cancelled');
   }
 
   /// Get pending notifications (for debugging)
   static Future<List<PendingNotificationRequest>>
   getPendingNotifications() async {
     final pending = await _notifications.pendingNotificationRequests();
-    print('📋 Pending notifications: ${pending.length}');
+    debugPrint('📋 Pending notifications: ${pending.length}');
     for (final notification in pending) {
-      print('  - ID: ${notification.id}, Title: ${notification.title}');
+      debugPrint('  - ID: ${notification.id}, Title: ${notification.title}');
     }
     return pending;
   }
@@ -310,7 +310,7 @@ class NotificationService {
     required String title,
     required String body,
   }) async {
-    print('📱 Showing immediate notification: $title');
+    debugPrint('📱 Showing immediate notification: $title');
 
     await _notifications.show(
       id: DateTime.now().millisecondsSinceEpoch % 100000,
@@ -328,6 +328,6 @@ class NotificationService {
       ),
     );
 
-    print('✅ Immediate notification shown');
+    debugPrint('✅ Immediate notification shown');
   }
 }

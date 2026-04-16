@@ -1,8 +1,8 @@
 import '../models/user_model.dart';
+import 'package:flutter/foundation.dart';
 import '../models/health_data_model.dart';
 import '../models/meal_model.dart';
 import './meals_firestore_service.dart';
-
 class DummyDataService {
   // Mock credentials for login
   static const String mockEmail = "demo@totalhealthy.com";
@@ -815,12 +815,12 @@ class DummyDataService {
         final mealsData = getDummyMeals();
         final meals = mealsData.map((m) => MealModel.fromJson(m)).toList();
         await mealsService.uploadBulkMeals(meals);
-        print("Successfully seeded dummy meals to Firestore.");
+        debugPrint("Successfully seeded dummy meals to Firestore.");
       } else {
-        print("Meals already exist in Firestore, skipping seeding.");
+        debugPrint("Meals already exist in Firestore, skipping seeding.");
       }
     } catch (e) {
-      print("Error seeding dummy meals: $e");
+      debugPrint("Error seeding dummy meals: $e");
     }
   }
 }

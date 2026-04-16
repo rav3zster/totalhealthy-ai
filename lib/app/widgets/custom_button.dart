@@ -66,9 +66,10 @@ class CustomButton extends StatelessWidget {
     switch (type) {
       case ButtonType.elevated:
         return ElevatedButton(
-            onPressed: onPressed,
-            style: ElevatedButton.styleFrom(backgroundColor: color),
-            child: child);
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(backgroundColor: color),
+          child: child,
+        );
       case ButtonType.text:
         return TextButton(
           onPressed: onPressed,
@@ -87,11 +88,6 @@ class CustomButton extends StatelessWidget {
           onPressed: onPressed,
           tooltip: 'Icon Button',
         );
-      default:
-        return ElevatedButton(
-            onPressed: onPressed,
-            style: ElevatedButton.styleFrom(backgroundColor: color),
-            child: child);
     }
   }
 }

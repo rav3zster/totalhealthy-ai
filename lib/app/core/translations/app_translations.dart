@@ -297,7 +297,7 @@ class AppTranslations extends Translations {
       'female': 'Female',
       'other': 'Other',
       'sedentary': 'Sedentary',
-      'light': 'Light',
+      'light_activity': 'Light',
       'moderate': 'Moderate',
       'active': 'Active',
       'very_active': 'Very Active',
@@ -326,7 +326,6 @@ class AppTranslations extends Translations {
       'meal_no_schedule': 'I don\'t have a specific schedule',
 
       // Privacy Policy
-      'privacy_policy': 'Privacy Policy',
       'introduction': 'Introduction',
       'privacy_intro_text':
           'Welcome to Total Healthy. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about our policy, or our practices with regards to your personal information, please contact us.',
@@ -662,7 +661,7 @@ class AppTranslations extends Translations {
       'female': 'महिला',
       'other': 'अन्य',
       'sedentary': 'गतिहीन',
-      'light': 'हल्का',
+      'light_activity': 'हल्का',
       'moderate': 'मध्यम',
       'active': 'सक्रिय',
       'very_active': 'बहुत सक्रिय',
@@ -691,7 +690,6 @@ class AppTranslations extends Translations {
       'meal_no_schedule': 'मेरे पास कोई विशिष्ट कार्यक्रम नहीं है',
 
       // Privacy Policy
-      'privacy_policy': 'गोपनीयता नीति',
       'introduction': 'परिचय',
       'privacy_intro_text':
           'Total Healthy में आपका स्वागत है। हम आपकी व्यक्तिगत जानकारी और आपकी गोपनीयता के अधिकार की रक्षा के लिए प्रतिबद्ध हैं। यदि आपके पास हमारी नीति या आपकी व्यक्तिगत जानकारी के संबंध में हमारी प्रथाओं के बारे में कोई प्रश्न या चिंता है, तो कृपया हमसे संपर्क करें।',
@@ -1036,7 +1034,7 @@ class AppTranslations extends Translations {
       'female': 'Femenino',
       'other': 'Otro',
       'sedentary': 'Sedentario',
-      'light': 'Ligero',
+      'light_activity': 'Ligero',
       'moderate': 'Moderado',
       'active': 'Activo',
       'very_active': 'Muy Activo',
@@ -1065,7 +1063,6 @@ class AppTranslations extends Translations {
       'meal_no_schedule': 'No tengo un horario específico',
 
       // Privacy Policy
-      'privacy_policy': 'Política de Privacidad',
       'introduction': 'Introducción',
       'privacy_intro_text':
           'Bienvenido a Total Healthy. Estamos comprometidos a proteger tu información personal y tu derecho a la privacidad. Si tienes alguna pregunta o inquietud sobre nuestra política o nuestras prácticas con respecto a tu información personal, contáctanos.',
@@ -1411,7 +1408,7 @@ class AppTranslations extends Translations {
       'female': 'Féminin',
       'other': 'Autre',
       'sedentary': 'Sédentaire',
-      'light': 'Léger',
+      'light_activity': 'Léger',
       'moderate': 'Modéré',
       'active': 'Actif',
       'very_active': 'Très Actif',
@@ -1440,7 +1437,6 @@ class AppTranslations extends Translations {
       'meal_no_schedule': 'Je n\'ai pas d\'horaire spécifique',
 
       // Privacy Policy
-      'privacy_policy': 'Politique de Confidentialité',
       'introduction': 'Introduction',
       'privacy_intro_text':
           'Bienvenue chez Total Healthy. Nous nous engageons à protéger vos informations personnelles et votre droit à la vie privée. Si vous avez des questions ou des préoccupations concernant notre politique ou nos pratiques concernant vos informations personnelles, veuillez nous contacter.',

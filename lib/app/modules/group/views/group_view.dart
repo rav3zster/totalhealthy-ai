@@ -415,13 +415,15 @@ class _GroupViewState extends State<GroupView>
                           final isSearching =
                               controller.membersSearchQuery.value.isNotEmpty;
 
-                          print(
+                          debugPrint(
                             '🔍 MEMBERS TAB - filteredMembers count: ${members.length}',
                           );
-                          print(
+                          debugPrint(
                             '🔍 MEMBERS TAB - users count: ${controller.users.length}',
                           );
-                          print('🔍 MEMBERS TAB - isSearching: $isSearching');
+                          debugPrint(
+                            '🔍 MEMBERS TAB - isSearching: $isSearching',
+                          );
 
                           if (members.isEmpty) {
                             return Center(
@@ -505,23 +507,6 @@ class _GroupViewState extends State<GroupView>
         ),
       ),
       bottomNavigationBar: const MobileNavBar(),
-    );
-  }
-
-  Widget _buildEmptyState(IconData icon, String message) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 64, color: Colors.white54),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
-          ),
-        ],
-      ),
     );
   }
 

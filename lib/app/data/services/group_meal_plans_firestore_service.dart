@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../models/group_meal_plan_model.dart';
-
 class GroupMealPlansFirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _collection = 'group_meal_plans';
@@ -20,13 +20,13 @@ class GroupMealPlansFirestoreService {
     DateTime startDate,
     DateTime endDate,
   ) {
-    print('=== FIRESTORE QUERY: getGroupMealPlansStream ===');
-    print('🔍 Query Parameters:');
-    print('   - groupId: $groupId');
-    print('   - startDate: ${_formatDateOnly(startDate)}');
-    print('   - endDate: ${_formatDateOnly(endDate)}');
-    print('🆔 Using deterministic document IDs');
-    print('===============================================');
+    debugPrint('=== FIRESTORE QUERY: getGroupMealPlansStream ===');
+    debugPrint('🔍 Query Parameters:');
+    debugPrint('   - groupId: $groupId');
+    debugPrint('   - startDate: ${_formatDateOnly(startDate)}');
+    debugPrint('   - endDate: ${_formatDateOnly(endDate)}');
+    debugPrint('🆔 Using deterministic document IDs');
+    debugPrint('===============================================');
 
     // Generate list of document IDs for the date range
     final docIds = <String>[];
@@ -36,7 +36,7 @@ class GroupMealPlansFirestoreService {
       currentDate = currentDate.add(const Duration(days: 1));
     }
 
-    print('📄 Document IDs to fetch: $docIds');
+    debugPrint('📄 Document IDs to fetch: $docIds');
 
     // Create a stream that fetches all documents by ID
     return Stream.periodic(const Duration(seconds: 1))
@@ -53,34 +53,34 @@ class GroupMealPlansFirestoreService {
               if (docSnapshot.exists) {
                 final data = docSnapshot.data();
                 if (data != null) {
-                  print('📄 Document $docId found');
+                  debugPrint('📄 Document $docId found');
                   plans.add(
                     GroupMealPlanModel.fromJson(data, docId: docSnapshot.id),
                   );
                 }
               } else {
-                print('📄 Document $docId does not exist');
+                debugPrint('📄 Document $docId does not exist');
               }
             } catch (e) {
-              print('❌ Error fetching document $docId: $e');
+              debugPrint('❌ Error fetching document $docId: $e');
             }
           }
 
-          print('=== FIRESTORE FETCH COMPLETE ===');
-          print('📦 Documents found: ${plans.length}');
+          debugPrint('=== FIRESTORE FETCH COMPLETE ===');
+          debugPrint('📦 Documents found: ${plans.length}');
           for (var plan in plans) {
-            print('📄 Plan:');
-            print('   - ID: ${plan.id}');
-            print('   - groupId: ${plan.groupId}');
-            print('   - date: ${_formatDateOnly(plan.date)}');
-            print('   - mealSlots: ${plan.mealSlots}');
+            debugPrint('📄 Plan:');
+            debugPrint('   - ID: ${plan.id}');
+            debugPrint('   - groupId: ${plan.groupId}');
+            debugPrint('   - date: ${_formatDateOnly(plan.date)}');
+            debugPrint('   - mealSlots: ${plan.mealSlots}');
           }
-          print('================================');
+          debugPrint('================================');
 
           return plans..sort((a, b) => a.date.compareTo(b.date));
         })
         .handleError((error) {
-          print('❌ Error in stream: $error');
+          debugPrint('❌ Error in stream: $error');
           return <GroupMealPlanModel>[];
         });
   }
@@ -92,7 +92,7 @@ class GroupMealPlansFirestoreService {
   ) async {
     try {
       final docId = _generateDocId(groupId, date);
-      print('🔍 Fetching meal plan by document ID: $docId');
+      debugPrint('🔍 Fetching meal plan by document ID: $docId');
 
       final docSnapshot = await _firestore
           .collection(_collection)
@@ -100,20 +100,20 @@ class GroupMealPlansFirestoreService {
           .get();
 
       if (!docSnapshot.exists) {
-        print('📄 Document $docId does not exist');
+        debugPrint('📄 Document $docId does not exist');
         return null;
       }
 
       final data = docSnapshot.data();
       if (data == null) {
-        print('📄 Document $docId has no data');
+        debugPrint('📄 Document $docId has no data');
         return null;
       }
 
-      print('✅ Document $docId found');
+      debugPrint('✅ Document $docId found');
       return GroupMealPlanModel.fromJson(data, docId: docSnapshot.id);
     } catch (e) {
-      print('❌ Error getting meal plan for date: $e');
+      debugPrint('❌ Error getting meal plan for date: $e');
       return null;
     }
   }
@@ -124,13 +124,13 @@ class GroupMealPlansFirestoreService {
     try {
       final docId = _generateDocId(mealPlan.groupId, mealPlan.date);
 
-      print('=== SET MEAL PLAN ===');
-      print('📅 Date: ${_formatDateOnly(mealPlan.date)}');
-      print('🏢 Group ID: ${mealPlan.groupId}');
-      print('🆔 Document ID: $docId');
-      print('📊 Incoming mealSlots:');
+      debugPrint('=== SET MEAL PLAN ===');
+      debugPrint('📅 Date: ${_formatDateOnly(mealPlan.date)}');
+      debugPrint('🏢 Group ID: ${mealPlan.groupId}');
+      debugPrint('🆔 Document ID: $docId');
+      debugPrint('📊 Incoming mealSlots:');
       mealPlan.mealSlots.forEach((key, value) {
-        print('   - $key: $value');
+        debugPrint('   - $key: $value');
       });
 
       // Check if document exists
@@ -140,7 +140,7 @@ class GroupMealPlansFirestoreService {
           .get();
 
       if (docSnapshot.exists) {
-        print('📄 Existing document found, merging mealSlots');
+        debugPrint('📄 Existing document found, merging mealSlots');
         final existingData = docSnapshot.data();
         if (existingData != null) {
           final existingPlan = GroupMealPlanModel.fromJson(
@@ -148,18 +148,18 @@ class GroupMealPlansFirestoreService {
             docId: docSnapshot.id,
           );
 
-          print('📊 Existing mealSlots:');
+          debugPrint('📊 Existing mealSlots:');
           existingPlan.mealSlots.forEach((key, value) {
-            print('   - $key: $value');
+            debugPrint('   - $key: $value');
           });
 
           // MERGE mealSlots
           final mergedSlots = Map<String, String?>.from(existingPlan.mealSlots);
           mergedSlots.addAll(mealPlan.mealSlots);
 
-          print('📊 Merged mealSlots (BEFORE save):');
+          debugPrint('📊 Merged mealSlots (BEFORE save):');
           mergedSlots.forEach((key, value) {
-            print('   - $key: $value');
+            debugPrint('   - $key: $value');
           });
 
           // Update with merged data
@@ -170,20 +170,20 @@ class GroupMealPlansFirestoreService {
             'dinnerMealId': mergedSlots['Dinner'],
             'updatedAt': DateTime.now().toIso8601String(),
           });
-          print('✅ Document updated with merged mealSlots');
+          debugPrint('✅ Document updated with merged mealSlots');
         }
       } else {
-        print('📄 No existing document, creating new one');
+        debugPrint('📄 No existing document, creating new one');
         // Create new document with deterministic ID
         await _firestore
             .collection(_collection)
             .doc(docId)
             .set(mealPlan.toJson());
-        print('✅ New document created with ID: $docId');
+        debugPrint('✅ New document created with ID: $docId');
       }
-      print('=== END SET MEAL PLAN ===');
+      debugPrint('=== END SET MEAL PLAN ===');
     } catch (e) {
-      print('❌ Error setting meal plan: $e');
+      debugPrint('❌ Error setting meal plan: $e');
       rethrow;
     }
   }
@@ -200,12 +200,12 @@ class GroupMealPlansFirestoreService {
     try {
       final docId = _generateDocId(groupId, date);
 
-      print('=== UPDATE MEAL SLOT ===');
-      print('📅 Date: ${_formatDateOnly(date)}');
-      print('🏢 Group ID: $groupId');
-      print('🆔 Document ID: $docId');
-      print('🍽️ Meal Type: $mealType');
-      print('🆔 Meal ID: $mealId');
+      debugPrint('=== UPDATE MEAL SLOT ===');
+      debugPrint('📅 Date: ${_formatDateOnly(date)}');
+      debugPrint('🏢 Group ID: $groupId');
+      debugPrint('🆔 Document ID: $docId');
+      debugPrint('🍽️ Meal Type: $mealType');
+      debugPrint('🆔 Meal ID: $mealId');
 
       // Check if document exists
       final docSnapshot = await _firestore
@@ -214,7 +214,7 @@ class GroupMealPlansFirestoreService {
           .get();
 
       if (docSnapshot.exists) {
-        print('📄 Existing document found');
+        debugPrint('📄 Existing document found');
         final existingData = docSnapshot.data();
         if (existingData != null) {
           final existingPlan = GroupMealPlanModel.fromJson(
@@ -222,9 +222,9 @@ class GroupMealPlansFirestoreService {
             docId: docSnapshot.id,
           );
 
-          print('📊 Current mealSlots BEFORE update:');
+          debugPrint('📊 Current mealSlots BEFORE update:');
           existingPlan.mealSlots.forEach((key, value) {
-            print('   - $key: $value');
+            debugPrint('   - $key: $value');
           });
 
           // MERGE with existing mealSlots
@@ -233,9 +233,9 @@ class GroupMealPlansFirestoreService {
           );
           updatedSlots[mealType] = mealId;
 
-          print('📊 Updated mealSlots AFTER merge (BEFORE save):');
+          debugPrint('📊 Updated mealSlots AFTER merge (BEFORE save):');
           updatedSlots.forEach((key, value) {
-            print('   - $key: $value');
+            debugPrint('   - $key: $value');
           });
 
           final updates = <String, dynamic>{
@@ -246,12 +246,12 @@ class GroupMealPlansFirestoreService {
             'updatedAt': DateTime.now().toIso8601String(),
           };
 
-          print('💾 Updating document...');
+          debugPrint('💾 Updating document...');
           await _firestore.collection(_collection).doc(docId).update(updates);
-          print('✅ Meal slot updated successfully');
+          debugPrint('✅ Meal slot updated successfully');
         }
       } else {
-        print('📄 No existing document, creating new one');
+        debugPrint('📄 No existing document, creating new one');
         // Create new document with deterministic ID
         final newPlan = GroupMealPlanModel(
           groupId: groupId,
@@ -262,21 +262,21 @@ class GroupMealPlansFirestoreService {
           createdAt: DateTime.now(),
         );
 
-        print('📊 New plan mealSlots:');
+        debugPrint('📊 New plan mealSlots:');
         newPlan.mealSlots.forEach((key, value) {
-          print('   - $key: $value');
+          debugPrint('   - $key: $value');
         });
 
-        print('💾 Creating new document with ID: $docId');
+        debugPrint('💾 Creating new document with ID: $docId');
         await _firestore
             .collection(_collection)
             .doc(docId)
             .set(newPlan.toJson());
-        print('✅ New meal plan created successfully');
+        debugPrint('✅ New meal plan created successfully');
       }
-      print('=== END UPDATE ===');
+      debugPrint('=== END UPDATE ===');
     } catch (e) {
-      print('❌ Error updating meal slot: $e');
+      debugPrint('❌ Error updating meal slot: $e');
       rethrow;
     }
   }
@@ -294,23 +294,23 @@ class GroupMealPlansFirestoreService {
       final sourceDocId = _generateDocId(groupId, sourceDate);
       final targetDocId = _generateDocId(groupId, targetDate);
 
-      print('=== DUPLICATING DAY ===');
-      print('Source date: ${_formatDateOnly(sourceDate)}');
-      print('Target date: ${_formatDateOnly(targetDate)}');
-      print('Source doc ID: $sourceDocId');
-      print('Target doc ID: $targetDocId');
-      print('GroupId: $groupId');
+      debugPrint('=== DUPLICATING DAY ===');
+      debugPrint('Source date: ${_formatDateOnly(sourceDate)}');
+      debugPrint('Target date: ${_formatDateOnly(targetDate)}');
+      debugPrint('Source doc ID: $sourceDocId');
+      debugPrint('Target doc ID: $targetDocId');
+      debugPrint('GroupId: $groupId');
 
       final sourcePlan = await getMealPlanForDate(groupId, sourceDate);
 
       if (sourcePlan == null) {
-        print('✗ No meal plan found for source date');
+        debugPrint('✗ No meal plan found for source date');
         throw Exception('No meal plan found for source date');
       }
 
-      print('Source plan found:');
-      print('  - mealSlots: ${sourcePlan.mealSlots}');
-      print('  - meal count: ${sourcePlan.mealCount}');
+      debugPrint('Source plan found:');
+      debugPrint('  - mealSlots: ${sourcePlan.mealSlots}');
+      debugPrint('  - meal count: ${sourcePlan.mealCount}');
 
       final newPlan = GroupMealPlanModel(
         groupId: groupId,
@@ -321,12 +321,12 @@ class GroupMealPlansFirestoreService {
         createdAt: DateTime.now(),
       );
 
-      print('Creating new plan for target date with ID: $targetDocId');
+      debugPrint('Creating new plan for target date with ID: $targetDocId');
       await setMealPlan(newPlan);
-      print('✓ Day duplicated successfully');
-      print('=== END DUPLICATION ===');
+      debugPrint('✓ Day duplicated successfully');
+      debugPrint('=== END DUPLICATION ===');
     } catch (e) {
-      print('✗ Error duplicating day meals: $e');
+      debugPrint('✗ Error duplicating day meals: $e');
       rethrow;
     }
   }
@@ -361,7 +361,7 @@ class GroupMealPlansFirestoreService {
         await setMealPlan(plan);
       }
     } catch (e) {
-      print('Error applying week template: $e');
+      debugPrint('Error applying week template: $e');
       rethrow;
     }
   }
@@ -370,12 +370,12 @@ class GroupMealPlansFirestoreService {
   Future<void> deleteMealPlan(String groupId, DateTime date) async {
     try {
       final docId = _generateDocId(groupId, date);
-      print('🗑️ Deleting meal plan document: $docId');
+      debugPrint('🗑️ Deleting meal plan document: $docId');
 
       await _firestore.collection(_collection).doc(docId).delete();
-      print('✅ Meal plan deleted successfully');
+      debugPrint('✅ Meal plan deleted successfully');
     } catch (e) {
-      print('❌ Error deleting meal plan: $e');
+      debugPrint('❌ Error deleting meal plan: $e');
       rethrow;
     }
   }

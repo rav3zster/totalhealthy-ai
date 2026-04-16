@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
-import 'package:totalhealthy/app/modules/Registration_Screen/Registration_view.dart';
 
 import '../../routes/app_pages.dart';
 
@@ -30,15 +27,21 @@ class _OnboardingViewState extends State<OnboardingView> {
   }
 
   void _onDotTapped(int index) {
-    _pageController.animateToPage(index,
-        duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   void _goToNextPage() {
     if (_currentPage < 2) {
       // Assuming there are 3 pages (index 0, 1, 2)
-      _pageController.animateToPage(_currentPage + 1,
-          duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+      _pageController.animateToPage(
+        _currentPage + 1,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     } else {
       // Navigate to Welcome Screen instead of Signup
       Get.offAllNamed(Routes.WelcomeScreen);

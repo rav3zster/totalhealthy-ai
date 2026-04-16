@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import '../core/base/constants/appcolor.dart';
@@ -20,7 +19,8 @@ class NutritionalCard extends StatefulWidget {
   final String? role;
   final ValueChanged<bool?> onChanged;
 
-  const NutritionalCard({super.key, 
+  const NutritionalCard({
+    super.key,
     required this.title,
     required this.kcal,
     required this.weight,
@@ -62,14 +62,8 @@ class _NutritionalCardState extends State<NutritionalCard> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset(
-                    "assets/salad.png",
-                    height: 50,
-                    width: 50,
-                  ),
-                  SizedBox(
-                    width: 15,
-                  ),
+                  Image.asset("assets/salad.png", height: 50, width: 50),
+                  SizedBox(width: 15),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -83,8 +77,11 @@ class _NutritionalCardState extends State<NutritionalCard> {
                       ),
                       Row(
                         children: [
-                          Icon(Icons.local_fire_department,
-                              color: Colors.red, size: 20),
+                          Icon(
+                            Icons.local_fire_department,
+                            color: Colors.red,
+                            size: 20,
+                          ),
                           SizedBox(width: 4),
                           Text(
                             "${widget.kcal} Kcal",
@@ -102,9 +99,7 @@ class _NutritionalCardState extends State<NutritionalCard> {
                                 size: 8,
                                 color: AppColors.neplesYellow,
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
+                              SizedBox(width: 10),
                               Text(
                                 "${widget.weight} g",
                                 style: TextStyle(
@@ -125,7 +120,6 @@ class _NutritionalCardState extends State<NutritionalCard> {
                 children: [
                   PopupMenuButton<String>(
                     // foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-
                     onSelected: (value) {},
                     itemBuilder: (context) => [
                       PopupMenuItem(
@@ -141,27 +135,31 @@ class _NutritionalCardState extends State<NutritionalCard> {
                       ),
                       PopupMenuItem(
                         value: "Option 2",
-                        child: Text("Option 2",
-                            style: TextStyle(color: Colors.black)),
+                        child: Text(
+                          "Option 2",
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
                       PopupMenuItem(
                         value: "Option 3",
-                        child: Text("Option 3",
-                            style: TextStyle(color: Colors.black)),
+                        child: Text(
+                          "Option 3",
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
                     ],
                     child: Container(
-                        height: 30,
-                        width: 30,
-                        decoration: BoxDecoration(
-                            color: AppColors.chineseGreen,
-                            shape: BoxShape.circle),
-                        child: Icon(Icons.more_horiz, color: Colors.black)),
+                      height: 30,
+                      width: 30,
+                      decoration: BoxDecoration(
+                        color: AppColors.chineseGreen,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.more_horiz, color: Colors.black),
+                    ),
                     // Icon that opens the menu
                   ),
-                  SizedBox(
-                    width: 10,
-                  ),
+                  SizedBox(width: 10),
                   widget.role == "admin"
                       ? SizedBox()
                       : Checkbox(
@@ -172,7 +170,7 @@ class _NutritionalCardState extends State<NutritionalCard> {
                           ),
                           value: widget.isChecked,
                           onChanged: widget.onChanged,
-                        )
+                        ),
                 ],
               ),
             ],
@@ -213,12 +211,14 @@ class NutrientIndicator extends StatelessWidget {
   final Color color;
   final bool isPadding;
   final Color? textcolor;
-  const NutrientIndicator(
-      {super.key, required this.label,
-      required this.amount,
-      required this.color,
-      this.textcolor,
-      this.isPadding = true});
+  const NutrientIndicator({
+    super.key,
+    required this.label,
+    required this.amount,
+    required this.color,
+    this.textcolor,
+    this.isPadding = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -237,29 +237,30 @@ class NutrientIndicator extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: 0.5, // value should be a fraction (0.0 to 1.0)
                 valueColor: AlwaysStoppedAnimation<Color>(
-                    color), // Correctly set the value color
+                  color,
+                ), // Correctly set the value color
                 backgroundColor: Colors.white,
               ),
             ),
           ),
-          SizedBox(
-            width: 15,
-          ),
+          SizedBox(width: 15),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 "$amount g",
                 style: TextStyle(
-                    color: textcolor ?? Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold),
+                  color: textcolor ?? Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 label,
                 style: TextStyle(
-                    color: textcolor ?? Colors.white,
-                    fontWeight: FontWeight.bold),
+                  color: textcolor ?? Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),

@@ -10,14 +10,9 @@ import '../../../routes/app_pages.dart';
 import '../../../core/base/controllers/auth_controller.dart';
 import '../../../data/models/meal_model.dart';
 import '../../../data/services/meals_firestore_service.dart';
-import '../../../data/services/meal_categories_firestore_service.dart';
-import '../../../data/services/groups_firestore_service.dart';
 
 class CreateMealController extends GetxController {
   final MealsFirestoreService _mealsService = MealsFirestoreService();
-  final MealCategoriesFirestoreService _categoriesService =
-      MealCategoriesFirestoreService();
-  final GroupsFirestoreService _groupsService = GroupsFirestoreService();
 
   final fullNameController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -59,46 +54,46 @@ class CreateMealController extends GetxController {
   void onInit() {
     super.onInit();
 
-    print('═══════════════════════════════════════');
-    print('🚀 CREATE MEAL CONTROLLER INITIALIZED');
-    print('═══════════════════════════════════════');
+    debugPrint('═══════════════════════════════════════');
+    debugPrint('🚀 CREATE MEAL CONTROLLER INITIALIZED');
+    debugPrint('═══════════════════════════════════════');
 
     // Get group category ID from arguments if passed
     final arguments = Get.arguments;
-    print('🔵 CreateMealController onInit - Arguments: $arguments');
-    print('🔵 Arguments type: ${arguments.runtimeType}');
+    debugPrint('🔵 CreateMealController onInit - Arguments: $arguments');
+    debugPrint('🔵 Arguments type: ${arguments.runtimeType}');
 
     if (arguments is Map<String, dynamic>) {
       groupCategoryId = arguments['groupCategoryId'] as String?;
-      print('🔵 Received groupCategoryId: $groupCategoryId');
+      debugPrint('🔵 Received groupCategoryId: $groupCategoryId');
 
       // If editing a meal, extract it from the arguments
       final meal = arguments['meal'] as MealModel?;
       if (meal != null) {
-        print('🔵 Editing meal: ${meal.name}');
+        debugPrint('🔵 Editing meal: ${meal.name}');
         populateForEdit(meal);
       }
     } else if (arguments is MealModel) {
       // Legacy support: arguments is directly a MealModel
-      print('🔵 Legacy: Editing meal: ${arguments.name}');
+      debugPrint('🔵 Legacy: Editing meal: ${arguments.name}');
       populateForEdit(arguments);
     } else {
-      print('⚠️ No arguments or unexpected argument type');
+      debugPrint('⚠️ No arguments or unexpected argument type');
     }
 
     // Load categories based on mode
     if (groupCategoryId != null) {
-      print('🟢 GROUP MODE: Loading meal categories from Firestore');
-      print('🟢 Group Category ID: $groupCategoryId');
+      debugPrint('🟢 GROUP MODE: Loading meal categories from Firestore');
+      debugPrint('🟢 Group Category ID: $groupCategoryId');
       _loadGroupCategories();
     } else {
-      print('🟢 PERSONAL MODE: Using default categories');
-      print('🟢 Default categories: $defaultCategories');
+      debugPrint('🟢 PERSONAL MODE: Using default categories');
+      debugPrint('🟢 Default categories: $defaultCategories');
       availableCategories.assignAll(defaultCategories);
       isLoadingCategories.value = false;
     }
 
-    print('═══════════════════════════════════════');
+    debugPrint('═══════════════════════════════════════');
   }
 
   @override
@@ -116,20 +111,22 @@ class CreateMealController extends GetxController {
       final userId = authController.firebaseUser.value?.uid ?? '';
 
       if (userId.isEmpty) {
-        print('❌ No user ID found, falling back to default categories');
+        debugPrint('❌ No user ID found, falling back to default categories');
         availableCategories.assignAll(defaultCategories);
         isLoadingCategories.value = false;
         return;
       }
 
       if (groupCategoryId == null) {
-        print('❌ No groupCategoryId, falling back to default categories');
+        debugPrint('❌ No groupCategoryId, falling back to default categories');
         availableCategories.assignAll(defaultCategories);
         isLoadingCategories.value = false;
         return;
       }
 
-      print('🟢 Loading meal categories for groupCategoryId: $groupCategoryId');
+      debugPrint(
+        '🟢 Loading meal categories for groupCategoryId: $groupCategoryId',
+      );
 
       // Use direct Firestore query (same as weekly meal planner)
       final categoriesSnapshot = await FirebaseFirestore.instance
@@ -152,11 +149,11 @@ class CreateMealController extends GetxController {
       availableCategories.assignAll(categoryNames);
       isLoadingCategories.value = false;
 
-      print(
+      debugPrint(
         '🟢 SUCCESS: Loaded ${availableCategories.length} meal categories: $categoryNames',
       );
     } catch (e) {
-      print('❌ Error loading meal categories: $e');
+      debugPrint('❌ Error loading meal categories: $e');
       availableCategories.assignAll(defaultCategories);
       isLoadingCategories.value = false;
     }
@@ -196,7 +193,7 @@ class CreateMealController extends GetxController {
 
   // Initialize controller with existing meal data for editing
   void populateForEdit(MealModel meal) {
-    print("Populating form for edit: ${meal.name} (${meal.id})");
+    debugPrint("Populating form for edit: ${meal.name} (${meal.id})");
     isEditing.value = true;
     editingMealId = meal.id;
 
@@ -235,7 +232,7 @@ class CreateMealController extends GetxController {
 
   // Populate controller with existing meal data for copying (creates new meal)
   void populateForCopy(MealModel meal) {
-    print("Populating form for copy from: ${meal.name}");
+    debugPrint("Populating form for copy from: ${meal.name}");
     isEditing.value = false;
     editingMealId = null;
 
@@ -270,7 +267,7 @@ class CreateMealController extends GetxController {
   }
 
   //  {"name": "string", "amount": "string", "unit": "string"}
-  Future<void> submitUser(context, userId) async {
+  Future<void> submitUser(String userId) async {
     try {
       // Validate form and categories
       bool isFormValid = key.currentState!.validate();
@@ -284,15 +281,15 @@ class CreateMealController extends GetxController {
 
         // Extract userId from various possible locations
         final firebaseUid = authController.firebaseUser.value?.uid;
-        final storageUserId = userId?.toString() ?? "";
+        final storageUserId = userId.toString();
 
         final finalUserId = storageUserId.isNotEmpty
             ? storageUserId
             : (firebaseUid ?? "unknown_user");
 
-        print("DEBUG: Final UserID for upload: $finalUserId");
-        print("DEBUG: Firebase UID: $firebaseUid");
-        print("DEBUG: Argument UserID: $userId");
+        debugPrint("DEBUG: Final UserID for upload: $finalUserId");
+        debugPrint("DEBUG: Firebase UID: $firebaseUid");
+        debugPrint("DEBUG: Argument UserID: $userId");
 
         // Clean ingredients: Extract text from controllers and convert to plain list
         final List<IngredientModel> cleanIngredients = ingredientControllers
@@ -339,18 +336,18 @@ class CreateMealController extends GetxController {
         );
 
         if (isEditing.value) {
-          print("Updating Meal in Firestore: ${meal.toJson()}");
+          debugPrint("Updating Meal in Firestore: ${meal.toJson()}");
           await _mealsService.updateMeal(meal);
 
           Get.offAllNamed("${Routes.ClientDashboard}?id=$finalUserId");
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Meal Updated Successfully!'),
-              backgroundColor: Colors.blue,
-            ),
+          Get.snackbar(
+            'Success',
+            'Meal Updated Successfully!',
+            backgroundColor: Colors.blue,
+            colorText: Colors.white,
           );
         } else {
-          print("Creating New Meal in Firestore: ${meal.toJson()}");
+          debugPrint("Creating New Meal in Firestore: ${meal.toJson()}");
           await _mealsService.addMeal(meal);
 
           // Check for 'from' parameter to determine navigation
@@ -364,28 +361,28 @@ class CreateMealController extends GetxController {
             Get.offAllNamed("${Routes.ClientDashboard}?id=$finalUserId");
           }
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Meal Created Successfully!'),
-              backgroundColor: Colors.green,
-            ),
+          Get.snackbar(
+            'Success',
+            'Meal Created Successfully!',
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
           );
         }
       }
     } catch (e) {
-      print("Error in submitUser: $e");
+      debugPrint("Error in submitUser: $e");
       String errorMessage = 'Error: $e';
 
       if (e.toString().contains('permission-denied')) {
         errorMessage = 'Permission Denied: Check Firestore Security Rules.';
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 5),
-        ),
+      Get.snackbar(
+        'Error',
+        errorMessage,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 5),
       );
     } finally {
       isLoading.value = false;
@@ -438,7 +435,7 @@ class CreateMealController extends GetxController {
         );
       }
     } catch (e) {
-      print('Error picking meal image: $e');
+      debugPrint('Error picking meal image: $e');
       Get.snackbar(
         'Error',
         'Failed to pick image: $e',
@@ -476,7 +473,7 @@ class CreateMealController extends GetxController {
   //         ],
   //         "created_at": "2024-10-28T09:58:53.243Z"
   //       };
-  //       print(data);
+  //       debugPrint(data);
   //       // signupUser(
   //       //   APIEndpoints.auth.signup,
   //       //   data,
@@ -485,7 +482,7 @@ class CreateMealController extends GetxController {
   //           .post(url: APIEndpoints.auth.signup, map: data)
   //           .then((value) {
   //         if (APIStatus.success(value.statusCode)) {
-  //           print(value.data);
+  //           debugPrint(value.data);
   //           // clearDetails();
   //           Get.toNamed(Routes.Login);
   //           ScaffoldMessenger.of(context).showSnackBar(
@@ -507,7 +504,7 @@ class CreateMealController extends GetxController {
   //       });
   //     }
   //   } catch (e) {
-  //     print(e);
+  //     debugPrint(e);
   //   } finally {
   //     setState(() {
   //       isLoading = false;
@@ -516,23 +513,23 @@ class CreateMealController extends GetxController {
   //   // if (_formKey.currentState!.validate()) {
   // }
   void printMealData() {
-    print("Meal Name: ${fullNameController.text}");
-    print("Description: ${descriptionController.text}");
-    print("Selected Categories: $selectedCategories");
-    print("Ingredients:");
-    print(ingredientControllers);
+    debugPrint("Meal Name: ${fullNameController.text}");
+    debugPrint("Description: ${descriptionController.text}");
+    debugPrint("Selected Categories: $selectedCategories");
+    debugPrint("Ingredients:");
+    debugPrint(ingredientControllers.toString());
     for (var controller in ingredientControllers) {
-      print(
+      debugPrint(
         "Name: ${controller['name']!.text}, Amount: ${controller['amount']!.text}",
       );
     }
     if (calculateAutomatically.value) {
-      print("Nutritional Info: Calculated Automatically");
+      debugPrint("Nutritional Info: Calculated Automatically");
     } else {
-      print("kcal: ${kcalController.text}");
-      print("Carbs: ${carbsController.text}");
-      print("Protein: ${proteinController.text}");
-      print("Fats: ${fatsController.text}");
+      debugPrint("kcal: ${kcalController.text}");
+      debugPrint("Carbs: ${carbsController.text}");
+      debugPrint("Protein: ${proteinController.text}");
+      debugPrint("Fats: ${fatsController.text}");
     }
   }
 }

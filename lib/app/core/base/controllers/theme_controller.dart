@@ -96,11 +96,11 @@ class ThemeController extends GetxController {
     ),
     inputDecorationTheme: InputDecorationTheme(
       focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: AppColors.grey.withOpacity(.4)),
+        borderSide: BorderSide(color: AppColors.grey.withValues(alpha: .4)),
         borderRadius: BorderRadius.circular(4.0),
       ),
       enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: AppColors.grey.withOpacity(.4)),
+        borderSide: BorderSide(color: AppColors.grey.withValues(alpha: .4)),
         borderRadius: BorderRadius.circular(4.0),
       ),
       errorBorder: OutlineInputBorder(

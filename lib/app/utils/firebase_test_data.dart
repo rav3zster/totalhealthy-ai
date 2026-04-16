@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../data/models/user_model.dart';
-
 /// Helper class to populate Firebase with test data for development
 class FirebaseTestData {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -133,11 +133,11 @@ class FirebaseTestData {
     try {
       for (var member in sampleMembers) {
         await _firestore.collection('user').doc(member.id).set(member.toJson());
-        print('✅ Created member: ${member.fullName}');
+        debugPrint('✅ Created member: ${member.fullName}');
       }
-      print('🎉 All sample members created successfully!');
+      debugPrint('🎉 All sample members created successfully!');
     } catch (e) {
-      print('❌ Error creating sample members: $e');
+      debugPrint('❌ Error creating sample members: $e');
     }
   }
 
@@ -163,9 +163,9 @@ class FirebaseTestData {
 
     try {
       await _firestore.collection('user').doc(uid).set(trainer.toJson());
-      print('✅ Created trainer profile');
+      debugPrint('✅ Created trainer profile');
     } catch (e) {
-      print('❌ Error creating trainer: $e');
+      debugPrint('❌ Error creating trainer: $e');
     }
   }
 
@@ -182,11 +182,11 @@ class FirebaseTestData {
     try {
       for (var id in sampleIds) {
         await _firestore.collection('user').doc(id).delete();
-        print('🗑️ Deleted member: $id');
+        debugPrint('🗑️ Deleted member: $id');
       }
-      print('✅ All sample data deleted');
+      debugPrint('✅ All sample data deleted');
     } catch (e) {
-      print('❌ Error deleting sample data: $e');
+      debugPrint('❌ Error deleting sample data: $e');
     }
   }
 }

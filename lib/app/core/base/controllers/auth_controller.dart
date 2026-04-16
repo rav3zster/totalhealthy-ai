@@ -38,7 +38,7 @@ class AuthController extends GetxController {
     // Handle initial navigation AFTER GetMaterialApp is ready
     final currentUser = _auth.currentUser;
     if (currentUser != null) {
-      print("🏠 App start: User already authenticated, bootstrapping...");
+      debugPrint("🏠 App start: User already authenticated, bootstrapping...");
       bootstrapUser(currentUser.uid, isNewSignup: false);
     }
   }
@@ -59,7 +59,7 @@ class AuthController extends GetxController {
   /// Called after login, signup, and app start
   Future<void> bootstrapUser(String uid, {bool isNewSignup = false}) async {
     try {
-      print("🚀 Bootstrapping user: $uid (isNewSignup: $isNewSignup)");
+      debugPrint("🚀 Bootstrapping user: $uid (isNewSignup: $isNewSignup)");
 
       final usersService = UsersFirestoreService();
 
@@ -68,13 +68,13 @@ class AuthController extends GetxController {
 
       if (profile == null) {
         // Document DOES NOT exist - this is a BRAND NEW USER
-        print("📝 New user detected - no Firestore document");
+        debugPrint("📝 New user detected - no Firestore document");
         Get.offAllNamed(Routes.SWITCHROLE);
         return;
       }
 
       // Document EXISTS - check if role is set
-      print("👤 Existing user found - role: ${profile.role}");
+      debugPrint("👤 Existing user found - role: ${profile.role}");
 
       // Sync profile to local storage
       await userdataStore(profile.toJson());
@@ -84,12 +84,12 @@ class AuthController extends GetxController {
 
         if (isNewSignup) {
           // This is a new signup - show Switch Role screen
-          print("⚠️ New signup without role - showing Switch Role");
+          debugPrint("⚠️ New signup without role - showing Switch Role");
           Get.offAllNamed(Routes.SWITCHROLE);
           return;
         } else {
           // This is an existing user logging in - assign default role "member"
-          print(
+          debugPrint(
             "⚠️ Existing user without role - assigning default 'member' role",
           );
 
@@ -122,7 +122,7 @@ class AuthController extends GetxController {
           await userdataStore(updatedProfile.toJson());
 
           roleStore("member");
-          print("✅ Navigating to Client Dashboard with default role");
+          debugPrint("✅ Navigating to Client Dashboard with default role");
           Get.offAllNamed(Routes.ClientDashboard);
           return;
         }
@@ -135,14 +135,14 @@ class AuthController extends GetxController {
       roleStore(normalizedRole);
 
       if (normalizedRole == "advisor") {
-        print("✅ Navigating to Trainer Dashboard");
+        debugPrint("✅ Navigating to Trainer Dashboard");
         Get.offAllNamed(Routes.TrainerDashboard);
       } else {
-        print("✅ Navigating to Client Dashboard");
+        debugPrint("✅ Navigating to Client Dashboard");
         Get.offAllNamed(Routes.ClientDashboard);
       }
     } catch (e) {
-      print("❌ Bootstrap error: $e");
+      debugPrint("❌ Bootstrap error: $e");
       // On error, go to login
       Get.offAllNamed(Routes.Login);
     }
@@ -180,7 +180,7 @@ class AuthController extends GetxController {
         backgroundColor: Get.theme.colorScheme.error,
         colorText: Get.theme.colorScheme.onError,
       );
-      print("Login error: $e");
+      debugPrint("Login error: $e");
       return false;
     } finally {
       flowloader.value = false;
@@ -284,7 +284,7 @@ class AuthController extends GetxController {
   final NotificationService _notificationService = NotificationService();
   NotificationService get notificationService => _notificationService;
 
-  Future<void> fetchAndScheduleNotifications(data) async {
+  Future<void> fetchAndScheduleNotifications(dynamic data) async {
     try {
       var categories = data ?? DummyDataService.getDummyMealCategories();
 
@@ -315,7 +315,7 @@ class AuthController extends GetxController {
         );
       }
     } catch (e) {
-      print('Error scheduling notifications: $e');
+      debugPrint('Error scheduling notifications: $e');
     }
   }
 
@@ -342,7 +342,7 @@ class AuthController extends GetxController {
   }
 
   // Data Helpers
-  Future<void> categoriesAdd(data) => box.write("categories", data);
+  Future<void> categoriesAdd(dynamic data) => box.write("categories", data);
   dynamic categoriesGet() =>
       box.read("categories") ?? DummyDataService.getDummyMealCategories();
 
@@ -354,7 +354,7 @@ class AuthController extends GetxController {
     await box.write("groupId", id);
   }
 
-  Future<void> userdataStore(userData) async {
+  Future<void> userdataStore(dynamic userData) async {
     await box.write("userdata", userData);
   }
 
@@ -475,7 +475,7 @@ class AuthController extends GetxController {
         Get.offAllNamed(Routes.ClientDashboard);
       }
     } catch (e) {
-      print("❌ Error switching role: $e");
+      debugPrint("❌ Error switching role: $e");
       Get.snackbar(
         'Error',
         'Failed to switch role. Please try again.',

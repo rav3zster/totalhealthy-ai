@@ -58,7 +58,7 @@ class MealHistoryController extends GetxController {
             isLoading.value = false;
           },
           onError: (e) {
-            print("Error fetching meals: $e");
+            debugPrint("Error fetching meals: $e");
             isLoading.value = false;
           },
         );
@@ -120,7 +120,7 @@ class MealHistoryController extends GetxController {
     final mealToCopy = meals.firstWhereOrNull((m) => m.id == firstSelectedId);
 
     if (mealToCopy != null) {
-      print("Continuing with meal: ${mealToCopy.name}");
+      debugPrint("Continuing with meal: ${mealToCopy.name}");
 
       // Navigate to Create Meal page in 'copy' mode
       final authController = Get.find<AuthController>();

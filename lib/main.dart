@@ -32,11 +32,11 @@ void main() async {
   // If this fails, app will continue without notification support
   NotificationService.init()
       .then((_) {
-        print('✅ Production NotificationService initialized');
+        debugPrint('✅ Production NotificationService initialized');
       })
       .catchError((e) {
-        print('⚠️ NotificationService initialization failed: $e');
-        print('⚠️ App will continue without notification support');
+        debugPrint('⚠️ NotificationService initialization failed: $e');
+        debugPrint('⚠️ App will continue without notification support');
       });
 
   await initializeControllers();
@@ -55,9 +55,9 @@ void main() async {
       // Default to Client Dashboard if logged in
       initialRoute = Routes.ClientDashboard;
     }
-    print("🚀 App Launch: Logged in as $role, starting at $initialRoute");
+    debugPrint("🚀 App Launch: Logged in as $role, starting at $initialRoute");
   } else {
-    print("👋 App Launch: No user found, starting at Onboarding");
+    debugPrint("👋 App Launch: No user found, starting at Onboarding");
   }
 
   runApp(MyApp(initialRoute: initialRoute));
@@ -67,7 +67,7 @@ Future<void> initializeControllers() async {
   try {
     await _notificationService.initialize();
   } catch (e) {
-    print("Notification service initialization failed: $e");
+    debugPrint("Notification service initialization failed: $e");
   }
 
   // Initialize core bindings first

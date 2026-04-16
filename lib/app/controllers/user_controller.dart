@@ -59,7 +59,7 @@ class UserController extends GetxController {
         final base64String = imageSource.split(',').last;
         return MemoryImage(base64Decode(base64String));
       } catch (e) {
-        print('Error decoding Base64 image: $e');
+        debugPrint('Error decoding Base64 image: $e');
         return null;
       }
     }
@@ -124,7 +124,7 @@ class UserController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    print("UserController: onInit called");
+    debugPrint("UserController: onInit called");
     _loadCachedData();
 
     // Initialize immediately after the frame is built
@@ -159,7 +159,7 @@ class UserController extends GetxController {
         }
       }
     } catch (e) {
-      print('Error loading cached user data: $e');
+      debugPrint('Error loading cached user data: $e');
     }
   }
 
@@ -170,7 +170,7 @@ class UserController extends GetxController {
         return UserModel.fromJson(Map<String, dynamic>.from(cachedData));
       }
     } catch (e) {
-      print('Error getting cached user: $e');
+      debugPrint('Error getting cached user: $e');
     }
     return null;
   }
@@ -180,7 +180,7 @@ class UserController extends GetxController {
       _storage.write(_userCacheKey, user.toJson());
       _storage.write(_lastFetchKey, DateTime.now().millisecondsSinceEpoch);
     } catch (e) {
-      print('Error caching user data: $e');
+      debugPrint('Error caching user data: $e');
     }
   }
 
@@ -189,24 +189,24 @@ class UserController extends GetxController {
       _storage.remove(_userCacheKey);
       _storage.remove(_lastFetchKey);
     } catch (e) {
-      print('Error clearing cache: $e');
+      debugPrint('Error clearing cache: $e');
     }
   }
 
   void _initializeAuthListener() {
-    print("UserController: Initializing auth listener");
+    debugPrint("UserController: Initializing auth listener");
 
     // Check if AuthController is available
     final authController = _authController;
     if (authController == null) {
-      print(
+      debugPrint(
         "UserController: AuthController not available, using direct Firebase Auth",
       );
       // Fallback to direct Firebase Auth if AuthController is not ready
       _authSubscription = FirebaseAuth.instance.authStateChanges().listen((
         user,
       ) {
-        print("UserController: Auth state changed - User: ${user?.uid}");
+        debugPrint("UserController: Auth state changed - User: ${user?.uid}");
         if (user != null && user.uid != _currentUserId) {
           _currentUserId = user.uid;
           _subscribeToUserData(user.uid);
@@ -217,10 +217,10 @@ class UserController extends GetxController {
       return;
     }
 
-    print("UserController: Using AuthController for auth state");
+    debugPrint("UserController: Using AuthController for auth state");
     // Listen to AuthController's authentication state
     _authSubscription = authController.firebaseUser.listen((user) {
-      print(
+      debugPrint(
         "UserController: AuthController state changed - User: ${user?.uid}",
       );
       if (user != null && user.uid != _currentUserId) {
@@ -233,14 +233,14 @@ class UserController extends GetxController {
   }
 
   void _subscribeToUserData(String uid) {
-    print("UserController: Subscribing to user data for UID: $uid");
+    debugPrint("UserController: Subscribing to user data for UID: $uid");
 
     // Don't show loading if we have cached data
     if (_currentUser.value == null) {
-      print("UserController: No cached data, showing loading");
+      debugPrint("UserController: No cached data, showing loading");
       _isLoading.value = true;
     } else {
-      print(
+      debugPrint(
         "UserController: Using cached data for user: ${_currentUser.value?.fullName}",
       );
     }
@@ -254,7 +254,7 @@ class UserController extends GetxController {
         .timeout(const Duration(seconds: 15))
         .listen(
           (userData) {
-            print("UserController: Received user data: ${userData?.fullName}");
+            debugPrint("UserController: Received user data: ${userData?.fullName}");
             if (userData != null) {
               _currentUser.value = userData;
               _cacheUserData(userData);
@@ -269,18 +269,18 @@ class UserController extends GetxController {
             _isLoading.value = false;
             _error.value = '';
             _isInitialized.value = true;
-            print("UserController: User data loading completed");
+            debugPrint("UserController: User data loading completed");
           },
           onError: (err) {
             if (err is TimeoutException) {
-              print(
+              debugPrint(
                 'UserController: Stream timed out after 15s. Using cached data if available.',
               );
               if (_currentUser.value == null) {
                 _error.value = 'Connection timed out';
               }
             } else {
-              print('UserController stream error: $err');
+              debugPrint('UserController stream error: $err');
               if (_currentUser.value == null) {
                 _error.value = 'Failed to load user data';
               }
@@ -293,7 +293,7 @@ class UserController extends GetxController {
     // Safety timeout to ensure loading state is cleared
     Future.delayed(const Duration(seconds: 10), () {
       if (_isLoading.value) {
-        print("UserController: Timeout reached, clearing loading state");
+        debugPrint("UserController: Timeout reached, clearing loading state");
         _isLoading.value = false;
         _isInitialized.value = true;
         if (_currentUser.value == null) {
@@ -331,7 +331,7 @@ class UserController extends GetxController {
       );
     } catch (e) {
       _error.value = 'Failed to update progress: $e';
-      print('Update progress error: $e');
+      debugPrint('Update progress error: $e');
     }
   }
 
@@ -411,7 +411,7 @@ class UserController extends GetxController {
     } catch (e) {
       _error.value = 'Failed to update profile: $e';
       _isLoading.value = false;
-      print('Update profile error: $e');
+      debugPrint('Update profile error: $e');
       rethrow;
     }
   }
@@ -446,7 +446,7 @@ class UserController extends GetxController {
     } catch (e) {
       _error.value = 'Failed to save profile image: $e';
       _isLoading.value = false;
-      print('Save profile image error: $e');
+      debugPrint('Save profile image error: $e');
       rethrow;
     }
   }

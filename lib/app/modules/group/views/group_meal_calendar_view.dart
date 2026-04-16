@@ -44,7 +44,7 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -84,7 +84,7 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
                   Text(
                     controller.groupName ?? 'Group',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
+                      color: Colors.white.withValues(alpha: 0.6),
                       fontSize: 13,
                     ),
                   ),
@@ -100,7 +100,7 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFC2D86A).withOpacity(0.3),
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -150,7 +150,7 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
           decoration: BoxDecoration(
             color: const Color(0xFF1E1E1E),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.05), width: 1),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.05), width: 1),
           ),
           child: Row(
             children: [
@@ -200,7 +200,7 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
           children: [
             Icon(
               icon,
-              color: isSelected ? Colors.black : Colors.white.withOpacity(0.5),
+              color: isSelected ? Colors.black : Colors.white.withValues(alpha: 0.5),
               size: 18,
             ),
             const SizedBox(width: 6),
@@ -209,7 +209,7 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
               style: TextStyle(
                 color: isSelected
                     ? Colors.black
-                    : Colors.white.withOpacity(0.5),
+                    : Colors.white.withValues(alpha: 0.5),
                 fontSize: 14,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
               ),
@@ -325,15 +325,15 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isToday
-              ? const Color(0xFFC2D86A).withOpacity(0.4)
-              : Colors.white.withOpacity(0.05),
+              ? const Color(0xFFC2D86A).withValues(alpha: 0.4)
+              : Colors.white.withValues(alpha: 0.05),
           width: isToday ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isToday
-                ? const Color(0xFFC2D86A).withOpacity(0.15)
-                : Colors.black.withOpacity(0.2),
+                ? const Color(0xFFC2D86A).withValues(alpha: 0.15)
+                : Colors.black.withValues(alpha: 0.2),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -399,7 +399,7 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFC2D86A).withOpacity(0.2),
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Text(
@@ -447,8 +447,8 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: meal != null
-                ? const Color(0xFFC2D86A).withOpacity(0.3)
-                : Colors.white.withOpacity(0.05),
+                ? const Color(0xFFC2D86A).withValues(alpha: 0.3)
+                : Colors.white.withValues(alpha: 0.05),
             width: 1,
           ),
         ),
@@ -463,7 +463,7 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
                   Text(
                     mealType,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
+                      color: Colors.white.withValues(alpha: 0.6),
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                     ),
@@ -484,7 +484,7 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
                     Text(
                       '${meal.kcal} kcal',
                       style: TextStyle(
-                        color: Colors.orange.withOpacity(0.8),
+                        color: Colors.orange.withValues(alpha: 0.8),
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -493,7 +493,7 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
                     Text(
                       hasPermission ? 'Tap to add meal' : 'No meal assigned',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.4),
+                        color: Colors.white.withValues(alpha: 0.4),
                         fontSize: 13,
                         fontStyle: FontStyle.italic,
                       ),
@@ -576,8 +576,8 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isToday
-                ? const Color(0xFFC2D86A).withOpacity(0.4)
-                : Colors.white.withOpacity(0.05),
+                ? const Color(0xFFC2D86A).withValues(alpha: 0.4)
+                : Colors.white.withValues(alpha: 0.05),
             width: isToday ? 2 : 1,
           ),
         ),
@@ -654,7 +654,7 @@ class GroupMealCalendarView extends GetView<GroupMealCalendarController> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

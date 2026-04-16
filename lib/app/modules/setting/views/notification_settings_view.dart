@@ -59,9 +59,9 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
         updateNotificationEnabled = updateData['enabled'] as bool? ?? true;
       }
 
-      print('✅ Loaded reminder settings');
+      debugPrint('✅ Loaded reminder settings');
     } catch (e) {
-      print('❌ Error loading settings: $e');
+      debugPrint('❌ Error loading settings: $e');
     } finally {
       setState(() => isLoading = false);
     }
@@ -199,6 +199,7 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                                 setState(
                                   () => updateNotificationEnabled = value,
                                 );
+                                final accentColor = context.accent;
                                 await ReminderStorageService.saveUpdateNotification(
                                   value,
                                 );
@@ -208,7 +209,7 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
                                   value
                                       ? 'update_notification_enabled'.tr
                                       : 'update_notification_disabled'.tr,
-                                  backgroundColor: context.accent,
+                                  backgroundColor: accentColor,
                                   colorText: Colors.black,
                                 );
                               },
@@ -270,16 +271,17 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
 
   /// Disable water reminder
   Future<void> _disableWaterReminder() async {
+    final accentColor = context.accent;
     await ReminderStorageService.saveWaterReminder(false, null);
     await NotificationService.cancelWaterReminders();
     setState(() => waterReminderEnabled = false);
 
-    print('Reminder cancelled: Water');
+    debugPrint('Reminder cancelled: Water');
 
     Get.snackbar(
       'success'.tr,
       'water_reminder_disabled'.tr,
-      backgroundColor: context.accent,
+      backgroundColor: accentColor,
       colorText: Colors.black,
     );
   }
@@ -381,21 +383,24 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
   /// Enable meal reminders (sync with meal categories)
   Future<void> _enableMealReminder() async {
     try {
+      final accentColor = context.accent;
       // Enable meal reminder
       await ReminderStorageService.saveMealReminder(true, []);
       setState(() => mealReminderEnabled = true);
 
-      print('✅ Meal reminders enabled - User can configure in Meal Categories');
+      debugPrint(
+        '✅ Meal reminders enabled - User can configure in Meal Categories',
+      );
 
       Get.snackbar(
         'success'.tr,
         'meal_reminder_enabled_message'.tr,
-        backgroundColor: context.accent,
+        backgroundColor: accentColor,
         colorText: Colors.black,
         duration: const Duration(seconds: 4),
       );
     } catch (e) {
-      print('❌ Error enabling meal reminders: $e');
+      debugPrint('❌ Error enabling meal reminders: $e');
       Get.snackbar(
         'error'.tr,
         'failed_to_enable_meal_reminder'.tr,
@@ -408,6 +413,7 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
   /// Disable meal reminders (sync with meal categories)
   Future<void> _disableMealReminder() async {
     try {
+      final accentColor = context.accent;
       // Disable meal reminder
       await ReminderStorageService.saveMealReminder(false, null);
 
@@ -416,16 +422,16 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
 
       setState(() => mealReminderEnabled = false);
 
-      print('🗑️ All meal reminders disabled and cancelled');
+      debugPrint('🗑️ All meal reminders disabled and cancelled');
 
       Get.snackbar(
         'success'.tr,
         'meal_reminder_disabled'.tr,
-        backgroundColor: context.accent,
+        backgroundColor: accentColor,
         colorText: Colors.black,
       );
     } catch (e) {
-      print('❌ Error disabling meal reminders: $e');
+      debugPrint('❌ Error disabling meal reminders: $e');
       Get.snackbar(
         'error'.tr,
         'failed_to_disable_meal_reminder'.tr,
@@ -435,18 +441,18 @@ class _NotificationSettingsViewState extends State<NotificationSettingsView> {
     }
   }
 
-  /// Disable exercise reminder
   Future<void> _disableExerciseReminder() async {
+    final accentColor = context.accent;
     await ReminderStorageService.saveExerciseReminder(false, null);
     await NotificationService.cancelExerciseReminders();
     setState(() => exerciseReminderEnabled = false);
 
-    print('Reminder cancelled: Exercise');
+    debugPrint('Reminder cancelled: Exercise');
 
     Get.snackbar(
       'success'.tr,
       'exercise_reminder_disabled'.tr,
-      backgroundColor: context.accent,
+      backgroundColor: accentColor,
       colorText: Colors.black,
     );
   }

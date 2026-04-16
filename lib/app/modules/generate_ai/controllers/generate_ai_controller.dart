@@ -134,11 +134,15 @@ class GenerateAiController extends GetxController {
 
   Future<void> _loadSavedPreferences() async {
     final prefs = await AiService.instance.loadPreferences();
-    if (prefs['goal']?.isNotEmpty == true) selectedGoal.value = prefs['goal']!;
-    if (prefs['dietType']?.isNotEmpty == true)
+    if (prefs['goal']?.isNotEmpty == true) {
+      selectedGoal.value = prefs['goal']!;
+    }
+    if (prefs['dietType']?.isNotEmpty == true) {
       dietType.value = prefs['dietType']!;
-    if (prefs['cuisine']?.isNotEmpty == true)
+    }
+    if (prefs['cuisine']?.isNotEmpty == true) {
       preferredCuisine.value = prefs['cuisine']!;
+    }
   }
 
   // ── MAIN: Generate Plan ────────────────────────────────────────────────────
@@ -356,11 +360,12 @@ class _ExplainDialogState extends State<_ExplainDialog> {
       goal: widget.goal,
       dietType: widget.dietType,
     );
-    if (mounted)
+    if (mounted) {
       setState(() {
         _explanation = result;
         _loading = false;
       });
+    }
   }
 
   @override

@@ -101,7 +101,7 @@ class _PlanWeekDialogState extends State<PlanWeekDialog> {
                           color: const Color(0xFF2A2A2A),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withValues(alpha: 0.1),
                             width: 1,
                           ),
                         ),
@@ -234,8 +234,8 @@ class _PlanWeekDialogState extends State<PlanWeekDialog> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: selectedMeal != null
-                    ? const Color(0xFFC2D86A).withOpacity(0.3)
-                    : Colors.white.withOpacity(0.1),
+                    ? const Color(0xFFC2D86A).withValues(alpha: 0.3)
+                    : Colors.white.withValues(alpha: 0.1),
                 width: 1,
               ),
             ),
@@ -247,7 +247,7 @@ class _PlanWeekDialogState extends State<PlanWeekDialog> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
                     'Select meal (optional)',
-                    style: TextStyle(color: Colors.white.withOpacity(0.5)),
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
                   ),
                 ),
                 dropdownColor: const Color(0xFF2A2A2A),
@@ -262,7 +262,7 @@ class _PlanWeekDialogState extends State<PlanWeekDialog> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
                         'No meal',
-                        style: TextStyle(color: Colors.white.withOpacity(0.5)),
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
                       ),
                     ),
                   ),
@@ -337,7 +337,7 @@ class _PlanWeekDialogState extends State<PlanWeekDialog> {
       Get.snackbar(
         'Error',
         'Please select a week',
-        backgroundColor: Colors.red.withOpacity(0.8),
+        backgroundColor: Colors.red.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
       return;
@@ -347,7 +347,7 @@ class _PlanWeekDialogState extends State<PlanWeekDialog> {
       Get.snackbar(
         'Error',
         'Please select at least one meal',
-        backgroundColor: Colors.red.withOpacity(0.8),
+        backgroundColor: Colors.red.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
       return;

@@ -145,9 +145,10 @@ class _SwipeBackTransition extends StatelessWidget {
   }
 
   _SwipeBackGestureController _startPopGesture(BuildContext context) {
+    final route = ModalRoute.of(context)!;
     return _SwipeBackGestureController(
       navigator: Navigator.of(context),
-      controller: ModalRoute.of(context)!.controller!,
+      controller: route.animation! as AnimationController,
     );
   }
 }
@@ -273,7 +274,6 @@ class _SwipeBackGestureController {
 
   void dragEnd(double velocity) {
     const double kMinFlingVelocity = 1.0;
-    const double kBackGestureWidth = 20.0;
 
     bool animateForward;
 

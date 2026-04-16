@@ -199,7 +199,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                         Container(
                                           padding: const EdgeInsets.all(10),
                                           decoration: BoxDecoration(
-                                            color: Colors.black.withOpacity(
+                                            color: Colors.black.withValues(alpha: 
                                               0.1,
                                             ),
                                             shape: BoxShape.circle,
@@ -229,7 +229,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                                 'manage_daily_meal_schedule'.tr,
                                                 style: TextStyle(
                                                   color: Colors.black
-                                                      .withOpacity(0.6),
+                                                      .withValues(alpha: 0.6),
                                                   fontSize: 14,
                                                 ),
                                               ),
@@ -261,19 +261,19 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                               SimpleRealTimeSearchBar(
                                 searchQuery: controller.searchQuery,
                                 onSearchChanged: (query) {
-                                  print(
+                                  debugPrint(
                                     '🎯 VIEW DEBUG - onSearchChanged callback received: "$query"',
                                   );
                                   controller.updateSearchQuery(query);
                                 },
                                 onSearchFocused: () {
-                                  print(
+                                  debugPrint(
                                     '🎯 VIEW DEBUG - onSearchFocused callback received',
                                   );
                                   controller.onSearchFocused();
                                 },
                                 onSearchCleared: () {
-                                  print(
+                                  debugPrint(
                                     '🎯 VIEW DEBUG - onSearchCleared callback received',
                                   );
                                   controller.clearSearch();
@@ -386,25 +386,25 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                               // Meals List - Firebase-backed with modern styling
                               Obx(() {
                                 // DEBUG: Log the state
-                                print(
+                                debugPrint(
                                   '🎨 VIEW DEBUG - isGroupMode: ${controller.isGroupMode.value}',
                                 );
-                                print(
+                                debugPrint(
                                   '🎨 VIEW DEBUG - groupMeals count: ${controller.groupMeals.length}',
                                 );
-                                print(
+                                debugPrint(
                                   '🎨 VIEW DEBUG - shouldShowLoading: ${controller.shouldShowLoading}',
                                 );
-                                print(
+                                debugPrint(
                                   '🎨 VIEW DEBUG - shouldShowError: ${controller.shouldShowError}',
                                 );
-                                print(
+                                debugPrint(
                                   '🎨 VIEW DEBUG - isSearchFocused: ${controller.isSearchFocused.value}',
                                 );
-                                print(
+                                debugPrint(
                                   '🎨 VIEW DEBUG - searchQuery: "${controller.searchQuery.value}"',
                                 );
-                                print(
+                                debugPrint(
                                   '🎨 VIEW DEBUG - searchQuery trimmed: "${controller.searchQuery.value.trim()}"',
                                 );
 
@@ -442,7 +442,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
 
                                 // Get meals to display
                                 final meals = controller.displayMeals;
-                                print(
+                                debugPrint(
                                   '🎨 VIEW DEBUG - displayMeals count: ${meals.length}',
                                 );
 
@@ -595,7 +595,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                 }
 
                                 // Show meals list
-                                print(
+                                debugPrint(
                                   '🎨 VIEW DEBUG - Rendering ${meals.length} meals',
                                 );
 

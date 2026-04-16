@@ -232,7 +232,7 @@ class WaterReminderDialog {
                   intervalMinutes: intervalMinutes,
                 );
 
-                print(
+                debugPrint(
                   'Reminder scheduled: ${startTime.format(context)} to ${endTime.format(context)}, every $intervalMinutes min',
                 );
 
@@ -430,7 +430,7 @@ class MealReminderDialog {
                   time: selectedTime,
                 );
 
-                print(
+                debugPrint(
                   'Reminder scheduled: $selectedMeal at ${selectedTime.format(context)}',
                 );
 
@@ -649,7 +649,7 @@ class ExerciseReminderDialog {
                   weekdays: selectedDays.toList(),
                 );
 
-                print(
+                debugPrint(
                   'Reminder scheduled: Exercise at ${selectedTime.format(context)} on days ${selectedDays.toList()}',
                 );
 

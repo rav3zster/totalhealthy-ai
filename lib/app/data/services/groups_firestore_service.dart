@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/group_model.dart';
-
 class GroupsFirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _collection = 'groups';
@@ -51,15 +51,15 @@ class GroupsFirestoreService {
   /// Creates group document AND adds admin to members subcollection
   Future<void> addGroup(GroupModel group) async {
     final user = FirebaseAuth.instance.currentUser;
-    print('AUTH USER: ${user?.uid}');
+    debugPrint('AUTH USER: ${user?.uid}');
 
     // Create group document
     final docRef = await _firestore.collection(_collection).add(group.toJson());
     final groupId = docRef.id;
 
-    print('=== CREATING GROUP ===');
-    print('Group ID: $groupId');
-    print('Admin ID: ${group.createdBy}');
+    debugPrint('=== CREATING GROUP ===');
+    debugPrint('Group ID: $groupId');
+    debugPrint('Admin ID: ${group.createdBy}');
 
     // CRITICAL: Add admin to members subcollection
     // This ensures admin appears in members list for leave validation
@@ -74,13 +74,13 @@ class GroupsFirestoreService {
           'addedBy': group.createdBy,
         });
 
-    print('✓ Admin added to members subcollection');
+    debugPrint('✓ Admin added to members subcollection');
 
     // NOTE: Category initialization removed - groups now reference group categories
     // Categories are managed at the user level under group categories
     // When creating a group, select a group category that already has meal categories
 
-    print('======================');
+    debugPrint('======================');
   }
 
   /// Fetch user-specific groups once
@@ -129,9 +129,9 @@ class GroupsFirestoreService {
       );
     }
 
-    print('=== ADDING MEMBER TO GROUP ===');
-    print('Group ID: $groupId');
-    print('User ID: $userId');
+    debugPrint('=== ADDING MEMBER TO GROUP ===');
+    debugPrint('Group ID: $groupId');
+    debugPrint('User ID: $userId');
 
     // Add member to members_list array
     await _firestore.collection(_collection).doc(groupId).update({
@@ -148,8 +148,8 @@ class GroupsFirestoreService {
         .doc(userId)
         .set({'joinedAt': FieldValue.serverTimestamp(), 'role': 'member'});
 
-    print('✓ Member added to both array and subcollection');
-    print('==============================');
+    debugPrint('✓ Member added to both array and subcollection');
+    debugPrint('==============================');
   }
 
   /// Update an existing group
@@ -182,9 +182,9 @@ class GroupsFirestoreService {
   /// Auto-creates if missing (data healing)
   Future<void> _ensureAdminMembership(String groupId, String adminId) async {
     try {
-      print('=== CHECKING ADMIN MEMBERSHIP ===');
-      print('Group ID: $groupId');
-      print('Admin ID: $adminId');
+      debugPrint('=== CHECKING ADMIN MEMBERSHIP ===');
+      debugPrint('Group ID: $groupId');
+      debugPrint('Admin ID: $adminId');
 
       final adminMemberDoc = await _firestore
           .collection(_collection)
@@ -194,7 +194,7 @@ class GroupsFirestoreService {
           .get();
 
       if (!adminMemberDoc.exists) {
-        print('⚠️ Admin membership document missing - auto-creating...');
+        debugPrint('⚠️ Admin membership document missing - auto-creating...');
 
         await _firestore
             .collection(_collection)
@@ -208,14 +208,14 @@ class GroupsFirestoreService {
               'autoHealed': true, // Flag to track auto-created docs
             });
 
-        print('✓ Admin membership document created');
+        debugPrint('✓ Admin membership document created');
       } else {
-        print('✓ Admin membership document exists');
+        debugPrint('✓ Admin membership document exists');
       }
 
-      print('=================================');
+      debugPrint('=================================');
     } catch (e) {
-      print('Error ensuring admin membership: $e');
+      debugPrint('Error ensuring admin membership: $e');
       // Don't throw - this is a healing operation
     }
   }
@@ -240,7 +240,7 @@ class GroupsFirestoreService {
     // Delete the group document
     await _firestore.collection(_collection).doc(groupId).delete();
 
-    print('Group $groupId deleted successfully');
+    debugPrint('Group $groupId deleted successfully');
   }
 
   /// Get all members of a group
@@ -251,9 +251,9 @@ class GroupsFirestoreService {
       throw ArgumentError('Group ID cannot be empty');
     }
 
-    print('=== FETCHING GROUP MEMBERS ===');
-    print('Group ID: $groupId');
-    print('Collection path: groups/$groupId/members');
+    debugPrint('=== FETCHING GROUP MEMBERS ===');
+    debugPrint('Group ID: $groupId');
+    debugPrint('Collection path: groups/$groupId/members');
 
     // First, get the group to know who the admin is
     final groupDoc = await _firestore
@@ -278,9 +278,9 @@ class GroupsFirestoreService {
 
     final memberIds = membersSnapshot.docs.map((doc) => doc.id).toList();
 
-    print('Documents found: ${membersSnapshot.docs.length}');
-    print('Member IDs: $memberIds');
-    print('==============================');
+    debugPrint('Documents found: ${membersSnapshot.docs.length}');
+    debugPrint('Member IDs: $memberIds');
+    debugPrint('==============================');
 
     return memberIds;
   }
@@ -325,7 +325,7 @@ class GroupsFirestoreService {
       'member_count': FieldValue.increment(-1),
     });
 
-    print('Member $userId left group $groupId');
+    debugPrint('Member $userId left group $groupId');
   }
 
   /// Admin leaves group with ownership transfer
@@ -345,10 +345,10 @@ class GroupsFirestoreService {
       throw ArgumentError('New admin cannot be the same as current admin');
     }
 
-    print('=== ADMIN LEAVE WITH TRANSFER ===');
-    print('Group ID: $groupId');
-    print('Current Admin: $currentAdminId');
-    print('New Admin: $newAdminId');
+    debugPrint('=== ADMIN LEAVE WITH TRANSFER ===');
+    debugPrint('Group ID: $groupId');
+    debugPrint('Current Admin: $currentAdminId');
+    debugPrint('New Admin: $newAdminId');
 
     // IMPORTANT: Validate members BEFORE transaction
     // Cannot do collection queries inside Firestore transactions
@@ -359,7 +359,7 @@ class GroupsFirestoreService {
         .get();
 
     final memberIds = membersSnapshot.docs.map((doc) => doc.id).toList();
-    print('All members before transfer: $memberIds');
+    debugPrint('All members before transfer: $memberIds');
 
     // Remove current admin from member list
     final otherMemberIds = List<String>.from(memberIds)..remove(currentAdminId);
@@ -375,8 +375,8 @@ class GroupsFirestoreService {
       throw Exception('Selected user is not a valid member');
     }
 
-    print('Other members available: $otherMemberIds');
-    print('Transferring admin rights to: $newAdminId');
+    debugPrint('Other members available: $otherMemberIds');
+    debugPrint('Transferring admin rights to: $newAdminId');
 
     // Use transaction to ensure atomic operation
     await _firestore.runTransaction((transaction) async {
@@ -432,10 +432,10 @@ class GroupsFirestoreService {
         'member_count': FieldValue.increment(-1),
       });
 
-      print('✓ Transaction prepared successfully');
+      debugPrint('✓ Transaction prepared successfully');
     });
 
-    print('✓ Admin transfer completed: $currentAdminId → $newAdminId');
-    print('=================================');
+    debugPrint('✓ Admin transfer completed: $currentAdminId → $newAdminId');
+    debugPrint('=================================');
   }
 }

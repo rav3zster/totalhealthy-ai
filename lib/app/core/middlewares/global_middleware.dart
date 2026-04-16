@@ -13,11 +13,11 @@ class AuthCheckMiddleware extends GetMiddleware {
       // since middleware doesn't need reactive updates
       final isAuth = authController.isAuthenticated.value;
       if (!isAuth) {
-        print("User not authenticated, redirecting to login");
+        debugPrint("User not authenticated, redirecting to login");
         return const RouteSettings(name: "/login");
       }
     } catch (e) {
-      print("AuthController not found or error: $e");
+      debugPrint("AuthController not found or error: $e");
       return const RouteSettings(name: "/login");
     }
 

@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import '../data/models/user_model.dart';
 import '../data/services/users_firestore_service.dart';
-
 class TestDataHelper {
   static final UsersFirestoreService _userService = UsersFirestoreService();
 
@@ -9,7 +9,7 @@ class TestDataHelper {
   static Future<void> createTestUserData() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      print('No authenticated user found');
+      debugPrint('No authenticated user found');
       return;
     }
 
@@ -38,9 +38,9 @@ class TestDataHelper {
 
     try {
       await _userService.createUserProfile(testUser);
-      print('Test user data created successfully!');
+      debugPrint('Test user data created successfully!');
     } catch (e) {
-      print('Error creating test user data: $e');
+      debugPrint('Error creating test user data: $e');
     }
   }
 
@@ -56,9 +56,9 @@ class TestDataHelper {
         fatLost: 3.0,
         muscleGained: 0.8,
       );
-      print('Test progress updated successfully!');
+      debugPrint('Test progress updated successfully!');
     } catch (e) {
-      print('Error updating test progress: $e');
+      debugPrint('Error updating test progress: $e');
     }
   }
 }

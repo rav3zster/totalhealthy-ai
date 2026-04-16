@@ -29,9 +29,6 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
 
   @override
   Widget build(BuildContext context) {
-    final authController = Get.find<AuthController>();
-    final userId = authController.firebaseUser.value?.uid ?? '';
-
     return Column(
       children: [
         // Header with Weekly Planner Button (Visible to All)
@@ -48,7 +45,7 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFC2D86A).withOpacity(0.3),
+                      color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -131,13 +128,13 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
                       Icon(
                         Icons.restaurant_menu,
                         size: 64,
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withValues(alpha: 0.3),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         "No meals shared yet.",
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white.withValues(alpha: 0.6),
                           fontSize: 16,
                         ),
                       ),
@@ -146,7 +143,7 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
                         Text(
                           'Tap \'Create Meal\' below to start',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Colors.white.withValues(alpha: 0.4),
                             fontSize: 14,
                           ),
                         ),
@@ -155,7 +152,7 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
                         Text(
                           'Only the group admin can add meals.',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Colors.white.withValues(alpha: 0.4),
                             fontSize: 14,
                             fontStyle: FontStyle.italic,
                           ),
@@ -194,7 +191,10 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
             decoration: BoxDecoration(
               color: const Color(0xFF1E1E1E),
               border: Border(
-                top: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
+                top: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  width: 1,
+                ),
               ),
             ),
             child: Container(
@@ -266,7 +266,7 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
         groupCategoryId = groupData?['group_category_id'] as String?;
       }
 
-      print(
+      debugPrint(
         '🚀 Group Details: Navigating to Create Meal with groupCategoryId: $groupCategoryId',
       );
 
@@ -277,7 +277,7 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
             : null,
       );
     } catch (e) {
-      print('❌ Error getting group category ID: $e');
+      debugPrint('❌ Error getting group category ID: $e');
       // Fallback: navigate without group category ID
       Get.toNamed("${Routes.CreateMeal}?id=$userId&from=group_details");
     }
@@ -300,7 +300,7 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
             child: Text(
               DateFormat('MMM d, h:mm a').format(meal.createdAt),
               style: TextStyle(
-                color: Colors.white.withOpacity(0.4),
+                color: Colors.white.withValues(alpha: 0.4),
                 fontSize: 12,
               ),
             ),
@@ -317,12 +317,12 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
               ),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: const Color(0xFFC2D86A).withOpacity(0.3),
+                color: const Color(0xFFC2D86A).withValues(alpha: 0.3),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -389,7 +389,7 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
                             Text(
                               meal.description,
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
+                                color: Colors.white.withValues(alpha: 0.7),
                                 fontSize: 13,
                               ),
                               maxLines: 2,
@@ -435,9 +435,9 @@ class _GroupMealChatViewState extends State<GroupMealChatView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/group_controller.dart';
-import '../../../data/services/dummy_data_service.dart';
 import '../../../widgets/group_card.dart';
 import '../../../routes/app_pages.dart';
 
@@ -14,8 +13,6 @@ class GroupScreen extends GetView<GroupController> {
     // CRITICAL: Persistent controllers - NEVER recreate these
     final TextEditingController groupSearchController = TextEditingController();
     final FocusNode groupSearchFocusNode = FocusNode();
-
-    final groups = DummyDataService.getDummyGroups();
 
     return PopScope(
       // 🔥 THIS IS THE REAL FIX FOR FLUTTER WEB

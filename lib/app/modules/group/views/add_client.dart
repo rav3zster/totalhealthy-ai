@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../../../core/base/constants/appcolor.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../data/services/mock_api_service.dart';
-import '../controllers/group_controller.dart';
 
 class AddClient extends StatefulWidget {
   final String id;
@@ -26,12 +25,13 @@ class _AddClientState extends State<AddClient> {
       });
       String input = searchController.text.trim();
       var phone = int.tryParse(input);
-      
+
       // Use mock API instead of real API
       final response = phone != null
           ? await MockApiService.searchUserByPhone(input)
           : await MockApiService.searchUserByEmail(input);
-      
+
+      if (!mounted) return;
       if (response['statusCode'] == 200) {
         setState(() {
           userData = [response['data']];
@@ -46,7 +46,7 @@ class _AddClientState extends State<AddClient> {
       }
       // }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     } finally {
       setState(() {
         isLoading = false;
@@ -56,19 +56,20 @@ class _AddClientState extends State<AddClient> {
   }
 
   var isAddLoading = false;
-//  {"name": "string", "amount": "string", "unit": "string"}
-  Future<void> addMember(userId) async {
+  //  {"name": "string", "amount": "string", "unit": "string"}
+  Future<void> addMember(String userId) async {
     try {
       setState(() {
         isAddLoading = true;
       });
       Map<String, dynamic> data = {};
 
-      print(data);
+      debugPrint(data.toString());
 
       // Use mock API instead of real API
       final response = await MockApiService.addGroupMember(widget.id, userId);
-      
+
+      if (!mounted) return;
       if (response['statusCode'] == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -85,7 +86,7 @@ class _AddClientState extends State<AddClient> {
         );
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     } finally {
       setState(() {
         isAddLoading = false;
@@ -153,7 +154,7 @@ class _AddClientState extends State<AddClient> {
             //               Container(
             //                   padding: EdgeInsets.all(8),
             //                   decoration: BoxDecoration(
-            //                       color: Color(0XFFCDE26D).withOpacity(0.1),
+            //                       color: Color(0XFFCDE26D).withValues(alpha: 0.1),
             //                       shape: BoxShape.circle),
             //                   child: Icon(
             //                     Icons.calendar_today_outlined,
@@ -180,7 +181,7 @@ class _AddClientState extends State<AddClient> {
             //           //         padding: EdgeInsets.all(8),
             //           //         decoration: BoxDecoration(
             //           //             color:
-            //           //                 Color(0XFFCDE26D).withOpacity(0.1),
+            //           //                 Color(0XFFCDE26D).withValues(alpha: 0.1),
             //           //             shape: BoxShape.circle),
             //           //         child: Icon(
             //           //           Icons.people_outline,
@@ -207,7 +208,6 @@ class _AddClientState extends State<AddClient> {
             //     ),
             //   ),
             // ),
-
             SizedBox(height: 16),
             // Search Box
             Row(
@@ -218,11 +218,13 @@ class _AddClientState extends State<AddClient> {
                     onChanged: (value) {},
                     decoration: InputDecoration(
                       focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50)),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
                       fillColor: Color(0XFF242522),
                       filled: true,
                       enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50)),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
                       hintText: 'Search here...',
                       hintStyle: TextStyle(color: Color(0XFFDBDBDB)),
                       prefixIcon: Icon(Icons.search, color: Color(0XFFDBDBDB)),
@@ -230,17 +232,16 @@ class _AddClientState extends State<AddClient> {
                   ),
                 ),
                 CustomButton(
-                    onPressed: () => submitUser(),
-                    size: ButtonSize.medium,
-                    type: ButtonType.elevated,
-                    child: isLoading
-                        ? Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : Text(
-                            "Search",
-                            style: TextStyle(color: AppColors.buttonText),
-                          )),
+                  onPressed: () => submitUser(),
+                  size: ButtonSize.medium,
+                  type: ButtonType.elevated,
+                  child: isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : Text(
+                          "Search",
+                          style: TextStyle(color: AppColors.buttonText),
+                        ),
+                ),
                 // SizedBox(width: 10),
                 // Icon(Icons.filter_list, color: Colors.white, size: 30),
               ],
@@ -259,26 +260,25 @@ class _AddClientState extends State<AddClient> {
             SizedBox(height: 8),
             // Client List
             isLoading
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
+                ? Center(child: CircularProgressIndicator())
                 : userData.isEmpty
-                    ? Text("No Data Found")
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: userData.length,
-                        itemBuilder: (context, index) {
-                          var data = userData[index];
-                          return buildClientCard(
-                            context,
-                            "${data["phone_number"]}",
-                            "${data["email"]}",
-                            "${data["id"]}",
+                ? Text("No Data Found")
+                : ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: userData.length,
+                    itemBuilder: (context, index) {
+                      var data = userData[index];
+                      return buildClientCard(
+                        context,
+                        "${data["phone_number"]}",
+                        "${data["email"]}",
+                        "${data["id"]}",
 
-                            // Replace with actual image asset
-                          );
-                        }),
+                        // Replace with actual image asset
+                      );
+                    },
+                  ),
           ],
         ),
       ),
@@ -293,9 +293,7 @@ class _AddClientState extends State<AddClient> {
   ) {
     return Card(
       color: Colors.grey[900],
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -335,31 +333,37 @@ class _AddClientState extends State<AddClient> {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                          color: Color(0XFFF5D657), shape: BoxShape.circle),
+                        color: Color(0XFFF5D657),
+                        shape: BoxShape.circle,
+                      ),
                       child: IconButton(
-                        icon: Icon(Icons.phone_outlined,
-                            color: Color(0XFF242522)),
+                        icon: Icon(
+                          Icons.phone_outlined,
+                          color: Color(0XFF242522),
+                        ),
                         onPressed: () {},
                       ),
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
+                    SizedBox(height: 10),
                     Container(
                       decoration: BoxDecoration(
-                          color: Color(0XFFCDE26D), shape: BoxShape.circle),
+                        color: Color(0XFFCDE26D),
+                        shape: BoxShape.circle,
+                      ),
                       child: IconButton(
-                        icon: Icon(Icons.local_post_office_outlined,
-                            color: Color(0XFF242522)),
+                        icon: Icon(
+                          Icons.local_post_office_outlined,
+                          color: Color(0XFF242522),
+                        ),
                         onPressed: () {},
                       ),
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
+                    SizedBox(height: 10),
                     Container(
                       decoration: BoxDecoration(
-                          color: Color(0XFFF5D657), shape: BoxShape.circle),
+                        color: Color(0XFFF5D657),
+                        shape: BoxShape.circle,
+                      ),
                       child: IconButton(
                         icon: Icon(Icons.message, color: Color(0XFF242522)),
                         onPressed: () {},
@@ -379,11 +383,9 @@ class _AddClientState extends State<AddClient> {
                   ? CircularProgressIndicator()
                   : Text(
                       "Add Client",
-                      style: TextStyle(
-                        color: Color(0XFF242522),
-                      ),
+                      style: TextStyle(color: Color(0XFF242522)),
                     ),
-            )
+            ),
           ],
         ),
       ),

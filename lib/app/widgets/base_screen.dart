@@ -7,7 +7,7 @@ import 'drawer_menu.dart';
 import 'phone_nav_bar.dart';
 
 class BaseScreen extends StatefulWidget {
-  BaseScreen({
+  const BaseScreen({
     super.key,
     required this.body,
     this.isDrawer = true,
@@ -20,7 +20,7 @@ class BaseScreen extends StatefulWidget {
     this.backgroundColor = AppColors.white,
   });
   final Widget body;
-  double backgroundheight;
+  final double backgroundheight;
 
   final Widget? floatingActionButton;
   final bool isDrawer;
@@ -35,6 +35,7 @@ class BaseScreen extends StatefulWidget {
 }
 
 class _BaseScreenState extends State<BaseScreen> {
+  // ignore: unused_element
   Future<bool> _onWillPop() async {
     return await showDialog(
           context: context,
@@ -70,18 +71,21 @@ class _BaseScreenState extends State<BaseScreen> {
     return SafeArea(
       child: Scaffold(
         key: _scaffoldKey,
-        bottomNavigationBar:
-            widget.isBottomNavbar == true ? const MobileNavBar() : null,
+        bottomNavigationBar: widget.isBottomNavbar == true
+            ? const MobileNavBar()
+            : null,
         backgroundColor: widget.backgroundColor,
-        floatingActionButton:
-            widget.isfloaingbutton ? widget.floatingActionButton : null,
+        floatingActionButton: widget.isfloaingbutton
+            ? widget.floatingActionButton
+            : null,
         drawer: widget.isDrawer ? const DrawerMenu() : null,
         body: widget.istheme
             ? Column(
                 children: [
                   Container(
-                    constraints:
-                        BoxConstraints(maxHeight: widget.backgroundheight),
+                    constraints: BoxConstraints(
+                      maxHeight: widget.backgroundheight,
+                    ),
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -134,9 +138,7 @@ class _BaseScreenState extends State<BaseScreen> {
                                 fontSize: 22,
                               ),
                             ),
-                            const SizedBox(
-                              width: 20,
-                            ),
+                            const SizedBox(width: 20),
 
                             // Image.asset('assets/Ellipse 2149.png',
                             //     width: 30, height: 50)

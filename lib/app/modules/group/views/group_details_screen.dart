@@ -35,17 +35,17 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
 
     // Load group members when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('🔍 GROUP DETAILS DEBUG - Received arguments: $_groupData');
+      debugPrint('🔍 GROUP DETAILS DEBUG - Received arguments: $_groupData');
       final groupId = _groupData['id'] ?? '';
-      print('🔍 GROUP DETAILS DEBUG - Group ID: $groupId');
+      debugPrint('🔍 GROUP DETAILS DEBUG - Group ID: $groupId');
       if (groupId.isNotEmpty) {
         final controller = Get.find<GroupController>();
-        print(
+        debugPrint(
           '🔍 GROUP DETAILS DEBUG - Calling setCurrentGroup with ID: $groupId',
         );
         controller.setCurrentGroup(groupId);
       } else {
-        print('❌ GROUP DETAILS DEBUG - Group ID is empty!');
+        debugPrint('❌ GROUP DETAILS DEBUG - Group ID is empty!');
       }
     });
   }
@@ -514,14 +514,14 @@ class _GroupDetailsScreenState extends State<GroupDetailsScreen>
             final isSearching =
                 controller.groupMembersSearchQuery.value.isNotEmpty;
 
-            print(
+            debugPrint(
               '🔍 MEMBERS TAB DEBUG - filteredGroupMembers count: ${members.length}',
             );
-            print(
+            debugPrint(
               '🔍 MEMBERS TAB DEBUG - groupMembers count: ${controller.groupMembers.length}',
             );
-            print('🔍 MEMBERS TAB DEBUG - isSearching: $isSearching');
-            print(
+            debugPrint('🔍 MEMBERS TAB DEBUG - isSearching: $isSearching');
+            debugPrint(
               '🔍 MEMBERS TAB DEBUG - isMemberLoading: ${controller.isMemberLoading.value}',
             );
 

@@ -33,7 +33,7 @@ class SwipeScreenView extends GetView<SwipeScreenController> {
                     margin: EdgeInsets.symmetric(horizontal: 3),
                     height: 300,
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.8),
+                      color: Colors.black.withValues(alpha: 0.8),
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(30),
                         topRight: Radius.circular(30),

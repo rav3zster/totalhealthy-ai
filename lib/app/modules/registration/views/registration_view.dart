@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:totalhealthy/app/core/base/controllers/auth_controller.dart';
 import 'package:totalhealthy/app/modules/manage_accounts/views/manage_accounts_views.dart';
 import 'package:totalhealthy/app/widgets/baseWidget.dart';
-import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 import 'package:totalhealthy/app/controllers/user_controller.dart';
 
 import '../../nutrition_goal/views/nutrition_goal_screen.dart';
@@ -24,7 +23,7 @@ class RegistrationView extends StatelessWidget {
             // PreferredSize(
             //   preferredSize: Size.fromHeight(100),
             //   child: AppBar(
-            //     backgroundColor: Color(0XFF000000).withOpacity(0.1),
+            //     backgroundColor: Color(0XFF000000).withValues(alpha: 0.1),
             //     elevation: 0,
             //     centerTitle: true,
             //     title: Text('Profile',

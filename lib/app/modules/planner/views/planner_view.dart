@@ -194,7 +194,7 @@ class _PlannerPageState extends State<PlannerPage> {
                               )
                             : Container(
                                 width: 160,
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 child: const Icon(
                                   Icons.restaurant,
                                   size: 50,
@@ -332,7 +332,7 @@ class _PlannerPageState extends State<PlannerPage> {
 
   Widget _buildWeeklyList() {
     return Obx(() {
-      print(
+      debugPrint(
         '🔄 LIST DEBUG - Rebuilding Weekly List, expanded: ${controller.expandedDays}',
       );
       return ListView.builder(
@@ -458,7 +458,7 @@ class _PlannerPageState extends State<PlannerPage> {
         color: const Color(0xFF262626),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: const Color(0xFFCDE26D).withOpacity(0.1),
+          color: const Color(0xFFCDE26D).withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -470,7 +470,7 @@ class _PlannerPageState extends State<PlannerPage> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFCDE26D).withOpacity(0.1),
+                  color: const Color(0xFFCDE26D).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -497,7 +497,7 @@ class _PlannerPageState extends State<PlannerPage> {
               Text(
                 '${dishes.length} items',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white.withValues(alpha: 0.5),
                   fontSize: 12,
                 ),
               ),
@@ -509,7 +509,7 @@ class _PlannerPageState extends State<PlannerPage> {
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(

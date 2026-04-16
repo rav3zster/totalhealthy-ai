@@ -14,7 +14,7 @@ class DynamicLiveStatsCard extends StatelessWidget {
     final dashboardController = Get.find<ClientDashboardControllers>();
 
     return Obx(() {
-      print(
+      debugPrint(
         "📊 LIVE STATS UI REBUILD → Group: ${dashboardController.selectedGroupId.value}",
       );
 

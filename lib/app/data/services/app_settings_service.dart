@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/app_settings_model.dart';
-
 class AppSettingsService {
   static const String _settingsKey = 'app_settings';
   SharedPreferences? _prefs;
@@ -41,7 +41,7 @@ class AppSettingsService {
     try {
       return AppSettingsModel.fromJson(jsonDecode(jsonString));
     } catch (e) {
-      print('Error loading settings: $e');
+      debugPrint('Error loading settings: $e');
       return AppSettingsModel(
         language: 'English',
         region: 'India',
@@ -60,7 +60,7 @@ class AppSettingsService {
           .doc('app_settings')
           .set(settings.toJson(), SetOptions(merge: true));
     } catch (e) {
-      print('Error syncing settings to Firestore: $e');
+      debugPrint('Error syncing settings to Firestore: $e');
     }
   }
 
@@ -78,7 +78,7 @@ class AppSettingsService {
         return AppSettingsModel.fromJson(doc.data()!);
       }
     } catch (e) {
-      print('Error loading settings from Firestore: $e');
+      debugPrint('Error loading settings from Firestore: $e');
     }
     return null;
   }

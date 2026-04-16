@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
-
 class UsersFirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _collection = 'user';
@@ -19,12 +18,12 @@ class UsersFirestoreService {
             data['id'] = doc.id;
             return UserModel.fromJson(data);
           } catch (e) {
-            print('Error parsing user profile for $uid: $e');
+            debugPrint('Error parsing user profile for $uid: $e');
             return null;
           }
         })
         .handleError((error) {
-          print('Error in getUserProfileStream for $uid: $error');
+          debugPrint('Error in getUserProfileStream for $uid: $error');
           return null;
         });
   }
@@ -47,7 +46,7 @@ class UsersFirestoreService {
         await _firestore.collection(_collection).doc(uid).update(updates);
       }
     } catch (e) {
-      print('Error updating user progress for $uid: $e');
+      debugPrint('Error updating user progress for $uid: $e');
       rethrow;
     }
   }
@@ -64,13 +63,13 @@ class UsersFirestoreService {
               data['id'] = doc.id;
               return UserModel.fromJson(data);
             } catch (e) {
-              print('Error parsing user ${doc.id}: $e');
+              debugPrint('Error parsing user ${doc.id}: $e');
               rethrow;
             }
           }).toList();
         })
         .handleError((error) {
-          print('Error in getUsersStream: $error');
+          debugPrint('Error in getUsersStream: $error');
           return <UserModel>[];
         });
   }
@@ -84,7 +83,7 @@ class UsersFirestoreService {
           return snapshot.docs.length;
         })
         .handleError((error) {
-          print('Error in getTotalUsersCountStream: $error');
+          debugPrint('Error in getTotalUsersCountStream: $error');
           return 0;
         });
   }
@@ -100,7 +99,7 @@ class UsersFirestoreService {
 
       await _firestore.collection(_collection).doc(user.id).set(user.toJson());
     } catch (e) {
-      print('Error creating user profile for ${user.id}: $e');
+      debugPrint('Error creating user profile for ${user.id}: $e');
       rethrow;
     }
   }
@@ -116,7 +115,7 @@ class UsersFirestoreService {
       }
       return null;
     } catch (e) {
-      print('Error fetching user profile for $uid: $e');
+      debugPrint('Error fetching user profile for $uid: $e');
       return null;
     }
   }
@@ -135,7 +134,7 @@ class UsersFirestoreService {
           .doc(user.id)
           .update(user.toJson());
     } catch (e) {
-      print('Error updating user profile for ${user.id}: $e');
+      debugPrint('Error updating user profile for ${user.id}: $e');
       rethrow;
     }
   }
@@ -146,7 +145,7 @@ class UsersFirestoreService {
       final snapshot = await _firestore.collection(_collection).get();
       return snapshot.docs.length;
     } catch (e) {
-      print('Error fetching total users count: $e');
+      debugPrint('Error fetching total users count: $e');
       return 0;
     }
   }
@@ -164,13 +163,13 @@ class UsersFirestoreService {
               data['id'] = doc.id;
               return UserModel.fromJson(data);
             } catch (e) {
-              print('Error parsing user ${doc.id}: $e');
+              debugPrint('Error parsing user ${doc.id}: $e');
               rethrow;
             }
           }).toList();
         })
         .handleError((error) {
-          print('Error in getUsersByRoleStream: $error');
+          debugPrint('Error in getUsersByRoleStream: $error');
           return <UserModel>[];
         });
   }
@@ -188,13 +187,13 @@ class UsersFirestoreService {
               data['id'] = doc.id;
               return UserModel.fromJson(data);
             } catch (e) {
-              print('Error parsing client ${doc.id}: $e');
+              debugPrint('Error parsing client ${doc.id}: $e');
               rethrow;
             }
           }).toList();
         })
         .handleError((error) {
-          print('Error in getTrainerClientsStream: $error');
+          debugPrint('Error in getTrainerClientsStream: $error');
           return <UserModel>[];
         });
   }
@@ -206,7 +205,7 @@ class UsersFirestoreService {
         'assignedTrainerId': trainerId,
       });
     } catch (e) {
-      print('Error assigning client $clientId to trainer $trainerId: $e');
+      debugPrint('Error assigning client $clientId to trainer $trainerId: $e');
       rethrow;
     }
   }
@@ -218,7 +217,7 @@ class UsersFirestoreService {
         'assignedTrainerId': FieldValue.delete(),
       });
     } catch (e) {
-      print('Error unassigning client $clientId: $e');
+      debugPrint('Error unassigning client $clientId: $e');
       rethrow;
     }
   }

@@ -67,7 +67,7 @@ class DynamicProfileHeader extends StatelessWidget {
                 controller.profileImage,
               ),
               onBackgroundImageError: controller.profileImage.isNotEmpty
-                  ? (_, __) {
+                  ? (_, _) {
                       // Image failed to load
                     }
                   : null,
@@ -390,7 +390,7 @@ class _GroupDropdown extends StatelessWidget {
                   Get.find<ClientDashboardControllers>();
               dashboardController.enterGroupMode(group.id!, group.name);
             } catch (e) {
-              print('Error entering group mode: $e');
+              debugPrint('Error entering group mode: $e');
               // Fallback: Navigate to weekly planner
               Get.toNamed(
                 Routes.WEEKLY_MEAL_PLANNER,

@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 import '../../core/base/controllers/auth_controller.dart';
 import '../../controllers/user_controller.dart';
-
 /// Centralized Role-Based Access Control (RBAC) Service
 /// Enforces strict permission rules for Advisor and Member roles
 class RolePermissionsService {
@@ -28,7 +28,7 @@ class RolePermissionsService {
       final authController = Get.find<AuthController>();
       return authController.getCurrentUser();
     } catch (e) {
-      print("❌ RolePermissionsService: Failed to get current user: $e");
+      debugPrint("❌ RolePermissionsService: Failed to get current user: $e");
       return null;
     }
   }
@@ -37,7 +37,7 @@ class RolePermissionsService {
   bool get isAdvisor {
     final user = _getCurrentUser();
     final advisorStatus = user?.isAdvisor ?? false;
-    print(
+    debugPrint(
       "🔑 RBAC Check: User: ${user?.fullName}, Role: ${user?.role}, IsAdvisor: $advisorStatus",
     );
     return advisorStatus;
@@ -263,8 +263,8 @@ class RolePermissionsService {
     Set<String> currentMemberIds,
     Set<String> pendingInviteIds,
   ) {
-    print("\n🔍 FILTER DEBUG:");
-    print("Total users to filter: ${allUsers.length}");
+    debugPrint("\n🔍 FILTER DEBUG:");
+    debugPrint("Total users to filter: ${allUsers.length}");
 
     int excludedByMembership = 0;
     int excludedByPending = 0;
@@ -285,7 +285,7 @@ class RolePermissionsService {
 
       // Check if role is null or empty - INCLUDE them (they can be invited)
       if (user.role == null || user.role!.isEmpty) {
-        print("  ✓ User ${user.username} included (no role assigned)");
+        debugPrint("  ✓ User ${user.username} included (no role assigned)");
         return true;
       }
 
@@ -295,7 +295,7 @@ class RolePermissionsService {
 
       if (isExcludedRole) {
         excludedByRole++;
-        print("  ⚠️ User ${user.username} excluded by role: ${user.role}");
+        debugPrint("  ⚠️ User ${user.username} excluded by role: ${user.role}");
         return false;
       }
 
@@ -303,10 +303,10 @@ class RolePermissionsService {
       return true;
     }).toList();
 
-    print("Excluded by membership: $excludedByMembership");
-    print("Excluded by pending invite: $excludedByPending");
-    print("Excluded by role type (admin/advisor): $excludedByRole");
-    print("Final result: ${result.length} users");
+    debugPrint("Excluded by membership: $excludedByMembership");
+    debugPrint("Excluded by pending invite: $excludedByPending");
+    debugPrint("Excluded by role type (admin/advisor): $excludedByRole");
+    debugPrint("Final result: ${result.length} users");
 
     return result;
   }

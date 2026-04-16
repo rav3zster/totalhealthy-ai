@@ -113,7 +113,7 @@ class _DuplicateDayDialogState extends State<DuplicateDayDialog> {
                                     ? '${sourcePlan!.mealCount} meal(s) assigned'
                                     : 'No meals assigned',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.6),
+                                  color: Colors.white.withValues(alpha: 0.6),
                                   fontSize: 12,
                                 ),
                               ),
@@ -129,10 +129,10 @@ class _DuplicateDayDialogState extends State<DuplicateDayDialog> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.1),
+                        color: Colors.orange.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Colors.orange.withOpacity(0.3),
+                          color: Colors.orange.withValues(alpha: 0.3),
                           width: 1,
                         ),
                       ),
@@ -148,7 +148,7 @@ class _DuplicateDayDialogState extends State<DuplicateDayDialog> {
                             child: Text(
                               'This day has no meals to duplicate',
                               style: TextStyle(
-                                color: Colors.orange.withOpacity(0.9),
+                                color: Colors.orange.withValues(alpha: 0.9),
                                 fontSize: 13,
                               ),
                             ),
@@ -229,8 +229,8 @@ class _DuplicateDayDialogState extends State<DuplicateDayDialog> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: enabled
-                ? const Color(0xFFC2D86A).withOpacity(0.3)
-                : Colors.white.withOpacity(0.05),
+                ? const Color(0xFFC2D86A).withValues(alpha: 0.3)
+                : Colors.white.withValues(alpha: 0.05),
             width: 1,
           ),
         ),
@@ -240,15 +240,15 @@ class _DuplicateDayDialogState extends State<DuplicateDayDialog> {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: enabled
-                    ? const Color(0xFFC2D86A).withOpacity(0.2)
-                    : Colors.white.withOpacity(0.05),
+                    ? const Color(0xFFC2D86A).withValues(alpha: 0.2)
+                    : Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 icon,
                 color: enabled
                     ? const Color(0xFFC2D86A)
-                    : Colors.white.withOpacity(0.3),
+                    : Colors.white.withValues(alpha: 0.3),
                 size: 20,
               ),
             ),
@@ -262,7 +262,7 @@ class _DuplicateDayDialogState extends State<DuplicateDayDialog> {
                     style: TextStyle(
                       color: enabled
                           ? Colors.white
-                          : Colors.white.withOpacity(0.4),
+                          : Colors.white.withValues(alpha: 0.4),
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
@@ -272,8 +272,8 @@ class _DuplicateDayDialogState extends State<DuplicateDayDialog> {
                     subtitle,
                     style: TextStyle(
                       color: enabled
-                          ? Colors.white.withOpacity(0.6)
-                          : Colors.white.withOpacity(0.3),
+                          ? Colors.white.withValues(alpha: 0.6)
+                          : Colors.white.withValues(alpha: 0.3),
                       fontSize: 12,
                     ),
                   ),
@@ -284,7 +284,7 @@ class _DuplicateDayDialogState extends State<DuplicateDayDialog> {
               Icons.arrow_forward_ios,
               color: enabled
                   ? const Color(0xFFC2D86A)
-                  : Colors.white.withOpacity(0.2),
+                  : Colors.white.withValues(alpha: 0.2),
               size: 16,
             ),
           ],

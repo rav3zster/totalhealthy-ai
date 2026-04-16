@@ -263,7 +263,7 @@ class GroupCategoriesView extends GetView<GroupCategoriesController> {
     );
   }
 
-  Widget _buildCategoryCard(category, int index) {
+  Widget _buildCategoryCard(dynamic category, int index) {
     return Builder(
       builder: (context) => TweenAnimationBuilder<double>(
         duration: Duration(milliseconds: 300 + (index * 50)),
@@ -609,7 +609,7 @@ class GroupCategoriesView extends GetView<GroupCategoriesController> {
     );
   }
 
-  void _showDeleteDialog(category) {
+  void _showDeleteDialog(dynamic category) {
     Get.dialog(
       Builder(
         builder: (context) => AlertDialog(

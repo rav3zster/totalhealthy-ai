@@ -253,14 +253,14 @@ class _SimpleRealTimeSearchBarState extends State<SimpleRealTimeSearchBar> {
                 contentPadding: EdgeInsets.zero,
               ),
               onChanged: (value) {
-                print(
+                debugPrint(
                   '🔤 WIDGET DEBUG - TextField onChanged called with: "$value"',
                 );
                 // CRITICAL FIX: Update searchQuery immediately for reactive UI (clear button, etc.)
                 widget.searchQuery.value = value;
-                print('🔤 WIDGET DEBUG - Calling onSearchChanged callback');
+                debugPrint('🔤 WIDGET DEBUG - Calling onSearchChanged callback');
                 widget.onSearchChanged(value);
-                print('🔤 WIDGET DEBUG - onSearchChanged callback completed');
+                debugPrint('🔤 WIDGET DEBUG - onSearchChanged callback completed');
               },
             ),
           ),

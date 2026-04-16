@@ -152,7 +152,7 @@ class IOSStylePageTransition extends CustomTransition {
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(
+                  color: Colors.black.withValues(alpha: 
                     0.25 * (1.0 - shadowAnimation.value),
                   ),
                   blurRadius: 10.0,

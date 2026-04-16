@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'group_categories_firestore_service.dart';
-
 class UserInitializationService {
   final GroupCategoriesFirestoreService _groupCategoriesService =
       GroupCategoriesFirestoreService();
@@ -21,12 +21,12 @@ class UserInitializationService {
       if (existingCategories.isEmpty) {
         // Initialize default group categories
         await _groupCategoriesService.initializeDefaultGroupCategories(userId);
-        print('✓ Default group categories initialized for user: $userId');
+        debugPrint('✓ Default group categories initialized for user: $userId');
       } else {
-        print('✓ User already has group categories');
+        debugPrint('✓ User already has group categories');
       }
     } catch (e) {
-      print('⚠️ Failed to initialize user defaults: $e');
+      debugPrint('⚠️ Failed to initialize user defaults: $e');
       rethrow;
     }
   }

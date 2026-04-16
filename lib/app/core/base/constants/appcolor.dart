@@ -22,11 +22,11 @@ class AppColors {
   static const Color lightGrey = Color(0xFFEFEFEF); // Add the new color
   static const Color customOrange = Color(0xFFFF9A2F); // Add the new color
   static const Color customGreen = Color(0xFF046A38);
-  static const Color customGreen2 = Color(0xf00a8901);
-  static const Color pinklight = Color(0xfffc0a3f3);
-  static const Color pinkText = Color(0xfffa889dc);
+  static const Color customGreen2 = Color(0xFF0A8901);
+  static const Color pinklight = Color(0xFFFC0A3F);
+  static const Color pinkText = Color(0xFFFA889D);
 
-  static const Color pinkdark = Color(0xfffa989dc);
+  static const Color pinkdark = Color(0xFFFA989D);
 
   static const Color backgroundGreen = Color(0xEBEAFFE9);
   static const Color primarygreen = Color(0xEBCCFAC8); // Add the new color

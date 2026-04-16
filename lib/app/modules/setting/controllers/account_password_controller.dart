@@ -276,6 +276,7 @@ class AccountPasswordController extends GetxController {
   }
 
   /// Check if reauthentication is needed (updated for two-step password flow)
+  // ignore: unused_element
   bool _needsReauth() {
     return emailController.text.trim() != _originalEmail ||
         (isCurrentPasswordVerified.value && passwordController.text.isNotEmpty);
@@ -454,6 +455,7 @@ class AccountPasswordController extends GetxController {
   }
 
   /// Validate all form data with enhanced checks
+  // ignore: unused_element
   bool _validateAllData() {
     _validateUsername();
     _validateEmail();
@@ -707,13 +709,13 @@ class AccountPasswordController extends GetxController {
   /// Update password in Firebase Auth with comprehensive validation
   Future<bool> _updatePassword(String newPassword) async {
     try {
-      print(
+      debugPrint(
         'DEBUG: _updatePassword called with password length: ${newPassword.length}',
       );
 
       final user = _auth.currentUser;
       if (user == null) {
-        print('DEBUG: No current user found');
+        debugPrint('DEBUG: No current user found');
         Get.snackbar(
           'Authentication Error',
           'No authenticated user found. Please log in again.',
@@ -725,7 +727,7 @@ class AccountPasswordController extends GetxController {
 
       // Validate password before attempting update
       if (!_isPasswordValid(newPassword)) {
-        print('DEBUG: Password validation failed');
+        debugPrint('DEBUG: Password validation failed');
         Get.snackbar(
           'Invalid Password',
           'Password must be at least 6 characters and contain both letters and numbers.',
@@ -737,7 +739,7 @@ class AccountPasswordController extends GetxController {
 
       // Validate password confirmation
       if (!_isPasswordConfirmationValid()) {
-        print('DEBUG: Password confirmation validation failed');
+        debugPrint('DEBUG: Password confirmation validation failed');
         Get.snackbar(
           'Password Mismatch',
           'Password and confirmation password do not match.',
@@ -747,11 +749,11 @@ class AccountPasswordController extends GetxController {
         return false;
       }
 
-      print('DEBUG: About to call user.updatePassword()');
+      debugPrint('DEBUG: About to call user.updatePassword()');
       // Update password in Firebase Auth
       await user.updatePassword(newPassword);
 
-      print('DEBUG: Password update successful');
+      debugPrint('DEBUG: Password update successful');
       Get.snackbar(
         'Password Updated',
         'Your password has been updated successfully.',
@@ -762,7 +764,7 @@ class AccountPasswordController extends GetxController {
 
       return true;
     } on FirebaseAuthException catch (e) {
-      print('DEBUG: FirebaseAuthException: ${e.code} - ${e.message}');
+      debugPrint('DEBUG: FirebaseAuthException: ${e.code} - ${e.message}');
       String errorTitle = 'Password Update Failed';
       String errorMessage = 'Failed to update password.';
 
@@ -861,13 +863,13 @@ class AccountPasswordController extends GetxController {
   /// Save profile changes (excluding password changes)
   Future<void> saveChanges() async {
     try {
-      print('=== SAVE PROFILE CHANGES DEBUG ===');
-      print('usernameController.text: "${usernameController.text}"');
-      print('emailController.text: "${emailController.text}"');
-      print('contactController.text: "${contactController.text}"');
-      print('canSave: $canSave');
-      print('_hasChanges(): ${_hasChanges()}');
-      print('hasValidationErrors: $hasValidationErrors');
+      debugPrint('=== SAVE PROFILE CHANGES DEBUG ===');
+      debugPrint('usernameController.text: "${usernameController.text}"');
+      debugPrint('emailController.text: "${emailController.text}"');
+      debugPrint('contactController.text: "${contactController.text}"');
+      debugPrint('canSave: $canSave');
+      debugPrint('_hasChanges(): ${_hasChanges()}');
+      debugPrint('hasValidationErrors: $hasValidationErrors');
 
       // Step 1: Validate all form data first (excluding password fields)
       _validateUsername();
@@ -875,7 +877,7 @@ class AccountPasswordController extends GetxController {
       _validateContact();
 
       if (hasValidationErrors) {
-        print('DEBUG: Validation failed');
+        debugPrint('DEBUG: Validation failed');
         Get.snackbar(
           'Validation Error',
           'Please fix all validation errors before saving.',
@@ -892,7 +894,7 @@ class AccountPasswordController extends GetxController {
           contactController.text.trim() != _originalContact;
 
       if (!hasNonPasswordChanges) {
-        print('DEBUG: No profile changes detected');
+        debugPrint('DEBUG: No profile changes detected');
         Get.snackbar(
           'No Changes',
           'No profile changes detected to save.',
@@ -911,8 +913,8 @@ class AccountPasswordController extends GetxController {
           contactController.text.trim() != _originalContact ||
           needsEmailUpdate; // Email also needs to be updated in Firestore
 
-      print('DEBUG: needsEmailUpdate: $needsEmailUpdate');
-      print('DEBUG: needsProfileUpdate: $needsProfileUpdate');
+      debugPrint('DEBUG: needsEmailUpdate: $needsEmailUpdate');
+      debugPrint('DEBUG: needsProfileUpdate: $needsProfileUpdate');
 
       // Step 4: Handle reauthentication for email changes
       if (needsEmailUpdate) {
@@ -996,7 +998,7 @@ class AccountPasswordController extends GetxController {
             );
           } catch (e) {
             // Non-critical error - data refresh failed but updates were successful
-            print('Warning: Failed to refresh user data: $e');
+            debugPrint('Warning: Failed to refresh user data: $e');
           }
 
           // Show success message
@@ -1075,11 +1077,11 @@ class AccountPasswordController extends GetxController {
 
   /// Check if save button should be enabled (for non-password profile updates)
   bool get canSave {
-    print('=== CANSAVE DEBUG (Profile Updates Only) ===');
+    debugPrint('=== CANSAVE DEBUG (Profile Updates Only) ===');
 
     // Don't allow save if currently saving
     if (isSaving.value) {
-      print('canSave: false - currently saving');
+      debugPrint('canSave: false - currently saving');
       return false;
     }
 
@@ -1090,20 +1092,20 @@ class AccountPasswordController extends GetxController {
         contactController.text.trim() != _originalContact;
 
     if (!hasNonPasswordChanges) {
-      print('canSave: false - no non-password changes detected');
+      debugPrint('canSave: false - no non-password changes detected');
       return false;
     }
 
     // Don't allow save if there are validation errors (excluding password fields)
     if (hasValidationErrors) {
-      print('canSave: false - validation errors in profile fields');
-      print('  usernameError: "${usernameError.value}"');
-      print('  emailError: "${emailError.value}"');
-      print('  contactError: "${contactError.value}"');
+      debugPrint('canSave: false - validation errors in profile fields');
+      debugPrint('  usernameError: "${usernameError.value}"');
+      debugPrint('  emailError: "${emailError.value}"');
+      debugPrint('  contactError: "${contactError.value}"');
       return false;
     }
 
-    print('canSave: true - profile changes ready to save');
+    debugPrint('canSave: true - profile changes ready to save');
     return true;
   }
 
@@ -1132,12 +1134,12 @@ class AccountPasswordController extends GetxController {
   /// Dedicated method to change password independently
   Future<void> changePassword() async {
     try {
-      print('=== CHANGE PASSWORD DEBUG ===');
-      print(
+      debugPrint('=== CHANGE PASSWORD DEBUG ===');
+      debugPrint(
         'currentPasswordController.text: "${currentPasswordController.text}"',
       );
-      print('passwordController.text: "${passwordController.text}"');
-      print(
+      debugPrint('passwordController.text: "${passwordController.text}"');
+      debugPrint(
         'confirmPasswordController.text: "${confirmPasswordController.text}"',
       );
 
@@ -1197,24 +1199,24 @@ class AccountPasswordController extends GetxController {
       isChangingPassword.value = true;
 
       // Step 4: Reauthenticate with current password
-      print('DEBUG: Starting reauthentication for password change');
+      debugPrint('DEBUG: Starting reauthentication for password change');
       final reauthSuccess = await _reauthenticateUser(
         currentPasswordController.text,
       );
 
       if (!reauthSuccess) {
-        print('DEBUG: Reauthentication failed');
+        debugPrint('DEBUG: Reauthentication failed');
         return;
       }
 
       // Step 5: Update password in Firebase
-      print('DEBUG: Reauthentication successful, updating password');
+      debugPrint('DEBUG: Reauthentication successful, updating password');
       final passwordUpdateSuccess = await _updatePassword(
         passwordController.text,
       );
 
       if (passwordUpdateSuccess) {
-        print('DEBUG: Password update successful');
+        debugPrint('DEBUG: Password update successful');
 
         // Reset password change flow
         isPasswordEditable.value = false;
@@ -1243,7 +1245,7 @@ class AccountPasswordController extends GetxController {
           duration: const Duration(seconds: 3),
         );
       } else {
-        print('DEBUG: Password update failed');
+        debugPrint('DEBUG: Password update failed');
         Get.snackbar(
           'Password Change Failed',
           'Failed to update password. Please try again.',
@@ -1252,7 +1254,7 @@ class AccountPasswordController extends GetxController {
         );
       }
     } catch (e) {
-      print('DEBUG: Exception during password change: $e');
+      debugPrint('DEBUG: Exception during password change: $e');
       Get.snackbar(
         'Password Change Error',
         'An error occurred while changing password: ${e.toString()}',
@@ -1278,20 +1280,20 @@ class AccountPasswordController extends GetxController {
 
   /// Debug method to check current state
   void debugCurrentState() {
-    print('=== DEBUG STATE ===');
-    print('isPasswordEditable: ${isPasswordEditable.value}');
-    print('isCurrentPasswordVerified: ${isCurrentPasswordVerified.value}');
-    print('canEditNewPassword: ${canEditNewPassword.value}');
-    print('passwordController.text: "${passwordController.text}"');
-    print(
+    debugPrint('=== DEBUG STATE ===');
+    debugPrint('isPasswordEditable: ${isPasswordEditable.value}');
+    debugPrint('isCurrentPasswordVerified: ${isCurrentPasswordVerified.value}');
+    debugPrint('canEditNewPassword: ${canEditNewPassword.value}');
+    debugPrint('passwordController.text: "${passwordController.text}"');
+    debugPrint(
       'confirmPasswordController.text: "${confirmPasswordController.text}"',
     );
-    print(
+    debugPrint(
       'currentPasswordController.text: "${currentPasswordController.text}"',
     );
-    print('canSave: $canSave');
-    print('_hasChanges(): ${_hasChanges()}');
-    print('hasValidationErrors: $hasValidationErrors');
-    print('==================');
+    debugPrint('canSave: $canSave');
+    debugPrint('_hasChanges(): ${_hasChanges()}');
+    debugPrint('hasValidationErrors: $hasValidationErrors');
+    debugPrint('==================');
   }
 }

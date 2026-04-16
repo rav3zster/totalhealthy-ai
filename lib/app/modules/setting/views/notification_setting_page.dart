@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-
-
 
 class notification_SettingsScreen extends StatefulWidget {
   const notification_SettingsScreen({super.key});
@@ -16,12 +13,10 @@ class _SettingsScreenState extends State<notification_SettingsScreen> {
   String selectedRegion = 'India';
   String selectedTheme = 'Dark';
 
-  String selected_meal="on";
-  String selected_water="off";
-  String selected_expercise="on";
-  String selected_notification="on";
-
-
+  String selected_meal = "on";
+  String selected_water = "off";
+  String selected_expercise = "on";
+  String selected_notification = "on";
 
   @override
   Widget build(BuildContext context) {
@@ -31,12 +26,16 @@ class _SettingsScreenState extends State<notification_SettingsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: const Icon(
-            Icons.arrow_back_ios_new_outlined, color: Colors.white),
+          Icons.arrow_back_ios_new_outlined,
+          color: Colors.white,
+        ),
         actions: [
-          IconButton(onPressed: () {
-            Get.back();
-          },
-              icon: Icon(Icons.search, size: 35, color: Colors.white,))
+          IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: Icon(Icons.search, size: 35, color: Colors.white),
+          ),
         ],
         title: const SizedBox(
           width: double.infinity,
@@ -45,14 +44,15 @@ class _SettingsScreenState extends State<notification_SettingsScreen> {
             // Adjust this value to control the left shift
             child: Text(
               'Notifications',
-              style: TextStyle(color: Color(0XFFFFFFFF),
-                  fontFamily: 'inter',
-                  fontSize: 24,
-                  fontWeight: FontWeight.w400),
+              style: TextStyle(
+                color: Color(0XFFFFFFFF),
+                fontFamily: 'inter',
+                fontSize: 24,
+                fontWeight: FontWeight.w400,
+              ),
             ),
           ),
         ),
-
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -62,7 +62,7 @@ class _SettingsScreenState extends State<notification_SettingsScreen> {
             SettingOption(
               title: 'Meal Reminder',
               value: selected_meal,
-              items: ['on','off'],
+              items: ['on', 'off'],
               onChanged: (value) {
                 setState(() {
                   selectedLanguage = value!;
@@ -72,7 +72,7 @@ class _SettingsScreenState extends State<notification_SettingsScreen> {
             SettingOption(
               title: 'Water Reminder ',
               value: selected_water,
-              items:  ['on','off'],
+              items: ['on', 'off'],
               onChanged: (value) {
                 setState(() {
                   selectedRegion = value!;
@@ -82,7 +82,7 @@ class _SettingsScreenState extends State<notification_SettingsScreen> {
             SettingOption(
               title: 'Exercise Reminder',
               value: selected_expercise,
-              items:  ['on','off'],
+              items: ['on', 'off'],
               onChanged: (value) {
                 setState(() {
                   selectedTheme = value!;
@@ -92,7 +92,7 @@ class _SettingsScreenState extends State<notification_SettingsScreen> {
             SettingOption(
               title: 'Update Notification',
               value: selected_notification,
-              items:  ['on','off'],
+              items: ['on', 'off'],
               onChanged: (value) {
                 setState(() {
                   selectedTheme = value!;
@@ -112,7 +112,8 @@ class SettingOption extends StatelessWidget {
   final List<String> items;
   final ValueChanged<String?> onChanged;
 
-  const SettingOption({super.key, 
+  const SettingOption({
+    super.key,
     required this.title,
     required this.value,
     required this.items,
@@ -126,10 +127,7 @@ class SettingOption extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: TextStyle(color: Colors.white, fontSize: 16),
-          ),
+          Text(title, style: TextStyle(color: Colors.white, fontSize: 16)),
           SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
@@ -146,10 +144,7 @@ class SettingOption extends StatelessWidget {
               style: TextStyle(color: Color(0xffCCE16B), fontSize: 16),
               onChanged: onChanged,
               items: items.map((item) {
-                return DropdownMenuItem(
-                  value: item,
-                  child: Text(item),
-                );
+                return DropdownMenuItem(value: item, child: Text(item));
               }).toList(),
             ),
           ),

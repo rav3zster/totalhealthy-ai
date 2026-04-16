@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-
+import 'package:flutter/foundation.dart';
 class SignupController extends GetxController {
   //TODO: Implement SignupController
   // Gender selection state
@@ -28,10 +28,10 @@ class SignupController extends GetxController {
         email.value.isNotEmpty &&
         password.value.isNotEmpty) {
       // Process the signup logic here
-      print("Sign up successful");
+      debugPrint("Sign up successful");
     } else {
       // Handle form validation failure
-      print("Please fill all the fields");
+      debugPrint("Please fill all the fields");
     }
   }
 }

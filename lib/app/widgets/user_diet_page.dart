@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:totalhealthy/app/modules/meals_details/controllers/meals_details_controller.dart';
 import 'package:totalhealthy/app/modules/user_diet_screen/controllers/user_diet_screen_controllers.dart';
-import 'package:easy_date_timeline/easy_date_timeline.dart';
-import 'package:totalhealthy/app/widgets/phone_nav_bar.dart';
 import 'package:totalhealthy/app/widgets/profile_card.dart';
 import '../core/base/constants/appcolor.dart';
 import '../core/base/controllers/auth_controller.dart';
@@ -51,6 +48,7 @@ class _UserDietPageState extends State<UserDietPage> {
         "admin",
       );
 
+      if (!mounted) return;
       if (response['statusCode'] == 200) {
         setState(() {
           dataList = List<Map<String, dynamic>>.from(response['data']);
@@ -67,7 +65,7 @@ class _UserDietPageState extends State<UserDietPage> {
         );
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     } finally {
       setState(() {
         isLoading = false;
@@ -99,6 +97,7 @@ class _UserDietPageState extends State<UserDietPage> {
       // Use mock API instead of real API
       final response = await MockApiService.createMeal(data);
 
+      if (!mounted) return;
       if (response['statusCode'] == 200) {
         setState(() {
           isCheck = {for (int i = 0; i < dataList.length; i++) i: false};
@@ -121,7 +120,7 @@ class _UserDietPageState extends State<UserDietPage> {
         );
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     } finally {
       setState(() {
         isGetLoading = false;
@@ -141,7 +140,7 @@ class _UserDietPageState extends State<UserDietPage> {
         return categoriesList.contains(selectedCategory);
       }).toList();
     });
-    print(filteredRecipes);
+    debugPrint(filteredRecipes.toString());
   }
 
   int selectedIndex = 0;
@@ -280,7 +279,7 @@ class _UserDietPageState extends State<UserDietPage> {
                             } else {
                               selectedMealIds.remove(data['_id'] ?? '0');
                             }
-                            print(selectedMealIds);
+                            debugPrint(selectedMealIds.toString());
                           });
                         },
                         data: data,

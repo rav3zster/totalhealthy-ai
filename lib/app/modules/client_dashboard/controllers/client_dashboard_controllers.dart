@@ -10,12 +10,9 @@ import '../../../data/models/group_model.dart';
 import '../../../data/services/dummy_data_service.dart';
 import '../../../data/services/meals_firestore_service.dart';
 import '../../../data/services/groups_firestore_service.dart';
-import '../../../data/services/meal_categories_firestore_service.dart';
 
 class ClientDashboardControllers extends GetxController {
   final MealsFirestoreService _mealsService = MealsFirestoreService();
-  final MealCategoriesFirestoreService _categoriesService =
-      MealCategoriesFirestoreService();
   final GetStorage _storage = GetStorage();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -95,7 +92,7 @@ class ClientDashboardControllers extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    print("ClientDashboardControllers: onInit called");
+    debugPrint("ClientDashboardControllers: onInit called");
     _loadCachedMeals();
 
     // CRITICAL: Wait for auth state before loading data
@@ -106,7 +103,7 @@ class ClientDashboardControllers extends GetxController {
     // Safety mechanism: Force clear loading state after 15 seconds
     Future.delayed(const Duration(seconds: 15), () {
       if (isLoading.value) {
-        print(
+        debugPrint(
           "ClientDashboardControllers: Timeout reached, clearing loading state",
         );
         isLoading.value = false;
@@ -161,11 +158,11 @@ class ClientDashboardControllers extends GetxController {
   }
 
   void _listenToAuthState() {
-    print("ClientDashboardControllers: Setting up auth state listener");
+    debugPrint("ClientDashboardControllers: Setting up auth state listener");
 
     // Listen to Firebase Auth state changes
     _authSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
-      print(
+      debugPrint(
         "ClientDashboardControllers: Auth state changed - User: ${user?.uid}",
       );
 
@@ -186,7 +183,9 @@ class ClientDashboardControllers extends GetxController {
   }
 
   void _clearDataForUnauthenticatedUser() {
-    print("ClientDashboardControllers: Clearing data for unauthenticated user");
+    debugPrint(
+      "ClientDashboardControllers: Clearing data for unauthenticated user",
+    );
     meals.clear();
     isLoading.value = false;
     isRefreshing.value = false;
@@ -197,19 +196,21 @@ class ClientDashboardControllers extends GetxController {
 
   Future<void> _initData() async {
     if (_isInitialized) {
-      print("ClientDashboardControllers: Already initialized, skipping");
+      debugPrint("ClientDashboardControllers: Already initialized, skipping");
       return;
     }
 
-    print("ClientDashboardControllers: Starting data initialization");
+    debugPrint("ClientDashboardControllers: Starting data initialization");
 
     try {
       // Only show loading if we don't have cached data
       if (meals.isEmpty) {
-        print("ClientDashboardControllers: No cached data, showing loading");
+        debugPrint(
+          "ClientDashboardControllers: No cached data, showing loading",
+        );
         isLoading.value = true;
       } else {
-        print(
+        debugPrint(
           "ClientDashboardControllers: Using cached data (${meals.length} meals)",
         );
       }
@@ -219,14 +220,14 @@ class ClientDashboardControllers extends GetxController {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         // Don't throw error, just wait for auth state
-        print(
+        debugPrint(
           "ClientDashboardControllers: No authenticated user, waiting for auth",
         );
         isLoading.value = false;
         return;
       }
 
-      print("ClientDashboardControllers: User authenticated: ${user.uid}");
+      debugPrint("ClientDashboardControllers: User authenticated: ${user.uid}");
       _currentUserId = user.uid;
 
       // Seed dummy data in background (don't wait for it)
@@ -236,11 +237,11 @@ class ClientDashboardControllers extends GetxController {
       await _setupMealsStream(user.uid);
 
       _isInitialized = true;
-      print(
+      debugPrint(
         "ClientDashboardControllers: Initialization completed successfully",
       );
     } catch (e) {
-      print("ClientDashboardControllers: Initialization failed: $e");
+      debugPrint("ClientDashboardControllers: Initialization failed: $e");
       error.value = 'Failed to initialize: ${e.toString()}';
       isLoading.value = false;
       isRefreshing.value = false;
@@ -257,7 +258,7 @@ class ClientDashboardControllers extends GetxController {
 
   Future<void> _setupMealsStream(String userId) async {
     try {
-      print(
+      debugPrint(
         "ClientDashboardControllers: Setting up meals stream for user: $userId",
       );
 
@@ -277,7 +278,7 @@ class ClientDashboardControllers extends GetxController {
       // 2. Fetch User's Groups and Subscribe to Group Meals
       try {
         final fetchedGroups = await _groupsService.getUserGroups(userId);
-        print(
+        debugPrint(
           "ClientDashboardControllers: Found ${fetchedGroups.length} groups for user",
         );
 
@@ -293,12 +294,16 @@ class ClientDashboardControllers extends GetxController {
           }
         }
       } catch (e) {
-        print("ClientDashboardControllers: Error fetching user groups: $e");
+        debugPrint(
+          "ClientDashboardControllers: Error fetching user groups: $e",
+        );
       }
 
-      print("ClientDashboardControllers: Meals stream setup completed");
+      debugPrint("ClientDashboardControllers: Meals stream setup completed");
     } catch (e) {
-      print("ClientDashboardControllers: Failed to setup meals stream: $e");
+      debugPrint(
+        "ClientDashboardControllers: Failed to setup meals stream: $e",
+      );
       // Fallback to one-time fetch if stream fails
       await _tryFallbackQuery(userId);
     }
@@ -311,7 +316,7 @@ class ClientDashboardControllers extends GetxController {
         _mergeAndUpdateMeals();
       },
       onError: (error) {
-        print(
+        debugPrint(
           "ClientDashboardControllers: Stream error for $sourceKey: $error",
         );
         // Don't fail everything, just log
@@ -354,11 +359,13 @@ class ClientDashboardControllers extends GetxController {
 
   Future<void> _tryFallbackQuery(String userId) async {
     try {
-      print("ClientDashboardControllers: Fetching meals for user: $userId");
+      debugPrint(
+        "ClientDashboardControllers: Fetching meals for user: $userId",
+      );
 
       // Fallback: Get all meals and filter locally
       final allMeals = await _mealsService.getMeals();
-      print(
+      debugPrint(
         "ClientDashboardControllers: Retrieved ${allMeals.length} total meals from Firebase",
       );
 
@@ -371,7 +378,7 @@ class ClientDashboardControllers extends GetxController {
         return meal.userId == userId;
       }).toList();
 
-      print(
+      debugPrint(
         "ClientDashboardControllers: Filtered to ${userMeals.length} meals for user",
       );
 
@@ -383,12 +390,14 @@ class ClientDashboardControllers extends GetxController {
       isRefreshing.value = false;
       error.value = '';
 
-      print("ClientDashboardControllers: Data loading completed successfully");
+      debugPrint(
+        "ClientDashboardControllers: Data loading completed successfully",
+      );
 
       // CRITICAL: Force UI update for GetBuilder
       update();
     } catch (e) {
-      print("ClientDashboardControllers: Fallback query failed: $e");
+      debugPrint("ClientDashboardControllers: Fallback query failed: $e");
 
       // CRITICAL: Always clear loading state even on error
       isLoading.value = false;
@@ -421,12 +430,12 @@ class ClientDashboardControllers extends GetxController {
     var filtered = List<MealModel>.from(meals);
 
     // DEBUG: Log the data flow
-    print('🔍 SEARCH DEBUG - Total meals in allMeals: ${meals.length}');
-    print('🔍 SEARCH DEBUG - Search query raw: "${searchQuery.value}"');
-    print(
+    debugPrint('🔍 SEARCH DEBUG - Total meals in allMeals: ${meals.length}');
+    debugPrint('🔍 SEARCH DEBUG - Search query raw: "${searchQuery.value}"');
+    debugPrint(
       '🔍 SEARCH DEBUG - Search query trimmed: "${searchQuery.value.trim()}"',
     );
-    print('🔍 SEARCH DEBUG - isSearchFocused: $isSearchFocused');
+    debugPrint('🔍 SEARCH DEBUG - isSearchFocused: $isSearchFocused');
 
     // CRITICAL: Check if search query has actual content (after trimming)
     final trimmedQuery = searchQuery.value.trim();
@@ -434,7 +443,7 @@ class ClientDashboardControllers extends GetxController {
     if (trimmedQuery.isNotEmpty) {
       // SEARCH MODE: Search across ALL meals, ignore category
       final query = trimmedQuery.toLowerCase();
-      print('🔍 SEARCH DEBUG - Entering search mode with query: "$query"');
+      debugPrint('🔍 SEARCH DEBUG - Entering search mode with query: "$query"');
 
       filtered = filtered.where((meal) {
         // Search in meal name
@@ -487,22 +496,22 @@ class ClientDashboardControllers extends GetxController {
             difficultyMatch;
 
         if (matches) {
-          print('🔍 SEARCH DEBUG - Match found: ${meal.name}');
+          debugPrint('🔍 SEARCH DEBUG - Match found: ${meal.name}');
         }
 
         return matches;
       }).toList();
 
-      print('🔍 SEARCH DEBUG - Filtered meals count: ${filtered.length}');
+      debugPrint('🔍 SEARCH DEBUG - Filtered meals count: ${filtered.length}');
     } else {
       // CATEGORY MODE: Filter by selected category only
-      print(
+      debugPrint(
         '🔍 SEARCH DEBUG - Category mode, selected: ${selectedCategory.value}',
       );
       filtered = filtered.where((meal) {
         return meal.categories.contains(selectedCategory.value);
       }).toList();
-      print(
+      debugPrint(
         '🔍 SEARCH DEBUG - Category filtered meals count: ${filtered.length}',
       );
     }
@@ -599,12 +608,12 @@ class ClientDashboardControllers extends GetxController {
 
   // Enhanced search with immediate update
   void updateSearchQuery(String query) {
-    print('📝 CONTROLLER DEBUG - updateSearchQuery called with: "$query"');
+    debugPrint('📝 CONTROLLER DEBUG - updateSearchQuery called with: "$query"');
     // Ensure the query is updated and UI is rebuilt
     // We update even if values match because SimpleRealTimeSearchBar might have already
     // updated the RxString directly, but we still need to trigger GetBuilder's update()
     searchQuery.value = query;
-    print('📝 CONTROLLER DEBUG - Calling update() to rebuild UI');
+    debugPrint('📝 CONTROLLER DEBUG - Calling update() to rebuild UI');
     update();
   }
 
@@ -684,7 +693,7 @@ class ClientDashboardControllers extends GetxController {
       // Clear loading state
       isLoading.value = false;
 
-      print(
+      debugPrint(
         "ClientDashboardControllers: Meal '${meal.name}' deleted successfully",
       );
 
@@ -693,7 +702,7 @@ class ClientDashboardControllers extends GetxController {
 
       return true;
     } catch (e) {
-      print("ClientDashboardControllers: Failed to delete meal: $e");
+      debugPrint("ClientDashboardControllers: Failed to delete meal: $e");
       error.value = 'Failed to delete meal: ${e.toString()}';
       isLoading.value = false;
       update();
@@ -766,8 +775,8 @@ class ClientDashboardControllers extends GetxController {
     // Prevent rapid switching
     if (isGroupModeLoading.value) return;
 
-    print('🔵 GROUP SWITCHED → $groupId');
-    print('🔵 ENTERING GROUP MODE: $groupName (ID: $groupId)');
+    debugPrint('🔵 GROUP SWITCHED → $groupId');
+    debugPrint('🔵 ENTERING GROUP MODE: $groupName (ID: $groupId)');
 
     // Set group mode immediately for instant UI feedback
     selectedGroupId.value = groupId;
@@ -790,7 +799,7 @@ class ClientDashboardControllers extends GetxController {
     _loadGroupCategories(groupId);
     fetchTodayGroupPlan(groupId);
 
-    print('🔵 Group mode activated');
+    debugPrint('🔵 Group mode activated');
   }
 
   /// Load categories for the selected group
@@ -800,13 +809,13 @@ class ClientDashboardControllers extends GetxController {
     _categoriesSubscription?.cancel();
 
     try {
-      print('🔵 Dashboard: Loading categories for group: $groupId');
+      debugPrint('🔵 Dashboard: Loading categories for group: $groupId');
 
       // Get the group to find its groupCategoryId
       final groupDoc = await _firestore.collection('groups').doc(groupId).get();
 
       if (!groupDoc.exists) {
-        print('❌ Dashboard: Group document does not exist');
+        debugPrint('❌ Dashboard: Group document does not exist');
         groupCategories.assignAll([]);
         selectedGroupCategoryId.value = null;
         return;
@@ -815,10 +824,12 @@ class ClientDashboardControllers extends GetxController {
       final groupData = groupDoc.data();
       final groupCategoryId = groupData?['group_category_id'] as String?;
 
-      print('🔵 Dashboard: Group category ID from Firestore: $groupCategoryId');
+      debugPrint(
+        '🔵 Dashboard: Group category ID from Firestore: $groupCategoryId',
+      );
 
       if (groupCategoryId == null) {
-        print('❌ Dashboard: Group category ID is null');
+        debugPrint('❌ Dashboard: Group category ID is null');
         groupCategories.assignAll([]);
         selectedGroupCategoryId.value = null;
         return;
@@ -826,14 +837,14 @@ class ClientDashboardControllers extends GetxController {
 
       // Store the group category ID for use in Create Meal
       selectedGroupCategoryId.value = groupCategoryId;
-      print(
+      debugPrint(
         '🟢 Dashboard: Stored group category ID: ${selectedGroupCategoryId.value}',
       );
 
       // Get the current user ID
       final userId = FirebaseAuth.instance.currentUser?.uid;
       if (userId == null) {
-        print('❌ Dashboard: User ID is null');
+        debugPrint('❌ Dashboard: User ID is null');
         groupCategories.assignAll([]);
         selectedGroupCategoryId.value = null;
         return;
@@ -868,12 +879,12 @@ class ClientDashboardControllers extends GetxController {
               }
             },
             onError: (error) {
-              print('❌ ERROR loading categories: $error');
+              debugPrint('❌ ERROR loading categories: $error');
               groupCategories.assignAll([]);
             },
           );
     } catch (e) {
-      print('❌ EXCEPTION in _loadGroupCategories: $e');
+      debugPrint('❌ EXCEPTION in _loadGroupCategories: $e');
       groupCategories.assignAll([]);
     }
   }
@@ -1062,12 +1073,12 @@ class ClientDashboardControllers extends GetxController {
 
               groupMeals.value = allMeals;
             } catch (e) {
-              print('Error fetching group meals: $e');
+              debugPrint('Error fetching group meals: $e');
               groupMeals.clear();
             }
           },
           onError: (error) {
-            print('Stream error: $error');
+            debugPrint('Stream error: $error');
             todayMealSlots.clear();
             groupMeals.clear();
           },

@@ -44,12 +44,12 @@ class WeeklyMealPlannerController extends GetxController {
       isAdmin = args['isAdmin'] ?? false;
     }
 
-    print('=== WEEKLY MEAL PLANNER INIT ===');
-    print('👤 User Role: ${isAdmin ? "ADMIN" : "MEMBER"}');
-    print('🏢 Group ID: $groupId');
-    print('📛 Group Name: $groupName');
-    print('📦 Arguments received: $args');
-    print('=================================');
+    debugPrint('=== WEEKLY MEAL PLANNER INIT ===');
+    debugPrint('👤 User Role: ${isAdmin ? "ADMIN" : "MEMBER"}');
+    debugPrint('🏢 Group ID: $groupId');
+    debugPrint('📛 Group Name: $groupName');
+    debugPrint('📦 Arguments received: $args');
+    debugPrint('=================================');
 
     currentWeekStart.value = _getWeekStart(DateTime.now());
 
@@ -59,7 +59,7 @@ class WeeklyMealPlannerController extends GetxController {
       _loadAvailableMeals();
       _loadMealPlans();
     } else {
-      print('⚠️ WARNING: groupId is NULL! Cannot load meal plans.');
+      debugPrint('⚠️ WARNING: groupId is NULL! Cannot load meal plans.');
     }
   }
 
@@ -71,23 +71,23 @@ class WeeklyMealPlannerController extends GetxController {
       if (isAdmin) {
         // Admin: Load their personal meals for selection
         // These are the meals they can choose from to assign
-        print('Admin loading personal meals for user: $userId');
+        debugPrint('Admin loading personal meals for user: $userId');
         availableMeals.bindStream(_mealsService.getUserMealsStream(userId));
       } else {
         // Member: Load group meals for viewing
         // These are meals that have been assigned to the group
-        print('Member loading group meals for group: $groupId');
+        debugPrint('Member loading group meals for group: $groupId');
         availableMeals.bindStream(_mealsService.getMealsStream(groupId!));
       }
 
       // BOTH admin and members load assigned meals from the group
       // This is what shows up in the planner itself
-      print('Loading assigned meals from group: $groupId');
+      debugPrint('Loading assigned meals from group: $groupId');
       assignedMeals.bindStream(_mealsService.getMealsStream(groupId!));
 
       // Track assigned meals updates
       ever(assignedMeals, (_) {
-        print('Assigned meals updated: ${assignedMeals.length} meals');
+        debugPrint('Assigned meals updated: ${assignedMeals.length} meals');
       });
     }
   }
@@ -140,7 +140,7 @@ class WeeklyMealPlannerController extends GetxController {
 
       availableCategories.value = categoryNames;
     } catch (e) {
-      print('❌ PLANNER: Error loading meal categories: $e');
+      debugPrint('❌ PLANNER: Error loading meal categories: $e');
       availableCategories.value = [];
     }
   }
@@ -151,18 +151,18 @@ class WeeklyMealPlannerController extends GetxController {
     final startDate = currentWeekStart.value;
     final endDate = startDate.add(const Duration(days: 6));
 
-    print('=== LOADING MEAL PLANS ===');
-    print('👤 User Role: ${isAdmin ? "ADMIN" : "MEMBER"}');
-    print('🏢 Group ID for query: $groupId');
-    print(
+    debugPrint('=== LOADING MEAL PLANS ===');
+    debugPrint('👤 User Role: ${isAdmin ? "ADMIN" : "MEMBER"}');
+    debugPrint('🏢 Group ID for query: $groupId');
+    debugPrint(
       '📅 Date range: ${_formatDateOnly(startDate)} to ${_formatDateOnly(endDate)}',
     );
-    print('🔍 Firestore Query:');
-    print('   - Collection: group_meal_plans');
-    print('   - WHERE groupId == $groupId');
-    print('   - WHERE date >= ${_formatDateOnly(startDate)}');
-    print('   - WHERE date <= ${_formatDateOnly(endDate)}');
-    print('==========================');
+    debugPrint('🔍 Firestore Query:');
+    debugPrint('   - Collection: group_meal_plans');
+    debugPrint('   - WHERE groupId == $groupId');
+    debugPrint('   - WHERE date >= ${_formatDateOnly(startDate)}');
+    debugPrint('   - WHERE date <= ${_formatDateOnly(endDate)}');
+    debugPrint('==========================');
 
     // CRITICAL: Load meal plans from group_meal_plans collection
     // Data path: group_meal_plans where groupId == currentGroupId
@@ -174,18 +174,18 @@ class WeeklyMealPlannerController extends GetxController {
 
     // Track meal plan updates
     ever(mealPlans, (plans) {
-      print('=== MEAL PLANS STREAM UPDATE ===');
-      print('👤 User Role: ${isAdmin ? "ADMIN" : "MEMBER"}');
-      print('📊 Plans loaded: ${plans.length}');
+      debugPrint('=== MEAL PLANS STREAM UPDATE ===');
+      debugPrint('👤 User Role: ${isAdmin ? "ADMIN" : "MEMBER"}');
+      debugPrint('📊 Plans loaded: ${plans.length}');
       for (var plan in plans) {
-        print('📄 Plan Document:');
-        print('   - ID: ${plan.id}');
-        print('   - Date: ${_formatDateOnly(plan.date)}');
-        print('   - GroupId: ${plan.groupId}');
-        print('   - MealSlots: ${plan.mealSlots}');
-        print('   - Meal Count: ${plan.mealCount}');
+        debugPrint('📄 Plan Document:');
+        debugPrint('   - ID: ${plan.id}');
+        debugPrint('   - Date: ${_formatDateOnly(plan.date)}');
+        debugPrint('   - GroupId: ${plan.groupId}');
+        debugPrint('   - MealSlots: ${plan.mealSlots}');
+        debugPrint('   - Meal Count: ${plan.mealCount}');
       }
-      print('================================');
+      debugPrint('================================');
     });
   }
 
@@ -209,32 +209,32 @@ class WeeklyMealPlannerController extends GetxController {
 
   MealModel? getMealById(String? mealId) {
     if (mealId == null) {
-      print('getMealById: mealId is null');
+      debugPrint('getMealById: mealId is null');
       return null;
     }
-    print('getMealById: Looking for meal $mealId');
-    print('  - assignedMeals count: ${assignedMeals.length}');
-    print('  - availableMeals count: ${availableMeals.length}');
+    debugPrint('getMealById: Looking for meal $mealId');
+    debugPrint('  - assignedMeals count: ${assignedMeals.length}');
+    debugPrint('  - availableMeals count: ${availableMeals.length}');
 
     // First check assigned meals (what's in the planner)
     var meal = assignedMeals.firstWhereOrNull((meal) => meal.id == mealId);
     if (meal != null) {
-      print('  - Found in assignedMeals: ${meal.name}');
+      debugPrint('  - Found in assignedMeals: ${meal.name}');
       return meal;
     }
 
     // Fallback to available meals (for admin's personal meals)
     meal = availableMeals.firstWhereOrNull((meal) => meal.id == mealId);
     if (meal != null) {
-      print('  - Found in availableMeals: ${meal.name}');
+      debugPrint('  - Found in availableMeals: ${meal.name}');
       return meal;
     }
 
-    print('  - Meal NOT FOUND in either list!');
-    print(
+    debugPrint('  - Meal NOT FOUND in either list!');
+    debugPrint(
       '  - assignedMeals IDs: ${assignedMeals.map((m) => m.id).join(", ")}',
     );
-    print(
+    debugPrint(
       '  - availableMeals IDs: ${availableMeals.map((m) => m.id).join(", ")}',
     );
     return null;
@@ -255,11 +255,11 @@ class WeeklyMealPlannerController extends GetxController {
       final userName =
           '${userData['firstName'] ?? ''} ${userData['lastName'] ?? ''}'.trim();
 
-      print('=== ASSIGNING MEAL TO PLANNER ===');
-      print('Date: $date');
-      print('Meal Type: $mealType');
-      print('Meal ID: $mealId');
-      print('Group ID: $groupId');
+      debugPrint('=== ASSIGNING MEAL TO PLANNER ===');
+      debugPrint('Date: $date');
+      debugPrint('Meal Type: $mealType');
+      debugPrint('Meal ID: $mealId');
+      debugPrint('Group ID: $groupId');
 
       if (mealId != null) {
         // Verify the meal exists
@@ -268,13 +268,13 @@ class WeeklyMealPlannerController extends GetxController {
           throw Exception('Meal not found. Please ensure the meal exists.');
         }
 
-        print('✓ Meal found: ${meal.name}');
-        print('  - Meal groupId: ${meal.groupId}');
-        print('  - Target groupId: $groupId');
+        debugPrint('✓ Meal found: ${meal.name}');
+        debugPrint('  - Meal groupId: ${meal.groupId}');
+        debugPrint('  - Target groupId: $groupId');
 
         // CRITICAL FIX: If meal doesn't have correct groupId, update it
         if (meal.groupId != groupId) {
-          print('⚠️ Meal groupId mismatch, updating meal document...');
+          debugPrint('⚠️ Meal groupId mismatch, updating meal document...');
 
           try {
             // Create updated meal with correct groupId
@@ -299,16 +299,16 @@ class WeeklyMealPlannerController extends GetxController {
 
             // Update the meal's groupId to match the group
             await _mealsService.updateMeal(updatedMeal);
-            print('✓ Meal groupId updated to: $groupId');
+            debugPrint('✓ Meal groupId updated to: $groupId');
           } catch (e) {
-            print('✗ Failed to update meal groupId: $e');
+            debugPrint('✗ Failed to update meal groupId: $e');
             throw Exception(
               'Failed to assign meal to group. Please try again.',
             );
           }
         }
 
-        print('✓ Meal verified: ${meal.name} (groupId: $groupId)');
+        debugPrint('✓ Meal verified: ${meal.name} (groupId: $groupId)');
       }
 
       // Save only the mealId reference to the planner
@@ -321,8 +321,8 @@ class WeeklyMealPlannerController extends GetxController {
         userName.isEmpty ? 'Admin' : userName,
       );
 
-      print('✓ Meal slot updated successfully');
-      print('=== END ASSIGNMENT ===');
+      debugPrint('✓ Meal slot updated successfully');
+      debugPrint('=== END ASSIGNMENT ===');
 
       Get.snackbar(
         'Success',
@@ -332,7 +332,7 @@ class WeeklyMealPlannerController extends GetxController {
         duration: const Duration(seconds: 2),
       );
     } catch (e) {
-      print('✗ ERROR in updateMealSlot: $e');
+      debugPrint('✗ ERROR in updateMealSlot: $e');
       Get.snackbar(
         'Error',
         'Failed to update meal: $e',
@@ -349,9 +349,9 @@ class WeeklyMealPlannerController extends GetxController {
 
     try {
       isLoading.value = true;
-      print('Controller: duplicateDay called');
-      print('  - sourceDate: $sourceDate');
-      print('  - targetDate: $targetDate');
+      debugPrint('Controller: duplicateDay called');
+      debugPrint('  - sourceDate: $sourceDate');
+      debugPrint('  - targetDate: $targetDate');
 
       final authController = Get.find<AuthController>();
       final userId = authController.firebaseUser.value?.uid ?? '';
@@ -377,7 +377,7 @@ class WeeklyMealPlannerController extends GetxController {
         duration: const Duration(seconds: 2),
       );
     } catch (e) {
-      print('✗ Controller error in duplicateDay: $e');
+      debugPrint('✗ Controller error in duplicateDay: $e');
       Get.snackbar(
         'Error',
         'Failed to duplicate day: $e',

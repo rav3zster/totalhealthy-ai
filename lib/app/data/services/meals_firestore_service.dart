@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../models/meal_model.dart';
-
 class MealsFirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _collection = 'meals';
@@ -22,36 +21,36 @@ class MealsFirestoreService {
             ); // Sort in memory instead of using orderBy
         })
         .handleError((error) {
-          print('Error fetching user meals for $userId: $error');
+          debugPrint('Error fetching user meals for $userId: $error');
           return <MealModel>[];
         });
   }
 
   /// Stream of meals filtered by group (existing method enhanced)
   Stream<List<MealModel>> getMealsStream(String groupId) {
-    print('getMealsStream called for groupId: $groupId');
+    debugPrint('getMealsStream called for groupId: $groupId');
     return _firestore
         .collection(_collection)
         .where('groupId', isEqualTo: groupId)
         .snapshots()
         .map((snapshot) {
-          print(
+          debugPrint(
             'getMealsStream snapshot received: ${snapshot.docs.length} documents',
           );
           final list = snapshot.docs.map((doc) {
             final data = doc.data();
-            print(
+            debugPrint(
               '  - Meal doc ${doc.id}: name=${data['name']}, groupId=${data['groupId']}',
             );
             return MealModel.fromJson(data, docId: doc.id);
           }).toList();
           // Sort in-memory to avoid index requirement during development
           list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-          print('getMealsStream returning ${list.length} meals');
+          debugPrint('getMealsStream returning ${list.length} meals');
           return list;
         })
         .handleError((error) {
-          print('Error fetching group meals for $groupId: $error');
+          debugPrint('Error fetching group meals for $groupId: $error');
           return <MealModel>[];
         });
   }
@@ -76,7 +75,7 @@ class MealsFirestoreService {
           return list;
         })
         .handleError((error) {
-          print(
+          debugPrint(
             'Error fetching group meals for $groupId with category $category: $error',
           );
           return <MealModel>[];
@@ -98,7 +97,7 @@ class MealsFirestoreService {
               .toList();
         })
         .handleError((error) {
-          print(
+          debugPrint(
             'Error searching meals for $userId with query "$searchQuery": $error',
           );
           return <MealModel>[];
@@ -114,7 +113,7 @@ class MealsFirestoreService {
           .toList()
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Sort in memory
     } catch (e) {
-      print('Error fetching all meals: $e');
+      debugPrint('Error fetching all meals: $e');
       return <MealModel>[];
     }
   }
@@ -129,11 +128,11 @@ class MealsFirestoreService {
           .collection(_collection)
           .add(meal.toJson());
 
-      print('addMeal success: docId = ${docRef.id}, groupId = ${meal.groupId}');
+      debugPrint('addMeal success: docId = ${docRef.id}, groupId = ${meal.groupId}');
 
       return docRef.id;
     } catch (e) {
-      print('Error adding meal: $e');
+      debugPrint('Error adding meal: $e');
       rethrow;
     }
   }
@@ -151,7 +150,7 @@ class MealsFirestoreService {
       }
       await batch.commit();
     } catch (e) {
-      print('Error uploading bulk meals: $e');
+      debugPrint('Error uploading bulk meals: $e');
       rethrow;
     }
   }
@@ -161,7 +160,7 @@ class MealsFirestoreService {
     try {
       await _firestore.collection(_collection).doc(mealId).delete();
     } catch (e) {
-      print('Error deleting meal $mealId: $e');
+      debugPrint('Error deleting meal $mealId: $e');
       rethrow;
     }
   }
@@ -176,7 +175,7 @@ class MealsFirestoreService {
           .doc(meal.id)
           .update(meal.toJson());
     } catch (e) {
-      print('Error updating meal ${meal.id}: $e');
+      debugPrint('Error updating meal ${meal.id}: $e');
       rethrow;
     }
   }

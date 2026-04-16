@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as path;
 
@@ -44,7 +45,7 @@ class StorageService {
       final String downloadUrl = await ref.getDownloadURL();
       return downloadUrl;
     } catch (e) {
-      print('Error uploading file to Firebase Storage: $e');
+      debugPrint('Error uploading file to Firebase Storage: $e');
       if (e.toString().contains('object-not-found')) {
         throw Exception(
           'Storage not initialized. Please enable Storage in Firebase Console and click "Get Started".',
@@ -61,7 +62,7 @@ class StorageService {
       final Reference ref = _storage.refFromURL(url);
       await ref.delete();
     } catch (e) {
-      print('Error deleting file from Firebase Storage: $e');
+      debugPrint('Error deleting file from Firebase Storage: $e');
     }
   }
 }

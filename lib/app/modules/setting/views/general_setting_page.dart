@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -21,18 +20,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: const Icon(Icons.arrow_back_ios_new_outlined,
-            color: Colors.white),
+        leading: const Icon(
+          Icons.arrow_back_ios_new_outlined,
+          color: Colors.white,
+        ),
         actions: [
           IconButton(
-              onPressed: () {
-                Get.back();
-              },
-              icon: Icon(
-                Icons.search,
-                size: 35,
-                color: Colors.white,
-              ))
+            onPressed: () {
+              Get.back();
+            },
+            icon: Icon(Icons.search, size: 35, color: Colors.white),
+          ),
         ],
         title: const SizedBox(
           width: double.infinity,
@@ -42,10 +40,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Text(
               'General',
               style: TextStyle(
-                  color: Color(0XFFFFFFFF),
-                  fontFamily: 'inter',
-                  fontSize: 24,
-                  fontWeight: FontWeight.w400),
+                color: Color(0XFFFFFFFF),
+                fontFamily: 'inter',
+                fontSize: 24,
+                fontWeight: FontWeight.w400,
+              ),
             ),
           ),
         ),
@@ -98,7 +97,8 @@ class SettingOption extends StatelessWidget {
   final List<String> items;
   final ValueChanged<String?> onChanged;
 
-  const SettingOption({super.key, 
+  const SettingOption({
+    super.key,
     required this.title,
     required this.value,
     required this.items,
@@ -112,10 +112,7 @@ class SettingOption extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: TextStyle(color: Colors.white, fontSize: 16),
-          ),
+          Text(title, style: TextStyle(color: Colors.white, fontSize: 16)),
           SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
@@ -132,10 +129,7 @@ class SettingOption extends StatelessWidget {
               style: TextStyle(color: Color(0xffCCE16B), fontSize: 16),
               onChanged: onChanged,
               items: items.map((item) {
-                return DropdownMenuItem(
-                  value: item,
-                  child: Text(item),
-                );
+                return DropdownMenuItem(value: item, child: Text(item));
               }).toList(),
             ),
           ),

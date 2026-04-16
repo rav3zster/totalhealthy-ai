@@ -94,6 +94,7 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
       await usersService.updateUserProfile(updatedUser);
       await authController.userdataStore(updatedUser.toJson());
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Profile saved successfully!'),
@@ -102,6 +103,7 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
       );
       Get.back();
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error saving profile: $e'),
