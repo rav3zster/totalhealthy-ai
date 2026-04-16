@@ -8,8 +8,6 @@ class CreateView extends StatefulWidget {
 }
 
 class _CreateViewState extends State<CreateView> {
-
-
   // Separate values for each TextField
   int value1 = 500;
   int value2 = 500;
@@ -112,6 +110,7 @@ class _CreateViewState extends State<CreateView> {
       }
     });
   }
+
   bool isSwitched = false;
   @override
   Widget build(BuildContext context) {
@@ -140,14 +139,16 @@ class _CreateViewState extends State<CreateView> {
                   SizedBox(height: 120),
                   Container(
                     margin: const EdgeInsets.only(left: 15),
-                    child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 28),
+                    child: const Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.white,
+                      size: 28,
+                    ),
                   ),
                   SizedBox(width: 85),
-                  Container(
-                    child: Text(
-                      "Creating A Meal",
-                      style: TextStyle(color: Colors.white, fontSize: 22),
-                    ),
+                  Text(
+                    "Creating A Meal",
+                    style: TextStyle(color: Colors.white, fontSize: 22),
                   ),
                 ],
               ),
@@ -164,7 +165,10 @@ class _CreateViewState extends State<CreateView> {
                 margin: const EdgeInsets.only(right: 320),
                 child: const Text(
                   "Full Name",
-                  style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -196,7 +200,10 @@ class _CreateViewState extends State<CreateView> {
                 margin: const EdgeInsets.only(right: 324),
                 child: const Text(
                   "Category",
-                  style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -204,7 +211,10 @@ class _CreateViewState extends State<CreateView> {
                 width: 390,
                 child: TextField(
                   decoration: InputDecoration(
-                    suffixIcon: const Icon(Icons.keyboard_arrow_down_outlined, color: Colors.white54),
+                    suffixIcon: const Icon(
+                      Icons.keyboard_arrow_down_outlined,
+                      color: Colors.white54,
+                    ),
                     hintText: "Breakfast",
                     hintStyle: const TextStyle(color: Colors.white30),
                     fillColor: const Color.fromARGB(255, 36, 36, 36),
@@ -229,7 +239,10 @@ class _CreateViewState extends State<CreateView> {
                 margin: const EdgeInsets.only(right: 305),
                 child: const Text(
                   "Description",
-                  style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -240,7 +253,7 @@ class _CreateViewState extends State<CreateView> {
                   child: TextField(
                     maxLines: 5, // Allows for multiple lines of text
                     decoration: InputDecoration(
-                    //  suffixIcon: const Icon(Icons.keyboard_arrow_down_outlined, color: Colors.white54),
+                      //  suffixIcon: const Icon(Icons.keyboard_arrow_down_outlined, color: Colors.white54),
                       hintText: "Describe the recipe",
                       hintStyle: const TextStyle(color: Colors.white30),
                       fillColor: const Color.fromARGB(255, 36, 36, 36),
@@ -260,17 +273,21 @@ class _CreateViewState extends State<CreateView> {
                     ),
                   ),
                 ),
-              ), const SizedBox(height: 15),
+              ),
+              const SizedBox(height: 15),
               Container(
                 margin: const EdgeInsets.only(right: 304),
                 child: const Text(
                   "Ingredients",
-                  style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
               SizedBox(
-               // width: 100,
+                // width: 100,
                 child: Row(
                   children: [
                     Container(
@@ -280,7 +297,7 @@ class _CreateViewState extends State<CreateView> {
                       width: 290,
                       child: TextField(
                         decoration: InputDecoration(
-                        //  suffixIcon: const Icon(Icons.keyboard_arrow_down_outlined, color: Colors.white54),
+                          //  suffixIcon: const Icon(Icons.keyboard_arrow_down_outlined, color: Colors.white54),
                           hintText: "Describe the recipe",
                           hintStyle: const TextStyle(color: Colors.white30),
                           fillColor: const Color.fromARGB(255, 36, 36, 36),
@@ -326,8 +343,6 @@ class _CreateViewState extends State<CreateView> {
                         ),
                       ),
                     ),
-
-
                   ],
                 ),
               ),
@@ -389,8 +404,6 @@ class _CreateViewState extends State<CreateView> {
                         ),
                       ),
                     ),
-
-
                   ],
                 ),
               ),
@@ -453,11 +466,10 @@ class _CreateViewState extends State<CreateView> {
                         ),
                       ),
                     ),
-
-
                   ],
                 ),
-              ),SizedBox(height: 20,),
+              ),
+              SizedBox(height: 20),
               SizedBox(
                 width: 138,
                 height: 45,
@@ -467,73 +479,93 @@ class _CreateViewState extends State<CreateView> {
                     backgroundColor: const Color.fromARGB(255, 205, 226, 109),
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start, // Aligns content to the left
+                    mainAxisAlignment:
+                        MainAxisAlignment.start, // Aligns content to the left
                     children: [
                       Container(
                         margin: EdgeInsets.only(), // Keeps the icon at the left
-                        child: Icon(Icons.add,color: Colors.black,),
+                        child: Icon(Icons.add, color: Colors.black),
                       ),
-                      SizedBox(width: 5), // Adds some spacing between the icon and the text
-                      Container(
-                        child: Text("Add Meal",
-                        style: TextStyle(color: Colors.black54),),
-                      ),
+                      SizedBox(
+                        width: 5,
+                      ), // Adds some spacing between the icon and the text
+                      Text("Add Meal", style: TextStyle(color: Colors.black54)),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 15,),
+              SizedBox(height: 15),
               Row(
                 children: [
                   Container(
                     margin: const EdgeInsets.only(left: 15),
                     child: const Text(
                       "Calculate Automatically",
-                      style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
-                    ),
-
-                  ),SizedBox(width: 170,),
-                  Container(
-                    child: Transform.scale(
-                      scale: 0.8, // Keeps the overall size normal
-                      child: Transform(
-                        transform: Matrix4.identity()..scale(1.0, 0.9), // Scale width to 0.7 and keep height 1.0
-                        child: Switch(
-                          value: isSwitched,
-                          onChanged: (value) {
-                            setState(() {
-                              isSwitched = value;
-                            });
-                          },
-                          activeThumbColor: Colors.white, // The thumb (circle) color when the switch is active
-                          inactiveThumbColor: Colors.white,
-                          inactiveTrackColor: Colors.grey[700], // The track color when the switch is inactive
-                        ),
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
-
-
+                  SizedBox(width: 170),
+                  Transform.scale(
+                    scale: 0.8,
+                    child: Transform.scale(
+                      scaleX: 1.0,
+                      scaleY: 0.9,
+                      child: Switch(
+                        value: isSwitched,
+                        onChanged: (value) {
+                          setState(() {
+                            isSwitched = value;
+                          });
+                        },
+                        activeThumbColor: Colors.white,
+                        inactiveThumbColor: Colors.white,
+                        inactiveTrackColor: Colors.grey[700],
+                      ),
+                    ),
+                  ),
                 ],
               ),
-             // const SizedBox(height: 10),
 
-
-     Column(
-    children: [
-    buildIncrementDecrementField(
-    "kcal", value1, 1, isDecrementPressed1, isIncrementPressed1),
-    const SizedBox(height: 10),
-    buildIncrementDecrementField(
-    "kcal", value2, 2, isDecrementPressed2, isIncrementPressed2),
-    const SizedBox(height: 10),
-    buildIncrementDecrementField(
-    "kcal", value3, 3, isDecrementPressed3, isIncrementPressed3),
-    const SizedBox(height: 10),
-    buildIncrementDecrementField(
-    "kcal", value4, 4, isDecrementPressed4, isIncrementPressed4),
-    ],
-     ), SizedBox(height: 40,),
+              // const SizedBox(height: 10),
+              Column(
+                children: [
+                  buildIncrementDecrementField(
+                    "kcal",
+                    value1,
+                    1,
+                    isDecrementPressed1,
+                    isIncrementPressed1,
+                  ),
+                  const SizedBox(height: 10),
+                  buildIncrementDecrementField(
+                    "kcal",
+                    value2,
+                    2,
+                    isDecrementPressed2,
+                    isIncrementPressed2,
+                  ),
+                  const SizedBox(height: 10),
+                  buildIncrementDecrementField(
+                    "kcal",
+                    value3,
+                    3,
+                    isDecrementPressed3,
+                    isIncrementPressed3,
+                  ),
+                  const SizedBox(height: 10),
+                  buildIncrementDecrementField(
+                    "kcal",
+                    value4,
+                    4,
+                    isDecrementPressed4,
+                    isIncrementPressed4,
+                  ),
+                ],
+              ),
+              SizedBox(height: 40),
               SizedBox(
                 width: 400,
                 height: 50,
@@ -548,75 +580,78 @@ class _CreateViewState extends State<CreateView> {
                   ),
                 ),
               ),
-            ]
+            ],
           ),
-
-        )
+        ),
       ),
-
     );
-    }
-
-        Widget buildIncrementDecrementField(String label, int value, int index,
-        bool isDecrementPressed, bool isIncrementPressed) {
-      return Container(
-        width: 390,
-        height: 55,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 36, 36, 36),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white30),
-            ),
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () => decrement(index),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isDecrementPressed
-                          ? Color.fromARGB(255, 205, 226, 109)
-                          : Colors.white54,
-                      shape: BoxShape.circle,
-                    ),
-                    padding: const EdgeInsets.all(8),
-                    child: const Icon(Icons.arrow_downward,
-                        color: Colors.black, size: 12),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  '$value',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
-                ),
-                const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () => increment(index),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isIncrementPressed
-                          ? Color.fromARGB(255, 205, 226, 109)
-                          : Colors.white54,
-                      shape: BoxShape.circle,
-                    ),
-                    padding: const EdgeInsets.all(8),
-                    child: const Icon(Icons.arrow_upward,
-                        color: Colors.black, size: 12),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-    }
   }
 
-
-
+  Widget buildIncrementDecrementField(
+    String label,
+    int value,
+    int index,
+    bool isDecrementPressed,
+    bool isIncrementPressed,
+  ) {
+    return Container(
+      width: 390,
+      height: 55,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 36, 36, 36),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.white30)),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => decrement(index),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isDecrementPressed
+                        ? Color.fromARGB(255, 205, 226, 109)
+                        : Colors.white54,
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: const Icon(
+                    Icons.arrow_downward,
+                    color: Colors.black,
+                    size: 12,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                '$value',
+                style: const TextStyle(color: Colors.white, fontSize: 12),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () => increment(index),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isIncrementPressed
+                        ? Color.fromARGB(255, 205, 226, 109)
+                        : Colors.white54,
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: const Icon(
+                    Icons.arrow_upward,
+                    color: Colors.black,
+                    size: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
