@@ -396,7 +396,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                   '🎨 VIEW DEBUG - isGroupMode: ${controller.isGroupMode.value}',
                                 );
                                 debugPrint(
-                                  '🎨 VIEW DEBUG - groupMeals count: ${controller.groupMeals.length}',
+                                  '🎨 VIEW DEBUG - groupAllMeals count: ${controller.groupAllMeals.length}',
                                 );
                                 debugPrint(
                                   '🎨 VIEW DEBUG - shouldShowLoading: ${controller.shouldShowLoading}',

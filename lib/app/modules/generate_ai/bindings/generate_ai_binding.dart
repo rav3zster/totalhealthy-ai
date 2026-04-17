@@ -7,6 +7,7 @@ class GenerateAiBinding extends Bindings {
   void dependencies() {
     Get.lazyPut<GenerateAiController>(
       () => GenerateAiController(),
+      fenix: true,
     );
   }
 }

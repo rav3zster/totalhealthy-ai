@@ -180,13 +180,24 @@ class GenerateAiController extends GetxController {
     }
   }
 
+  String? get _resolvedGroupId {
+    // First try the stored value from onInit
+    if (_targetGroupId != null) return _targetGroupId;
+    // Fallback: read from current arguments (in case controller was reused)
+    final args = Get.arguments;
+    if (args is Map) return args['groupId'] as String?;
+    return null;
+  }
+
   // ── Save a single meal to Firestore ──────────────────────────────────────
   Future<void> saveSingleMeal(AiGeneratedMeal meal) async {
     try {
       final auth = Get.find<AuthController>();
       final userId = auth.firebaseUser.value?.uid ?? '';
-      // Use the group context passed when navigating here, fallback to stored group
-      final groupId = _targetGroupId ?? auth.groupgetId();
+      final groupId = _resolvedGroupId ?? auth.groupgetId();
+      debugPrint(
+        '💾 saveSingleMeal → groupId: $groupId, category: ${meal.category}',
+      );
       await FirebaseFirestore.instance
           .collection('meals')
           .add(meal.toFirestoreMap(userId: userId, groupId: groupId));
@@ -266,8 +277,10 @@ class GenerateAiController extends GetxController {
     try {
       final auth = Get.find<AuthController>();
       final userId = auth.firebaseUser.value?.uid ?? '';
-      // Use the group context passed when navigating here, fallback to stored group
-      final groupId = _targetGroupId ?? auth.groupgetId();
+      final groupId = _resolvedGroupId ?? auth.groupgetId();
+      debugPrint(
+        '💾 saveAllMeals → groupId: $groupId, count: ${generatedMeals.length}',
+      );
 
       final batch = FirebaseFirestore.instance.batch();
       for (final meal in generatedMeals) {

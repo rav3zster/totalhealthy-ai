@@ -534,8 +534,11 @@ class ClientDashboardControllers extends GetxController {
   // Display meals (computed property for UI) - ensures consistent results
   // Switches data source based on selectedGroupId, but UI remains the same
   List<MealModel> get displayMeals {
-    // In group mode use the real-time stream of all group meals
-    final sourceMeals = isGroupMode.value ? groupAllMeals : meals;
+    // In group mode use the real-time stream of all group meals.
+    // Accessing .length registers the RxList with GetX so Obx rebuilds on change.
+    final sourceMeals = isGroupMode.value
+        ? (groupAllMeals..length) // touch length to register dependency
+        : (meals..length);
 
     // Apply the same filtering logic regardless of source
     var filtered = List<MealModel>.from(sourceMeals);
