@@ -80,6 +80,9 @@ class ClientDashboardControllers extends GetxController {
   // Group Stats - Reactive state for Live Stats card
   final RxMap<String, dynamic> groupStats = <String, dynamic>{}.obs;
 
+  // All meals for the selected group (from meals collection, real-time)
+  final groupAllMeals = <MealModel>[].obs;
+
   StreamSubscription? _groupMealsSubscription;
 
   // Stream subscription for cleanup
@@ -121,6 +124,8 @@ class ClientDashboardControllers extends GetxController {
     _mealsSubscription?.cancel();
     _authSubscription?.cancel();
     _categoriesSubscription?.cancel();
+    _groupMealsSubscription?.cancel();
+    _groupAllMealsSubscription?.cancel();
     super.onClose();
   }
 
@@ -314,12 +319,19 @@ class ClientDashboardControllers extends GetxController {
       (newMeals) {
         _mealsMap[sourceKey] = newMeals;
         _mergeAndUpdateMeals();
+
+        // If this is a group stream and we're currently in that group, update groupAllMeals
+        if (sourceKey.startsWith('group_') && isGroupMode.value) {
+          final streamGroupId = sourceKey.replaceFirst('group_', '');
+          if (streamGroupId == selectedGroupId.value) {
+            groupAllMeals.value = newMeals;
+          }
+        }
       },
       onError: (error) {
         debugPrint(
           "ClientDashboardControllers: Stream error for $sourceKey: $error",
         );
-        // Don't fail everything, just log
       },
     );
     _subscriptions.add(subscription);
@@ -522,8 +534,8 @@ class ClientDashboardControllers extends GetxController {
   // Display meals (computed property for UI) - ensures consistent results
   // Switches data source based on selectedGroupId, but UI remains the same
   List<MealModel> get displayMeals {
-    // Determine which meal list to use based on group selection
-    final sourceMeals = selectedGroupId.value != null ? groupMeals : meals;
+    // In group mode use the real-time stream of all group meals
+    final sourceMeals = isGroupMode.value ? groupAllMeals : meals;
 
     // Apply the same filtering logic regardless of source
     var filtered = List<MealModel>.from(sourceMeals);
@@ -789,17 +801,35 @@ class ClientDashboardControllers extends GetxController {
 
     // Clear previous group data immediately
     groupMeals.clear();
+    groupAllMeals.clear();
     todayMealSlots.clear();
-    groupCategories.clear(); // Clear old categories
+    groupCategories.clear();
 
     // Load group stats for Live Stats card
     _loadGroupStats(groupId);
+
+    // Subscribe to all meals for this group (real-time)
+    _subscribeToGroupAllMeals(groupId);
 
     // Load categories and meal plan in parallel for faster loading
     _loadGroupCategories(groupId);
     fetchTodayGroupPlan(groupId);
 
     debugPrint('🔵 Group mode activated');
+  }
+
+  StreamSubscription? _groupAllMealsSubscription;
+
+  void _subscribeToGroupAllMeals(String groupId) {
+    _groupAllMealsSubscription?.cancel();
+    _groupAllMealsSubscription = _mealsService.getMealsStream(groupId).listen((
+      meals,
+    ) {
+      if (isGroupMode.value && selectedGroupId.value == groupId) {
+        groupAllMeals.value = meals;
+        update();
+      }
+    }, onError: (e) => debugPrint('❌ groupAllMeals stream error: $e'));
   }
 
   /// Load categories for the selected group
@@ -895,6 +925,10 @@ class ClientDashboardControllers extends GetxController {
     _groupMealsSubscription?.cancel();
     _groupMealsSubscription = null;
 
+    // Cancel group all meals subscription
+    _groupAllMealsSubscription?.cancel();
+    _groupAllMealsSubscription = null;
+
     // Cancel categories subscription
     _categoriesSubscription?.cancel();
     _categoriesSubscription = null;
@@ -904,9 +938,10 @@ class ClientDashboardControllers extends GetxController {
     selectedGroupId.value = null;
     selectedGroupName.value = '';
     groupMeals.clear();
+    groupAllMeals.clear();
     todayMealSlots.clear();
     groupCategories.clear();
-    groupStats.clear(); // Clear group stats
+    groupStats.clear();
 
     // Reset to default category
     selectedCategory.value = 'Breakfast';
