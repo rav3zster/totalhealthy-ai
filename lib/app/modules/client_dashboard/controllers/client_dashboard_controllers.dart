@@ -1129,6 +1129,8 @@ class ClientDashboardControllers extends GetxController {
     return groupMeals.firstWhereOrNull((meal) => meal.id == mealId);
   }
 
+  String? get currentUserId => _currentUserId;
+
   /// Check if current user is admin of the selected group
   /// Returns true if:
   /// - No group is selected (personal mode)

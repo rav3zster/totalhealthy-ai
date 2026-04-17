@@ -295,10 +295,31 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                               // Add Meal button visibility based on user role:
                               // - Personal mode: Always visible
                               // - Group mode: Visible only if user is admin
-                              Obx(
-                                () => DynamicDayCounter(
-                                  showAddButton:
-                                      controller.shouldShowAddMealButton,
+                              Obx(() {
+                                // Access reactive observables directly so Obx
+                                // rebuilds when group selection or groups list changes
+                                final groupId =
+                                    controller.selectedGroupId.value;
+                                final inGroupMode =
+                                    controller.isGroupMode.value;
+                                final groups =
+                                    controller.userGroups; // track RxList
+
+                                bool showAdd;
+                                if (!inGroupMode || groupId == null) {
+                                  showAdd = true;
+                                } else {
+                                  final uid = controller.currentUserId;
+                                  final selectedGroup = groups.firstWhereOrNull(
+                                    (g) => g.id == groupId,
+                                  );
+                                  showAdd =
+                                      selectedGroup?.isAdmin(uid ?? '') ??
+                                      false;
+                                }
+
+                                return DynamicDayCounter(
+                                  showAddButton: showAdd,
                                   onAddMealTap: () {
                                     final userData = Get.find<AuthController>()
                                         .userdataget();
@@ -336,8 +357,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                       ),
                                     );
                                   },
-                                ),
-                              ),
+                                );
+                              }),
                               const SizedBox(height: 20),
 
                               // Meal Type Tabs - Conditionally visible based on search state
