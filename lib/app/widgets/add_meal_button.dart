@@ -9,14 +9,15 @@ const _bdr = Color(0xFF2A2A2A);
 
 class AddMealButton extends StatelessWidget {
   final String id;
-  const AddMealButton({super.key, required this.id});
+  final String? groupId;
+  const AddMealButton({super.key, required this.id, this.groupId});
 
   void _show(BuildContext context) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (_) => _AddMealSheet(id: id),
+      builder: (_) => _AddMealSheet(id: id, groupId: groupId),
     );
   }
 
@@ -61,7 +62,8 @@ class AddMealButton extends StatelessWidget {
 
 class _AddMealSheet extends StatelessWidget {
   final String id;
-  const _AddMealSheet({required this.id});
+  final String? groupId;
+  const _AddMealSheet({required this.id, this.groupId});
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +137,10 @@ class _AddMealSheet extends StatelessWidget {
             badge: 'AI',
             onTap: () {
               Navigator.pop(context);
-              Get.toNamed('${Routes.generateAi}?id=$id');
+              Get.toNamed(
+                '${Routes.generateAi}?id=$id',
+                arguments: groupId != null ? {'groupId': groupId} : null,
+              );
             },
           ),
           const SizedBox(height: 10),

@@ -36,6 +36,9 @@ class GenerateAiController extends GetxController {
   final Rx<DateTime?> preferredStartDate = Rx<DateTime?>(null);
   final specialInstructionsController = TextEditingController();
 
+  // ── Context (group to save into) ──────────────────────────────────────────
+  String? _targetGroupId;
+
   // ── AI State ───────────────────────────────────────────────────────────────
   final RxBool isGenerating = false.obs;
   final RxBool hasResult = false.obs;
@@ -129,6 +132,11 @@ class GenerateAiController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Read groupId passed as argument when navigating from a group context
+    final args = Get.arguments;
+    if (args is Map) {
+      _targetGroupId = args['groupId'] as String?;
+    }
     _loadSavedPreferences();
   }
 
@@ -177,7 +185,8 @@ class GenerateAiController extends GetxController {
     try {
       final auth = Get.find<AuthController>();
       final userId = auth.firebaseUser.value?.uid ?? '';
-      final groupId = auth.groupgetId();
+      // Use the group context passed when navigating here, fallback to stored group
+      final groupId = _targetGroupId ?? auth.groupgetId();
       await FirebaseFirestore.instance
           .collection('meals')
           .add(meal.toFirestoreMap(userId: userId, groupId: groupId));
@@ -257,7 +266,8 @@ class GenerateAiController extends GetxController {
     try {
       final auth = Get.find<AuthController>();
       final userId = auth.firebaseUser.value?.uid ?? '';
-      final groupId = auth.groupgetId();
+      // Use the group context passed when navigating here, fallback to stored group
+      final groupId = _targetGroupId ?? auth.groupgetId();
 
       final batch = FirebaseFirestore.instance.batch();
       for (final meal in generatedMeals) {

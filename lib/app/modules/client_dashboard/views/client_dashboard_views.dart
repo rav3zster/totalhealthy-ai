@@ -199,8 +199,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                         Container(
                                           padding: const EdgeInsets.all(10),
                                           decoration: BoxDecoration(
-                                            color: Colors.black.withValues(alpha: 
-                                              0.1,
+                                            color: Colors.black.withValues(
+                                              alpha: 0.1,
                                             ),
                                             shape: BoxShape.circle,
                                           ),
@@ -305,8 +305,14 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                     final userId =
                                         userData["id"] ?? userData["_id"] ?? "";
 
-                                    // Pass group category ID if in group mode
+                                    // Pass group context if in group mode
                                     final arguments = <String, dynamic>{};
+                                    if (controller.isGroupMode.value &&
+                                        controller.selectedGroupId.value !=
+                                            null) {
+                                      arguments['groupId'] =
+                                          controller.selectedGroupId.value;
+                                    }
                                     if (controller.isGroupMode.value &&
                                         controller
                                                 .selectedGroupCategoryId
@@ -574,8 +580,23 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                             iconEmoji: '✨',
                                             iconBgColor: Colors.purple
                                                 .withValues(alpha: 0.2),
-                                            onTap: () =>
-                                                Get.toNamed(Routes.generateAi),
+                                            onTap: () => Get.toNamed(
+                                              Routes.generateAi,
+                                              arguments:
+                                                  controller
+                                                          .isGroupMode
+                                                          .value &&
+                                                      controller
+                                                              .selectedGroupId
+                                                              .value !=
+                                                          null
+                                                  ? {
+                                                      'groupId': controller
+                                                          .selectedGroupId
+                                                          .value,
+                                                    }
+                                                  : null,
+                                            ),
                                           ),
                                           _buildActionCard(
                                             title: 'copy_from_existing'.tr,
@@ -584,9 +605,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                                             iconBgColor: Colors.blue.withValues(
                                               alpha: 0.2,
                                             ),
-                                            onTap: () => Get.toNamed(
-                                              Routes.mealHistory,
-                                            ),
+                                            onTap: () =>
+                                                Get.toNamed(Routes.mealHistory),
                                           ),
                                         ],
                                       ],
@@ -1498,7 +1518,10 @@ class _MealCreationSheet extends StatelessWidget {
             badge: 'AI',
             onTap: () {
               Navigator.pop(context);
-              Get.toNamed('${Routes.generateAi}?id=$userId');
+              Get.toNamed(
+                '${Routes.generateAi}?id=$userId',
+                arguments: groupArguments,
+              );
             },
           ),
         ],
