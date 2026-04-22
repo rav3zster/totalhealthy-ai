@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -15,6 +16,7 @@ import '../../../widgets/drawer_menu.dart';
 import '../../../data/models/meal_model.dart';
 import '../controllers/client_dashboard_controllers.dart';
 import '../../generate_ai/views/recommendations_widget.dart';
+import 'client_dashboard_web_view.dart';
 
 class ClientDashboardScreen extends StatefulWidget {
   const ClientDashboardScreen({super.key});
@@ -27,12 +29,17 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   @override
   void initState() {
     super.initState();
-    OntapStore.index = 0; // Set to Member/Home tab
+    OntapStore.index = 0;
   }
 
   @override
   Widget build(BuildContext context) {
-    String id = Get.parameters["id"] ?? "";
+    // Use web layout on wide screens or web platform
+    final isWide = MediaQuery.of(context).size.width >= 900;
+    if (kIsWeb || isWide) {
+      return const ClientDashboardWebView();
+    }
+    final String id = Get.parameters["id"] ?? "";
     final controller = Get.find<ClientDashboardControllers>();
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 

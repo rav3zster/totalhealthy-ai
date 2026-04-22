@@ -1,12 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/theme_helper.dart';
 import '../controllers/setting_controller.dart';
+import 'setting_web_view.dart';
 
 class SettingView extends GetView<SettingController> {
   const SettingView({super.key});
   @override
   Widget build(BuildContext context) {
+    // Use web layout on wide screens or web platform
+    final isWide = MediaQuery.of(context).size.width >= 900;
+    if (kIsWeb || isWide) {
+      return const SettingWebView();
+    }
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(gradient: context.backgroundGradient),

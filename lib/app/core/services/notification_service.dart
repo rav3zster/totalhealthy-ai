@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -18,6 +19,11 @@ class NotificationService {
 
   /// Initialize notification service
   static Future<void> init() async {
+    // Notifications not supported on web
+    if (kIsWeb) {
+      debugPrint('🌐 Web platform — skipping NotificationService init');
+      return;
+    }
     try {
       debugPrint('📱 Initializing NotificationService...');
 
